@@ -1,0 +1,67 @@
+name: Weekly eProstor WFS sync
+
+on:
+  schedule:
+    - cron: "17 3 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: eprostor-wfs-sync
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install
+        run: python -m pip install '.[dev]'
+
+      - name: Run offline test suites
+        run: >-
+          python -m pytest
+          Agents/AgentTests/wfs-sync/implementers-tests
+          Agents/AgentTests/wfs-sync/main-tests
+          Agents/DevTests/wfs-sync
+
+      - name: Discover live schemas and counts
+        run: python -m wfs_sync discover --report build/wfs-discovery.json
+
+      - name: Full atomic sync
+        run: python -m wfs_sync sync --output build/upravni_akti.gpkg
+
+      - name: Create checksum
+        shell: python
+        run: |
+          import hashlib
+          from pathlib import Path
+
+          source = Path("build/upravni_akti.gpkg")
+          checksum = source.with_suffix(source.suffix + ".sha256")
+          with source.open("rb") as stream:
+              digest = hashlib.file_digest(stream, "sha256").hexdigest()
+          checksum.write_text(
+              f"{digest}  {source.name}\n",
+              encoding="ascii",
+          )
+
+      - name: Upload verified result
+        uses: actions/upload-artifact@v4
+        with:
+          name: upravni-akti-${{ github.run_id }}
+          path: |
+            build/upravni_akti.gpkg
+            build/upravni_akti.gpkg.sha256
+            build/wfs-discovery.json
+          if-no-files-found: error
+          retention-days: 14

@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "eprostor-wfs-sync"
+version = "1.0.0"
+description = "Atomic full synchronization of eProstor administrative-act WFS layers"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "geopandas>=1.0,<2",
+  "pandas>=2.2,<3",
+  "pyogrio>=0.10,<1",
+  "requests>=2.32,<3",
+  "shapely>=2.0,<3",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8,<9"]
+
+[project.scripts]
+wfs-sync = "wfs_sync.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = [
+  "Agents/AgentTests/wfs-sync/implementers-tests",
+  "Agents/AgentTests/wfs-sync/main-tests",
+  "Agents/DevTests/wfs-sync",
+]
