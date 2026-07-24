@@ -2,68 +2,83 @@
 
 ## Main concepts
 
-Weekly, deletion-safe replacement of both administrative-act layers.
+Two complementary paths: resumable full snapshot on disk; small recurring database transfer with complete deletion reconciliation.
 
 ```mermaid
 flowchart LR
-    A["Weekly / manual run"] -->|"1"| B["Full WFS sync"]
-    B -->|"2.a"| C["Points<br/>UPRAVNI_AKTI"]
-    B -->|"2.b"| D["Parcels<br/>UPRAVNI_AKTI_PARCELE"]
-    C -->|"3.a"| E["Keyset pages<br/>ID_UA + CQL_FILTER"]
-    D -->|"3.b"| E
-    E -->|"4"| F["Staged GeoPackage<br/>two layers"]
-    F -->|"5"| G["Schema, ID, geometry,<br/>count, integrity checks"]
-    G -->|"6"| H["Atomic replacement"]
-    H -->|"7"| I["Published<br/>upravni_akti.gpkg"]
+    WFS["eProstor WFS<br/>points + parcels"]
+
+    WFS -->|"1.a full features"| CP["Checkpointed<br/>GeoPackage download"]
+    CP -->|"1.b atomic file replace<br/>+ metadata finalize"| GPKG["Complete snapshot<br/>+ manifest + SHA-256"]
+    GPKG -->|"1.c initial seed / recovery"| PG["PostGIS<br/>schema eprostor"]
+
+    WFS -->|"2.a complete light inventory<br/>wfs_id + ID_UA + ZAD_SPR"| DELTA["Inventory-reconciled<br/>delta"]
+    DELTA -->|"2.b resourceId<br/>new + changed"| PG
+    DELTA -->|"2.c missing IDs"| DELETE["Delete stale rows"]
+    DELETE -->|"2.d same transaction"| PG
+
+    CRON["On-prem cron"] -->|"3 weekly"| DELTA
 ```
 
-- `1`
-  - scheduled or manual full run
-- `2.a–2.b`
-  - both source feature types
-- `3.a–3.b`
-  - independent keyset transfer per layer
-- `4–5`
-  - one staged file; validate before exposure
-- `6–7`
-  - atomic promotion to published result
+- `1.a`
+  - both layers
+  - keyset paging by `ID_UA`
+  - persistent partial file + JSON checkpoint
+- `1.b`
+  - exact counts and layers
+  - SQLite integrity check
+  - atomic GeoPackage replacement
+  - recoverable manifest / checksum finalization
+- `1.c`
+  - optional first database load
+  - bounded-memory GeoPackage chunks
+- `2.a`
+  - no geometry
+  - complete current WFS-ID set
+- `2.b`
+  - only absent or changed IDs
+  - `ZAD_SPR IS NULL`: refreshed every run
+- `2.c–2.d`
+  - target IDs absent from inventory
+  - upserts, deletes, and sync state committed together
+- `3`
+  - Python CLI on own server
+  - PostgreSQL advisory lock against overlap
 
-- Source
-  - eProstor public WFS
-  - WFS 2.0 data transfer
-  - `EPSG:3794`
-- Destination
-  - `upravni_akti_tocke`
-  - `upravni_akti_parcele`
-  - one GeoPackage
-- Sync mode
-  - full replacement
-  - weekly default
-  - no deletion/tombstone feed
-  - `ZAD_SPR` insufficient for deleted records
-- Paging
-  - keyset cursor: `ID_UA`
-  - `CQL_FILTER`
-  - complete `ID_UA IS NULL` group first
-  - complete boundary-group refetch
-  - safe with repeated `ID_UA`
-- Publication
-  - both layers staged together
-  - previous result retained on failure
-  - `os.replace` only after validation
+## Data identity
+
+- Layers
+  - `SI.MOP.GRAD:UPRAVNI_AKTI` → `eprostor.upravni_akti_tocke`
+  - `SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE` → `eprostor.upravni_akti_parcele`
+- Primary mirror key
+  - WFS feature ID → `wfs_id`
+  - required for both layers
+  - parcel `ID_UA`: not unique
+  - disk: every raw source row preserved
+  - PostGIS: identical duplicate IDs → one row
+  - PostGIS: conflicting duplicate IDs → rejected
+- Date typing
+  - valid XSD years outside pandas nanosecond range preserved
+  - example source edge: year `0002`
 - Geometry
-  - points when present: `Point`
-  - parcels when present: `Polygon` / `MultiPolygon`
-  - source parcel rows with `NULL` geometry preserved
+  - CRS: `EPSG:3794`
+  - points: `Point`
+  - parcels: `MultiPolygon`
+  - source `NULL` geometry preserved
 
 ## Correctness boundary
 
-- Detects
-  - count drift
-  - duplicate / missing WFS IDs
-  - stalled keyset cursor
-  - schema / CRS / geometry mismatch
-  - invalid staged GeoPackage
+- Protected
+  - interruption: resume from last durable key boundary
+  - failure before file replacement: old snapshot retained
+  - failure during metadata finalization: completed checkpoint recovery
+  - deletion: complete inventory reconciliation
+  - failed database reconciliation: both layers rolled back
+  - overlapping local / database runs: locks
+  - unexpected empty source over existing mirror: deletion refused
+  - bootstrap: publication manifest + SHA-256 required
+  - live WFS schema drift: database sync refused
 - WFS limitation
-  - no transactional snapshot
-  - equal-count concurrent source changes may remain undetected
+  - no transactional source snapshot
+  - counts checked before and after transfer
+  - rare equal-count concurrent replacement may converge next run

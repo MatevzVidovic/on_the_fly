@@ -45,7 +45,7 @@ def test_bad_config_has_concise_nonzero_cli_result(tmp_path: Path) -> None:
 
 def test_lock_is_advisory_and_released_after_owner_failure(tmp_path: Path) -> None:
     # The lock does not lock the GeoPackage itself, but it rejects a cooperating
-    # second sync and is always cleaned when its owner exits.
+    # second sync. Closing the descriptor releases it after owner failure.
     destination = tmp_path / "acts.gpkg"
     lock_path = destination.with_suffix(".gpkg.lock")
     with pytest.raises(RuntimeError, match="owner failed"):
@@ -56,27 +56,25 @@ def test_lock_is_advisory_and_released_after_owner_failure(tmp_path: Path) -> No
                 with output_lock(destination):
                     pass
             raise RuntimeError("owner failed")
-    assert not lock_path.exists()
+    assert lock_path.exists()
+    with output_lock(destination):
+        assert f"pid={os.getpid()}" in lock_path.read_text(encoding="utf-8")
 
 
-def test_stale_lock_is_not_silently_stolen_or_deleted(tmp_path: Path) -> None:
-    # A stale-looking PID is ambiguous across hosts/containers. The safe current
-    # contract is to fail and leave it for an operator to inspect and remove.
+def test_stale_unlocked_lock_file_is_reused(tmp_path: Path) -> None:
+    # File contents are informational only; ownership is the kernel flock held
+    # by an open descriptor, so hard-killed processes cannot block later runs.
     destination = tmp_path / "acts.gpkg"
     lock_path = destination.with_suffix(".gpkg.lock")
     lock_path.write_text("pid=999999999\n", encoding="utf-8")
 
-    with pytest.raises(StorageError, match="another sync owns lock"):
-        with output_lock(destination):
-            pass
+    with output_lock(destination):
+        assert f"pid={os.getpid()}" in lock_path.read_text(encoding="utf-8")
 
-    assert lock_path.read_text(encoding="utf-8") == "pid=999999999\n"
+    assert lock_path.exists()
 
 
-def test_workflow_checksum_creation_is_cross_platform_python() -> None:
-    # Keep checksum generation usable on Linux, macOS, and an on-prem Python runner.
-    workflow = (ROOT / ".github/workflows/wfs-sync.yml").read_text(encoding="utf-8")
-
-    assert "sha256sum " not in workflow
-    assert "hashlib" in workflow
-    assert "upravni_akti.gpkg.sha256" in workflow
+def test_inactive_github_workflow_is_not_shipped() -> None:
+    # Production scheduling belongs to persistent on-prem cron, not an unpushed
+    # GitHub-hosted workflow whose partial disk cannot survive between runs.
+    assert not (ROOT / ".github/workflows/wfs-sync.yml").exists()

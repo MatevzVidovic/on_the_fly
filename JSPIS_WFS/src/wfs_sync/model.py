@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Literal
 
 
@@ -45,6 +46,16 @@ class LayerResult:
     bounds: tuple[float, float, float, float] | None
 
 
+@dataclass(frozen=True)
+class CheckpointStatus:
+    destination: Path
+    partial: Path
+    checkpoint: Path
+    exists: bool
+    complete: bool
+    layers: dict[str, dict[str, object]]
+
+
 LAYERS: tuple[LayerSpec, ...] = (
     LayerSpec(
         type_name="SI.MOP.GRAD:UPRAVNI_AKTI",
@@ -79,4 +90,3 @@ LAYERS: tuple[LayerSpec, ...] = (
         text_fields=("PARCELA", "BARVA_POLIGONA"),
     ),
 )
-

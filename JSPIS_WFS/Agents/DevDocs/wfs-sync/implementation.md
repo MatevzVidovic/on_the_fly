@@ -1,117 +1,161 @@
 # WFS sync — implementation
 
-## Commands
+## Install
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install .
-
-python -m wfs_sync discover --report build/wfs-discovery.json
-python -m wfs_sync sync --output data/upravni_akti.gpkg
 ```
 
 - Python: `3.12+`
-- Native dependency: GDAL stack used by GeoPandas / pyogrio
-- CLI alias after install: `wfs-sync`
+- GeoPackage: GeoPandas + pyogrio / GDAL
+- Database: PostgreSQL `14+`, PostGIS `3+`, psycopg `3`
+
+## Commands
+
+```bash
+# Inspect source contract
+python -m wfs_sync discover --report build/wfs-discovery.json
+
+# Full file download: start or automatic resume
+python -m wfs_sync sync --output data/upravni_akti.gpkg
+python -m wfs_sync status --output data/upravni_akti.gpkg
+python -m wfs_sync sync --output data/upravni_akti.gpkg --restart
+
+# Dedicated PostGIS schema
+export DATABASE_URL='postgresql://user:password@host/database'
+python -m wfs_sync db-init
+python -m wfs_sync db-bootstrap --input data/upravni_akti.gpkg
+python -m wfs_sync db-sync
+python -m wfs_sync db-sync --full-refresh
+```
+
 - Global options before subcommand
   - `--endpoint`
   - `--page-size`
   - `--timeout`
   - `--retries`
   - `--log-level`
+- Database fetch sizing
+  - `db-sync --fetch-batch-size N`
+  - default: `100`
 
 ## Configuration
 
-| Setting | Environment | Default |
-|---|---|---|
-| Endpoint | `WFS_ENDPOINT` | eProstor public WFS |
-| Page size | `WFS_PAGE_SIZE` | `5000` |
-| Timeout | `WFS_TIMEOUT` | `120` seconds |
-| Retries | `WFS_RETRIES` | `4` |
-| Log level | `WFS_LOG_LEVEL` | `INFO` |
-| Output | `WFS_OUTPUT` | `data/upravni_akti.gpkg` |
-| Report | `WFS_REPORT` | `build/wfs-discovery.json` |
+| Environment | Default / purpose |
+|---|---|
+| `DATABASE_URL` | required for `db-*`; never logged |
+| `WFS_ENDPOINT` | public eProstor WFS |
+| `WFS_PAGE_SIZE` | `5000` |
+| `WFS_RESOURCE_BATCH_SIZE` | `100` |
+| `WFS_TIMEOUT` | `120` seconds |
+| `WFS_RETRIES` | `4` |
+| `WFS_LOG_LEVEL` | `INFO` |
+| `WFS_OUTPUT` | `data/upravni_akti.gpkg` |
+| `WFS_REPORT` | `build/wfs-discovery.json` |
 
-- CLI values override environment values
-- CRS fixed: `EPSG:3794`
-- Retry statuses
+- Retry status
   - `429`
   - `500`, `502`, `503`, `504`
+- CRS
+  - `EPSG:3794`
 
-## Data contract
+## Disk state and recovery
 
-- Source → output
-  - `SI.MOP.GRAD:UPRAVNI_AKTI` → `upravni_akti_tocke`
-  - `SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE` → `upravni_akti_parcele`
-- Required
-  - exact attributes and source types
-  - `_wfs_id`: non-empty, globally unique per layer
-  - stable total `numberMatched`
-- Geometry
-  - point layer when present: `Point`
-  - parcel layer when present: promoted to `MultiPolygon`
-  - parcel `NULL`: valid
-  - empty / non-finite / wrong family: invalid
-
-## Storage and failure behavior
-
-- Staging
-  - hidden UUID file beside destination
-  - same filesystem as destination
-  - page-wise append
-- Pre-publication checks
-  - both expected layer names only
-  - stored counts equal downloaded counts
-  - final source recounts
-  - `PRAGMA integrity_check = ok`
+- In-progress
+  - `.upravni_akti.partial.gpkg`
+  - `.upravni_akti.gpkg.checkpoint.json`
+  - `<output>.lock`: advisory `flock`; harmless file retained
+- Checkpoint
+  - atomic JSON write + file and directory `fsync`
+  - source endpoint, CRS, layer definitions, schema fingerprints
+  - expected and written counts
+  - null-key completion and last completed `ID_UA`
+- Resume
+  - partial GeoPackage inspected as source of truth
+  - raw source duplicates preserved
+  - complete layers skipped
+  - count / contract drift → `--restart`
 - Publication
-  - atomic `os.replace`
-  - old output preserved until success
-- Failure
-  - exit code `1`
-  - known staging file removed
-  - old output unchanged
-- Concurrency
-  - adjacent `.lock` file
-  - overlapping run rejected
-  - stale lock requires operator review/removal
+  - exact two-layer set and counts
+  - `PRAGMA integrity_check = ok`
+  - GeoPackage: atomic `os.replace`
+  - metadata: `<output>.manifest.json`, `<output>.sha256`
+  - metadata interruption: completed checkpoint recovery
+  - previous complete output preserved until replace
+
+## PostGIS contract
+
+- Schema: `eprostor`
+- Tables
+  - `upravni_akti_tocke`
+  - `upravni_akti_parcele`
+  - `sync_state`
+- Per-layer row
+  - `wfs_id`: primary key
+  - source attributes
+  - `source_updated_at`
+  - `geom`
+  - `synced_at`
+- Initialization
+  - PostGIS extension
+  - idempotent schema, table, and index creation
+  - existing columns and geometry type / SRID validation
+- Delta staging
+  - session temporary inventory, wanted-ID, and feature tables
+  - inventory transport: geometry-free CSV
+  - naive CSV timestamps: `Europe/Ljubljana` → UTC
+  - streamed `COPY`
+  - bounded feature batches
+  - identical WFS-ID duplicates canonicalized
+  - conflicting WFS-ID duplicates rejected
+- Final transaction
+  - upsert staged features
+  - delete target IDs absent from complete inventory
+  - verify stored count equals unique inventory count
+  - raw WFS count may include identical duplicate IDs
+  - update `sync_state`
+  - both layers commit or roll back together
+- Safety
+  - PostgreSQL advisory lock
+  - initial / final WFS counts
+  - non-empty target protected from unexpected zero source
+  - exact `resourceId` response validation
+  - omitted batch member: one individual retry
+  - live source schema fingerprint validation
+  - bootstrap manifest, counts, and SHA-256 validation
+
+## On-prem schedule
+
+```cron
+17 4 * * 1 cd /opt/jspis-wfs && . /etc/jspis-wfs.env && /opt/jspis-wfs/.venv/bin/python -m wfs_sync db-sync >> /var/log/jspis-wfs-sync.log 2>&1
+```
+
+- Secret handling
+  - `/etc/jspis-wfs.env`: `export DATABASE_URL='postgresql://...'`
+  - owner-only permissions
+  - alternative: protected wrapper or systemd `EnvironmentFile`
+  - not directly in crontab
+- Scheduler
+  - own cron / systemd
+  - GitHub Actions workflow removed
 
 ## Tests
 
 ```bash
 python -m pip install -e '.[dev]'
 pytest
+
+WFS_SYNC_TEST_DATABASE_URL='postgresql://...' pytest \
+  Agents/AgentTests/wfs-sync/implementers-tests/test_postgis.py
 ```
 
-- Offline suites
-  - `Agents/DevTests/wfs-sync`
-  - `Agents/AgentTests/wfs-sync/implementers-tests`
-  - `Agents/AgentTests/wfs-sync/main-tests`
-- Coverage focus
-  - protocol / schema parsing
-  - tied-key keyset paging
-  - nullable geometry
-  - atomic publication / cleanup
-  - final recount
-  - CLI / lock / workflow
-
-## Operations
-
-- GitHub Actions
-  - Monday `03:17 UTC`
-  - manual dispatch
-  - single concurrency group
-  - `180` minute job timeout
-  - offline tests → discovery → full sync → SHA-256
-  - artifact retention: `14` days
-- Produced artifact
-  - `upravni_akti.gpkg`
-  - `upravni_akti.gpkg.sha256`
-  - `wfs-discovery.json`
-- Capacity
-  - room for old and staged GeoPackages simultaneously
-  - WFS ID set grows with feature count
-- Delivery
-  - workflow artifact: temporary distribution
-  - durable object storage / database: downstream extension
+- Offline
+  - WFS parsing, inventory paging, `resourceId`
+  - checkpoint interruption, resume, restart, atomic publication
+  - database SQL and failure behavior
+- Optional real PostGIS
+  - initialize and bootstrap
+  - insert, update, null-timestamp refresh, deletion
+  - two-run convergence

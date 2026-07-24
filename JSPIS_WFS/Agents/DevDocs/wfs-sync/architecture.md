@@ -2,50 +2,58 @@
 
 ## Layered DAG
 
-Arrows mean module dependency or entrypoint invocation. Subgraph borders separate architectural layers; no dependency violates the downward DAG.
+Arrows mean invocation or import dependency. No dependency points to a higher layer, so there are no red DAG violations.
 
 ```mermaid
 flowchart TB
-    subgraph L4["Layer 4 — automation / entry"]
+    subgraph L4["Layer 4 — on-prem automation"]
         direction LR
-        WF["GitHub workflow<br/>.github/workflows/wfs-sync.yml"]
-        MAIN["__main__.py"]
+        CRON["cron / systemd"]
+        OP["operator"]
     end
 
-    subgraph L3["Layer 3 — interface"]
+    subgraph L3["Layer 3 — entry"]
         direction LR
-        CLI["cli.py<br/>arguments, env, exit codes"]
+        MAIN["__main__.py"]
+        CLI["cli.py<br/>commands, env, exit codes"]
     end
 
     subgraph L2["Layer 2 — application"]
         direction LR
-        DISC["discovery.py<br/>schema and count report"]
-        SYNC["sync.py<br/>two-layer orchestration"]
+        DISC["discovery.py<br/>source inspection"]
+        SNAP["sync.py<br/>checkpointed snapshot"]
+        DB["postgis.py<br/>inventory reconciliation"]
     end
 
     subgraph L1["Layer 1 — infrastructure"]
         direction LR
-        WFS["wfs.py<br/>HTTP, XML, GeoJSON, keyset"]
-        STORE["storage.py<br/>validation, staging, lock, publish"]
+        WFS["wfs.py<br/>HTTP, paging, resourceId"]
+        STORE["storage.py<br/>GeoPackage, checkpoint, lock"]
+        PG["psycopg / PostGIS"]
     end
 
     subgraph L0["Layer 0 — domain"]
         direction LR
-        MODEL["model.py<br/>configuration, layer specs, results"]
+        MODEL["model.py<br/>layer contract, results"]
     end
 
-    WF --> CLI
+    CRON --> MAIN
+    OP --> MAIN
     MAIN --> CLI
     CLI --> DISC
-    CLI --> SYNC
+    CLI --> SNAP
+    CLI --> DB
     CLI --> WFS
     CLI --> STORE
     CLI --> MODEL
     DISC --> WFS
     DISC --> MODEL
-    SYNC --> WFS
-    SYNC --> STORE
-    SYNC --> MODEL
+    SNAP --> WFS
+    SNAP --> STORE
+    SNAP --> MODEL
+    DB --> WFS
+    DB --> PG
+    DB --> MODEL
     WFS --> MODEL
     STORE --> MODEL
 
@@ -56,95 +64,95 @@ flowchart TB
     style L0 fill:#f8f9fa,stroke:#6c757d,stroke-width:2px
 ```
 
-- `model.py`
-  - fixed source/output mappings
-  - field types
-  - sort expressions
-- `wfs.py`
-  - bounded retries / timeout
-  - WFS exceptions
-  - WFS 2.0 hits and features
-  - WFS 1.1 schema fallback for server defect
-  - typed GeoDataFrames
-- `storage.py`
-  - frame checks
-  - page append
-  - exact layer-set inspection
-  - SQLite integrity check
-  - exclusive output lock
-- `sync.py`
-  - counts and unique IDs
-  - both layers or no publication
-- `discovery.py`
-  - strict schema validation
-  - full-sync rationale
+- Domain
+  - fixed two-layer contract
+  - source/output names, attributes, geometry families
+- Infrastructure
+  - WFS 2.0 transfer; WFS 1.1 schema fallback
+  - bounded retries and timeouts
+  - durable file operations
+- Application
+  - snapshot and database paths independent
+  - shared WFS and layer contract
+- Entry / automation
+  - one CLI
+  - cron or manual invocation
+  - no GitHub Actions scheduler
 
-## Sync sequence
+## Execution sequence
 
-Numbered messages form the synchronization pseudocode. The layer loop covers points, then parcels.
+Numbered messages form the pseudocode. The `alt` branches show the full disk checkpoint path and the recurring PostGIS path.
 
 ```mermaid
 sequenceDiagram
-    actor Run as CLI / workflow
-    participant Sync as sync.py
-    participant WFS as wfs.py
-    participant Store as storage.py
-    participant File as GeoPackage
+    actor Run as cron / operator
+    participant CLI as CLI
+    participant App as sync.py / postgis.py
+    participant WFS as eProstor WFS
+    participant Disk as GeoPackage + checkpoint
+    participant DB as PostGIS eprostor
 
-    Run->>Sync: 1. sync_all()
-    Sync->>Store: 2. acquire output lock
-    Sync->>Store: 3. create sibling staging path
-    loop 4. each layer
-        Sync->>WFS: 4.1 initial numberMatched
-        Sync->>WFS: 4.2 count ID_UA IS NULL
-        opt 4.2.a nullable-key group exists
-            Sync->>WFS: 4.2.a.1 fetch complete nullable-key group
-            WFS-->>Sync: 4.2.a.2 typed nullable-key page
-            Sync->>Sync: 4.2.a.3 reject repeated _wfs_id
-            Sync->>Store: 4.2.a.4 validate and append page
-            Store->>File: 4.2.a.5 write staging layer
+    Run->>CLI: 1. invoke command
+    CLI->>App: 2. construct client and operation
+
+    alt checkpointed full snapshot
+        App->>Disk: 3.a acquire flock; load checkpoint
+        App->>WFS: 3.b validate live contract and counts
+        loop 3.c each layer and key boundary
+            App->>WFS: 3.c.1 fetch complete feature page
+            WFS-->>App: 3.c.2 typed GeoDataFrame
+            App->>Disk: 3.c.3 append partial GeoPackage
+            App->>Disk: 3.c.4 atomically save checkpoint
         end
-        loop 4.3 numeric keyset until expected count emitted
-            Sync->>WFS: 4.3.1 ID_UA keyset CQL page
-            WFS->>WFS: 4.3.2 split safe prefix / boundary ID_UA
-            WFS->>WFS: 4.3.3 refetch complete boundary group
-            WFS-->>Sync: 4.3.4 typed page, nullable geometry allowed
-            Sync->>Sync: 4.3.5 reject repeated _wfs_id
-            Sync->>Store: 4.3.6 validate and append page
-            Store->>File: 4.3.7 write staging layer
+        App->>Disk: 3.d validate layers, counts, integrity
+        App->>Disk: 3.e atomic file replace; finalize manifest + SHA-256
+    else inventory-reconciled database sync
+        App->>DB: 4.a acquire PostgreSQL advisory lock
+        App->>WFS: 4.b read initial counts
+        loop 4.c each layer
+            App->>WFS: 4.c.1 stream geometry-free CSV inventory
+            App->>DB: 4.c.2 COPY inventory into temporary table
+            App->>DB: 4.c.3 derive wanted and missing IDs
+            App->>WFS: 4.c.4 resourceId fetch wanted features
+            App->>DB: 4.c.5 COPY features into temporary table
         end
-        Sync->>WFS: 4.4 final layer numberMatched
+        App->>WFS: 4.d verify final counts
+        App->>DB: 4.e begin one transaction
+        App->>DB: 4.f upsert, delete missing, verify counts
+        App->>DB: 4.g write sync_state; commit both layers
     end
-    Sync->>Store: 5. inspect exact layers, counts, bounds
-    loop 6. each layer
-        Sync->>WFS: 6.1 pre-publication numberMatched
-    end
-    Sync->>Store: 7. publish staging file
-    Store->>File: 7.1 SQLite integrity_check
-    Store->>File: 7.2 atomic os.replace
-    Store-->>Sync: 8. release lock
-    Sync-->>Run: 9. layer results
+
+    App-->>CLI: 5. structured layer results
+    CLI-->>Run: 6. JSON and exit code
 ```
 
-- `1–3`
-  - one run, one lock, one staging file
-- `4.2–4.2.a`
-  - count nullable keys once
-  - fetch one complete `ID_UA IS NULL` group when present
-- `4.3.1`
-  - first numeric page: `ID_UA IS NOT NULL`
-  - later pages: `ID_UA > cursor`
-- `4.3.2–4.3.3`
-  - boundary tie excluded from prefix
-  - equality query retrieves the entire tied group
-- `4.2.a.2`, `4.3.4`
-  - source types normalized
-  - parcel `NULL` geometry retained
-- `4.4`, `6.1`
-  - abort on count drift
-- `7`
-  - only fully verified two-layer file becomes visible
-- failure path
-  - staging removed
-  - destination unchanged
-  - lock released
+- `1–2`
+  - global configuration before subcommand
+- `3.a`
+  - automatic resume
+  - `--restart`: discard only partial state under lock
+- `3.b`
+  - endpoint, CRS, layers, source schema fingerprints
+  - changed count or contract: explicit restart required
+- `3.c.3–3.c.4`
+  - checkpoint after completed page append
+  - completed layer skipped after resume
+- `3.d–3.e`
+  - old published snapshot untouched until validated file replacement
+  - crash after rename recovered from completed checkpoint
+- `4.b–4.d`
+  - inventory and features staged before target mutation
+  - count drift aborts run
+- `4.c.3`
+  - wanted: new, changed timestamp, or null timestamp
+  - missing: target WFS ID absent from inventory
+- `4.c.4`
+  - batched `resourceId`
+  - omitted batch member: individual retry
+- `4.e–4.g`
+  - two target tables and `sync_state`
+  - one atomic commit
+- failure
+  - non-zero exit
+  - checkpoint retained for snapshot resume
+  - database target unchanged before final transaction

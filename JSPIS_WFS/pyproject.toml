@@ -5,12 +5,13 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "eprostor-wfs-sync"
 version = "1.0.0"
-description = "Atomic full synchronization of eProstor administrative-act WFS layers"
+description = "Checkpointed eProstor WFS snapshots and PostGIS delta synchronization"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
   "geopandas>=1.0,<2",
   "pandas>=2.2,<3",
+  "psycopg[binary]>=3.2,<4",
   "pyogrio>=0.10,<1",
   "requests>=2.32,<3",
   "shapely>=2.0,<3",

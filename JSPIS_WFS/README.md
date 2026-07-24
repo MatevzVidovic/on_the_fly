@@ -1,90 +1,156 @@
 # eProstor WFS – upravni akti
 
-Tedenska popolna sinhronizacija dveh javnih slojev upravnih aktov v en
-GeoPackage:
+Orodje podpira dva načina prenosa javnih podatkov upravnih aktov:
 
-- `SI.MOP.GRAD:UPRAVNI_AKTI` → `upravni_akti_tocke`
-- `SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE` → `upravni_akti_parcele`
+- checkpointiran popoln prenos v GeoPackage za začetni zajem, arhiv ali obnovo;
+- redno delta usklajevanje v PostgreSQL/PostGIS.
 
-Izhodni CRS je `EPSG:3794`. Sinhronizacija je namenoma popolna. Atribut
-`ZAD_SPR` sicer opisuje spremembo zapisa, vendar WFS ne ponuja izbrisanih
-zapisov oziroma tombstonov. Delta zato ne more pravilno zaznati brisanj.
+Vir vsebuje:
 
-## Lokalni zagon
+- `SI.MOP.GRAD:UPRAVNI_AKTI` → `upravni_akti_tocke`;
+- `SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE` → `upravni_akti_parcele`.
 
-Potreben je Python 3.12 ali novejši in sistemske knjižnice GDAL, ki jih
-uporabljata GeoPandas in pyogrio.
+Izhodni koordinatni sistem je `EPSG:3794`.
+
+## Namestitev
+
+Potreben je Python 3.12 ali novejši. GeoPackage uporablja GDAL prek
+GeoPandas/pyogrio; podatkovna baza potrebuje PostgreSQL 14+ in PostGIS 3+.
 
 ```bash
 python -m venv .venv
 . .venv/bin/activate
 python -m pip install .
-
-# Hiter pregled shem in števila zapisov, brez prenosa geometrij
-python -m wfs_sync discover --report build/wfs-discovery.json
-
-# Celoten prenos (trenutno približno 864.000 geometrij)
-python -m wfs_sync sync --output data/upravni_akti.gpkg
 ```
 
-Globalne možnosti morajo biti pred ukazom:
+## Checkpointiran prenos na disk
+
+```bash
+# Preverjanje shem in trenutnih števil zapisov
+python -m wfs_sync discover --report build/wfs-discovery.json
+
+# Nov prenos ali samodejno nadaljevanje obstoječega checkpointa
+python -m wfs_sync sync --output data/upravni_akti.gpkg
+
+# Lokalno stanje brez klica WFS
+python -m wfs_sync status --output data/upravni_akti.gpkg
+
+# Zavrnitev starega checkpointa in nov začetek
+python -m wfs_sync sync --output data/upravni_akti.gpkg --restart
+```
+
+Med prenosom ostaneta na disku:
+
+- `.upravni_akti.partial.gpkg`;
+- `.upravni_akti.gpkg.checkpoint.json`.
+
+Checkpoint se posodobi po vsaki zaključeni keyset meji `ID_UA`. Ob prekinitvi
+se isti ukaz nadaljuje za zadnjim zaključenim ID-jem. Sprememba endpointa,
+CRS-a, pogodbe slojev ali izvornega števila zapisov zahteva `--restart`.
+
+Po uspehu nastanejo:
+
+- `upravni_akti.gpkg`;
+- `upravni_akti.gpkg.manifest.json`;
+- `upravni_akti.gpkg.sha256`.
+
+Prejšnji dokončan GeoPackage ostane nespremenjen do atomske objave novega.
+
+## PostGIS
+
+Povezava se podaja samo prek okoljske spremenljivke:
+
+```bash
+export DATABASE_URL='postgresql://user:password@db.example/jspis'
+```
+
+Orodje upravlja namensko shemo `eprostor`:
+
+```bash
+# Idempotentna izdelava sheme, tabel in indeksov
+python -m wfs_sync db-init
+
+# Začetno polnjenje iz že prenesenega GeoPackage
+python -m wfs_sync db-bootstrap --input data/upravni_akti.gpkg
+
+# Redna delta sinhronizacija
+python -m wfs_sync db-sync
+
+# Ročni popoln pregled vseh geometrij
+python -m wfs_sync db-sync --full-refresh
+```
+
+`db-bootstrap` sprejme samo dokončano objavo skupaj z datotekama
+`.manifest.json` in `.sha256`; pred zamenjavo preveri kontrolno vsoto, sloje,
+števila zapisov, shemo, CRS in geometrije.
+
+### Delta postopek
+
+Za vsak sloj skripta:
+
+1. prenese celoten lahek CSV inventar `FID + ID_UA + ZAD_SPR` brez geometrije;
+2. primerja inventar s PostGIS zrcalom;
+3. prek WFS `resourceId` prenese samo nove ali spremenjene zapise;
+4. zapise z `ZAD_SPR IS NULL` osveži ob vsakem zagonu;
+5. vstavi oziroma posodobi spremembe;
+6. izbriše lokalne WFS ID-je, ki jih ni več v izvornem inventarju;
+7. stanje obeh slojev in `sync_state` potrdi v eni transakciji.
+
+To odpravi problem brisanj, ki ga sam časovni filter ne more rešiti. Za točke
+in parcele je ključ `wfs_id`; `ID_UA` pri parcelah ni unikaten. Če vir spremeni
+WFS ID, se nov zapis vstavi, stari pa v istem ciklu izbriše.
+
+Javni točkovni sloj trenutno vsebuje tudi identične podvojene vrstice z istim
+`wfs_id`. Surovi GeoPackage jih ohrani, PostGIS pa identične dvojnike
+kanonizira v eno vrstico; konfliktne dvojnike zavrne. Vsak DB cikel preveri
+tudi živi fingerprint WFS sheme in se ob nenapovedani spremembi varno ustavi.
+
+Inventar uporablja boundary-safe keyset paging po `ID_UA`. Pred transakcijo se
+število obeh izvornih slojev ponovno preveri. WFS ne ponuja transakcijskega
+snapshot-a, zato se redka sočasna sprememba z nespremenjenim skupnim številom
+lahko dokončno uskladi šele pri naslednjem zagonu.
+
+CSV čas brez odmika se interpretira v `Europe/Ljubljana` in shrani v UTC, kar
+ustreza GeoJSON zapisu istega vira. Če GeoServer izpusti posamezen ID iz
+večvrednostnega `resourceId` odgovora, ga skripta še enkrat zahteva samostojno
+in nato še vedno zahteva natančno ujemanje vseh zahtevanih ID-jev.
+
+## Cron na lastnem strežniku
+
+GitHub Actions ni produkcijski scheduler. Prejšnja lokalna YAML datoteka ni
+bila potisnjena ali aktivirana in je iz rešitve odstranjena.
+
+Primer tedenskega crona:
+
+```cron
+17 4 * * 1 cd /opt/jspis-wfs && . /etc/jspis-wfs.env && /opt/jspis-wfs/.venv/bin/python -m wfs_sync db-sync >> /var/log/jspis-wfs-sync.log 2>&1
+```
+
+Datoteka `/etc/jspis-wfs.env` naj bo dostopna samo izvajalnemu uporabniku in
+naj vsebuje `export DATABASE_URL='postgresql://...'`. Alternativi sta zaščiten
+cron wrapper ali systemd `EnvironmentFile`; skrivnosti ne vpisujte neposredno
+v crontab. Postgres advisory lock zavrne prekrivajoča se zagona.
+
+## Nastavitve
+
+Globalne CLI možnosti morajo biti pred podukazom:
 
 ```bash
 python -m wfs_sync --page-size 2000 --timeout 180 sync \
   --output data/upravni_akti.gpkg
 ```
 
-Enake nastavitve so na voljo prek `WFS_ENDPOINT`, `WFS_PAGE_SIZE`,
-`WFS_TIMEOUT`, `WFS_RETRIES`, `WFS_LOG_LEVEL`, `WFS_OUTPUT` in `WFS_REPORT`.
+Podprte okoljske spremenljivke:
 
-## Varnost sinhronizacije
-
-- WFS 2.0 keyset strani po `ID_UA` in `CQL_FILTER`; zadnja skupina z enakim
-  `ID_UA` se vedno ponovno prenese v celoti, zato neunikatna meja strani ne
-  more izpustiti zapisa
-- preverjanje vsake strani: schema, tipi, CRS, geometrije in WFS ID-ji
-- v pomnilniku je samo trenutna stran in množica vseh že videnih WFS ID-jev;
-  poraba za ID-je zato raste s številom zapisov, ne pa z velikostjo geometrij
-- ponovna primerjava `numberMatched` po prenosu
-- oba sloja se najprej zapišeta v začasni GeoPackage
-- star rezultat se zamenja z `os.replace` šele po vseh preverjanjih
-- lock datoteka prepreči dva sočasna zagona
-
-Če prenos pade, ostane prejšnji GeoPackage nespremenjen. Začasna datoteka se
-odstrani. Parcelni vir vsebuje tudi zapise brez geometrije; ti se ohranijo z
-`NULL` geometrijo, ker so njihovi atributi še vedno veljavni.
-
-WFS strani niso transakcijski posnetek. Keyset pomikanje brez offsetov,
-unikatni WFS ID-ji in primerjava števila vseh slojev tik pred objavo so
-najboljša praktična zaščita, vendar ne morejo zaznati vsake sočasne spremembe,
-če skupno število ostane enako.
-
-`DescribeFeatureType` se najprej pošlje kot en WFS 2.0 klic s
-singularnim parametrom `typeName`. Ker je storitev 23. julija 2026 za ta klic
-občasno vračala `ArrayIndexOutOfBoundsException`, klient v tem konkretnem
-primeru ponovi shemi posamično prek WFS 1.1. Prenos podatkov ostane WFS 2.0.
-
-## Avtomatizacija
-
-Workflow [`.github/workflows/wfs-sync.yml`](.github/workflows/wfs-sync.yml)
-teče vsak ponedeljek ob 03:17 UTC in tudi ročno. Objavi:
-
-- `upravni_akti.gpkg`
-- poročilo odkrivanja
-- SHA-256 kontrolne vsote
-
-GitHub artifact je začetna dostava z omejeno hrambo, ne trajna podatkovna
-shramba. Če ima uporabnik trajni objektni prostor ali podatkovno bazo, naj se
-po uspešnem ukazu `sync` doda korak za objavo z začasnimi poverilnicami.
-
-Primer za strežnik s cron:
-
-```cron
-17 4 * * 1 cd /opt/jspis-wfs && .venv/bin/python -m wfs_sync sync --output /srv/data/upravni_akti.gpkg >> /var/log/wfs-sync.log 2>&1
-```
-
-Čas cron je lokalni čas strežnika. Najprej preverite prostor na disku:
-za atomsko zamenjavo morata med prenosom obstajati stara in nova datoteka.
+- `DATABASE_URL`;
+- `WFS_ENDPOINT`;
+- `WFS_PAGE_SIZE` (privzeto `5000`);
+- `WFS_RESOURCE_BATCH_SIZE` (privzeto `100`);
+- `WFS_TIMEOUT` (privzeto `120`);
+- `WFS_RETRIES` (privzeto `4`);
+- `WFS_LOG_LEVEL`;
+- `WFS_OUTPUT`;
+- `WFS_REPORT`.
 
 ## Testi
 
@@ -93,5 +159,10 @@ python -m pip install -e '.[dev]'
 pytest
 ```
 
-Avtomatski testi ne kličejo žive storitve. Za ročni omejeni pregled uporabite
-`discover`; popolna sinhronizacija prenese približno 1 GB in ni smoke test.
+Offline testi ne kličejo javne storitve. Test z resničnim začasnim PostGIS se
+vključi z:
+
+```bash
+WFS_SYNC_TEST_DATABASE_URL='postgresql://...' pytest \
+  Agents/AgentTests/wfs-sync/implementers-tests/test_postgis.py
+```

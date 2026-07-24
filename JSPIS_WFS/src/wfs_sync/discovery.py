@@ -58,10 +58,12 @@ def discover(client: WfsClient, layers: tuple[LayerSpec, ...] = LAYERS) -> dict:
         "checked_at": datetime.now(timezone.utc).isoformat(),
         "endpoint": client.config.base_url,
         "crs": client.config.crs,
-        "sync_mode": "full",
+        "disk_sync_mode": "checkpointed_full_snapshot",
+        "database_sync_mode": "inventory_reconciled_delta",
         "sync_reason": (
-            "The service has no deletion/tombstone feed. A ZAD_SPR timestamp cannot "
-            "detect source deletions, so a weekly full replacement is required."
+            "PostGIS compares a complete geometry-free WFS ID/ZAD_SPR inventory "
+            "with its mirror, upserts new or changed features, refreshes null "
+            "timestamps, and deletes IDs absent from the source."
         ),
         "layers": discovered_layers,
     }

@@ -121,7 +121,9 @@ def test_keyset_pages_nulls_and_refetches_complete_tied_boundaries() -> None:
         "ID_UA > 2",
         "ID_UA = 3",
     ]
-    assert [call["count"] for call in feature_calls] == [2, 3, 3, 3, 1]
+    # Boundary probes request page_size + 1. A full-size probe would fall back
+    # to an exact hits count; these small groups are proven complete directly.
+    assert [call["count"] for call in feature_calls] == [2, 3, 4, 3, 4]
     assert all(call["sortBy"] == LAYERS[0].sort_by for call in feature_calls)
 
 
