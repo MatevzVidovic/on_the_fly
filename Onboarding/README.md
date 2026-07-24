@@ -4,7 +4,7 @@
 
 
 
-General napotek:
+Imejmo script-e spoznavnih nalog:
 
 Dodaj specifičen script, kaj naj nekdo na onboardingu izvede.
 Od kje naj vzame csv, kot kaj naj ga vnese kot atributno tabelo, kako naj spremeni polja, kako naj naredi karto in skupine slojev in sloje in uporabnike...
@@ -18,7 +18,18 @@ Tematike:
 
 LIFT:
 
+Klikanje na karti:
+- prižiganje slojev
+- informacija na karti
+- tabela rezultatov
+- filtri na tabeli rezultatov, group by
+- geometrijska poizvedba
+- info sidepanel
+- urejanje v sidepanelu
+- povezovanje sej, premik in odcepitev tabele rezultatov
+
 Administracija kot osnova (pokrito na Tilnovih posnetkih. Predlagam ogled od štarta do konca):
+
 =====================
 
 Filozofija okolij
