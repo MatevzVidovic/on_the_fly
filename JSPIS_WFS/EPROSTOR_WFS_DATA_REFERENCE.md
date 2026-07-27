@@ -7,6 +7,20 @@ rules used by the synchronization implementation.
 
 Operational commands and deployment instructions remain in [README.md](README.md).
 
+## Implementation decisions
+
+| Concern | Decision |
+|---|---|
+| Orchestration | Python Temporal workflow and Activities |
+| Parcel target | `MOP - Upravni akti (parcele)` / `si_mop_ua_parc` |
+| Point target | `MOP - Upravni akti (točke)` / `si_mop_ua_tock` |
+| Upsert identity | Current WFS FID numeric suffix → Lift `ogc_fid` |
+| Change selection | `ZAD_SPR > MAX(target.zad_spr)` |
+| Watermarks | Derived from each target table; no separate state |
+| Deletions | None |
+| Bootstrap | Verified GeoPackage or complete paged WFS read |
+| Null timestamps | Loaded by bootstrap; not selected by recurring delta |
+
 ## Source
 
 ### Catalogue record
@@ -46,13 +60,72 @@ https://storitve.eprostor.gov.si/ows-pub-wfs/wfs?service=WFS&version=2.0.0&reque
 
 Get a geometry-free delta inventory:
 
-```text
-https://storitve.eprostor.gov.si/ows-pub-wfs/wfs?service=WFS&version=2.0.0&request=GetFeature&typeNames=SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE&outputFormat=csv&propertyName=ID_UA,ZAD_SPR&sortBy=ID_UA
+```bash
+curl -G 'https://storitve.eprostor.gov.si/ows-pub-wfs/wfs' \
+  --data 'service=WFS' \
+  --data 'version=2.0.0' \
+  --data 'request=GetFeature' \
+  --data 'typeNames=SI.MOP.GRAD:UPRAVNI_AKTI_PARCELE' \
+  --data 'outputFormat=csv' \
+  --data 'propertyName=ID_UA,ZAD_SPR' \
+  --data 'count=5000' \
+  --data-urlencode 'sortBy=ID_UA A'
 ```
 
-GeoServer includes `FID` and several mandatory display attributes in the CSV
-even when `propertyName` requests only `ID_UA,ZAD_SPR`. The synchronization
-client reads only `FID`, `ID_UA`, and `ZAD_SPR`.
+The parcel response contains no geometry:
+
+```csv
+FID,ID_UA,ZAD_SPR
+UPRAVNI_AKTI_PARCELE.737,3,2020-12-22T00:00:00
+UPRAVNI_AKTI_PARCELE.352528,4,2020-12-22T00:00:00
+```
+
+For points, GeoServer also returns three mandatory display attributes, but
+still no geometry:
+
+```csv
+FID,ID_UA,SIF_VRS_UA_KRA_SIF,VRS_AKT_2,NAZ_UPR_POS,ZAD_SPR
+```
+
+The full source must still be paged, but an inventory page is much smaller
+than full GeoJSON. The planned filter-only Lift integration does not require
+this inventory; it remains useful for diagnostics and any future deletion
+reconciliation.
+
+Fetch full features changed after a time:
+
+```bash
+curl -G 'https://storitve.eprostor.gov.si/ows-pub-wfs/wfs' \
+  --data 'service=WFS' \
+  --data 'version=2.0.0' \
+  --data 'request=GetFeature' \
+  --data 'typeNames=SI.MOP.GRAD:UPRAVNI_AKTI' \
+  --data 'outputFormat=application/json' \
+  --data 'srsName=EPSG:3794' \
+  --data-urlencode "CQL_FILTER=ZAD_SPR > '2026-07-01T00:00:00Z'"
+```
+
+The live service accepts all three tested forms:
+
+```text
+ZAD_SPR > '2026-07-01T00:00:00Z'
+ZAD_SPR >= '2026-07-01T00:00:00Z'
+ZAD_SPR AFTER 2026-07-01T00:00:00Z
+```
+
+Live results verified on 2026-07-27:
+
+| Filter | Points | Parcels |
+|---|---:|---:|
+| `ZAD_SPR > '2026-07-01T00:00:00Z'` | 2,478 | 3,406 |
+| `ZAD_SPR IS NULL` | 1 | 14 |
+
+The service supports overlap and null selection, but the selected Lift
+integration deliberately uses the simpler strict maximum filter:
+
+```text
+CQL_FILTER=ZAD_SPR > '<MAX(target.zad_spr)>'
+```
 
 Fetch complete current features by WFS identity:
 
@@ -210,10 +283,10 @@ Example from the older 491,885-row table:
 | `VRS_AKT` | 3 | 3 |
 | Colour | `#cc2a12` | `#cc2a12` |
 
-The business row is the same while its technical identifier changed. A WFS-ID
-change still converges safely in the current reconciliation algorithm: insert
-the new ID and delete the old absent ID. It can, however, cause unnecessary
-row churn.
+The business row is the same while its technical identifier changed. With the
+selected no-delete policy, a WFS-ID change inserts the new Lift row and leaves
+the old one in place. A future full-inventory reconciliation could remove the
+old identity, but it must be a separately approved operation.
 
 ## Change timestamps
 
@@ -238,8 +311,9 @@ OR source.source_updated_at IS NULL
 OR source.source_updated_at IS DISTINCT FROM target.source_updated_at
 ```
 
-Rows with `ZAD_SPR IS NULL` are fetched and upserted on every run because the
-source provides no timestamp with which to prove unchangedness.
+The service allows null-timestamp rows to be selected explicitly. The chosen
+strict-maximum Lift delta does not do this, so those rows enter through the
+initial full bootstrap and are not selected by recurring delta runs.
 
 ### Time zones
 
@@ -269,50 +343,161 @@ null. PostgreSQL `timestamptz` accepts these observed values.
 This issue was observed in date fields such as `DAT_ZAC_GRA`, not in the
 normal recent `ZAD_SPR` inventory used for delta comparison.
 
-## Delta reconciliation
+## Planned Lift integration: filtered upserts without deletion
 
-The synchronization does not rely on a timestamp watermark alone. A watermark
-cannot detect source deletions.
+This is the selected production behaviour for the Python Temporal workflow.
+It fetches and upserts new or changed source features. It intentionally does
+not delete Lift rows that disappear from WFS.
 
-For each layer:
+### Delta filter
 
-1. Read the initial raw WFS `numberMatched`.
-2. Stream the complete geometry-free CSV inventory:
-   `FID + ID_UA + ZAD_SPR`.
-3. Canonicalize identical FID duplicates and reject conflicting duplicates.
-4. Compare the inventory with PostGIS by `wfs_id`.
-5. Select:
-   - IDs absent from PostGIS
-   - IDs with a different `source_updated_at`
-   - IDs whose source timestamp is null
-6. Fetch complete selected features in bounded WFS `resourceId` batches.
-7. If GeoServer omits one member of a multi-ID response, retry that ID alone.
-8. Require the final response ID set to match the requested set exactly.
-9. Calculate target IDs absent from the complete current inventory.
-10. Recheck both raw WFS counts.
-11. In one database transaction:
-    - upsert changed/new rows
-    - delete absent IDs
-    - verify canonical target counts
-    - update `sync_state` for both layers
+For each layer, read the maximum source-change timestamp already stored in its
+target table:
 
-The most recent live convergence test after bootstrap produced:
+```sql
+SELECT MAX(zad_spr) FROM si_mop_ua_parc;
+SELECT MAX(zad_spr) FROM si_mop_ua_tock;
+```
 
-| Layer | Canonical rows | Features downloaded | Inserted | Updated | Deleted |
-|---|---:|---:|---:|---:|---:|
-| Points | 234,475 | 1 | 0 | 1 | 0 |
-| Parcels | 630,012 | 14 | 0 | 14 | 0 |
+Use that value directly in the corresponding WFS request:
 
-Only null-timestamp rows required refresh.
+```text
+CQL_FILTER=ZAD_SPR > '<current MAX(target.zad_spr)>'
+```
 
-### Source snapshot limitation
+Serialize the maximum as a full ISO-8601 timestamp. Keep the boundary fixed
+for every page and retry belonging to that workflow run.
 
-WFS does not provide a transactional snapshot across requests. The client
-checks counts before and after staging, but a rare concurrent replacement that
-keeps the same total count may only converge on the following run.
+If `MAX(zad_spr)` is null because the table is empty, perform the complete
+bootstrap without a CQL date filter.
 
-No target mutation occurs until both layers have been staged and the final
-database transaction begins.
+The database maximum is independent for points and parcels. No separate
+watermark table or `run_started_at` watermark is needed.
+
+The comparison must use the source-mapped `zad_spr` column. Do not use Lift's
+audit `updated_at`: it records when Lift wrote the row, while WFS `ZAD_SPR`
+records when the source changed it. Comparing those different clocks can skip
+valid source changes.
+
+### Upsert identity
+
+Use the numeric suffix of the current WFS `FID` as Lift `ogc_fid`:
+
+```text
+UPRAVNI_AKTI.12345          → ogc_fid = 12345
+UPRAVNI_AKTI_PARCELE.519563 → ogc_fid = 519563
+```
+
+Within each Lift table, `ogc_fid` is the integration lookup key and should have
+a unique constraint if Lift supports one. It is unique only within a layer,
+not globally.
+
+Do not use `id_ua` as the parcel upsert key. Current data also disproves the
+obvious parcel business composite:
+
+| Parcel identity candidate | Distinct values from 630,026 raw rows |
+|---|---:|
+| `ID_UA` | 233,806 |
+| `ID_UA + SIFKO + PARCELA` | 628,535 |
+| `ID_UA + OB_ID + SIFKO + PARCELA + VRS_AKT` | 628,535 |
+| WFS `FID` | 630,012 |
+
+There are 1,491 raw parcel rows beyond the distinct business composite count.
+Some otherwise identical business rows have multiple distinct WFS IDs.
+
+For points, `ID_UA` currently has the same distinct count as WFS identity after
+duplicate canonicalization, but that uniqueness is not formally documented.
+Use `ogc_fid` consistently for both tables.
+
+`id` is Lift's UUID primary key, not the source ID. Prefer letting Lift create
+it on insert and preserve it on update. If the integration API requires the
+client to supply it, generate deterministic UUIDv5 from the layer name and
+full WFS FID; do not generate a new UUIDv4 on every retry.
+
+### Temporal workflow shape
+
+Keep Temporal workflow code deterministic. All HTTP, Lift/database calls, and
+filesystem operations belong in Activities.
+
+```mermaid
+sequenceDiagram
+    participant S as Temporal Schedule
+    participant W as Sync Workflow
+    participant A as WFS/Lift Activities
+    participant E as eProstor WFS
+    participant L as Lift
+    S->>W: 1. Start scheduled sync
+    W->>A: 2.a Read MAX(zad_spr)
+    A->>L: 2.b Query target layer
+    L-->>A: 2.c Current maximum
+    A-->>W: 2.d Delta boundary
+    W->>A: 3. Download complete filtered delta
+    loop Every WFS page
+        A->>E: 3.a GetFeature where ZAD_SPR > maximum
+        E-->>A: 3.b GeoJSON features
+        A-->>W: 3.c Durable page checkpoint
+    end
+    W->>A: 4. Canonicalize and upsert downloaded delta
+    A->>L: 4.a Idempotent upsert by ogc_fid
+```
+
+- 2: execute independently for points and parcels
+- 3.a: bounded page size, stable ordering, retryable HTTP request
+- 3.c: retain the original maximum and page cursor across Activity retries
+- 4.a: insert new rows; update matching rows; never delete
+
+Recommended Temporal controls:
+
+- Schedule: configurable; weekly is an acceptable starting interval
+- Activity retries: exponential backoff for transient WFS/Lift failures
+- Explicit connect/read timeouts and response validation
+- Heartbeats during long downloads and batch upserts
+- Idempotent upserts so Activity replay is safe
+- Separate per-layer execution and metrics
+- One workflow ID policy preventing overlapping scheduled runs
+- Counts logged per layer: fetched, canonical, inserted, updated, null
+  `ZAD_SPR`, rejected, and database maximum
+
+With a strict `>` boundary, an abandoned partially applied run can advance the
+database maximum past unprocessed rows that have the same `ZAD_SPR`. Therefore
+the workflow must download/checkpoint the complete delta before applying it
+and must resume a failed apply rather than starting a fresh run from a newly
+calculated maximum. If Lift supports transactions, apply the complete layer
+delta atomically.
+
+### Initial load
+
+Bootstrap Lift either from the verified GeoPackage or with an unfiltered,
+paged WFS read. The following recurring run derives its boundary from
+`MAX(zad_spr)`. The verified checkpointable GeoPackage remains useful for
+disaster recovery and bulk bootstrap.
+
+### Consequences of no deletion
+
+This policy is valid, but the target is an append/update mirror rather than an
+exact current snapshot:
+
+- Source deletions remain in Lift.
+- A source WFS-ID replacement inserts the new row and leaves the old row.
+- A new or changed row whose `ZAD_SPR` is not greater than the current target
+  maximum is not selected.
+- `ZAD_SPR IS NULL` rows enter through the full bootstrap but are not selected
+  by recurring delta runs.
+
+Do not run an inventory-based delete implicitly. If exact source parity is
+required later, make deletion reconciliation a separate, explicitly approved
+workflow.
+
+### Available full-inventory reconciliation
+
+The service also supports a lightweight full `FID + ID_UA + ZAD_SPR` CSV
+inventory. The existing repository implementation can compare it by WFS ID,
+fetch only changed full features, and identify source deletions. This was
+tested successfully, but deletion is outside the selected Lift workflow.
+
+WFS does not provide a transactional snapshot across requests. Even a future
+inventory reconciliation must account for concurrent source changes and may
+only converge on the following run.
 
 ## Older 491,885-row table
 
@@ -335,36 +520,108 @@ Migration guidance:
 
 1. Do not continue a delta from old `ogc_fid` values.
 2. Replace/bootstrap from the completed current GeoPackage.
-3. Start recurring reconciliation using the current `wfs_id`.
+3. Populate Lift `ogc_fid` from the numeric suffix of the current WFS FID.
+4. Start recurring filtered upserts using `ZAD_SPR`.
 
 Trying to construct a business composite key for all old rows is unnecessary
 and can be ambiguous.
 
-## Local and Lift names
+## Lift table specifications
 
-Recommended technical names when a dedicated schema is available:
+Use the existing short, ASCII unique-name convention. The matching point name
+is `si_mop_ua_tock`.
 
-```text
-eprostor.upravni_akti_tocke
-eprostor.upravni_akti_parcele
-```
+| Layer | Lift display name | Lift unique name |
+|---|---|---|
+| Parcels | `MOP - Upravni akti (parcele)` | `si_mop_ua_parc` |
+| Points | `MOP - Upravni akti (točke)` | `si_mop_ua_tock` |
 
-When Lift requires globally prefixed table names:
+The parcel table contains administrative-act/parcel associations, not the
+authoritative cadastral parcel register.
 
-```text
-eprostor_upravni_akti_tocke
-eprostor_upravni_akti_parcele
-```
+### Parcels: `si_mop_ua_parc`
 
-Recommended display names:
+This is the supplied Lift definition, with the recommended `zad_spr` type
+correction shown in the final column.
 
-```text
-eProstor – Upravni akti – točke
-eProstor – Upravni akti – parcele
-```
+| Lift field | Current Lift type | Recommended type | Source/mapping |
+|---|---|---|---|
+| `zad_spr` | `date` | **`date-time`** | WFS `ZAD_SPR` |
+| `geom` | `geom` | `geom` | WFS polygon geometry |
+| `id` | `uuid` | `uuid` | Lift primary key; Lift-generated |
+| `gid` | `integer` | `integer` | Lift technical field; not a WFS identifier |
+| `created_at` | `date-time` | `date-time` | Lift audit field |
+| `updated_at` | `date-time` | `date-time` | Lift audit field |
+| `created_by` | `uuid` | `uuid` | Lift audit field |
+| `updated_by` | `uuid` | `uuid` | Lift audit field |
+| `id_ua` | `decimal` | `decimal` | WFS `ID_UA` |
+| `sifko` | `decimal` | `decimal` | WFS `SIFKO` |
+| `ob_id` | `decimal` | `decimal` | WFS `OB_ID` |
+| `parcela` | `plain-text-single-row` | same | WFS `PARCELA`; never numeric |
+| `vrs_akt` | `decimal` | `decimal` | WFS `VRS_AKT` |
+| `barva_poli` | `plain-text-single-row` | same | WFS `BARVA_POLIGONA` |
+| `ogc_fid` | `integer` | `integer`, unique | Numeric suffix of WFS FID |
 
-The parcel display name must not imply that this is the authoritative cadastral
-parcel register.
+`ZAD_SPR` is an actual timestamp, not merely a calendar date. Keeping
+`zad_spr` as `date` discards the time and timezone precision needed to inspect
+delta behaviour. Change it to `date-time` if Lift allows it.
+
+If the existing parcel schema remains `date`, `MAX(zad_spr)` has day precision
+only. With the selected strict `>` filter, records later on that same source
+day can be skipped after the maximum date is present. The safe schema for this
+specific strategy therefore requires `zad_spr` to be `date-time`.
+
+### Points: `si_mop_ua_tock`
+
+Create the point table with the same system, audit, identity, and naming
+conventions:
+
+| Lift field | Lift type | Source/mapping |
+|---|---|---|
+| `zad_spr` | `date-time` | WFS `ZAD_SPR` |
+| `geom` | `geom` | WFS point geometry |
+| `id` | `uuid` | Lift primary key; Lift-generated |
+| `gid` | `integer` | Lift technical field; not a WFS identifier |
+| `created_at` | `date-time` | Lift audit field |
+| `updated_at` | `date-time` | Lift audit field |
+| `created_by` | `uuid` | Lift audit field |
+| `updated_by` | `uuid` | Lift audit field |
+| `id_ua` | `decimal` | WFS `ID_UA` |
+| `sif_pu` | `decimal` | WFS `SIF_PU` |
+| `naz_upr_org` | `plain-text-single-row` | WFS `NAZ_UPR_ORG` |
+| `stev_zad` | `plain-text-single-row` | WFS `STEV_ZAD` |
+| `ob_id` | `decimal` | WFS `OB_ID` |
+| `sif_vrs_ua_kra_sif` | `plain-text-single-row` | WFS `SIF_VRS_UA_KRA_SIF` |
+| `vrs_akt_2` | `plain-text-single-row` | WFS `VRS_AKT_2` |
+| `naz_upr_pos` | `plain-text-single-row` | WFS `NAZ_UPR_POS` |
+| `obj` | `plain-text-single-row` | WFS `OBJ` |
+| `dat_izd` | `date-time` | WFS `DAT_IZD` |
+| `dat_pop` | `date-time` | WFS `DAT_POP` |
+| `max_dat_pra` | `date-time` | WFS `MAX_DAT_PRA` |
+| `dat_raz` | `date-time` | WFS `DAT_RAZ` |
+| `vrs_akt` | `decimal` | WFS `VRS_AKT` |
+| `dat_zac_gra` | `date-time` | WFS `DAT_ZAC_GRA` |
+| `ogc_fid` | `integer`, unique | Numeric suffix of WFS FID |
+
+The source contains unusual but syntactically valid years in some point date
+fields (`0002`, `0021`, `0202`, `2919`). Before initial import, confirm Lift's
+accepted date-time range. The importer must not silently turn rejected values
+into null: record the source FID, field, raw value, and error for remediation.
+
+### Common field ownership
+
+| Field | Written by integration? | Notes |
+|---|---|---|
+| `id` | Prefer no | Let Lift generate; preserve on update |
+| `gid` | No | Lift technical value unless its API explicitly requires it |
+| `created_at`, `created_by` | No | Lift-managed creation audit |
+| `updated_at`, `updated_by` | No | Lift-managed update audit |
+| `ogc_fid` | Yes | Upsert lookup identity |
+| `zad_spr` | Yes | Source modification timestamp |
+| `geom` and source attributes | Yes | Replace from each fetched feature |
+
+`updated_at` answers when Lift last wrote a row. `zad_spr` answers when the
+source says the feature changed. They are not interchangeable.
 
 ## Downloaded artifact
 
