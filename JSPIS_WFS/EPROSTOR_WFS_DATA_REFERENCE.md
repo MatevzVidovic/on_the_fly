@@ -7,6 +7,176 @@ rules used by the synchronization implementation.
 
 Operational commands and deployment instructions remain in [README.md](README.md).
 
+## User instructions — what must be done in LIFT
+
+Complete these schema changes before enabling the Temporal integration.
+
+### 1. Update the existing parcel table
+
+Existing table:
+
+```text
+Display name: MOP - Upravni akti (parcele)
+Unique name:  si_mop_ua_parc
+```
+
+Required change:
+
+```text
+zad_spr: date → date-time
+```
+
+This change is required because the recurring WFS filter uses:
+
+```text
+ZAD_SPR > MAX(si_mop_ua_parc.zad_spr)
+```
+
+A `date` value loses the time of day. After one row from a given day exists,
+other source changes later on the same day could be skipped. The `date-time`
+field must retain the complete source timestamp.
+
+Also configure `ogc_fid` as unique if LIFT supports field-level uniqueness.
+The integration uses it to find and update existing parcel rows.
+
+Final parcel table:
+
+```text
+MOP - Upravni akti (parcele)
+si_mop_ua_parc
+
+zad_spr,date-time
+geom,geom
+id,uuid
+gid,integer
+created_at,date-time
+updated_at,date-time
+created_by,uuid
+updated_by,uuid
+id_ua,decimal
+sifko,decimal
+ob_id,decimal
+parcela,plain-text-single-row
+vrs_akt,decimal
+barva_poli,plain-text-single-row
+ogc_fid,integer,unique
+```
+
+### 2. Create the point table
+
+Create this new table:
+
+```text
+Display name: MOP - Upravni akti (točke)
+Unique name:  si_mop_ua_tock
+```
+
+Complete field definition:
+
+```text
+zad_spr,date-time
+geom,geom
+id,uuid
+gid,integer
+created_at,date-time
+updated_at,date-time
+created_by,uuid
+updated_by,uuid
+id_ua,decimal
+sif_pu,decimal
+naz_upr_org,plain-text-single-row
+stev_zad,plain-text-single-row
+ob_id,decimal
+sif_vrs_ua_kra_sif,plain-text-single-row
+vrs_akt_2,plain-text-single-row
+naz_upr_pos,plain-text-single-row
+obj,plain-text-single-row
+dat_izd,date-time
+dat_pop,date-time
+max_dat_pra,date-time
+dat_raz,date-time
+vrs_akt,decimal
+dat_zac_gra,date-time
+ogc_fid,integer,unique
+```
+
+If LIFT does not express uniqueness as part of a field definition, create the
+field as `ogc_fid,integer` and configure its unique constraint separately.
+
+
+### 3. Do this:
+
+
+  -- Run against the Lift application database, not the Temporal database.
+
+  ALTER TABLE si_mop_ua_parc
+      ALTER COLUMN ogc_fid SET NOT NULL;
+
+  ALTER TABLE si_mop_ua_parc
+      ADD CONSTRAINT si_mop_ua_parc_ogc_fid_key UNIQUE (ogc_fid);
+
+  ALTER TABLE si_mop_ua_tock
+      ALTER COLUMN ogc_fid SET NOT NULL;
+
+  ALTER TABLE si_mop_ua_tock
+      ADD CONSTRAINT si_mop_ua_tock_ogc_fid_key UNIQUE (ogc_fid);
+
+  Before applying this, check for existing bad data:
+
+  SELECT ogc_fid, COUNT(*)
+  FROM si_mop_ua_parc
+  GROUP BY ogc_fid
+  HAVING COUNT(*) > 1;
+
+  SELECT COUNT(*)
+  FROM si_mop_ua_parc
+  WHERE ogc_fid IS NULL;
+
+  SELECT ogc_fid, COUNT(*)
+  FROM si_mop_ua_tock
+  GROUP BY ogc_fid
+  HAVING COUNT(*) > 1;
+
+  SELECT COUNT(*)
+  FROM si_mop_ua_tock
+  WHERE ogc_fid IS NULL;
+
+### 3. Confirm field ownership
+
+LIFT should generate and manage:
+
+```text
+id
+gid
+created_at
+updated_at
+created_by
+updated_by
+```
+
+The integration should write:
+
+```text
+ogc_fid
+zad_spr
+geom
+all WFS business attributes
+```
+
+Do not use LIFT `updated_at` for the WFS delta boundary. The workflow compares
+WFS `ZAD_SPR` with `MAX(zad_spr)` from the corresponding LIFT table.
+
+### 4. Report back before integration setup
+
+Confirm the following after the LIFT changes:
+
+- Parcel `zad_spr` is `date-time`.
+- Both tables exist under the exact unique names above.
+- `ogc_fid` uniqueness is enabled, or whether the integration must enforce it.
+- LIFT accepts the unusual years found in some point date fields, including
+  `0002`, `0021`, `0202`, and `2919`.
+- Geometry fields accept the source CRS/geometry handling expected by LIFT.
+
 ## Implementation decisions
 
 | Concern | Decision |
