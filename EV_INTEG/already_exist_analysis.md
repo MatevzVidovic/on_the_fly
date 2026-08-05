@@ -1,33 +1,33 @@
 # Existing EV historical-table analysis
 
-This comparison uses the required EV source tables from `spec.md` and the PostgreSQL table inventory supplied on 2026-08-05. `ev_*_h` is treated as the expected historical destination naming convention; it is an inference from the existing database names, not a verified LIFT mapping.
+This compares the Oracle estimates in `research/research.md` with the LIFT PostgreSQL table sizes and approximate row counts supplied on 2026-08-05. Row-count differences are diagnostic only: Oracle statistics and PostgreSQL `reltuples` are approximate and may have been collected at different times. They are not a substitute for exact `COUNT(*)` using the same filter.
 
-| EV source table to integrate | Expected historical PostgreSQL name | Existing PostgreSQL table(s) | Assessment / required advance analysis |
-| --- | --- | --- | --- |
-| `DST_PRIPIS_PODATKI` | `ev_dst_pripis_podatki_h` | None found | Does **not** appear to exist. Confirm the intended target name and whether it is historical despite its name not beginning `JN_`. |
-| `JN_DEL_STAVBE` | `ev_del_stavbe_h` | `ev_del_stavbe_h` | Already exists. Compare its column contract, key, revision timestamps, source filter, and row counts before reuse. |
-| `JN_DEL_STAVB_ENOTA` | split historical tables | `ev_del_stavbe_enota_h_2020_2024`, `ev_del_stavbe_enota_h_2025_danes` | Already exists as the required split. Verify year boundaries, no gaps/overlap, omitted `PODATKI`, and that the 2025+ integration is active/correct. |
-| `JN_PARC_DEL` | `ev_parc_del_h` | `ev_parc_del_h` | Already exists. Validate the historical key, revision joins, status filter, and count parity. |
-| `JN_PARC_ENOTA` | split historical tables | `ev_parc_enota_h_2020`, `ev_parc_enota_h_2021`, `ev_parc_enota_h_2022`, `ev_parc_enota_h_2023`, `ev_parc_enota_h_2024`, `ev_parc_enota_h_2025_danes` | Already exists as the required split. Verify all annual boundary rules, no gaps/duplicates, omitted `PODATKI`, and the 2025+ delta integration. |
-| `JN_PARCELA` | `ev_parcela_h` | `ev_parcela_h` | Already exists. Compare schema, primary/synthetic key, revision timestamps, status filter, and geometry handling. |
-| `JN_PE_DST` | `ev_pe_dst_h` | `ev_pe_dst_h` | Already exists. This is one of the three POC tables; inspect before creating/running its LIFT integration or bootstrap loader. |
-| `JN_PE_PARC` | `ev_pe_parc_h` | `ev_pe_parc_h`, `ev_h_pe_parc` | Already exists, but there are **two similarly named historical candidates**. Determine which is authoritative before loading anything; inspect columns, row counts, owners/creation dates, and downstream references. |
-| `JN_POSEBNA_ENOTA` | `ev_posebna_enota_h` | `ev_posebna_enota_h`, `ev_posebna_enota_pod_h` | `ev_posebna_enota_h` is the likely direct historical match. `ev_posebna_enota_pod_h` may be a related child/detail table; inspect it rather than treating it as a duplicate. |
-| `JN_PROSTOR` | `ev_prostor_h` | `ev_prostor_h` | Already exists. Validate its historical projection and counts before reuse. |
-| `JN_STAVBA` | `ev_stavba_h` | `ev_stavba_h` | Already exists. Validate schema, revision timestamps, status filter, and geometry handling before reuse. |
-| `PARC_PRIPIS_PODATKI` | `ev_parc_pripis_podatki_h` | None found | Does **not** appear to exist. Confirm target naming and whether its `JN_REV_NUM`-based history needs the same revision projection. |
+| EV source table | Oracle research estimate | Existing LIFT historical target(s) | LIFT approx. rows | LIFT physical size | Difference / coverage | Advance analysis |
+| --- | ---: | --- | ---: | ---: | ---: | --- |
+| `DST_PRIPIS_PODATKI` | 1,935,694 | None found | — | — | — | Missing target; create/analyse a new historical integration. |
+| `JN_DEL_STAVBE` | 11,133,941 | `ev_del_stavbe_h` | 9,941,382 | 2,490 MB | -1,192,559 / 89.29% | Existing data is materially behind the current Oracle estimate; inspect status/filter and latest `date_change`. |
+| `JN_DEL_STAVB_ENOTA` | Not available (`OBJECT NOT FOUND` in research export) | `ev_del_stavbe_enota_h_2020_2024`; `ev_del_stavbe_enota_h_2025_danes` | 6,902,641 + 4,747,777 = 11,650,418 | 1,229 MB + 1,258 MB = 2,487 MB | No source comparison available | Verify the split boundary, overlap/gap, omitted `PODATKI`, and 2025+ delta configuration. |
+| `JN_PARC_DEL` | 18,238,911 | `ev_parc_del_h` | 14,801,009 | 2,943 MB | -3,437,902 / 81.15% | Largest non-split shortfall; investigate before relying on the existing table. |
+| `JN_PARC_ENOTA` | 90,939,157 | `ev_parc_enota_h_2020`, `_2021`, `_2022`, `_2023`, `_2024`, `_2025_danes` | 88,248,911 total | 21,542 MB total | -2,690,246 / 97.04% | Looks broadly populated, but exact annual range checks are required. |
+| `JN_PARCELA` | 26,286,228 | `ev_parcela_h` | 26,018,648 | 8,169 MB | -267,580 / 98.98% | Close to the Oracle estimate; validate freshness and historical projection. |
+| `JN_PE_DST` | 213,204 | `ev_pe_dst_h` | 195,225 | 47 MB | -17,979 / 91.57% | Existing POC candidate, but it is incomplete relative to research. Analyse before bootstrap/reload. |
+| `JN_PE_PARC` | 193,584 | `ev_pe_parc_h`; also `ev_h_pe_parc` | 170,292; `ev_h_pe_parc` has no estimated rows | 41 MB; 16 kB | -23,292 / 87.97% for `ev_pe_parc_h` | Use `ev_pe_parc_h` as the likely real target; `ev_h_pe_parc` appears empty/placeholder and must not be used without schema verification. |
+| `JN_POSEBNA_ENOTA` | 45,445 | `ev_posebna_enota_h`; related `ev_posebna_enota_pod_h` | 35,768; 84,926 | 39 MB; 22 MB | -9,677 / 78.71% for direct target | Direct target is significantly behind. `_pod_h` is a different/detail dataset, not an alternative row-count match. |
+| `JN_PROSTOR` | 4,739,443 | `ev_prostor_h` | 4,550,946 | 830 MB | -188,497 / 96.02% | Close, but validate freshness and status filtering. |
+| `JN_STAVBA` | 3,246,415 | `ev_stavba_h` | 2,021,174 | 648 MB | -1,225,241 / 62.26% | Material shortfall; high-priority investigation before reuse. |
+| `PARC_PRIPIS_PODATKI` | 8,584,239 | None found | — | — | — | Missing target; create/analyse a new historical integration. |
 
-## Summary
+## What already exists
 
-- Ten of the twelve required source-table integrations have an apparent historical destination already present.
-- The two apparent gaps are `DST_PRIPIS_PODATKI` and `PARC_PRIPIS_PODATKI`.
-- The three POC source tables already have likely historical destinations, so the immediate task is not necessarily table creation: first verify whether those tables already have the intended LIFT contract and data.
+- Apparent historical targets exist for 10 of the 12 required source tables.
+- `DST_PRIPIS_PODATKI` and `PARC_PRIPIS_PODATKI` have no apparent LIFT historical target.
+- The three POC targets already exist, but all have fewer approximate rows than the Oracle research statistics. They should be analysed rather than blindly treated as empty targets.
 
-## Notable irregularities to investigate
+## Important observations
 
-1. `ev_pe_parc_h` and `ev_h_pe_parc` are potentially duplicate or differently-versioned representations of `JN_PE_PARC`. Do not select a bootstrap target from its name alone.
-2. The `JN_DEL_STAVB_ENOTA` historical target is split into two ranges (`2020_2024` and `2025_danes`), while `JN_PARC_ENOTA` is split once per year through 2024 and then `2025_danes`. Confirm why the split strategies differ and verify the exact boundary predicate for every table.
-3. Unsuffixed tables such as `ev_del_stavbe`, `ev_parcela`, `ev_posebna_enota`, and `ev_stavba` also exist alongside their `_h` equivalents. They are likely current-state tables, not suitable targets for the historical imports, but this must be confirmed from columns and consumers.
-4. `ev_posebna_enota_pod_h` likely represents a subordinate/detail dataset, not a second copy of `JN_POSEBNA_ENOTA`; its key and provenance need checking.
-5. The supplied inventory contains `ev_parc_del_enota` without an `_h` suffix, while the required source table is `JN_PARC_DEL`. Do not infer that it is its historical target without schema confirmation.
-6. For every apparent existing target, inspect: column list and types; unique key; `valid_from`, `valid_to`, and `date_change`; source status handling; row count and min/max revision dates; and whether a LIFT integration already owns it. This is required before any loader writes to it.
+1. The source and LIFT numbers were measured at different times: Oracle analysis dates in `research/research.md` range from 2025 to 2026, and the supplied PostgreSQL values are approximate. Small differences may be timing/statistics; the large gaps below are still worth investigating.
+2. The most concerning direct-target coverage is `ev_stavba_h` (62.26%), then `ev_posebna_enota_h` (78.71%) and `ev_parc_del_h` (81.15%).
+3. `ev_h_pe_parc` is only 16 kB with no estimated rows, while `ev_pe_parc_h` contains 170,292 rows. This strongly suggests a placeholder/empty table or an abandoned integration; inspect its schema and dependencies before any write.
+4. `ev_posebna_enota_pod_h` has more rows than `ev_posebna_enota_h`, so it is not a direct duplicate of the required source table. Treat it as a distinct subordinate/detail relation.
+5. The `JN_PARC_ENOTA` yearly targets total 88.25 million rows. This supports the intended split design, but the `2020` table is much larger than the later annual tables; verify it is truly one calendar-year partition and not a legacy catch-all range.
+6. For every candidate target, run exact comparable checks before loading: `COUNT(*)`; `COUNT(DISTINCT synthetic_pk)`; min/max `valid_from`, `valid_to`, and `date_change`; count of `JN_STATUS = 'X'` (expected zero after filtering); and the exact source/LIFT schema and unique-key contract.

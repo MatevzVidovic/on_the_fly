@@ -17,7 +17,6 @@ SPEC = TableSpec(
         "JN_REV_NUM_PREV",
         "JN_STATUS",
         "VREDNOST_DODATEK",
-        "PODATKI",
         "DELITEV_MSG",
     ),
 )

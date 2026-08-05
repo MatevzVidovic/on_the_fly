@@ -14,7 +14,6 @@ SELECT
     j."CENY" AS ceny,
     j."NASLOV" AS naslov,
     j."POSPLOSENA_VREDNOST" AS posplosena_vrednost,
-    j."PODATKI" AS podatki,
     j."OB_MID" AS ob_mid,
     j."NASLOV_VROCANJA" AS naslov_vrocanja,
     j."TIP" AS tip,

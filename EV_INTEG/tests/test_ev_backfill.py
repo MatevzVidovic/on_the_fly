@@ -9,7 +9,7 @@ from ev_backfill.core import TableSpec, atomic_json_write, canonical_query, keys
 
 SPEC = TableSpec("jn_pe_dst", "JN_PE_DST", "ID_PE_DST", (
     "ID_PE_DST", "ID_PE", "DST_SID", "JN_REV_NUM", "JN_REV_NUM_TO", "JN_REV_NUM_PREV",
-    "JN_STATUS", "VREDNOST_DODATEK", "PODATKI", "DELITEV_MSG",
+    "JN_STATUS", "VREDNOST_DODATEK", "DELITEV_MSG",
 ))
 
 
@@ -20,9 +20,9 @@ def test_keyset_predicate_uses_the_full_native_primary_key() -> None:
     assert keyset_predicate("ID_PE_DST", False) == ""
 
 
-def test_canonical_query_keeps_history_contract_and_podatki() -> None:
+def test_canonical_query_keeps_history_contract_without_podatki() -> None:
     query = canonical_query(SPEC, True)
-    assert "j.\"PODATKI\" AS podatki" in query
+    assert "PODATKI" not in query
     assert "JOIN EV.REVISION rf" in query
     assert "LEFT JOIN EV.REVISION rt" in query
     assert "WHERE j.\"JN_STATUS\" <> 'X'" in query

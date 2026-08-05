@@ -8,7 +8,6 @@ SELECT
     j."JN_REV_NUM_PREV" AS jn_rev_num_prev,
     CAST(TRIM(j."JN_STATUS") AS VARCHAR2(1)) AS jn_status,
     j."VREDNOST_DODATEK" AS vrednost_dodatek,
-    j."PODATKI" AS podatki,
     j."DELITEV_MSG" AS delitev_msg,
     FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,
     FROM_TZ(CAST(rt.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_to,
