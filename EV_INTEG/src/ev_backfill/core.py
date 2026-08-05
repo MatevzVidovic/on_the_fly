@@ -152,18 +152,30 @@ def require_drivers() -> tuple[Any, Any]:
 
 
 def source_connection(oracledb: Any) -> Any:
-    required = ("ORACLE_USER", "ORACLE_PASSWORD", "ORACLE_DSN")
+    required = ("ORACLE_USER", "ORACLE_PASSWORD", "ORACLE_HOST", "ORACLE_PORT", "ORACLE_SERVICE")
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
         raise RuntimeError(f"missing Oracle environment variables: {', '.join(missing)}")
-    return oracledb.connect(user=os.environ["ORACLE_USER"], password=os.environ["ORACLE_PASSWORD"], dsn=os.environ["ORACLE_DSN"])
+    dsn = oracledb.makedsn(
+        os.environ["ORACLE_HOST"],
+        int(os.environ["ORACLE_PORT"]),
+        service_name=os.environ["ORACLE_SERVICE"],
+    )
+    return oracledb.connect(user=os.environ["ORACLE_USER"], password=os.environ["ORACLE_PASSWORD"], dsn=dsn)
 
 
 def pg_connection(psycopg: Any) -> Any:
-    dsn = os.environ.get("PG_DSN")
-    if not dsn:
-        raise RuntimeError("missing PG_DSN environment variable")
-    return psycopg.connect(dsn)
+    required = ("PG_USER", "PG_PASSWORD", "PG_HOST", "PG_PORT")
+    missing = [name for name in required if not os.environ.get(name)]
+    if missing:
+        raise RuntimeError(f"missing PostgreSQL environment variables: {', '.join(missing)}")
+    return psycopg.connect(
+        user=os.environ["PG_USER"],
+        password=os.environ["PG_PASSWORD"],
+        host=os.environ["PG_HOST"],
+        port=int(os.environ["PG_PORT"]),
+        dbname=os.environ.get("PG_DATABASE", os.environ["PG_USER"]),
+    )
 
 
 def get_fence(oracledb: Any) -> datetime:

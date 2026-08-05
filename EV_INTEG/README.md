@@ -14,8 +14,15 @@ The loaders read credentials only from process environment variables:
 ```sh
 export ORACLE_USER='...'
 export ORACLE_PASSWORD='...'
-export ORACLE_DSN='host:1521/service'
-export PG_DSN='postgresql://user:password@host:5432/database'
+export ORACLE_HOST='oracle-host.example.com'
+export ORACLE_PORT='1521'
+export ORACLE_SERVICE='ORCLPDB1'
+export PG_USER='...'
+export PG_PASSWORD='...'
+export PG_HOST='localhost'
+export PG_PORT='5432'
+# Optional; defaults to PG_USER when omitted.
+export PG_DATABASE='...'
 ```
 
 Do not place credentials in committed files. The target table must already exist, be schema-qualified, contain all columns selected by its LIFT SQL, and have a unique key on the synthetic `*_pk` column.

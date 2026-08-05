@@ -4,7 +4,7 @@ import sys
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "SRC"))
-from ev_backfill.core import TableSpec, atomic_json_write, canonical_query, keyset_predicate, parse_relation, read_checkpoint
+from ev_backfill.core import TableSpec, atomic_json_write, canonical_query, keyset_predicate, parse_relation, pg_connection, read_checkpoint, source_connection
 
 
 SPEC = TableSpec("jn_pe_dst", "JN_PE_DST", "ID_PE_DST", (
@@ -42,3 +42,33 @@ def test_checkpoint_is_replaced_atomically_and_round_trips(tmp_path: Path) -> No
 def test_target_relation_must_be_safe_and_schema_qualified(relation: str) -> None:
     with pytest.raises(ValueError):
         parse_relation(relation)
+
+
+def test_component_connection_settings_are_used_without_dsns(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("ORACLE_USER", "oracle-user")
+    monkeypatch.setenv("ORACLE_PASSWORD", "oracle-password")
+    monkeypatch.setenv("ORACLE_HOST", "oracle.example")
+    monkeypatch.setenv("ORACLE_PORT", "1521")
+    monkeypatch.setenv("ORACLE_SERVICE", "EV")
+    monkeypatch.setenv("PG_USER", "pg-user")
+    monkeypatch.setenv("PG_PASSWORD", "pg-password")
+    monkeypatch.setenv("PG_HOST", "postgres.example")
+    monkeypatch.setenv("PG_PORT", "5432")
+    monkeypatch.delenv("PG_DATABASE", raising=False)
+
+    class Oracle:
+        @staticmethod
+        def makedsn(host: str, port: int, service_name: str) -> tuple[str, int, str]:
+            return host, port, service_name
+
+        @staticmethod
+        def connect(**kwargs: object) -> dict[str, object]:
+            return kwargs
+
+    class Postgres:
+        @staticmethod
+        def connect(**kwargs: object) -> dict[str, object]:
+            return kwargs
+
+    assert source_connection(Oracle())["dsn"] == ("oracle.example", 1521, "EV")
+    assert pg_connection(Postgres())["dbname"] == "pg-user"
