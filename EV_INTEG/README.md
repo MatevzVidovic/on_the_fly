@@ -9,7 +9,7 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 ```
 
-The loaders read credentials only from process environment variables:
+The loaders automatically load this repository's ignored `.env` file. They also accept already-exported process environment variables, which take precedence over `.env` values:
 
 ```sh
 export ORACLE_USER='...'
@@ -31,7 +31,7 @@ Do not place credentials in committed files. The target table must already exist
 
 ```sh
 .venv/bin/python SRC/jn_pe_dst/load.py --target-table lift.jn_pe_dst
-.venv/bin/python SRC/jn_pe_parc/load.py --target-table lift.jn_pe_parc
+.venv/bin/python SRC/jn_pe_parc/load.py --target-table ev_h_pe_parc
 .venv/bin/python SRC/jn_posebna_enota/load.py --target-table lift.jn_posebna_enota
 ```
 

@@ -151,6 +151,16 @@ def require_drivers() -> tuple[Any, Any]:
     return oracledb, psycopg
 
 
+def load_project_environment() -> None:
+    """Load only this repository's .env; never print its values."""
+    try:
+        from dotenv import load_dotenv
+    except ImportError as error:
+        raise RuntimeError("install requirements into the shared .venv before running a loader") from error
+    project_root = Path(__file__).resolve().parents[2]
+    load_dotenv(project_root / ".env", override=False)
+
+
 def source_connection(oracledb: Any) -> Any:
     required = ("ORACLE_USER", "ORACLE_PASSWORD", "ORACLE_HOST", "ORACLE_PORT", "ORACLE_SERVICE")
     missing = [name for name in required if not os.environ.get(name)]
@@ -247,6 +257,7 @@ def run_loader(spec: TableSpec, entrypoint: Path | str) -> None:
     parser.add_argument("--status", action="store_true", help="print local checkpoint and exit")
     parser.add_argument("--restart", action="store_true", help="remove only this loader's local checkpoint")
     args = parser.parse_args()
+    load_project_environment()
     state_path = checkpoint_path(Path(entrypoint).resolve())
     if args.status:
         print(json.dumps(read_checkpoint(state_path) or {"status": "not started"}, indent=2, default=str))
