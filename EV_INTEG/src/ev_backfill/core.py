@@ -38,9 +38,11 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 
 def parse_relation(value: str) -> tuple[str, str]:
     parts = value.split(".")
-    if len(parts) != 2 or not all(IDENTIFIER.fullmatch(part) for part in parts):
-        raise ValueError("target table must be a schema-qualified PostgreSQL identifier, e.g. lift.jn_pe_dst")
-    return parts[0], parts[1]
+    if len(parts) == 1 and IDENTIFIER.fullmatch(parts[0]):
+        return "public", parts[0]
+    if len(parts) == 2 and all(IDENTIFIER.fullmatch(part) for part in parts):
+        return parts[0], parts[1]
+    raise ValueError("target table must be a PostgreSQL identifier, e.g. ev_h_pe_parc or public.ev_h_pe_parc")
 
 
 def quote_relation(value: str) -> str:
@@ -184,7 +186,7 @@ def pg_connection(psycopg: Any) -> Any:
         password=os.environ["PG_PASSWORD"],
         host=os.environ["PG_HOST"],
         port=int(os.environ["PG_PORT"]),
-        dbname=os.environ.get("PG_DATABASE", os.environ["PG_USER"]),
+        dbname=os.environ.get("PG_DATABASE", "fmp_data_gurs"),
     )
 
 
@@ -251,7 +253,7 @@ def checkpoint_path(entrypoint: Path) -> Path:
 
 def run_loader(spec: TableSpec, entrypoint: Path | str) -> None:
     parser = argparse.ArgumentParser(description=f"Resumable EV bootstrap loader for {spec.oracle_table}")
-    parser.add_argument("--target-table", default=os.environ.get("PG_TARGET_TABLE"), help="required schema-qualified LIFT destination")
+    parser.add_argument("--target-table", default=os.environ.get("PG_TARGET_TABLE"), help="required LIFT destination; defaults to public schema when unqualified")
     parser.add_argument("--page-size", type=int, default=1000)
     parser.add_argument("--max-pages", type=int, help="stop cleanly after this many committed pages")
     parser.add_argument("--status", action="store_true", help="print local checkpoint and exit")

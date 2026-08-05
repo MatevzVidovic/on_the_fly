@@ -38,7 +38,11 @@ def test_checkpoint_is_replaced_atomically_and_round_trips(tmp_path: Path) -> No
     assert not list(path.parent.glob(".checkpoint.json.*"))
 
 
-@pytest.mark.parametrize("relation", ["table", "a.b.c", "a.bad-name", "a.;drop"])
+def test_unqualified_target_uses_public_schema() -> None:
+    assert parse_relation("ev_h_pe_parc") == ("public", "ev_h_pe_parc")
+
+
+@pytest.mark.parametrize("relation", ["a.b.c", "a.bad-name", "a.;drop"])
 def test_target_relation_must_be_safe_and_schema_qualified(relation: str) -> None:
     with pytest.raises(ValueError):
         parse_relation(relation)
@@ -71,4 +75,4 @@ def test_component_connection_settings_are_used_without_dsns(monkeypatch: pytest
             return kwargs
 
     assert source_connection(Oracle())["dsn"] == ("oracle.example", 1521, "EV")
-    assert pg_connection(Postgres())["dbname"] == "pg-user"
+    assert pg_connection(Postgres())["dbname"] == "fmp_data_gurs"

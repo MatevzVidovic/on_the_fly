@@ -21,11 +21,11 @@ export PG_USER='...'
 export PG_PASSWORD='...'
 export PG_HOST='localhost'
 export PG_PORT='5432'
-# Optional; defaults to PG_USER when omitted.
+# Optional; defaults to fmp_data_gurs when omitted.
 export PG_DATABASE='...'
 ```
 
-Do not place credentials in committed files. The target table must already exist, be schema-qualified, contain all columns selected by its LIFT SQL, and have a unique key on the synthetic `*_pk` column.
+Do not place credentials in committed files. The target table must already exist, contain all columns selected by its LIFT SQL, and have a unique key on the synthetic `*_pk` column. Unqualified target names use the `public` schema.
 
 ## Run
 
