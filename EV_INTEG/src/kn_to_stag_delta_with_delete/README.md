@@ -65,7 +65,7 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
   --resumable --apply
 ```
 
-The resumable run first pages KN key/date values and records every KN key in `src/kn_to_stag_delta_with_delete/.state/source_keys.sqlite3`. It aborts before writes if it finds staging-newer values, then pages inserts/updates, and finally deletes staging keys absent from that persisted KN key index. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
+The resumable run first pages KN key/date values and records every KN key in its own fingerprinted directory under `src/kn_to_stag_delta_with_delete/.state/`. It aborts before writes if it finds staging-newer values, then pages inserts/updates, and finally deletes staging keys absent from that persisted KN key index. It requires a single-column unique key on the configured staging key field and verifies that KN returns no duplicate keys before writing. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
 
 ```sh
 # Inspect progress without database credentials.

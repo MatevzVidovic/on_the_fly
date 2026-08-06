@@ -31,3 +31,12 @@ def test_newer_staging_change_is_a_conflict() -> None:
     staging = {"key": datetime(2024, 1, 2, tzinfo=timezone.utc)}
 
     assert sync.make_plan(kn, staging, "date_change", False)[4] == [("key", kn["key"], staging["key"])]
+
+
+def test_resumable_state_paths_are_isolated_per_integration() -> None:
+    first = sync.resumable_paths("a" * 64)
+    second = sync.resumable_paths("b" * 64)
+
+    assert first != second
+    assert first[0].parent.name == "a" * 64
+    assert second[0].parent.name == "b" * 64
