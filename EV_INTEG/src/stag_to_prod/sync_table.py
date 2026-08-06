@@ -1,8 +1,5 @@
 #!/usr/bin/env python3
-"""Copy missing IDs from staging to production and remove stale production IDs.
-
-This intentionally never updates rows whose ID exists in both databases.
-"""
+"""Synchronise a staging PostgreSQL table to production using id and DATE_CHANGE."""
 
 from __future__ import annotations
 
@@ -75,7 +72,7 @@ def table_columns(connection: Any, schema: str, table: str) -> list[str]:
         return [row[0] for row in cursor.fetchall()]
 
 
-def verify_tables(stag: Any, prod: Any, schema: str, table: str) -> list[str]:
+def verify_tables(stag: Any, prod: Any, schema: str, table: str, change_field: str) -> list[str]:
     stag_columns = table_columns(stag, schema, table)
     prod_columns = table_columns(prod, schema, table)
     if not stag_columns:
@@ -84,6 +81,8 @@ def verify_tables(stag: Any, prod: Any, schema: str, table: str) -> list[str]:
         raise RuntimeError(f"production table {schema}.{table} was not found or has no insertable columns")
     if "id" not in stag_columns or "id" not in prod_columns:
         raise RuntimeError(f"both {schema}.{table} tables must have an id column")
+    if change_field not in stag_columns or change_field not in prod_columns:
+        raise RuntimeError(f"both {schema}.{table} tables must have the change field {change_field}")
     if stag_columns != prod_columns:
         only_stag = sorted(set(stag_columns) - set(prod_columns))
         only_prod = sorted(set(prod_columns) - set(stag_columns))
@@ -94,10 +93,49 @@ def verify_tables(stag: Any, prod: Any, schema: str, table: str) -> list[str]:
     return prod_columns
 
 
-def ids(connection: Any, schema: str, table: str) -> set[Any]:
+def id_changes(connection: Any, schema: str, table: str, change_field: str) -> dict[Any, Any]:
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT id FROM {relation_sql(schema, table)}")
-        return {row[0] for row in cursor.fetchall()}
+        cursor.execute(f'SELECT id, "{change_field}" FROM {relation_sql(schema, table)}')
+        result: dict[Any, Any] = {}
+        for identifier, changed_at in cursor.fetchall():
+            if identifier is None:
+                raise RuntimeError(f"{schema}.{table} contains a NULL id")
+            if identifier in result:
+                raise RuntimeError(f"{schema}.{table} contains a duplicate id: {identifier!r}")
+            result[identifier] = changed_at
+        return result
+
+
+def ordered(values: Iterable[Any]) -> list[Any]:
+    """Stable display/order without assuming a particular PostgreSQL id type."""
+    return sorted(values, key=lambda value: (type(value).__name__, repr(value)))
+
+
+def make_plan(stag_changes: dict[Any, Any], prod_changes: dict[Any, Any]) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
+    delete_ids = ordered(prod_changes.keys() - stag_changes.keys())
+    insert_ids = ordered(stag_changes.keys() - prod_changes.keys())
+    unchanged_ids: list[Any] = []
+    update_ids: list[Any] = []
+    conflicts: list[tuple[Any, Any, Any]] = []
+    for identifier in stag_changes.keys() & prod_changes.keys():
+        stag_change = stag_changes[identifier]
+        prod_change = prod_changes[identifier]
+        if stag_change == prod_change:
+            unchanged_ids.append(identifier)
+        elif stag_change is None or prod_change is None:
+            conflicts.append((identifier, stag_change, prod_change))
+        else:
+            try:
+                if prod_change < stag_change:
+                    update_ids.append(identifier)
+                else:
+                    conflicts.append((identifier, stag_change, prod_change))
+            except TypeError as error:
+                raise RuntimeError(
+                    f"cannot compare change field for id {identifier!r}: "
+                    f"staging={stag_change!r}, production={prod_change!r}"
+                ) from error
+    return delete_ids, insert_ids, ordered(unchanged_ids), ordered(update_ids), sorted(conflicts, key=lambda item: (type(item[0]).__name__, repr(item[0])))
 
 
 def chunks(values: list[Any], size: int) -> Iterable[list[Any]]:
@@ -126,13 +164,20 @@ def print_preview(label: str, rows: Iterable[tuple[Any, ...]], columns: list[str
         print("(none)")
 
 
+def print_conflicts(conflicts: list[tuple[Any, Any, Any]], change_field: str, limit: int) -> None:
+    print(f"CONFLICT rows (production {change_field} is newer or cannot be compared; showing up to {limit}):")
+    for identifier, stag_change, prod_change in conflicts[:limit]:
+        print(json.dumps({"id": identifier, f"staging_{change_field}": stag_change, f"production_{change_field}": prod_change}, default=str, ensure_ascii=False))
+
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("table", help="table name, without schema")
     parser.add_argument("--schema", default=None, help="schema; defaults to SYNC_SCHEMA or public")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
-    mode.add_argument("--apply", action="store_true", help="perform the deletes and inserts")
+    mode.add_argument("--apply", action="store_true", help="perform the deletes, inserts, and staging-newer updates")
+    parser.add_argument("--change-field", default="date_change", help="field used to compare matching IDs (default: DATE_CHANGE)")
     parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
     parser.add_argument("--batch-size", type=int, default=1_000, help="IDs processed per SQL statement (default: 1000)")
     args = parser.parse_args()
@@ -145,35 +190,56 @@ def main() -> int:
     args = parse_args()
     try:
         table = valid_identifier(args.table, "table")
+        change_field = valid_identifier(args.change_field, "change field").lower()
         load_environment()
         schema = valid_identifier(args.schema or os.environ.get("SYNC_SCHEMA", "public"), "schema")
         psycopg = require_psycopg()
         with psycopg.connect(**connection_settings("STAG")) as stag, psycopg.connect(**connection_settings("PROD")) as prod:
-            columns = verify_tables(stag, prod, schema, table)
-            stag_ids = ids(stag, schema, table)
-            prod_ids = ids(prod, schema, table)
-            delete_ids = sorted(prod_ids - stag_ids)
-            insert_ids = sorted(stag_ids - prod_ids)
-            print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "staging_ids": len(stag_ids), "production_ids": len(prod_ids), "delete_from_production": len(delete_ids), "insert_into_production": len(insert_ids)}))
-            if args.preview_limit:
-                print_preview("DELETE", rows_for_ids(prod, schema, table, columns, delete_ids, args.batch_size), columns, args.preview_limit)
-                print_preview("INSERT", rows_for_ids(stag, schema, table, columns, insert_ids, args.batch_size), columns, args.preview_limit)
-            if not args.apply:
-                return 0
-
+            columns = verify_tables(stag, prod, schema, table, change_field)
+            stag_changes = id_changes(stag, schema, table, change_field)
             relation = relation_sql(schema, table)
             placeholders = ", ".join("%s" for _ in columns)
             column_sql = ", ".join(f'"{column}"' for column in columns)
             insert_sql = f"INSERT INTO {relation} ({column_sql}) VALUES ({placeholders})"
-            # A transaction keeps production unchanged if any source row cannot be inserted.
+            update_columns = [column for column in columns if column != "id"]
+            update_sql = f"UPDATE {relation} SET {', '.join(f'\"{column}\" = %s' for column in update_columns)} WHERE id = %s"
+
+            def report_and_preview(prod_changes: dict[Any, Any]) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
+                plan = make_plan(stag_changes, prod_changes)
+                delete_ids, insert_ids, unchanged_ids, update_ids, conflicts = plan
+                print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "change_field": change_field, "staging_ids": len(stag_changes), "production_ids": len(prod_changes), "unchanged": len(unchanged_ids), "delete_from_production": len(delete_ids), "insert_into_production": len(insert_ids), "update_in_production": len(update_ids), "production_newer_conflicts": len(conflicts)}))
+                if args.preview_limit:
+                    print_preview("DELETE", rows_for_ids(prod, schema, table, columns, delete_ids, args.batch_size), columns, args.preview_limit)
+                    print_preview("INSERT", rows_for_ids(stag, schema, table, columns, insert_ids, args.batch_size), columns, args.preview_limit)
+                    print_preview("UPDATE", rows_for_ids(stag, schema, table, columns, update_ids, args.batch_size), columns, args.preview_limit)
+                    if conflicts:
+                        print_conflicts(conflicts, change_field, args.preview_limit)
+                return plan
+
+            if not args.apply:
+                plan = report_and_preview(id_changes(prod, schema, table, change_field))
+                if plan[-1]:
+                    raise RuntimeError("production has rows with a newer change field; no changes were made")
+                return 0
+
+            # The lock and second production read make the conflict check authoritative for this apply run.
             with prod.transaction():
+                with prod.cursor() as cursor:
+                    cursor.execute(f"LOCK TABLE {relation} IN SHARE ROW EXCLUSIVE MODE")
+                delete_ids, insert_ids, _unchanged_ids, update_ids, conflicts = report_and_preview(id_changes(prod, schema, table, change_field))
+                if conflicts:
+                    raise RuntimeError("production has rows with a newer change field; transaction rolled back without changes")
                 with prod.cursor() as cursor:
                     for batch in chunks(delete_ids, args.batch_size):
                         cursor.execute(f"DELETE FROM {relation} WHERE id = ANY(%s)", (batch,))
                     for batch in chunks(insert_ids, args.batch_size):
                         source_rows = list(rows_for_ids(stag, schema, table, columns, batch, args.batch_size))
                         cursor.executemany(insert_sql, source_rows)
-            print(f"applied: deleted {len(delete_ids)} rows; inserted {len(insert_ids)} rows")
+                    for batch in chunks(update_ids, args.batch_size):
+                        source_rows = rows_for_ids(stag, schema, table, columns, batch, args.batch_size)
+                        values = ((*[row[columns.index(column)] for column in update_columns], row[columns.index("id")]) for row in source_rows)
+                        cursor.executemany(update_sql, values)
+            print(f"applied: deleted {len(delete_ids)} rows; inserted {len(insert_ids)} rows; updated {len(update_ids)} rows")
             return 0
     except (RuntimeError, ValueError) as error:
         print(f"error: {error}", file=sys.stderr)
