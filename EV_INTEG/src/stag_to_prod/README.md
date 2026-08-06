@@ -9,7 +9,7 @@ If any matching production row has a newer `DATE_CHANGE` (or a non-comparable/nu
 Preview the proposed changes (no writes):
 
 ```sh
-.venv/bin/python src/stag_to_prod/sync_table.py jn_pe_parc --dry-run
+.venv/bin/python src/stag_to_prod/sync_table.py ev_pe_parc_h --id-field jn_pe_parc_pk --dry-run
 ```
 
 It prints the total counts and up to five example rows for each action. Use `--preview-limit 500` for more, or `--preview-limit 0` for counts only.
