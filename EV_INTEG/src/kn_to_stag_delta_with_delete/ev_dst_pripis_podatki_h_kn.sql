@@ -1,5 +1,6 @@
 SELECT
     j."ID" AS dst_pripis_podatki_pk,
+    j."ID" AS kn_page_id,
     j."DST_SID" AS dst_sid,
     j."EID" AS eid,
     j."ID_MODEL" AS id_model,

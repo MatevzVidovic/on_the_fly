@@ -4,7 +4,7 @@ Create `src/kn_to_stag_delta_with_delete/.env` from `.env.example`. The source i
 
 If KN enforces Oracle Native Network Encryption/Data Integrity, install Oracle Instant Client and set `KN_ORACLE_CLIENT_LIB_DIR` to its library directory in `.env`. This enables python-oracledb Thick mode, which KN requires for that security setting.
 
-Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique key, and return no duplicate keys. The key defaults to `id`; use `--id-field` for tables such as `jn_pe_parc_pk`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging. Existing keys are not updated.
+Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique key, and return no duplicate keys. The key defaults to `id`; use `--id-field` for tables such as `jn_pe_parc_pk`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging; matching keys are compared and may be updated unless `--ignore-change-field` is used.
 
 The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--ignore-change-field` for integrations that should use only key membership: delete staging keys absent from KN and insert KN keys absent from staging, while leaving matching keys unchanged.
 
@@ -49,12 +49,17 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
 ```sh
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_dst_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_dst_pripis_podatki_h_kn.sql \
-  --id-field dst_pripis_podatki_pk --change-field DATE_CHANGE --resumable --apply
-
+  --id-field dst_pripis_podatki_pk \
+  --source-page-key kn_page_id \
+  --change-field DATE_CHANGE \
+  --resumable --apply --page-size 10000
 
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
-  --id-field parc_pripis_podatki_pk --change-field DATE_CHANGE --resumable --apply
+  --id-field parc_pripis_podatki_pk \
+  --source-page-key kn_page_id \
+  --change-field DATE_CHANGE \
+  --resumable --apply --page-size 10000
 ```
 
 ## Dry-run: use only key membership
@@ -87,7 +92,9 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
   --resumable --apply
 ```
 
-`--source-page-key` is required for resumable runs. It is the native KN key (one or more integration-query columns) in the same order as the KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for direct-ID tables, use their selected `*_pk` alias. The resumable run first pages KN key/date values and records every KN key in its own fingerprinted directory under `src/kn_to_stag_delta_with_delete/.state/`. It aborts before writes if it finds staging-newer values, then pages inserts/updates, and finally deletes staging keys absent from that persisted KN key index. It requires a single-column unique key on the configured staging key field and verifies that KN returns no duplicate keys before writing. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
+`--source-page-key` is required for resumable runs. It is the native KN key (one or more integration-query aliases) in the same order as an all-ascending KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. A paging field that is not a staging column must be selected with a `kn_page_` alias, for example `j."ID" AS kn_page_id`; those fields are never inserted or updated in PostgreSQL. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for the two direct-ID examples, use `kn_page_id`.
+
+Before writing, resumable mode validates that both the membership ID and the complete native page tuple are non-null and unique. It stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
 
 ```sh
 # Inspect progress without database credentials.
@@ -101,6 +108,6 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
   --id-field jn_pe_parc_pk --source-page-key id_pe_parc,jn_rev_num --resumable --restart
 ```
 
-Resumable mode assumes the KN query is stable for the duration of the run. If the source query changes materially while a run is paused, use `--restart` to build a fresh key index.
+Resumable mode requires the KN query to remain stable from preflight through the final staging delete, including pauses and resumes. The final verification detects changes before deletion but is not an Oracle SCN/flashback snapshot; if KN may change during the run, use `--restart` to build a fresh key index.
 
 Use `--schema another_schema` only when staging tables are not in `public`; use `--preview-limit` to change the number of displayed rows.

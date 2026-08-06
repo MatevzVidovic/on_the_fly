@@ -1,5 +1,6 @@
 SELECT
     j."ID" AS parc_pripis_podatki_pk,
+    j."ID" AS kn_page_id,
     j."PC_MID" AS pc_mid,
     j."EID" AS eid,
     j."ID_MODEL" AS id_model,
