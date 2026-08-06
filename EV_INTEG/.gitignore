@@ -1,4 +1,6 @@
 .venv/
+.env
+src/stag_to_prod/.env
 __pycache__/
 .pytest_cache/
 src/**/.state/
