@@ -3,7 +3,7 @@
 
 with target_tables (table_name) as (
     select 'DST_PRIPIS_PODATKI' from dual union all select 'JN_DEL_STAVBE' from dual union all
-    select 'JN_DEL_STAVB_ENOTA' from dual union all select 'JN_PARC_DEL' from dual union all
+    select 'JN_DEL_STAVBE_ENOTA' from dual union all select 'JN_PARC_DEL' from dual union all
     select 'JN_PARC_ENOTA' from dual union all select 'JN_PARCELA' from dual union all
     select 'JN_PE_DST' from dual union all select 'JN_PE_PARC' from dual union all
     select 'JN_POSEBNA_ENOTA' from dual union all select 'JN_PROSTOR' from dual union all

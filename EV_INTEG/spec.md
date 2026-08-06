@@ -46,7 +46,7 @@ dst_pripis_podatki
 
 jn_del_stavbe
 
-jn_del_stavb_enota (deljena, spusti atribut podatki).  (že v liftu - to sta te 2025 dalje)
+JN_DEL_STAVBE_ENOTA (deljena, spusti atribut podatki).  (že v liftu - to sta te 2025 dalje)
 
 jn_parc_del
 

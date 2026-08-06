@@ -6,7 +6,7 @@ This compares the Oracle estimates in `research/research.md` with the LIFT Postg
 | --- | ---: | --- | ---: | ---: | ---: | --- |
 | `DST_PRIPIS_PODATKI` | 1,935,694 | None found | — | — | — | Missing target; create/analyse a new historical integration. |
 | `JN_DEL_STAVBE` | 11,133,941 | `ev_del_stavbe_h` | 9,941,382 | 2,490 MB | -1,192,559 / 89.29% | Existing data is materially behind the current Oracle estimate; inspect status/filter and latest `date_change`. |
-| `JN_DEL_STAVB_ENOTA` | Not available (`OBJECT NOT FOUND` in research export) | `ev_del_stavbe_enota_h_2020_2024`; `ev_del_stavbe_enota_h_2025_danes` | 6,902,641 + 4,747,777 = 11,650,418 | 1,229 MB + 1,258 MB = 2,487 MB | No source comparison available | Verify the split boundary, overlap/gap, omitted `PODATKI`, and 2025+ delta configuration. |
+| `JN_DEL_STAVBE_ENOTA` | Not available (`OBJECT NOT FOUND` in research export) | `ev_del_stavbe_enota_h_2020_2024`; `ev_del_stavbe_enota_h_2025_danes` | 6,902,641 + 4,747,777 = 11,650,418 | 1,229 MB + 1,258 MB = 2,487 MB | No source comparison available | Verify the split boundary, overlap/gap, omitted `PODATKI`, and 2025+ delta configuration. |
 | `JN_PARC_DEL` | 18,238,911 | `ev_parc_del_h` | 14,801,009 | 2,943 MB | -3,437,902 / 81.15% | Largest non-split shortfall; investigate before relying on the existing table. |
 | `JN_PARC_ENOTA` | 90,939,157 | `ev_parc_enota_h_2020`, `_2021`, `_2022`, `_2023`, `_2024`, `_2025_danes` | 88,248,911 total | 21,542 MB total | -2,690,246 / 97.04% | Looks broadly populated, but exact annual range checks are required. |
 | `JN_PARCELA` | 26,286,228 | `ev_parcela_h` | 26,018,648 | 8,169 MB | -267,580 / 98.98% | Close to the Oracle estimate; validate freshness and historical projection. |
