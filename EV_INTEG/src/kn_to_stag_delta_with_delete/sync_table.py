@@ -2,8 +2,8 @@
 """Synchronise ID membership from a KN Oracle SELECT into a staging PG table.
 
 The SQL file must contain one SELECT (or WITH ... SELECT) and must alias its
-output columns to the destination PostgreSQL column names, including `id`.
-Rows with an ID in both systems are intentionally not updated.
+output columns to the destination PostgreSQL column names. The membership key
+defaults to `id`, but can be selected with --id-field.
 """
 
 from __future__ import annotations
@@ -78,14 +78,14 @@ def read_select(path: Path) -> str:
     except OSError as error:
         raise RuntimeError(f"cannot read integration SQL file: {path}") from error
     query = query.rstrip(";").strip()
-    if not query or not re.match(r"^(SELECT|WITH)\\b", query, re.IGNORECASE):
+    if not query or not re.match(r"^(SELECT|WITH)\b", query, re.IGNORECASE):
         raise ValueError("integration SQL must contain exactly one SELECT or WITH query")
     if ";" in query:
         raise ValueError("integration SQL must not contain multiple statements")
     return query
 
 
-def target_columns(connection: Any, schema: str, table: str) -> list[str]:
+def target_columns(connection: Any, schema: str, table: str, id_field: str) -> list[str]:
     query = """
         SELECT column_name
         FROM information_schema.columns
@@ -99,8 +99,8 @@ def target_columns(connection: Any, schema: str, table: str) -> list[str]:
         columns = [row[0] for row in cursor.fetchall()]
     if not columns:
         raise RuntimeError(f"staging table {schema}.{table} was not found or has no insertable columns")
-    if "id" not in columns:
-        raise RuntimeError(f"staging table {schema}.{table} must have an id column")
+    if id_field not in columns:
+        raise RuntimeError(f"staging table {schema}.{table} must have the key column {id_field}")
     return columns
 
 
@@ -110,7 +110,7 @@ def scalar(value: Any) -> Any:
     return read() if callable(read) else value
 
 
-def source_rows(connection: Any, query: str, target_columns_: list[str]) -> dict[Any, tuple[Any, ...]]:
+def source_rows(connection: Any, query: str, target_columns_: list[str], id_field: str) -> dict[Any, tuple[Any, ...]]:
     with connection.cursor() as cursor:
         cursor.execute(query)
         source_columns = [description[0].lower() for description in cursor.description]
@@ -121,35 +121,35 @@ def source_rows(connection: Any, query: str, target_columns_: list[str]) -> dict
             extra = sorted(set(source_columns) - set(target_columns_))
             raise RuntimeError(f"integration SQL columns do not match staging table; missing: {missing or '-'}; extra: {extra or '-'}")
         positions = [source_columns.index(column) for column in target_columns_]
-        id_position = target_columns_.index("id")
+        id_position = target_columns_.index(id_field)
         rows: dict[Any, tuple[Any, ...]] = {}
         while fetched := cursor.fetchmany(1_000):
             for raw_row in fetched:
                 row = tuple(scalar(raw_row[position]) for position in positions)
                 identifier = row[id_position]
                 if identifier is None:
-                    raise RuntimeError("integration SQL returned a NULL id")
+                    raise RuntimeError(f"integration SQL returned a NULL {id_field}")
                 if identifier in rows:
-                    raise RuntimeError(f"integration SQL returned duplicate id: {identifier!r}")
+                    raise RuntimeError(f"integration SQL returned duplicate {id_field}: {identifier!r}")
                 rows[identifier] = row
         return rows
 
 
-def staging_rows(connection: Any, schema: str, table: str, columns: list[str], identifiers: list[Any], batch_size: int) -> Iterable[tuple[Any, ...]]:
+def staging_rows(connection: Any, schema: str, table: str, columns: list[str], id_field: str, identifiers: list[Any], batch_size: int) -> Iterable[tuple[Any, ...]]:
     projection = ", ".join(f'"{column}"' for column in columns)
     for start in range(0, len(identifiers), batch_size):
         batch = identifiers[start : start + batch_size]
         with connection.cursor() as cursor:
-            cursor.execute(f"SELECT {projection} FROM {relation_sql(schema, table)} WHERE id = ANY(%s) ORDER BY id", (batch,))
+            cursor.execute(f'SELECT {projection} FROM {relation_sql(schema, table)} WHERE "{id_field}" = ANY(%s) ORDER BY "{id_field}"', (batch,))
             yield from cursor.fetchall()
 
 
-def staging_ids(connection: Any, schema: str, table: str) -> set[Any]:
+def staging_ids(connection: Any, schema: str, table: str, id_field: str) -> set[Any]:
     with connection.cursor() as cursor:
-        cursor.execute(f"SELECT id FROM {relation_sql(schema, table)}")
+        cursor.execute(f'SELECT "{id_field}" FROM {relation_sql(schema, table)}')
         result = {row[0] for row in cursor.fetchall()}
     if None in result:
-        raise RuntimeError(f"staging table {schema}.{table} contains a NULL id")
+        raise RuntimeError(f"staging table {schema}.{table} contains a NULL {id_field}")
     return result
 
 
@@ -169,6 +169,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("table", help="staging table name, without schema")
     parser.add_argument("--integration-sql", required=True, type=Path, help="path to the KN SELECT statement")
+    parser.add_argument("--id-field", default="id", help="unique membership key in both systems (default: id)")
     parser.add_argument("--schema", default=None, help="defaults to STAG_SCHEMA or public")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
@@ -185,20 +186,21 @@ def main() -> int:
     args = parse_args()
     try:
         table = valid_identifier(args.table, "table")
+        id_field = valid_identifier(args.id_field, "id field").lower()
         load_environment()
         schema = valid_identifier(args.schema or os.environ.get("STAG_SCHEMA", "public"), "schema")
         query = read_select(args.integration_sql)
         oracledb, psycopg = require_drivers()
         with oracledb.connect(**oracle_settings(oracledb)) as kn, psycopg.connect(**pg_settings()) as stag:
-            columns = target_columns(stag, schema, table)
-            source = source_rows(kn, query, columns)
+            columns = target_columns(stag, schema, table, id_field)
+            source = source_rows(kn, query, columns, id_field)
             source_ids = set(source)
-            destination_ids = staging_ids(stag, schema, table)
+            destination_ids = staging_ids(stag, schema, table, id_field)
             delete_ids = list(destination_ids - source_ids)
             insert_ids = list(source_ids - destination_ids)
-            print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "kn_ids": len(source_ids), "staging_ids": len(destination_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids)}))
+            print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "id_field": id_field, "kn_ids": len(source_ids), "staging_ids": len(destination_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids)}))
             if args.preview_limit:
-                preview("DELETE", staging_rows(stag, schema, table, columns, delete_ids, args.batch_size), columns, args.preview_limit)
+                preview("DELETE", staging_rows(stag, schema, table, columns, id_field, delete_ids, args.batch_size), columns, args.preview_limit)
                 preview("INSERT", (source[identifier] for identifier in insert_ids), columns, args.preview_limit)
             if not args.apply:
                 return 0
@@ -208,7 +210,7 @@ def main() -> int:
             with stag.transaction():
                 with stag.cursor() as cursor:
                     for start in range(0, len(delete_ids), args.batch_size):
-                        cursor.execute(f"DELETE FROM {relation} WHERE id = ANY(%s)", (delete_ids[start : start + args.batch_size],))
+                        cursor.execute(f'DELETE FROM {relation} WHERE "{id_field}" = ANY(%s)', (delete_ids[start : start + args.batch_size],))
                     for start in range(0, len(insert_ids), args.batch_size):
                         cursor.executemany(insert_sql, (source[identifier] for identifier in insert_ids[start : start + args.batch_size]))
             print(f"applied: deleted {len(delete_ids)} rows; inserted {len(insert_ids)} rows")
