@@ -190,38 +190,61 @@ def comparable_change(value: Any) -> Any:
     if not isinstance(value, str):
         return value
     try:
-        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+        return datetime.fromisoformat(value.strip().replace("Z", "+00:00"))
     except ValueError:
         return value
 
 
-def make_plan(source: dict[Any, tuple[Any, ...]], source_columns: list[str], stag_changes: dict[Any, Any], change_field: str, ignore_change_field: bool) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
-    source_ids = set(source)
+def source_changes(connection: Any, query: str, id_field: str, change_field: str | None) -> dict[Any, Any]:
+    projection = id_field if change_field is None else f"{id_field}, {change_field}"
+    with connection.cursor() as cursor:
+        cursor.execute(f"SELECT {projection} FROM ({query})")
+        result: dict[Any, Any] = {}
+        for row in cursor.fetchall():
+            identifier, changed_at = row if change_field else (row[0], None)
+            if identifier is None:
+                raise RuntimeError(f"integration SQL returned a NULL {id_field}")
+            if identifier in result:
+                raise RuntimeError(f"integration SQL returned duplicate {id_field}: {identifier!r}")
+            result[identifier] = scalar(changed_at)
+        return result
+
+
+def make_plan(kn_changes: dict[Any, Any], stag_changes: dict[Any, Any], change_field: str, ignore_change_field: bool) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
+    source_ids = set(kn_changes)
     stag_ids = set(stag_changes)
     delete_ids = ordered(stag_ids - source_ids)
     insert_ids = ordered(source_ids - stag_ids)
     unchanged_ids: list[Any] = []
     update_ids: list[Any] = []
     conflicts: list[tuple[Any, Any, Any]] = []
-    change_position = source_columns.index(change_field) if not ignore_change_field else None
     for identifier in source_ids & stag_ids:
         if ignore_change_field:
             unchanged_ids.append(identifier)
             continue
-        source_change = comparable_change(source[identifier][change_position])
+        source_change = comparable_change(kn_changes[identifier])
         stag_change = comparable_change(stag_changes[identifier])
         if source_change == stag_change:
             unchanged_ids.append(identifier)
         elif source_change is None or stag_change is None:
             conflicts.append((identifier, source_change, stag_change))
         else:
+            if isinstance(source_change, datetime) and isinstance(stag_change, datetime) and (source_change.tzinfo is None) != (stag_change.tzinfo is None):
+                # A PostgreSQL `timestamp` value is naive; compare Oracle's
+                # local wall-clock component in that exceptional layout.
+                source_change = source_change.replace(tzinfo=None)
+                stag_change = stag_change.replace(tzinfo=None)
             try:
                 if stag_change < source_change:
                     update_ids.append(identifier)
                 else:
                     conflicts.append((identifier, source_change, stag_change))
             except TypeError as error:
-                raise RuntimeError(f"cannot compare {change_field} for key {identifier!r}") from error
+                raise RuntimeError(
+                    f"cannot compare {change_field} for key {identifier!r}: "
+                    f"KN={source_change!r} ({type(source_change).__name__}), "
+                    f"staging={stag_change!r} ({type(stag_change).__name__})"
+                ) from error
     return delete_ids, insert_ids, ordered(unchanged_ids), ordered(update_ids), sorted(conflicts, key=lambda item: (type(item[0]).__name__, repr(item[0])))
 
 
@@ -277,19 +300,26 @@ def main() -> int:
             source_columns, destination_columns = target_columns(stag, schema, table, id_field)
             if not args.ignore_change_field and change_field not in source_columns:
                 raise RuntimeError(f"integration/staging table must contain {change_field}, or use --ignore-change-field")
-            source = source_rows(kn, query, source_columns, id_field)
+            # Dry-runs deliberately fetch only the key and change field from KN.
+            kn_changes = source_changes(kn, query, id_field, None if args.ignore_change_field else change_field)
             relation = relation_sql(schema, table)
             column_sql = ", ".join(f'"{column}"' for column in source_columns)
             insert_sql = f"INSERT INTO {relation} ({column_sql}) VALUES ({', '.join('%s' for _ in source_columns)})"
 
             def report_and_preview(stag_changes: dict[Any, Any]) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
-                plan = make_plan(source, source_columns, stag_changes, change_field, args.ignore_change_field)
+                plan = make_plan(kn_changes, stag_changes, change_field, args.ignore_change_field)
                 delete_ids, insert_ids, unchanged_ids, update_ids, conflicts = plan
-                print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": args.ignore_change_field, "kn_keys": len(source), "staging_keys": len(stag_changes), "unchanged": len(unchanged_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids), "update_in_staging": len(update_ids), "staging_newer_conflicts": len(conflicts)}))
+                print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": args.ignore_change_field, "kn_keys": len(kn_changes), "staging_keys": len(stag_changes), "unchanged": len(unchanged_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids), "update_in_staging": len(update_ids), "staging_newer_conflicts": len(conflicts)}))
                 if args.preview_limit:
-                    preview("DELETE", staging_rows(stag, schema, table, destination_columns, id_field, delete_ids, args.batch_size), destination_columns, args.preview_limit)
-                    preview("INSERT", (source[identifier] for identifier in insert_ids), source_columns, args.preview_limit)
-                    preview("UPDATE", (source[identifier] for identifier in update_ids), source_columns, args.preview_limit)
+                    preview_columns = [id_field] if args.ignore_change_field else [id_field, change_field]
+                    if args.ignore_change_field:
+                        preview("DELETE", ((identifier,) for identifier in delete_ids), preview_columns, args.preview_limit)
+                        preview("INSERT", ((identifier,) for identifier in insert_ids), preview_columns, args.preview_limit)
+                        preview("UPDATE", (), preview_columns, args.preview_limit)
+                    else:
+                        preview("DELETE", ((identifier, stag_changes[identifier]) for identifier in delete_ids), preview_columns, args.preview_limit)
+                        preview("INSERT", ((identifier, kn_changes[identifier]) for identifier in insert_ids), preview_columns, args.preview_limit)
+                        preview("UPDATE", ((identifier, kn_changes[identifier]) for identifier in update_ids), preview_columns, args.preview_limit)
                     if conflicts:
                         preview_conflicts(conflicts, id_field, change_field, args.preview_limit)
                 return plan
@@ -309,6 +339,13 @@ def main() -> int:
                 delete_ids, insert_ids, _unchanged_ids, update_ids, conflicts = report_and_preview(staging_changes(stag, schema, table, id_field, None if args.ignore_change_field else change_field))
                 if conflicts:
                     raise RuntimeError("staging has rows with a newer change field; transaction rolled back without changes")
+                # Fetch full KN rows only after the apply preflight has proved
+                # that data must be inserted or updated.
+                source: dict[Any, tuple[Any, ...]] = {}
+                if insert_ids or update_ids:
+                    source = source_rows(kn, query, source_columns, id_field)
+                    if set(source) != set(kn_changes):
+                        raise RuntimeError("KN result changed during this run; transaction rolled back without changes")
                 with stag.cursor() as cursor:
                     for start in range(0, len(delete_ids), args.batch_size):
                         cursor.execute(f'DELETE FROM {relation} WHERE "{id_field}" = ANY(%s)', (delete_ids[start : start + args.batch_size],))

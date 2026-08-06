@@ -27,6 +27,8 @@ The tool also parses ISO `DATE_CHANGE` text for its comparisons.
 
 This is the default. It deletes staging keys absent from KN, inserts absent staging keys, updates rows where KN is newer, and errors if staging is newer:
 
+Dry-run fetches only the key and comparison field from KN (and the same two fields from staging), so it does not pull the full table payload. The displayed examples therefore contain only those fields.
+
 
 ```sh
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
