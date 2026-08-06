@@ -12,10 +12,11 @@ The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_a
 
 This is the default. It deletes staging keys absent from KN, inserts absent staging keys, updates rows where KN is newer, and errors if staging is newer:
 
+
 ```sh
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
-  --id-field jn_pe_parc_pk --dry-run
+  --id-field jn_pe_parc_pk --change-field DATE_CHANGE --dry-run
 ```
 
 ## Dry-run: use only key membership
