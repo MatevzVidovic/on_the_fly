@@ -4,7 +4,7 @@ Create `src/kn_to_stag_delta_with_delete/.env` from `.env.example`. The source i
 
 If KN enforces Oracle Native Network Encryption/Data Integrity, install Oracle Instant Client and set `KN_ORACLE_CLIENT_LIB_DIR` to its library directory in `.env`. This enables python-oracledb Thick mode, which KN requires for that security setting.
 
-Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique key, and return no duplicate keys. The key defaults to `id`; use `--id-field` for tables such as `jn_pe_parc_pk`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging; matching keys are compared and may be updated unless `--ignore-change-field` is used.
+Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique membership key, and return no duplicate keys. `--id-field` is required and must name a source/staging field such as `jn_pe_parc_pk`; it cannot be LIFT's generated `id`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging; matching keys are compared and may be updated unless `--ignore-change-field` is used.
 
 The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--ignore-change-field` for integrations that should use only key membership: delete staging keys absent from KN and insert KN keys absent from staging, while leaving matching keys unchanged.
 
@@ -52,14 +52,14 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
   --id-field dst_pripis_podatki_pk \
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
-  --resumable --apply --page-size 10000
+  --resumable --apply --page-size 20000
 
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
   --id-field parc_pripis_podatki_pk \
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
-  --resumable --apply --page-size 10000
+  --resumable --apply --page-size 20000
 ```
 
 ## Dry-run: use only key membership
@@ -108,6 +108,6 @@ Before writing, resumable mode validates that both the membership ID and the com
   --id-field jn_pe_parc_pk --source-page-key id_pe_parc,jn_rev_num --resumable --restart
 ```
 
-Resumable mode requires the KN query to remain stable from preflight through the final staging delete, including pauses and resumes. The final verification detects changes before deletion but is not an Oracle SCN/flashback snapshot; if KN may change during the run, use `--restart` to build a fresh key index.
+Resumable mode requires the KN query to remain stable from preflight through the final staging delete, including pauses and resumes. The final verification detects changes before deletion but is not an Oracle SCN/flashback snapshot; if KN may change during the run, use `--restart` to build a fresh key index. Each active invocation holds a PostgreSQL advisory lock for the target table. Other staging writers must honor that lock (or the table must otherwise be quiescent); advisory locks cannot stop unrelated writers that ignore them, and they are released between `--max-pages` runs or after a crash. Keep staging writers quiescent for the complete logical run when resuming. `DATE_CHANGE` must change whenever imported payload data changes, because it is the source-version value verified by the loader.
 
 Use `--schema another_schema` only when staging tables are not in `public`; use `--preview-limit` to change the number of displayed rows.

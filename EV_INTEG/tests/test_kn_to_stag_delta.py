@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 import importlib.util
 from pathlib import Path
+from uuid import UUID
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "src" / "kn_to_stag_delta_with_delete" / "sync_table.py"
@@ -90,6 +91,11 @@ def test_typed_cursor_codec_rejects_lossy_values() -> None:
             raise AssertionError(f"{value!r} must be rejected")
 
 
+def test_typed_cursor_codec_round_trips_uuid() -> None:
+    value = UUID("12345678-1234-5678-1234-567812345678")
+    assert sync.decode_value(sync.encode_value(value)) == value
+
+
 def test_page_only_output_columns_are_allowed_but_unknown_extras_are_not() -> None:
     sync.validate_source_output(
         ["synthetic_pk", "date_change", "kn_page_id"],
@@ -136,3 +142,80 @@ def test_source_full_page_strips_page_only_column(monkeypatch) -> None:
     assert rows == {"row-1": ("row-1", "payload")}
     assert cursors == {"row-1": ("oracle-1",)}
     assert next_cursor == ("oracle-1",)
+
+
+def test_staging_advisory_lock_uses_autocommit_and_releases(monkeypatch) -> None:
+    events: list[str] = []
+
+    class Cursor:
+        def __init__(self, connection):
+            self.connection = connection
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, statement, _parameters):
+            assert self.connection.autocommit
+            events.append(statement)
+
+        def fetchone(self):
+            return (True,)
+
+    class Connection:
+        autocommit = False
+
+        def cursor(self):
+            return Cursor(self)
+
+        def close(self):
+            events.append("close")
+
+    class Driver:
+        def connect(self, **_settings):
+            return Connection()
+
+    monkeypatch.setattr(sync, "pg_settings", lambda: {})
+    with sync.staging_advisory_lock(Driver(), "public", "target"):
+        events.append("work")
+
+    assert "SELECT pg_try_advisory_lock(hashtext(%s))" in events
+    assert "SELECT pg_advisory_unlock(hashtext(%s))" in events
+    assert events[-1] == "close"
+
+
+def test_require_unique_key_rejects_partial_or_nullable_key() -> None:
+    class Cursor:
+        def __init__(self, responses):
+            self.responses = iter(responses)
+            self.statements: list[str] = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, statement, _parameters):
+            self.statements.append(statement)
+
+        def fetchone(self):
+            return next(self.responses)
+
+    class Connection:
+        def __init__(self, responses):
+            self.cursor_instance = Cursor(responses)
+
+        def cursor(self):
+            return self.cursor_instance
+
+    connection = Connection([(1,), ("YES",)])
+    try:
+        sync.require_unique_key(connection, "public", "target", "source_id")
+    except RuntimeError as error:
+        assert "NOT NULL" in str(error)
+    else:
+        raise AssertionError("nullable resumable key must be rejected")
+    assert "i.indpred IS NULL" in connection.cursor_instance.statements[0]

@@ -23,6 +23,7 @@ from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Any, Iterable
+from uuid import UUID
 
 
 HERE = Path(__file__).resolve().parent
@@ -30,7 +31,7 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 # These columns are owned by LIFT/PostgreSQL, not supplied by the KN SELECT.
 LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at", "updated_by"})
 PAGE_ONLY_PREFIX = "kn_page_"
-STATE_FORMAT = 2
+STATE_FORMAT = 3
 
 
 def valid_identifier(value: str, label: str) -> str:
@@ -149,6 +150,28 @@ def file_lock(path: Path) -> Iterable[None]:
             fcntl.flock(handle.fileno(), fcntl.LOCK_UN)
 
 
+@contextmanager
+def staging_advisory_lock(psycopg: Any, schema: str, table: str) -> Iterable[None]:
+    """Keep a cooperative per-table PG lock while individual pages commit."""
+    connection = psycopg.connect(**pg_settings())
+    # Session advisory locks outlive transactions.  This dedicated connection
+    # must not remain idle in an open transaction for a long backfill run.
+    connection.autocommit = True
+    name = f"kn_to_stag_delta:{schema}.{table}"
+    try:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT pg_try_advisory_lock(hashtext(%s))", (name,))
+            if not cursor.fetchone()[0]:
+                raise RuntimeError(f"another resumable sync holds the staging advisory lock for {schema}.{table}")
+        yield
+    finally:
+        try:
+            with connection.cursor() as cursor:
+                cursor.execute("SELECT pg_advisory_unlock(hashtext(%s))", (name,))
+        finally:
+            connection.close()
+
+
 def is_transient(error: Exception) -> bool:
     text = str(error).lower()
     return any(marker in text for marker in ("connection", "network", "timeout", "temporar", "ora-12170", "ora-125", "could not connect", "dpy-6005"))
@@ -205,14 +228,22 @@ def require_unique_key(connection: Any, schema: str, table: str, id_field: str) 
         FROM pg_index i
         JOIN pg_class c ON c.oid = i.indrelid
         JOIN pg_namespace n ON n.oid = c.relnamespace
-        JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = ANY(i.indkey)
+        JOIN pg_attribute a ON a.attrelid = c.oid AND a.attnum = i.indkey[0]
         WHERE n.nspname = %s AND c.relname = %s
-          AND i.indisunique AND array_length(i.indkey, 1) = 1 AND a.attname = %s
+          AND i.indisunique AND i.indisvalid AND i.indpred IS NULL
+          AND i.indnkeyatts = 1 AND a.attname = %s
     """
     with connection.cursor() as cursor:
         cursor.execute(query, (schema, table, id_field))
         if cursor.fetchone() is None:
-            raise RuntimeError(f"staging table {schema}.{table} needs a single-column unique key on {id_field}")
+            raise RuntimeError(f"staging table {schema}.{table} needs a non-partial single-column unique key on {id_field}")
+        cursor.execute(
+            "SELECT is_nullable FROM information_schema.columns WHERE table_schema = %s AND table_name = %s AND column_name = %s",
+            (schema, table, id_field),
+        )
+        nullable = cursor.fetchone()
+        if nullable is None or nullable[0] != "NO":
+            raise RuntimeError(f"staging table {schema}.{table} requires {id_field} to be NOT NULL for resumable sync")
 
 
 def insert_statement(schema: str, table: str, source_columns: list[str], destination_columns: list[str]) -> str:
@@ -244,6 +275,8 @@ def encode_value(value: Any) -> dict[str, str]:
         return {"type": "int", "value": str(value)}
     if isinstance(value, Decimal):
         return {"type": "decimal", "value": str(value)}
+    if isinstance(value, UUID):
+        return {"type": "uuid", "value": str(value)}
     if isinstance(value, datetime):
         return {"type": "datetime", "value": value.isoformat()}
     if isinstance(value, date):
@@ -264,6 +297,8 @@ def decode_value(value: Any) -> Any:
         return int(text)
     if kind == "decimal":
         return Decimal(text)
+    if kind == "uuid":
+        return UUID(text)
     if kind == "date":
         return date.fromisoformat(text)
     if kind == "datetime":
@@ -457,6 +492,8 @@ def sync_fingerprint(query: str, schema: str, table: str, id_field: str, change_
 
 def key_database(path: Path) -> sqlite3.Connection:
     connection = sqlite3.connect(path)
+    connection.execute("PRAGMA journal_mode=WAL")
+    connection.execute("PRAGMA synchronous=FULL")
     connection.execute("""
         CREATE TABLE IF NOT EXISTS source_keys (
             key TEXT PRIMARY KEY,
@@ -541,19 +578,17 @@ def source_change_page(oracledb: Any, query: str, id_field: str, change_field: s
     positions = {name: index for index, name in enumerate(names)}
     result: dict[Any, Any] = {}
     page_cursors: dict[Any, tuple[Any, ...]] = {}
-    previous_cursor: tuple[Any, ...] | None = None
     for row in rows:
         identifier = row[positions[id_field]]
         changed_at = row[positions[change_field]] if change_field else None
         page_cursor = tuple(row[positions[field]] for field in page_key)
-        if any(value is None for value in page_cursor) or (after_key is not None and page_cursor <= after_key) or (previous_cursor is not None and page_cursor <= previous_cursor):
+        if any(value is None for value in page_cursor):
             raise RuntimeError(f"integration SQL must return unique, non-NULL source page keys: {', '.join(page_key)}")
         if identifier is None or identifier in result:
             raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values")
         result[identifier] = changed_at
         page_cursors[identifier] = page_cursor
-        previous_cursor = page_cursor
-    return result, page_cursors, previous_cursor
+    return result, page_cursors, page_cursors[next(reversed(page_cursors))] if page_cursors else None
 
 
 def oracle_columns(oracledb: Any, query: str) -> list[str]:
@@ -571,22 +606,22 @@ def require_source_invariants(oracledb: Any, query: str, id_field: str, page_key
     def operation() -> None:
         with oracledb.connect(**oracle_settings(oracledb)) as connection:
             with connection.cursor() as cursor:
-                cursor.execute(f"SELECT {id_field} FROM ({query}) source_rows WHERE {id_field} IS NULL FETCH FIRST 1 ROWS ONLY")
-                if cursor.fetchone():
-                    raise RuntimeError(f"integration SQL returned a NULL {id_field}")
-                cursor.execute(f"SELECT {id_field} FROM ({query}) source_rows GROUP BY {id_field} HAVING COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY")
-                duplicate = cursor.fetchone()
-                if duplicate:
-                    raise RuntimeError(f"integration SQL returned duplicate {id_field}: {duplicate[0]!r}")
-                null_condition = " OR ".join(f"{field} IS NULL" for field in page_key)
-                cursor.execute(f"SELECT 1 FROM ({query}) source_rows WHERE {null_condition} FETCH FIRST 1 ROWS ONLY")
-                if cursor.fetchone():
-                    raise RuntimeError(f"integration SQL returned a NULL source page key component: {', '.join(page_key)}")
                 cursor.execute(
-                    f"SELECT 1 FROM ({query}) source_rows GROUP BY {', '.join(page_key)} HAVING COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY"
+                    f"SELECT {id_field} FROM ({query}) source_rows GROUP BY {id_field} "
+                    f"HAVING {id_field} IS NULL OR COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY"
+                )
+                invalid_id = cursor.fetchone()
+                if invalid_id:
+                    if invalid_id[0] is None:
+                        raise RuntimeError(f"integration SQL returned a NULL {id_field}")
+                    raise RuntimeError(f"integration SQL returned duplicate {id_field}: {invalid_id[0]!r}")
+                null_condition = " OR ".join(f"{field} IS NULL" for field in page_key)
+                cursor.execute(
+                    f"SELECT 1 FROM ({query}) source_rows GROUP BY {', '.join(page_key)} "
+                    f"HAVING ({null_condition}) OR COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY"
                 )
                 if cursor.fetchone():
-                    raise RuntimeError(f"integration SQL returned duplicate source page tuple: {', '.join(page_key)}")
+                    raise RuntimeError(f"integration SQL returned NULL or duplicate source page tuple: {', '.join(page_key)}")
     retry(operation)
 
 
@@ -598,19 +633,17 @@ def source_full_page(oracledb: Any, query: str, id_field: str, source_columns: l
     key_position = source_columns.index(id_field)
     result: dict[Any, tuple[Any, ...]] = {}
     page_cursors: dict[Any, tuple[Any, ...]] = {}
-    previous_cursor: tuple[Any, ...] | None = None
     for raw_row in rows:
         row = tuple(raw_row[position] for position in positions)
         identifier = row[key_position]
         page_cursor = tuple(raw_row[position] for position in page_positions)
-        if any(value is None for value in page_cursor) or (after_key is not None and page_cursor <= after_key) or (previous_cursor is not None and page_cursor <= previous_cursor):
+        if any(value is None for value in page_cursor):
             raise RuntimeError(f"integration SQL must return unique, non-NULL source page keys: {', '.join(page_key)}")
         if identifier is None or identifier in result:
             raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values")
         result[identifier] = row
         page_cursors[identifier] = page_cursor
-        previous_cursor = page_cursor
-    return result, page_cursors, previous_cursor
+    return result, page_cursors, tuple(rows[-1][page_positions[index]] for index in range(len(page_positions))) if rows else None
 
 
 def staging_changes_for_keys(connection: Any, schema: str, table: str, id_field: str, change_field: str | None, identifiers: list[Any]) -> dict[Any, Any]:
@@ -651,13 +684,22 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
     if not args.apply:
         raise RuntimeError("--resumable is only available with --apply; dry-run is already read-only")
-    with file_lock(lock_path):
+    with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table):
         state = read_checkpoint(checkpoint)
         if state and (state.get("fingerprint") != fingerprint or state.get("format") != STATE_FORMAT):
             raise RuntimeError("checkpoint belongs to a different table, SQL, or sync options; use --restart after review")
+        if state:
+            expected = {
+                "schema": schema, "table": table, "id_field": id_field, "change_field": change_field,
+                "ignore_change_field": args.ignore_change_field, "source_page_key": list(page_key),
+            }
+            if any(state.get(name) != value for name, value in expected.items()):
+                raise RuntimeError("checkpoint settings are inconsistent; use --restart")
         if state and state.get("phase") == "complete":
             print("resumable sync already complete; use --restart only to deliberately replay it")
             return 0
+        if state and state.get("phase") in {"conflict", "verification_failed"}:
+            raise RuntimeError(f"resumable sync is in terminal state {state.get('status', state['phase'])}; resolve the cause and use --restart")
         with psycopg.connect(**pg_settings()) as connection:
             source_columns, destination_columns = target_columns(connection, schema, table, id_field)
             require_unique_key(connection, schema, table, id_field)
@@ -670,6 +712,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                 "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key),
                 "ignore_change_field": args.ignore_change_field, "phase": "preflight", "source_cursor": None,
                 "verify_cursor": None, "delete_cursor": None, "pages": 0, "rows": 0, "status": "running",
+                "preflight_rows": 0, "applied_rows": 0, "verified_rows": 0, "delete_scanned": 0, "deleted": 0,
             }
             atomic_json_write(checkpoint, state)
         keys = key_database(key_path)
@@ -712,6 +755,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     cursor = next_cursor
                     page_count += 1
                     rows += len(kn_changes)
+                    state["preflight_rows"] = int(state.get("preflight_rows", 0)) + len(kn_changes)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
                     print(f"preflight committed page {page_count} ({len(kn_changes)} keys; total {rows})")
                     continue
@@ -719,7 +763,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     source, page_cursors, next_cursor = source_full_page(oracledb, query, id_field, source_columns, page_key, cursor, args.page_size)
                     if not source:
                         phase, cursor = "verify", None
-                        state["verify_rows"] = 0
+                        state["verified_rows"] = 0
                         save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
                         continue
                     changes = {identifier: None if args.ignore_change_field else source[identifier][source_columns.index(change_field)] for identifier in source}
@@ -744,13 +788,14 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     cursor = next_cursor
                     page_count += 1
                     rows += len(source)
+                    state["applied_rows"] = int(state.get("applied_rows", 0)) + len(source)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
                     print(f"apply committed page {page_count} ({len(source)} rows; total {rows})")
                     continue
                 if phase == "verify":
                     kn_changes, page_cursors, next_cursor = source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, args.page_size)
                     if not kn_changes:
-                        if int(state.get("verify_rows", 0)) != key_count(keys):
+                        if int(state.get("verified_rows", 0)) != key_count(keys):
                             state.update(phase="verification_failed", status="source_changed")
                             atomic_json_write(checkpoint, state)
                             raise RuntimeError("KN result changed during final verification; no deletes were made; use --restart")
@@ -764,9 +809,9 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     cursor = next_cursor
                     page_count += 1
                     rows += len(kn_changes)
-                    state["verify_rows"] = int(state.get("verify_rows", 0)) + len(kn_changes)
+                    state["verified_rows"] = int(state.get("verified_rows", 0)) + len(kn_changes)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
-                    print(f"verify committed page {page_count} ({len(kn_changes)} rows; total {state['verify_rows']})")
+                    print(f"verify committed page {page_count} ({len(kn_changes)} rows; total {state['verified_rows']})")
                     continue
                 if phase == "delete":
                     with psycopg.connect(**pg_settings()) as connection:
@@ -774,7 +819,14 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                         if not identifiers:
                             state.update(phase="complete", status="complete", completed_at=datetime.now().astimezone().isoformat())
                             atomic_json_write(checkpoint, state)
-                            print(f"complete: {state['rows']} scanned rows in {state['pages']} pages")
+                            print(
+                                "complete: "
+                                f"preflight={state.get('preflight_rows', 0)}, "
+                                f"apply={state.get('applied_rows', 0)}, "
+                                f"verify={state.get('verified_rows', 0)}, "
+                                f"staging_scanned={state.get('delete_scanned', 0)}, "
+                                f"deleted={state.get('deleted', 0)} rows in {state['pages']} pages"
+                            )
                             return 0
                         delete_ids = [identifier for identifier in identifiers if not known_key(keys, identifier)]
                         with connection.transaction():
@@ -784,6 +836,8 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     cursor = identifiers[-1]
                     page_count += 1
                     rows += len(identifiers)
+                    state["delete_scanned"] = int(state.get("delete_scanned", 0)) + len(identifiers)
+                    state["deleted"] = int(state.get("deleted", 0)) + len(delete_ids)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
                     print(f"delete committed page {page_count} ({len(delete_ids)} deleted; scanned {len(identifiers)})")
                     continue
@@ -796,7 +850,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("table", help="staging table name, without schema")
     parser.add_argument("--integration-sql", required=True, type=Path, help="path to the KN SELECT statement")
-    parser.add_argument("--id-field", default="id", help="unique membership key in both systems (default: id)")
+    parser.add_argument("--id-field", required=True, help="unique source/staging membership key (LIFT system id is not valid)")
     parser.add_argument("--schema", default=None, help="defaults to STAG_SCHEMA or public")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
@@ -838,7 +892,7 @@ def main() -> int:
                 print(json.dumps(read_checkpoint(checkpoint) or {"status": "not started"}, indent=2, default=str))
                 return 0
             with file_lock(lock_path):
-                for path in (checkpoint, key_path):
+                for path in (checkpoint, key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
                     if path.exists():
                         path.unlink()
             print("removed this integration's resumable checkpoint and source-key index")
