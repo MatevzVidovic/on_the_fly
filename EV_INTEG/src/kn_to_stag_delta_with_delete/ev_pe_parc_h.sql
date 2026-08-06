@@ -13,9 +13,12 @@ POV_PE_BREZ_ZPS,
 DELITEV_MSG,
 POVR_PARC_IZR,
 CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
-    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, 
-    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
-    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+    TO_CHAR(FROM_TZ(CAST(RF.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
+            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,
+    TO_CHAR(FROM_TZ(CAST(RT.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
+            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_to,
+    TO_CHAR(FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana'),
+            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change
 from EV.JN_PE_PARC j
              join ev.revision rf on (j.jn_rev_num = rf.rev_num)
          left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)
