@@ -253,13 +253,12 @@ def checkpoint_path(entrypoint: Path) -> Path:
 
 def run_loader(spec: TableSpec, entrypoint: Path | str) -> None:
     parser = argparse.ArgumentParser(description=f"Resumable EV bootstrap loader for {spec.oracle_table}")
-    parser.add_argument("--target-table", default=os.environ.get("PG_TARGET_TABLE"), help="required LIFT destination; defaults to public schema when unqualified")
+    parser.add_argument("--target-table", help="required LIFT destination; defaults to public schema when unqualified")
     parser.add_argument("--page-size", type=int, default=1000)
     parser.add_argument("--max-pages", type=int, help="stop cleanly after this many committed pages")
     parser.add_argument("--status", action="store_true", help="print local checkpoint and exit")
     parser.add_argument("--restart", action="store_true", help="remove only this loader's local checkpoint")
     args = parser.parse_args()
-    load_project_environment()
     state_path = checkpoint_path(Path(entrypoint).resolve())
     if args.status:
         print(json.dumps(read_checkpoint(state_path) or {"status": "not started"}, indent=2, default=str))
@@ -271,11 +270,12 @@ def run_loader(spec: TableSpec, entrypoint: Path | str) -> None:
                 state_path.unlink()
                 print(f"removed local checkpoint {state_path}")
         return
-    if not args.target_table:
+    load_project_environment()
+    target = args.target_table or os.environ.get("PG_TARGET_TABLE")
+    if not target:
         parser.error("--target-table or PG_TARGET_TABLE is required")
     if args.page_size <= 0:
         parser.error("--page-size must be positive")
-    target = args.target_table
     fingerprint = config_fingerprint(spec, target)
     with file_lock(lock_path):
         state = read_checkpoint(state_path)

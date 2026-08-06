@@ -3,7 +3,7 @@ import sys
 
 import pytest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "SRC"))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src" / "full_ev_backfill"))
 from ev_backfill.core import TableSpec, atomic_json_write, canonical_query, keyset_predicate, parse_relation, pg_connection, read_checkpoint, source_connection
 
 

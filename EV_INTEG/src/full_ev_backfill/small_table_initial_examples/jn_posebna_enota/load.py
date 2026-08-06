@@ -1,8 +1,8 @@
 from pathlib import Path
 import sys
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from EV_INTEG.src.full_ev_backfill.ev_backfill import TableSpec, run_loader
+sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
+from ev_backfill import TableSpec, run_loader
 
 SPEC = TableSpec(
     "jn_posebna_enota",
