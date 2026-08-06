@@ -2,22 +2,27 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from ev_backfill import TableSpec, run_loader
+from EV_INTEG.src.full_ev_backfill.ev_backfill import TableSpec, run_loader
 
 SPEC = TableSpec(
-    "jn_pe_dst",
-    "JN_PE_DST",
-    "ID_PE_DST",
+    "jn_pe_parc",
+    "JN_PE_PARC",
+    "ID_PE_PARC",
     (
-        "ID_PE_DST",
+        "ID_PE_PARC",
         "ID_PE",
-        "DST_SID",
+        "PC_MID",
         "JN_REV_NUM",
         "JN_REV_NUM_TO",
         "JN_REV_NUM_PREV",
         "JN_STATUS",
+        "POVRSINA_PE",
+        "VIR_POVRSINA_PE",
         "VREDNOST_DODATEK",
+        "POV_PARC_BREZ_ZPS",
+        "POV_PE_BREZ_ZPS",
         "DELITEV_MSG",
+        "POVR_PARC_IZR",
     ),
 )
 
