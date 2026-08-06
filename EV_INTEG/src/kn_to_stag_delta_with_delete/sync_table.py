@@ -169,7 +169,7 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("table", help="staging table name, without schema")
     parser.add_argument("--integration-sql", required=True, type=Path, help="path to the KN SELECT statement")
-    parser.add_argument("--schema", default=None, help="defaults to STAG_SCHEMA or fmp_data_gurs")
+    parser.add_argument("--schema", default=None, help="defaults to STAG_SCHEMA or public")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
     mode.add_argument("--apply", action="store_true", help="perform the delete and insert changes")
@@ -186,7 +186,7 @@ def main() -> int:
     try:
         table = valid_identifier(args.table, "table")
         load_environment()
-        schema = valid_identifier(args.schema or os.environ.get("STAG_SCHEMA", "fmp_data_gurs"), "schema")
+        schema = valid_identifier(args.schema or os.environ.get("STAG_SCHEMA", "public"), "schema")
         query = read_select(args.integration_sql)
         oracledb, psycopg = require_drivers()
         with oracledb.connect(**oracle_settings(oracledb)) as kn, psycopg.connect(**pg_settings()) as stag:

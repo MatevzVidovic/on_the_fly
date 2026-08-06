@@ -1,6 +1,6 @@
 # Staging-to-production table synchronisation
 
-Create `src/stag_to_prod/.env` from `.env.example` and fill in the two PostgreSQL connections. `STAG_DATABASE`, `PROD_DATABASE`, and `SYNC_SCHEMA` default to `fmp_data_gurs` when omitted.
+Create `src/stag_to_prod/.env` from `.env.example` and fill in the two PostgreSQL connections. `STAG_DATABASE` and `PROD_DATABASE` default to `fmp_data_gurs`; `SYNC_SCHEMA` defaults to `public`.
 
 The table name is supplied without a schema. The utility uses the `id` column as the membership key: it deletes production rows whose IDs are not in staging, then inserts staging rows whose IDs are not in production. It deliberately does **not** update IDs present in both databases.
 
@@ -18,4 +18,4 @@ Apply the changes only after reviewing the preview:
 .venv/bin/python src/stag_to_prod/sync_table.py jn_pe_parc --apply
 ```
 
-Use `--schema public` if the tables are in `public` rather than `fmp_data_gurs`.
+Use `--schema another_schema` only when the tables are not in `public`.

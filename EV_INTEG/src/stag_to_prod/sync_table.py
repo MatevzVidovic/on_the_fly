@@ -129,7 +129,7 @@ def print_preview(label: str, rows: Iterable[tuple[Any, ...]], columns: list[str
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("table", help="table name, without schema")
-    parser.add_argument("--schema", default=None, help="schema; defaults to SYNC_SCHEMA or fmp_data_gurs")
+    parser.add_argument("--schema", default=None, help="schema; defaults to SYNC_SCHEMA or public")
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
     mode.add_argument("--apply", action="store_true", help="perform the deletes and inserts")
@@ -146,7 +146,7 @@ def main() -> int:
     try:
         table = valid_identifier(args.table, "table")
         load_environment()
-        schema = valid_identifier(args.schema or os.environ.get("SYNC_SCHEMA", "fmp_data_gurs"), "schema")
+        schema = valid_identifier(args.schema or os.environ.get("SYNC_SCHEMA", "public"), "schema")
         psycopg = require_psycopg()
         with psycopg.connect(**connection_settings("STAG")) as stag, psycopg.connect(**connection_settings("PROD")) as prod:
             columns = verify_tables(stag, prod, schema, table)
