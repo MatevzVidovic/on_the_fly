@@ -1,6 +1,7 @@
 .venv/
 .env
 src/stag_to_prod/.env
+src/kn_to_stag_delta_with_delete/.env
 __pycache__/
 .pytest_cache/
 src/**/.state/
