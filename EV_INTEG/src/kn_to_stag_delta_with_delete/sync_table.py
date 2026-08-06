@@ -14,6 +14,7 @@ import json
 import os
 import re
 import random
+import signal
 import sqlite3
 import sys
 import tempfile
@@ -32,6 +33,20 @@ IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at", "updated_by"})
 PAGE_ONLY_PREFIX = "kn_page_"
 STATE_FORMAT = 3
+_SIGINT_COUNT = 0
+
+
+def install_sigint_handler() -> None:
+    """First Ctrl-C stops after the current page; second aborts immediately."""
+    def handle_sigint(_signum: int, _frame: Any) -> None:
+        global _SIGINT_COUNT
+        _SIGINT_COUNT += 1
+        if _SIGINT_COUNT == 1:
+            print("\nSIGINT received: finishing the current page, checkpointing it, then stopping. Press Ctrl-C again to abort immediately.", file=sys.stderr, flush=True)
+            return
+        raise KeyboardInterrupt
+
+    signal.signal(signal.SIGINT, handle_sigint)
 
 
 def valid_identifier(value: str, label: str) -> str:
@@ -151,19 +166,29 @@ def file_lock(path: Path) -> Iterable[None]:
 
 
 @contextmanager
-def staging_advisory_lock(psycopg: Any, schema: str, table: str) -> Iterable[None]:
+def staging_advisory_lock(psycopg: Any, schema: str, table: str) -> Iterable[Any]:
     """Keep a cooperative per-table PG lock while individual pages commit."""
     connection = psycopg.connect(**pg_settings())
     # Session advisory locks outlive transactions.  This dedicated connection
     # must not remain idle in an open transaction for a long backfill run.
     connection.autocommit = True
     name = f"kn_to_stag_delta:{schema}.{table}"
+
+    def heartbeat() -> None:
+        with connection.cursor() as cursor:
+            cursor.execute("SELECT 1")
+            cursor.fetchone()
+
     try:
         with connection.cursor() as cursor:
+            # This is a dedicated, intentionally idle session while Oracle
+            # pages are fetched.  Disable the server's idle-session timeout
+            # for it; the process still sends heartbeats between pages.
+            cursor.execute("SET idle_session_timeout = 0")
             cursor.execute("SELECT pg_try_advisory_lock(hashtext(%s))", (name,))
             if not cursor.fetchone()[0]:
                 raise RuntimeError(f"another resumable sync holds the staging advisory lock for {schema}.{table}")
-        yield
+        yield heartbeat
     finally:
         try:
             with connection.cursor() as cursor:
@@ -250,6 +275,7 @@ def insert_statement(schema: str, table: str, source_columns: list[str], destina
     """Insert source data while explicitly filling LIFT-owned audit fields."""
     automatic_values = {
         "id": "uuid_generate_v4()",
+        "created_by": "'00000000-0000-0000-0000-000000000000'::uuid",
         "created_at": "CURRENT_TIMESTAMP",
         "updated_at": "CURRENT_TIMESTAMP",
     }
@@ -660,7 +686,7 @@ def staging_changes_for_keys(connection: Any, schema: str, table: str, id_field:
         return result
 
 
-def staging_key_page(connection: Any, schema: str, table: str, id_field: str, after_key: str | None, page_size: int) -> list[Any]:
+def staging_key_page(connection: Any, schema: str, table: str, id_field: str, after_key: Any | None, page_size: int) -> list[Any]:
     suffix = "" if after_key is None else f' WHERE "{id_field}" > %s'
     parameters: tuple[Any, ...] = (page_size,) if after_key is None else (after_key, page_size)
     with connection.cursor() as cursor:
@@ -684,7 +710,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
     if not args.apply:
         raise RuntimeError("--resumable is only available with --apply; dry-run is already read-only")
-    with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table):
+    with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table) as heartbeat:
         state = read_checkpoint(checkpoint)
         if state and (state.get("fingerprint") != fingerprint or state.get("format") != STATE_FORMAT):
             raise RuntimeError("checkpoint belongs to a different table, SQL, or sync options; use --restart after review")
@@ -733,6 +759,10 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                 if not state.get("key_index_complete") or key_count(keys) != state.get("source_key_count"):
                     raise RuntimeError("resumable source-key index is missing or incomplete; use --restart")
             while True:
+                heartbeat()
+                if _SIGINT_COUNT:
+                    print("stopped after the last committed page; rerun the identical command to resume")
+                    return 130
                 if args.max_pages and page_count - invocation_start_pages >= args.max_pages:
                     print("stopped at --max-pages; rerun with --resumable --apply to continue")
                     return 0
@@ -877,6 +907,7 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_args()
+    install_sigint_handler()
     try:
         table = valid_identifier(args.table, "table")
         id_field = valid_identifier(args.id_field, "id field").lower()
@@ -960,6 +991,9 @@ def main() -> int:
                         cursor.executemany(update_sql, values)
             print(f"applied: deleted {len(delete_ids)} rows; inserted {len(insert_ids)} rows; updated {len(update_ids)} rows")
             return 0
+    except KeyboardInterrupt:
+        print("interrupted; committed pages are checkpointed and can be resumed", file=sys.stderr)
+        return 130
     except Exception as error:
         print(f"error: {error}", file=sys.stderr)
         return 2

@@ -48,8 +48,9 @@ def test_insert_statement_generates_lift_owned_id_and_timestamps() -> None:
     statement = sync.insert_statement("public", "ev_pe_parc_h", ["jn_pe_parc_pk", "date_change"], ["id", "created_at", "created_by", "updated_at", "updated_by", "jn_pe_parc_pk", "date_change"])
 
     assert '"id"' in statement and "uuid_generate_v4()" in statement
+    assert '"created_by"' in statement and "00000000-0000-0000-0000-000000000000" in statement
     assert statement.count("CURRENT_TIMESTAMP") == 2
-    assert '"created_by"' not in statement and '"updated_by"' not in statement
+    assert '"updated_by"' not in statement
 
 
 def test_composite_source_keyset_predicate_uses_native_key_order() -> None:
@@ -157,7 +158,7 @@ def test_staging_advisory_lock_uses_autocommit_and_releases(monkeypatch) -> None
         def __exit__(self, *_args):
             return False
 
-        def execute(self, statement, _parameters):
+        def execute(self, statement, _parameters=None):
             assert self.connection.autocommit
             events.append(statement)
 
@@ -181,12 +182,13 @@ def test_staging_advisory_lock_uses_autocommit_and_releases(monkeypatch) -> None
     with sync.staging_advisory_lock(Driver(), "public", "target"):
         events.append("work")
 
+    assert "SET idle_session_timeout = 0" in events
     assert "SELECT pg_try_advisory_lock(hashtext(%s))" in events
     assert "SELECT pg_advisory_unlock(hashtext(%s))" in events
     assert events[-1] == "close"
 
 
-def test_require_unique_key_rejects_partial_or_nullable_key() -> None:
+def test_require_unique_key_rejects_nullable_key() -> None:
     class Cursor:
         def __init__(self, responses):
             self.responses = iter(responses)
