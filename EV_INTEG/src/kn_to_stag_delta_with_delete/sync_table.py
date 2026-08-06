@@ -195,6 +195,17 @@ def comparable_change(value: Any) -> Any:
         return value
 
 
+def normalize_change_pair(kn_value: Any, staging_value: Any) -> tuple[Any, Any]:
+    """Put mixed PostgreSQL timestamp representations on a common basis."""
+    kn_change = comparable_change(kn_value)
+    staging_change = comparable_change(staging_value)
+    if isinstance(kn_change, datetime) and isinstance(staging_change, datetime) and (kn_change.tzinfo is None) != (staging_change.tzinfo is None):
+        # A PostgreSQL `timestamp` value is naïve. KN's ISO value is local
+        # Ljubljana wall-clock time, so compare the same local representation.
+        return kn_change.replace(tzinfo=None), staging_change.replace(tzinfo=None)
+    return kn_change, staging_change
+
+
 def source_changes(connection: Any, query: str, id_field: str, change_field: str | None) -> dict[Any, Any]:
     projection = id_field if change_field is None else f"{id_field}, {change_field}"
     with connection.cursor() as cursor:
@@ -222,18 +233,12 @@ def make_plan(kn_changes: dict[Any, Any], stag_changes: dict[Any, Any], change_f
         if ignore_change_field:
             unchanged_ids.append(identifier)
             continue
-        source_change = comparable_change(kn_changes[identifier])
-        stag_change = comparable_change(stag_changes[identifier])
+        source_change, stag_change = normalize_change_pair(kn_changes[identifier], stag_changes[identifier])
         if source_change == stag_change:
             unchanged_ids.append(identifier)
         elif source_change is None or stag_change is None:
             conflicts.append((identifier, source_change, stag_change))
         else:
-            if isinstance(source_change, datetime) and isinstance(stag_change, datetime) and (source_change.tzinfo is None) != (stag_change.tzinfo is None):
-                # A PostgreSQL `timestamp` value is naive; compare Oracle's
-                # local wall-clock component in that exceptional layout.
-                source_change = source_change.replace(tzinfo=None)
-                stag_change = stag_change.replace(tzinfo=None)
             try:
                 if stag_change < source_change:
                     update_ids.append(identifier)
