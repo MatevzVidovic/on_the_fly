@@ -2,7 +2,7 @@
 
 Create `src/stag_to_prod/.env` from `.env.example` and fill in the two PostgreSQL connections. `STAG_DATABASE` and `PROD_DATABASE` default to `fmp_data_gurs`; `SYNC_SCHEMA` defaults to `public`.
 
-The table name is supplied without a schema. The utility uses `id` as the membership key and `DATE_CHANGE` as the version field. It deletes production rows whose IDs are not in staging, inserts staging rows whose IDs are not in production, and fully updates a production row only when its `DATE_CHANGE` is older than staging's. Equal values are left alone.
+The table name is supplied without a schema. The utility uses `id` as the membership key by default and `DATE_CHANGE` as the version field. It deletes production rows whose keys are not in staging, inserts staging rows whose keys are not in production, and fully updates a production row only when its `DATE_CHANGE` is older than staging's. Equal values are left alone. Use `--id-field jn_pe_parc_pk` for tables that use a synthetic key instead of `id`.
 
 If any matching production row has a newer `DATE_CHANGE` (or a non-comparable/null mismatch), the run fails before making any change. Use `--change-field another_field` when a table uses a different version column.
 
