@@ -54,4 +54,31 @@ After review, execute the same operation with `--apply`:
   --id-field jn_pe_parc_pk --apply
 ```
 
+## Resumable apply
+
+Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each insert/update/delete page is committed independently; after a connection failure or interruption, rerun the identical command to continue from the last committed page:
+
+```sh
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
+  --id-field jn_pe_parc_pk --change-field DATE_CHANGE \
+  --resumable --apply
+```
+
+The resumable run first pages KN key/date values and records every KN key in `src/kn_to_stag_delta_with_delete/.state/source_keys.sqlite3`. It aborts before writes if it finds staging-newer values, then pages inserts/updates, and finally deletes staging keys absent from that persisted KN key index. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
+
+```sh
+# Inspect progress without database credentials.
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
+  --id-field jn_pe_parc_pk --resumable --status
+
+# Deliberately discard only this integration's state and begin again.
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
+  --id-field jn_pe_parc_pk --resumable --restart
+```
+
+Resumable mode assumes the KN query is stable for the duration of the run. If the source query changes materially while a run is paused, use `--restart` to build a fresh key index.
+
 Use `--schema another_schema` only when staging tables are not in `public`; use `--preview-limit` to change the number of displayed rows.
