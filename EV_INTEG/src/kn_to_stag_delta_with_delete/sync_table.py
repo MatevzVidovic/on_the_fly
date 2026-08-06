@@ -184,17 +184,17 @@ def ordered(values: Iterable[Any]) -> list[Any]:
     return sorted(values, key=lambda value: (type(value).__name__, repr(value)))
 
 
-def make_plan(source: dict[Any, tuple[Any, ...]], source_columns: list[str], stag_changes: dict[Any, Any], change_field: str, insert_only: bool) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
+def make_plan(source: dict[Any, tuple[Any, ...]], source_columns: list[str], stag_changes: dict[Any, Any], change_field: str, ignore_change_field: bool) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
     source_ids = set(source)
     stag_ids = set(stag_changes)
-    delete_ids = [] if insert_only else ordered(stag_ids - source_ids)
+    delete_ids = ordered(stag_ids - source_ids)
     insert_ids = ordered(source_ids - stag_ids)
     unchanged_ids: list[Any] = []
     update_ids: list[Any] = []
     conflicts: list[tuple[Any, Any, Any]] = []
-    change_position = source_columns.index(change_field) if not insert_only else None
+    change_position = source_columns.index(change_field) if not ignore_change_field else None
     for identifier in source_ids & stag_ids:
-        if insert_only:
+        if ignore_change_field:
             unchanged_ids.append(identifier)
             continue
         source_change = source[identifier][change_position]
@@ -242,7 +242,7 @@ def parse_args() -> argparse.Namespace:
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
     mode.add_argument("--apply", action="store_true", help="perform deletes, inserts, and KN-newer updates")
     parser.add_argument("--change-field", default="date_change", help="field used to compare matching keys (default: DATE_CHANGE)")
-    parser.add_argument("--insert-only", action="store_true", help="only insert absent keys; do not delete, update, or compare existing keys")
+    parser.add_argument("--ignore-change-field", action="store_true", help="use only key membership: delete absent staging keys and insert absent KN keys, but do not update or compare matching keys")
     parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
     parser.add_argument("--batch-size", type=int, default=1_000)
     args = parser.parse_args()
@@ -264,17 +264,17 @@ def main() -> int:
         enable_oracle_thick_mode(oracledb)
         with oracledb.connect(**oracle_settings(oracledb)) as kn, psycopg.connect(**pg_settings()) as stag:
             source_columns, destination_columns = target_columns(stag, schema, table, id_field)
-            if not args.insert_only and change_field not in source_columns:
-                raise RuntimeError(f"integration/staging table must contain {change_field}, or use --insert-only")
+            if not args.ignore_change_field and change_field not in source_columns:
+                raise RuntimeError(f"integration/staging table must contain {change_field}, or use --ignore-change-field")
             source = source_rows(kn, query, source_columns, id_field)
             relation = relation_sql(schema, table)
             column_sql = ", ".join(f'"{column}"' for column in source_columns)
             insert_sql = f"INSERT INTO {relation} ({column_sql}) VALUES ({', '.join('%s' for _ in source_columns)})"
 
             def report_and_preview(stag_changes: dict[Any, Any]) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
-                plan = make_plan(source, source_columns, stag_changes, change_field, args.insert_only)
+                plan = make_plan(source, source_columns, stag_changes, change_field, args.ignore_change_field)
                 delete_ids, insert_ids, unchanged_ids, update_ids, conflicts = plan
-                print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "insert_only": args.insert_only, "kn_keys": len(source), "staging_keys": len(stag_changes), "unchanged": len(unchanged_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids), "update_in_staging": len(update_ids), "staging_newer_conflicts": len(conflicts)}))
+                print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": args.ignore_change_field, "kn_keys": len(source), "staging_keys": len(stag_changes), "unchanged": len(unchanged_ids), "delete_from_staging": len(delete_ids), "insert_into_staging": len(insert_ids), "update_in_staging": len(update_ids), "staging_newer_conflicts": len(conflicts)}))
                 if args.preview_limit:
                     preview("DELETE", staging_rows(stag, schema, table, destination_columns, id_field, delete_ids, args.batch_size), destination_columns, args.preview_limit)
                     preview("INSERT", (source[identifier] for identifier in insert_ids), source_columns, args.preview_limit)
@@ -284,7 +284,7 @@ def main() -> int:
                 return plan
 
             if not args.apply:
-                plan = report_and_preview(staging_changes(stag, schema, table, id_field, None if args.insert_only else change_field))
+                plan = report_and_preview(staging_changes(stag, schema, table, id_field, None if args.ignore_change_field else change_field))
                 if plan[-1]:
                     raise RuntimeError("staging has rows with a newer change field; no changes were made")
                 return 0
@@ -295,7 +295,7 @@ def main() -> int:
             with stag.transaction():
                 with stag.cursor() as cursor:
                     cursor.execute(f"LOCK TABLE {relation} IN SHARE ROW EXCLUSIVE MODE")
-                delete_ids, insert_ids, _unchanged_ids, update_ids, conflicts = report_and_preview(staging_changes(stag, schema, table, id_field, None if args.insert_only else change_field))
+                delete_ids, insert_ids, _unchanged_ids, update_ids, conflicts = report_and_preview(staging_changes(stag, schema, table, id_field, None if args.ignore_change_field else change_field))
                 if conflicts:
                     raise RuntimeError("staging has rows with a newer change field; transaction rolled back without changes")
                 with stag.cursor() as cursor:

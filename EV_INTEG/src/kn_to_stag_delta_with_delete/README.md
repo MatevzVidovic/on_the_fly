@@ -6,14 +6,26 @@ If KN enforces Oracle Native Network Encryption/Data Integrity, install Oracle I
 
 Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique key, and return no duplicate keys. The key defaults to `id`; use `--id-field` for tables such as `jn_pe_parc_pk`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging. Existing keys are not updated.
 
-The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--insert-only` for integrations that should only insert missing keys and should not delete, update, or compare existing rows.
+The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--ignore-change-field` for integrations that should use only key membership: delete staging keys absent from KN and insert KN keys absent from staging, while leaving matching keys unchanged.
 
-Dry-run is the default and prints counts plus up to five example rows for each action:
+## Dry-run: compare `DATE_CHANGE`
+
+This is the default. It deletes staging keys absent from KN, inserts absent staging keys, updates rows where KN is newer, and errors if staging is newer:
 
 ```sh
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
   --id-field jn_pe_parc_pk --dry-run
+```
+
+## Dry-run: use only key membership
+
+This still deletes staging keys absent from KN and inserts missing staging keys, but leaves all matching keys unchanged without comparing `DATE_CHANGE`:
+
+```sh
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_pe_parc_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
+  --id-field jn_pe_parc_pk --ignore-change-field --dry-run
 ```
 
 After review, execute the same operation with `--apply`:
