@@ -13,6 +13,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any, Iterable
 
@@ -184,6 +185,16 @@ def ordered(values: Iterable[Any]) -> list[Any]:
     return sorted(values, key=lambda value: (type(value).__name__, repr(value)))
 
 
+def comparable_change(value: Any) -> Any:
+    """Accept ISO timestamp text when Oracle TSTZ values are selected as text."""
+    if not isinstance(value, str):
+        return value
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return value
+
+
 def make_plan(source: dict[Any, tuple[Any, ...]], source_columns: list[str], stag_changes: dict[Any, Any], change_field: str, ignore_change_field: bool) -> tuple[list[Any], list[Any], list[Any], list[Any], list[tuple[Any, Any, Any]]]:
     source_ids = set(source)
     stag_ids = set(stag_changes)
@@ -197,8 +208,8 @@ def make_plan(source: dict[Any, tuple[Any, ...]], source_columns: list[str], sta
         if ignore_change_field:
             unchanged_ids.append(identifier)
             continue
-        source_change = source[identifier][change_position]
-        stag_change = stag_changes[identifier]
+        source_change = comparable_change(source[identifier][change_position])
+        stag_change = comparable_change(stag_changes[identifier])
         if source_change == stag_change:
             unchanged_ids.append(identifier)
         elif source_change is None or stag_change is None:

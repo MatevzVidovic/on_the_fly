@@ -8,6 +8,21 @@ Pass a staging table name and a file containing the integration `SELECT`. The qu
 
 The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--ignore-change-field` for integrations that should use only key membership: delete staging keys absent from KN and insert KN keys absent from staging, while leaving matching keys unchanged.
 
+### Oracle timezone workaround
+
+If Oracle raises `ORA-01805` when fetching `TIMESTAMP WITH TIME ZONE` values, return the timestamp values as ISO text from the integration query. Oracle still applies the `Europe/Ljubljana` time zone and daylight-saving rules; PostgreSQL casts the ISO text back to its timestamp-with-time-zone columns. For example:
+
+```sql
+TO_CHAR(FROM_TZ(CAST(rf.created AS TIMESTAMP), 'Europe/Ljubljana'),
+        'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,
+TO_CHAR(FROM_TZ(CAST(rt.created AS TIMESTAMP), 'Europe/Ljubljana'),
+        'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_to,
+TO_CHAR(FROM_TZ(CAST(COALESCE(rt.created, rf.created) AS TIMESTAMP), 'Europe/Ljubljana'),
+        'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change
+```
+
+The tool also parses ISO `DATE_CHANGE` text for its comparisons.
+
 ## Dry-run: compare `DATE_CHANGE`
 
 This is the default. It deletes staging keys absent from KN, inserts absent staging keys, updates rows where KN is newer, and errors if staging is newer:
