@@ -133,7 +133,7 @@ def parse_args() -> argparse.Namespace:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="preview only (the default)")
     mode.add_argument("--apply", action="store_true", help="perform the deletes and inserts")
-    parser.add_argument("--preview-limit", type=int, default=100, help="maximum rows shown for each action (default: 100)")
+    parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
     parser.add_argument("--batch-size", type=int, default=1_000, help="IDs processed per SQL statement (default: 1000)")
     args = parser.parse_args()
     if args.preview_limit < 0 or args.batch_size <= 0:

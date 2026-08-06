@@ -10,7 +10,7 @@ Preview the proposed changes (no writes):
 .venv/bin/python src/stag_to_prod/sync_table.py jn_pe_parc --dry-run
 ```
 
-It prints row data for up to 100 deletes and 100 inserts. Use `--preview-limit 500` for more, or `--preview-limit 0` for counts only.
+It prints the total counts and up to five example rows for each action. Use `--preview-limit 500` for more, or `--preview-limit 0` for counts only.
 
 Apply the changes only after reviewing the preview:
 

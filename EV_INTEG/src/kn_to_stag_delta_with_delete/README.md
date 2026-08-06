@@ -4,7 +4,7 @@ Create `src/kn_to_stag_delta_with_delete/.env` from `.env.example`. The source i
 
 Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique `id`, and return no duplicate IDs. For every execution, the utility deletes staging IDs absent from KN, then inserts KN IDs absent from staging. Existing IDs are not updated.
 
-Dry-run is the default and prints counts plus up to 100 full rows for each action:
+Dry-run is the default and prints counts plus up to five example rows for each action:
 
 ```sh
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_h_pe_parc \
