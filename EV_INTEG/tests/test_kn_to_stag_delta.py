@@ -40,3 +40,28 @@ def test_resumable_state_paths_are_isolated_per_integration() -> None:
     assert first != second
     assert first[0].parent.name == "a" * 64
     assert second[0].parent.name == "b" * 64
+
+
+def test_insert_statement_generates_lift_owned_id_and_timestamps() -> None:
+    statement = sync.insert_statement("public", "ev_pe_parc_h", ["jn_pe_parc_pk", "date_change"], ["id", "created_at", "created_by", "updated_at", "updated_by", "jn_pe_parc_pk", "date_change"])
+
+    assert '"id"' in statement and "uuid_generate_v4()" in statement
+    assert statement.count("CURRENT_TIMESTAMP") == 2
+    assert '"created_by"' not in statement and '"updated_by"' not in statement
+
+
+def test_composite_source_keyset_predicate_uses_native_key_order() -> None:
+    predicate = sync.composite_keyset_predicate(("id_pe_parc", "jn_rev_num"), True)
+
+    assert "id_pe_parc > :last_key_0" in predicate
+    assert "id_pe_parc = :last_key_0 AND jn_rev_num > :last_key_1" in predicate
+
+
+def test_source_page_key_requires_distinct_identifiers() -> None:
+    assert sync.source_page_key("ID_PE_PARC, JN_REV_NUM") == ("id_pe_parc", "jn_rev_num")
+    try:
+        sync.source_page_key("id_pe_parc,id_pe_parc")
+    except ValueError:
+        pass
+    else:
+        raise AssertionError("duplicate source page keys must be rejected")
