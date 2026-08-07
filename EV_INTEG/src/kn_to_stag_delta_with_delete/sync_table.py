@@ -35,7 +35,10 @@ STATE_FORMAT = 3  # Full-reconciliation checkpoint format: do not change.
 # Incremental state v1 required loader-only SELECT aliases.  Do not reuse it:
 # v2 builds its watermark solely from the selected DATE_CHANGE column.
 ONLY_NEW_STATE_FORMAT = 2
-ONLY_NEW_WATERMARK = "__only_new_watermark"
+# This becomes an unquoted Oracle column alias in an internal wrapper query.
+# Oracle identifiers must start with a letter, so do not use a leading
+# underscore here.
+ONLY_NEW_WATERMARK = "only_new_watermark"
 ONLY_NEW_LOOKBACK = timedelta(hours=2)
 _SIGINT_COUNT = 0
 AUTO_PAGE_SIZE_DIR = HERE / ".auto_page_sizes"

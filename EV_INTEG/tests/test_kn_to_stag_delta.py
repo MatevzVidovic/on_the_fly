@@ -179,6 +179,7 @@ def test_only_new_uses_existing_date_change_and_two_hour_lookback() -> None:
     assert "source_rows.*" in query
     assert "TO_TIMESTAMP_TZ(source_rows.date_change" in query
     assert sync.ONLY_NEW_WATERMARK in query
+    assert sync.ONLY_NEW_WATERMARK[0].isalpha()
     assert "kn_delta" not in query and "kn_page" not in query
     assert sync.only_new_lower_bound(datetime(2025, 10, 26, 3, 30)) == datetime(2025, 10, 26, 1, 30)
 
