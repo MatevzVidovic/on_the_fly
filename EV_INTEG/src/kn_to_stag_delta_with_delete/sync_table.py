@@ -47,6 +47,10 @@ def install_sigint_handler() -> None:
         raise KeyboardInterrupt
 
     signal.signal(signal.SIGINT, handle_sigint)
+    # Ask Python to restart interrupted system calls after the first graceful
+    # SIGINT.  In particular this avoids needlessly breaking an Oracle fetch
+    # when the operator only wants to stop after its page checkpoint.
+    signal.siginterrupt(signal.SIGINT, False)
 
 
 def valid_identifier(value: str, label: str) -> str:
@@ -787,7 +791,10 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     rows += len(kn_changes)
                     state["preflight_rows"] = int(state.get("preflight_rows", 0)) + len(kn_changes)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
-                    print(f"preflight committed page {page_count} ({len(kn_changes)} keys; total {rows})")
+                    print(
+                        f"preflight committed page {page_count} "
+                        f"({len(kn_changes)} keys; total {state['preflight_rows']})"
+                    )
                     continue
                 if phase == "apply":
                     source, page_cursors, next_cursor = source_full_page(oracledb, query, id_field, source_columns, page_key, cursor, args.page_size)
@@ -820,7 +827,10 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     rows += len(source)
                     state["applied_rows"] = int(state.get("applied_rows", 0)) + len(source)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
-                    print(f"apply committed page {page_count} ({len(source)} rows; total {rows})")
+                    print(
+                        f"apply committed page {page_count} "
+                        f"({len(source)} rows; total {state['applied_rows']})"
+                    )
                     continue
                 if phase == "verify":
                     kn_changes, page_cursors, next_cursor = source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, args.page_size)
