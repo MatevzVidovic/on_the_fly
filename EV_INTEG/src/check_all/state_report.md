@@ -2,7 +2,7 @@
 
 | Table | Metadata | Data | High-water | Zero newer rows | Result |
 |---|---|---|---|---|---|
-| ev_dst_pripis_podatki_h | PASS | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
+| ev_dst_pripis_podatki_h | PASS | PASS | FAIL | FAIL | **FAIL** |
 | ev_del_stavbe_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_del_stavbe_enota_h_2025_danes | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_parc_del_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
@@ -19,8 +19,7 @@
 
 ### ev_dst_pripis_podatki_h
 
-- ORA-00960: ambiguous column naming in select list
-Help: https://docs.oracle.com/error-help/db/ora-00960/
+- integration=0b8f4fd2-9191-11f1-93da-0242ac12000d; connection='KN ORACLE'; titles=['EV H - Dst pripis podatki']; counts KN/target=1944791/1944791; target MAX(date_change)=2026-08-06T23:59:59.999000 != integration last_changed_datetime=2026-08-05T23:59:59.999000
 ### ev_del_stavbe_h
 
 - integration=b867296c-ab2a-11f0-a252-169cd02558fe; connection='KN ORACLE'; titles=['EV H – Del stavbe']; counts KN/target=11047300/9940024; target MAX(date_change)=2026-01-20T23:59:59.999000 != integration last_changed_datetime=2025-05-10T09:56:01.000000

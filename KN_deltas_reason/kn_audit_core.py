@@ -164,54 +164,6 @@ def validated_stream(rows: Iterable[dict[str, Any]], keys: list[str], datecol: s
         yield row
 
 
-def compare_all_rows(source: Iterable[dict[str, Any]], target: Iterable[dict[str, Any]],
-                     skeys: list[str], tkeys: list[str], sdate: str, tdate: str, cutoff: datetime,
-                     source_mode: str = "oracle_native_local", target_mode: str = "postgres_timestamp",
-                     limit: int = 20, on_delta: Callable[[str, dict[str, dict[str, Any]]], None] | None = None):
-    """Merge two complete (not pre-filtered) ordered key/date streams.
-
-    A missing eligible row is volatile only if its matching counterpart exists
-    but is at/after the cutoff.  Thus no third/fourth noneligible stream or
-    lookup query is required.
-    """
-    if limit < 0:
-        raise AuditError("--limit must be non-negative")
-    si = iter(validated_stream(source, skeys, sdate, source_mode))
-    ti = iter(validated_stream(target, tkeys, tdate, target_mode))
-    counts = Counter()
-    names = ("source_only", "target_only", "date_changed_mismatch", "post_cutoff_volatile")
-    samples: dict[str, list[dict[str, dict[str, Any]]]] = {x: [] for x in names}
-    def add(kind: str, payload: dict[str, dict[str, Any]]):
-        counts[kind] += 1
-        if on_delta: on_delta(kind, payload)
-        if len(samples[kind]) < limit: samples[kind].append(payload)
-    s, t = next(si, None), next(ti, None)
-    while s is not None or t is not None:
-        if s is None:
-            td = normalize_temporal(t[tdate], target_mode, field=tdate)
-            if td < cutoff: add("target_only", {"target": t})
-            t = next(ti, None); continue
-        if t is None:
-            sd = normalize_temporal(s[sdate], source_mode, field=sdate)
-            if sd < cutoff: add("source_only", {"source": s})
-            s = next(si, None); continue
-        a, b = key_of(s, skeys), key_of(t, tkeys)
-        if a < b:
-            if normalize_temporal(s[sdate], source_mode, field=sdate) < cutoff: add("source_only", {"source": s})
-            s = next(si, None); continue
-        if b < a:
-            if normalize_temporal(t[tdate], target_mode, field=tdate) < cutoff: add("target_only", {"target": t})
-            t = next(ti, None); continue
-        sd = normalize_temporal(s[sdate], source_mode, field=sdate)
-        td = normalize_temporal(t[tdate], target_mode, field=tdate)
-        if (sd < cutoff) != (td < cutoff):
-            add("post_cutoff_volatile", {"source": s, "target": t})
-        elif sd < cutoff and sd != td:
-            add("date_changed_mismatch", {"source": s, "target": t})
-        s, t = next(si, None), next(ti, None)
-    return {x: counts[x] for x in names}, samples
-
-
 def compare_eligible_rows(source: Iterable[dict[str, Any]], target: Iterable[dict[str, Any]],
                           skeys: list[str], tkeys: list[str], sdate: str, tdate: str,
                           source_mode: str, target_mode: str, limit: int = 20,

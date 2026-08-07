@@ -68,10 +68,12 @@ Inventory includes:
 - integration UUID
 - connection name
 - `last_changed_datetime`
-- saved integration SQL and its hash
+- SQL hash (saved SQL is hidden by default)
 - ambiguity warnings: zero/multiple KN integrations
 
 Discovery needs PostgreSQL/FMP credentials only. It does not contact KN Oracle.
+`discover --include-sql` is deliberate sensitive mode: it writes saved SQL to
+the local artifact directory.
 
 ## Step 2 — choose tables and keys
 
@@ -103,9 +105,11 @@ Rules:
 - The saved SQL must expose every source key and `source_date` alias.
 - The PostgreSQL target must expose every target key and `target_date` column.
 - `source_temporal_mode` is mandatory: `oracle_native_local` for Oracle
-  `DATE`/`TIMESTAMP`, or `iso8601_text` for offset-bearing ISO-8601 strings.
+  `DATE`/`TIMESTAMP`, or `iso8601_text` for offset-bearing
+  `YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)` strings.
 - Keys must be finite numeric values. Text/UUID keys are rejected because an
   Oracle and PostgreSQL collation cannot safely drive the same merge order.
+  Such tables are intentionally unsupported, not silently compared.
 - UUID values in the example are placeholders; copy the real value from `inventory.jsonl`.
 
 ## Step 3 — run one stable audit
@@ -115,8 +119,8 @@ flowchart TD
   A[--as-of with offset] --> B[parse one instant]
   B --> C[Oracle: saved SELECT]
   B --> D[PostgreSQL: target table]
-  C --> E[one complete key/date stream]
-  D --> F[one complete key/date stream]
+  C --> E[one date < cutoff key/date stream]
+  D --> F[one date < cutoff key/date stream]
   E --> G[ordered numeric composite-key merge]
   F --> G
   G --> H[report counts + up to --limit examples]
@@ -134,6 +138,8 @@ Example:
 ```
 
 `--as-of` is mandatory and must include an offset. It is recorded in UTC and in the artifact name.
+Both database queries apply `date < as_of`; rows at or after the cutoff are
+excluded before the local comparison.
 
 ## Result categories
 
@@ -145,13 +151,11 @@ flowchart LR
   M -- target only --> B[target_only]
   M -- both, date differs --> C[date_changed_mismatch]
   M -- both, date equal --> D[match]
-  M -- counterpart is >= cutoff --> E[post_cutoff_volatile]
 ```
 
 - `source_only`: row exists in KN integration result, not target.
 - `target_only`: row exists in target, not KN integration result.
 - `date_changed_mismatch`: same key; different eligible `DATE_CHANGED`.
-- `post_cutoff_volatile`: counterpart exists only with a value at/after cutoff. Excluded from normal deltas and from default export, so a recent change is not misreported as a historical absence.
 - Null dates/keys, duplicate or unordered keys, nonnumeric keys, unsafe SQL, malformed temporal values, or metadata mismatch: table failure with detail in the report.
 
 ## Optional full evidence export

@@ -36,8 +36,10 @@ open a KN Oracle connection or execute any integration SQL.
 
 The printed artifact directory contains `inventory.md` and `inventory.jsonl`.
 The inventory lists every FMP integration whose SQL connection is `KN ORACLE`,
-including table name, integration UUID, stored SQL, SQL hash, high-water mark,
-and duplicate-integration warning.
+including table name, integration UUID, SQL hash, high-water mark, and
+duplicate-integration warning. Saved SQL is hidden by default; add
+`--include-sql` only when the local artifact location is approved for that
+potentially sensitive business logic.
 
 Review that inventory and create a deliberately small `selected_tables.json`.
 The audit never selects all discovered tables automatically. Explicit mappings
@@ -52,7 +54,8 @@ avoid guessing keys or aliases:
 
 `source_temporal_mode` is required: use `oracle_native_local` for Oracle
 `DATE`/`TIMESTAMP` columns (naive values mean `Europe/Ljubljana`), or
-`iso8601_text` only for offset-bearing ISO-8601 text. Target values use the
+`iso8601_text` only for offset-bearing ISO-8601 text in
+`YYYY-MM-DDTHH:MM:SS[.fraction](Z|±HH:MM)` form. Target values use the
 documented `postgres_timestamp` contract. Composite keys are deliberately
 limited to finite integer/`Decimal` values: text/UUID keys are rejected rather
 than risking an invalid cross-database merge under different collations.
@@ -77,20 +80,24 @@ guard.
 
 - There is **no data cache**. A repeat intentionally reads live data again,
   because a cached delta result could be stale.
-- Each normal audit executes exactly one saved KN integration key/date stream
-  and one PostgreSQL target key/date stream per selected table. Both streams
-  include all rows, are ordered by the numeric composite key, and are merged
-  locally; this globally validates null/duplicate/order problems and classifies
-  `DATE_CHANGED < as_of` without extra post-cutoff lookups.
+- Each normal audit executes exactly one **cutoff-bounded** saved KN
+  integration key/date stream and one cutoff-bounded PostgreSQL target
+  key/date stream per selected table. Both use a bound `date < as_of`
+  predicate, are ordered by numeric composite key, and are merged locally.
+  Rows at or after the cutoff are excluded by both databases before comparison.
 - `discover` is cheap relative to audit: one metadata query, no KN access.
-- The audit streams rows in batches of 1,000 and initially fetches only the
-  composite key and date. It does not use `OFFSET`, load whole key sets into
-  memory, or fetch full payloads unless `--export` is explicit.
+- The PostgreSQL target scan uses a named server-side cursor (`itersize=1000`)
+  and initially fetches only the composite key and date. It does not use
+  `OFFSET`, load whole key sets into memory, or fetch full payloads unless
+  `--export` is explicit. Oracle fetches the same narrow projection in batches.
 - `--limit` reduces artifact examples, **not** source scan workload.
 - `--export` is the heavy mode: only after exact delta counts are known and
   under the cap, it re-runs bounded per-key reads for the actual delta keys.
   It never streams full-table payloads or writes a table spool. Evidence is a
   later re-read (its timestamp is recorded), so it is not a global snapshot.
+- Connection establishment remains subject to network/server behavior; the
+  client uses a configurable 15-second connect timeout and both query sides
+  use the requested statement/call timeout.
 
 Recommended repeat workflow:
 

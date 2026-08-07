@@ -370,6 +370,11 @@ def cache_write(value: dict[str, Any]) -> None:
         if os.path.exists(temporary): os.unlink(temporary)
 
 
+def heartbeat(message: str) -> None:
+    """Emit immediately so long KN checks remain visibly alive."""
+    print(message, flush=True)
+
+
 def oracle_count(oracle: Any, sql: str) -> int:
     with oracle.cursor() as cur:
         cur.execute(f"SELECT COUNT(*) FROM ({sql}) q")
@@ -406,13 +411,18 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
     pk = spec["pk"].lower(); after: tuple[Any, ...] | None = None; seen = 0
     source_keys = [source_output[key.lower()] for key in spec["source_page_keys"]]
     date_is_text = "date_change" in documented_text_temporal_aliases(sql, {"date_change"})
+    page = 0
     while True:
+        page += 1
+        heartbeat(f"[{spec['table']}] heartbeat: fetching KN data-diff page {page} (checked {seen}/{expected_count} rows)")
         with oracle.cursor() as cur:
             params = {"limit": page_size}
             if after is not None: params.update({f"after_{index}": value for index, value in enumerate(after)})
             cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after, date_is_text=date_is_text), params)
             rows = cur.fetchall()
-        if not rows: return (seen == expected_count, None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}")
+        if not rows:
+            heartbeat(f"[{spec['table']}] data-diff fetch complete ({seen}/{expected_count} rows)")
+            return (seen == expected_count, None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}")
         keys = [row[0] for row in rows]
         tuples = [tuple(row[2:]) for row in rows]
         if any(key is None for key in keys) or len(set(map(str, keys))) != len(keys):
@@ -437,6 +447,7 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
             if expected != actual:
                 return False, f"date_change mismatch for PK {key!r}: KN={expected}, target={actual}"
         seen += len(rows); after = tuples[-1]
+        heartbeat(f"[{spec['table']}] checked data-diff page {page} ({len(rows)} rows; total {seen}/{expected_count})")
         if len(rows) < page_size:
             return (
                 seen == expected_count,
@@ -481,10 +492,16 @@ def markdown(results: list[dict[str, Any]], environment: str) -> str:
     return "\n".join(lines)
 
 
+def write_report(path: Path, results: list[dict[str, Any]], environment: str) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(markdown(results, environment), encoding="utf-8")
+
+
 def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str) -> dict[str, Any]:
     table = target_table(spec, environment); local = {**spec, "table": table}
     result = {"table": table, "metadata": "FAIL", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
     try:
+        heartbeat(f"[{table}] heartbeat: resolving LIFT metadata and validating KN SQL")
         info = metadata(metadata_pg, table)
         title_bad = not info["titles"] or any(not str(title or "").startswith("EV H") for title in info["titles"])
         sql, output, failures = validate_sql(oracle, info["sql"], local)
@@ -506,8 +523,14 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         entry = cache["entries"].get(identity, {})
         kn_count = entry.get("kn_count")
         if kn_count is None or refresh:
+            heartbeat(f"[{table}] heartbeat: counting KN source rows")
             kn_count = oracle_count(oracle, sql); entry["kn_count"] = kn_count
+            heartbeat(f"[{table}] KN count complete: {kn_count} rows")
+        else:
+            heartbeat(f"[{table}] checkpoint: reusing cached KN count {kn_count}")
+        heartbeat(f"[{table}] heartbeat: counting target rows")
         target_count = pg_count(target_pg, table)
+        heartbeat(f"[{table}] target count complete: {target_count} rows")
         data_ok = True
         if target_count != kn_count:
             result["data"] = "FAIL"; result["detail"] = f"counts: KN={kn_count}, target={target_count}"; entry.pop("last_check_passed", None); data_ok = False
@@ -520,6 +543,7 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
             else:
                 entry["last_check_passed"] = True; result["data"] = "PASS"
         cache["entries"][identity] = entry
+        heartbeat(f"[{table}] heartbeat: checking target high-water mark and KN zero-transfer condition")
         ok, detail, delta = highwater_and_delta(target_pg, oracle, sql, local, data_output, info["highwater"])
         result["highwater"] = "FAIL" if delta == -1 else "PASS"
         result["delta"] = "PASS" if ok else "FAIL"
@@ -558,9 +582,15 @@ def main() -> int:
             psycopg.connect(**pg_settings(args.environment, metadata=True)) as metadata_pg,
         ):
             initialise_sessions(oracle, target_pg, metadata_pg)
-            results = [check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash) for spec in selected]
+            results = []
+            for index, spec in enumerate(selected, start=1):
+                heartbeat(f"[{index}/{len(selected)}] starting {target_table(spec, args.environment)}")
+                results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash))
+                cache_write(cache)
+                write_report(args.report, results, args.environment)
+                heartbeat(f"[{index}/{len(selected)}] checkpoint saved: cache and partial report written")
         cache_write(cache)
-        report = markdown(results, args.environment); args.report.parent.mkdir(parents=True, exist_ok=True); args.report.write_text(report, encoding="utf-8")
+        report = markdown(results, args.environment); write_report(args.report, results, args.environment)
         print(report)
         return 0 if all(item["result"] == "PASS" for item in results) else 1
     except Exception as error:

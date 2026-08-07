@@ -14,7 +14,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
-from kn_audit_core import (AuditError, Selection, compare_eligible_rows, normalize_temporal,
+from kn_audit_core import (AuditError, LJ, Selection, compare_eligible_rows, normalize_temporal,
                            parse_cutoff, qi)
 
 SQL_START = re.compile(r"^\s*(?:with\b|select\b)", re.I | re.S)
@@ -95,7 +95,7 @@ def oracle_connect():
     import oracledb
     lib = os.getenv("KN_ORACLE_CLIENT_LIB_DIR")
     if lib: oracledb.init_oracle_client(lib_dir=lib)
-    return oracledb.connect(user=os.environ["KN_USER"], password=os.environ["KN_PASSWORD"], dsn=oracledb.makedsn(os.environ["KN_HOST"], int(os.environ["KN_PORT"]), service_name=os.environ["KN_SERVICE"]))
+    return oracledb.connect(user=os.environ["KN_USER"], password=os.environ["KN_PASSWORD"], dsn=oracledb.makedsn(os.environ["KN_HOST"], int(os.environ["KN_PORT"]), service_name=os.environ["KN_SERVICE"]), tcp_connect_timeout=int(os.getenv("KN_AUDIT_CONNECT_TIMEOUT_SECONDS", "15")))
 
 
 def field(obj: dict[str, Any], names: tuple[str, ...]) -> Any:
@@ -175,76 +175,86 @@ def cursor_rows(cur) -> Iterator[dict[str, Any]]:
         for row in batch: yield dict(zip(names,row))
 
 
-def key_predicate(cols: list[str], values: list[Any], prefix: str, oracle: bool) -> tuple[str, dict[str, Any] | tuple[Any,...]]:
-    """Small per-key predicate used only after an export cap decision."""
-    if oracle:
-        binds={f"{prefix}{i}":v for i,v in enumerate(values)}
-        return " AND ".join(f"x.{qi(c)} = :{prefix}{i}" for i,c in enumerate(cols)), binds
-    return " AND ".join(f"{qi(c)} = %s" for c in cols), tuple(values)
+EVIDENCE_CHUNK_KEYS = 100
 
+def chunks(values, size=EVIDENCE_CHUNK_KEYS):
+    for i in range(0, len(values), size): yield values[i:i + size]
 
-def fetch_evidence(oc, tc, export_dir: Path, s: Selection, integ: dict[str, Any], selected: dict[str, list[dict[str, dict[str, Any]]]], cutoff: datetime) -> dict[str, Any]:
-    """Fetch full rows for bounded actual delta keys only; never table-spool."""
+def batch_predicate(cols: list[str], rows: list[dict[str, Any]], *, source: bool) -> tuple[str, Any]:
+    """Bounded OR-of-ANDs. At most 100 keys, never a giant IN predicate."""
+    pieces=[]
+    if source:
+        binds={}
+        for n,row in enumerate(rows):
+            pieces.append("(" + " AND ".join(f'x.{qi(c)} = :k{n}_{i}' for i,c in enumerate(cols)) + ")")
+            binds.update({f"k{n}_{i}": row[c] for i,c in enumerate(cols)})
+        return " OR ".join(pieces), binds
+    params=[]
+    for row in rows:
+        pieces.append("(" + " AND ".join(f'{qi(c)} = %s' for c in cols) + ")")
+        params.extend(row[c] for c in cols)
+    return " OR ".join(pieces), tuple(params)
+
+def fetch_evidence(oc, tc, export_dir: Path, s: Selection, integ: dict[str, Any], selected: dict[str, list[dict[str, dict[str, Any]]]]) -> dict[str, Any]:
+    """Bounded, batched full-row reads after count/cap decision only."""
     output={}
-    for kind, payloads in selected.items():
+    for kind,payloads in selected.items():
         files={}
-        for side, payload_key in (("source","source"),("target","target")):
-            rows=[]; cols=[x.source for x in s.keys] if side=="source" else [x.target for x in s.keys]
-            for payload in payloads:
-                if payload_key not in payload: continue
-                vals=[payload[payload_key][c] for c in cols]
+        for side in ("source", "target"):
+            key_rows=[p[side] for p in payloads if side in p]
+            if not key_rows: continue
+            cols=[x.source for x in s.keys] if side=="source" else [x.target for x in s.keys]
+            full=[]
+            for group in chunks(key_rows):
+                pred,bind=batch_predicate(cols,group,source=side=="source")
                 if side=="source":
-                    pred, bind=key_predicate(cols, vals, "k", True); sql=f"SELECT x.* FROM ({integ['sql']}) x WHERE {pred}"
-                    with oc.cursor() as c:
-                        c.execute(sql, bind); names=[x[0] for x in c.description]; batch=c.fetchmany(2); got=[dict(zip(names,x)) for x in batch]
+                    sql=f"SELECT x.* FROM ({integ['sql']}) x WHERE {pred}"
+                    with oc.cursor() as c: c.execute(sql,bind); full.extend(cursor_rows(c))
                 else:
-                    pred, bind=key_predicate(cols, vals, "k", False); sql=f"SELECT * FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {pred}"
-                    with tc.cursor() as c:
-                        c.execute(sql, bind); names=[x[0] for x in c.description]; batch=c.fetchmany(2); got=[dict(zip(names,x)) for x in batch]
-                if len(got)!=1: raise AuditError(f"export re-read drift for {kind}/{side} key")
-                rows.append(got[0])
-            if rows:
-                safe=re.sub(r"[^A-Za-z0-9_.-]+","_",s.name).strip("._") or "table"; path=export_dir/f"{safe}_{s.integration_id}_{kind}_{side}_full.jsonl"
-                write_jsonl(path, rows); files[side]=path.name
-        output[kind]={"complete":True,"paths":files,"reread_at":datetime.now(timezone.utc).isoformat(),"note":"Full rows were re-read after count; no cross-database global snapshot exists."}
+                    sql=f"SELECT * FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {pred}"
+                    with tc.cursor() as c: c.execute(sql,bind); full.extend(cursor_rows(c))
+            # Exact returned row count is a bounded drift/duplicate guard. The
+            # audit's numeric-key validation makes count equality sufficient.
+            if len(full) != len(key_rows): raise AuditError(f"export re-read drift or duplicate rows for {kind}/{side}")
+            safe=re.sub(r"[^A-Za-z0-9_.-]+","_",s.name).strip("._") or "table"; path=export_dir/f"{safe}_{s.integration_id}_{kind}_{side}_full.jsonl"; write_jsonl(path,full); files[side]=path.name
+        output[kind]={"complete":True,"paths":files,"reread_at":datetime.now(timezone.utc).isoformat(),"chunks":(len(payloads)+EVIDENCE_CHUNK_KEYS-1)//EVIDENCE_CHUNK_KEYS,"note":"Full rows were re-read after count; no cross-database global snapshot exists."}
     return output
 
 
 def audit_selection(p: dict[str,str], s: Selection, integ: dict[str,Any], cutoff: datetime, limit: int, export_dir: Path|None=None, max_export_rows: int=1000, allow_large_export: bool=False, timeout_seconds: int=1800):
-    oc=oracle_connect(); tc=pg_connect(p)
-    try:
+    with ExitStack() as stack:
+        oc=oracle_connect(); stack.callback(oc.close)
+        tc=pg_connect(p); stack.callback(tc.close)
         configure_oracle(oc, timeout_seconds); configure_pg(tc, timeout_seconds)
         sk,tk=[x.source for x in s.keys],[x.target for x in s.keys]
-        # Exactly one saved-integration stream and one target stream.  Both
-        # include all dates: comparator performs the cutoff classification.
-        source_sql=f"SELECT {', '.join(f'x.{qi(c)} AS {qi(c)}' for c in [*sk,s.source_date])} FROM ({integ['sql']}) x ORDER BY {', '.join('x.'+qi(c) for c in sk)}"
-        target_sql=f"SELECT {', '.join(qi(c) for c in [*tk,s.target_date])} FROM {qi(s.target_schema)}.{qi(s.target_table)} ORDER BY {', '.join(qi(c) for c in tk)}"
-        sc=oc.cursor(); tcurs=tc.cursor()
-        sc.execute(source_sql); tcurs.execute(target_sql)
+        source_cutoff = cutoff.astimezone(LJ).replace(tzinfo=None) if s.source_temporal_mode == "oracle_native_local" else cutoff
+        if s.source_temporal_mode == "oracle_native_local":
+            source_pred = f'x.{qi(s.source_date)} < :cutoff'
+        else:
+            text_date=f"REPLACE(x.{qi(s.source_date)}, 'Z', '+00:00')"
+            source_pred=(f"CASE WHEN INSTR({text_date}, '.') > 0 THEN "
+                         f"TO_TIMESTAMP_TZ({text_date}, 'YYYY-MM-DD\"T\"HH24:MI:SS.FF TZH:TZM') "
+                         f"ELSE TO_TIMESTAMP_TZ({text_date}, 'YYYY-MM-DD\"T\"HH24:MI:SS TZH:TZM') END < :cutoff")
+        source_sql=f"SELECT {', '.join(f'x.{qi(c)} AS {qi(c)}' for c in [*sk,s.source_date])} FROM ({integ['sql']}) x WHERE {source_pred} ORDER BY {', '.join('x.'+qi(c) for c in sk)}"
+        target_sql=f"SELECT {', '.join(qi(c) for c in [*tk,s.target_date])} FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {qi(s.target_date)} < %s ORDER BY {', '.join(qi(c) for c in tk)}"
+        sc=oc.cursor(); stack.callback(sc.close); tcurs=tc.cursor(name="kn_delta_target"); stack.callback(tcurs.close); tcurs.itersize=1000
+        sc.execute(source_sql, {"cutoff": source_cutoff}); tcurs.execute(target_sql,(cutoff,))
         evidence={k:[] for k in ("source_only","target_only","date_changed_mismatch")}
         def retain(kind,payload):
             # The override intentionally accepts memory/query cost in exchange
             # for complete evidence.  Default retains only cap+1 key payloads.
             if export_dir and kind in evidence and (allow_large_export or len(evidence[kind]) <= max_export_rows):
                 evidence[kind].append(payload)
-        try:
-            counts,samples=compare_all_rows(cursor_rows(sc),cursor_rows(tcurs),sk,tk,s.source_date,s.target_date,cutoff,s.source_temporal_mode,s.target_temporal_mode,limit,retain)
-        finally:
-            sc.close(); tcurs.close()
+        counts,samples=compare_eligible_rows(cursor_rows(sc),cursor_rows(tcurs),sk,tk,s.source_date,s.target_date,s.source_temporal_mode,s.target_temporal_mode,limit,retain)
         table={"table":s.name,"integration_id":s.integration_id,"sql_hash":integ["sql_hash"],"keys":[asdict(x) for x in s.keys],"source_date":s.source_date,"target_date":s.target_date,"source_temporal_mode":s.source_temporal_mode,"target_temporal_mode":s.target_temporal_mode,"counts":counts,"normal_scan_queries":{"oracle_saved_integration":1,"postgres_target":1}}
         if export_dir:
             skipped={}; selected={}
             for kind, count in counts.items():
-                if kind=="post_cutoff_volatile": continue
                 if count>max_export_rows and not allow_large_export: skipped[kind]={"skipped":True,"reason":f"category exceeds {max_export_rows} rows"}
-                elif count>max_export_rows and allow_large_export:
-                    selected[kind]=evidence[kind]
+                elif count>max_export_rows and allow_large_export: selected[kind]=evidence[kind]
                 else: selected[kind]=evidence[kind]
-            table["export"]={"files":{**skipped,**fetch_evidence(oc,tc,export_dir,s,integ,selected,cutoff)},"cap":max_export_rows,"large_override":allow_large_export}
+            table["export"]={"files":{**skipped,**fetch_evidence(oc,tc,export_dir,s,integ,selected)},"cap":max_export_rows,"large_override":allow_large_export}
         return table,samples
-    finally:
-        try: oc.close()
-        finally: tc.close()
 
 
 def main(argv: list[str]|None=None)->int:
@@ -263,11 +273,12 @@ def main(argv: list[str]|None=None)->int:
             finally: c.close()
             write_jsonl(d/"inventory.jsonl",rows); (d/"inventory.md").write_text("# KN ORACLE integrations\n\n"+"\n".join(f"- `{r['table_name']}` — `{r['integration_id']}` — highwater: `{r['highwater']}`" for r in rows)+"\n"); print(d); return 0
         cutoff=parse_cutoff(args.as_of); selections=load_selection(Path(args.selection)); mc=pg_connect(p,metadata=True)
-        try: integrations=resolve_integrations(mc,selections,args.query_timeout_seconds)
+        try: integrations, resolution_errors=resolve_integrations(mc,selections,args.query_timeout_seconds)
         finally: mc.close()
-        manifest={"environment":p["name"],"started_at":datetime.now(timezone.utc).isoformat(),"as_of_utc":cutoff.isoformat(),"predicate":"date_changed < as_of (classified after complete key/date merge)","normal_scan_contract":"one Oracle integration key/date stream and one PostgreSQL target key/date stream per table","export_snapshot_limitation":"Evidence rows are re-read after exact counts; timestamps are recorded and there is no global cross-database snapshot.","tables":[],"errors":[]}
+        manifest={"environment":p["name"],"started_at":datetime.now(timezone.utc).isoformat(),"as_of_utc":cutoff.isoformat(),"predicate":"date_changed < as_of (bound in both normal scan queries)","normal_scan_contract":"one cutoff-bounded Oracle integration key/date stream and one cutoff-bounded PostgreSQL target key/date stream per table","export_snapshot_limitation":"Evidence rows are re-read after exact counts; timestamps are recorded and there is no global cross-database snapshot.","tables":[],"errors":[]}
         for s in selections:
             try:
+                if s.integration_id in resolution_errors: raise AuditError(resolution_errors[s.integration_id])
                 table,samples=audit_selection(p,s,integrations[s.integration_id],cutoff,args.limit,d if args.export else None,args.max_export_rows,args.allow_large_export,args.query_timeout_seconds); table["sample_files"]={}
                 for kind,records in samples.items():
                     path=d/f"{re.sub(r'[^A-Za-z0-9_.-]+','_',s.name)}_{s.integration_id}_{kind}_samples.jsonl"; write_jsonl(path,records); table["sample_files"][kind]=path.name
