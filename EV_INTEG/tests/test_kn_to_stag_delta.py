@@ -56,7 +56,7 @@ def test_trust_constraint_assertion_uses_its_own_checkpoint() -> None:
 
 def test_only_new_checkpoint_and_auto_profile_are_isolated_from_full_sync() -> None:
     full = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",))
-    delta = sync.delta_fingerprint_args("SELECT 1", "public", "target", "source_id", "date_change", ("kn_page_id",), "kn_delta_date_change", False)
+    delta = sync.delta_fingerprint_args("SELECT 1", "public", "target", "source_id", "date_change", ("source_id",), False)
     full_profile = sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "data", False)
     delta_profile = sync.only_new_auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",))
 
@@ -162,34 +162,43 @@ def test_composite_source_keyset_predicate_uses_native_key_order() -> None:
 
 
 def test_incremental_delta_predicates_have_inclusive_lower_and_bounded_tuple() -> None:
-    upper = sync.tuple_predicate(("kn_delta_date_change", "kn_page_id"), "<=", "upper")
-    assert "kn_delta_date_change < :upper_0" in upper
-    assert "kn_delta_date_change = :upper_0 AND kn_page_id <= :upper_1" in upper
-    predicate = sync.tuple_predicate(("kn_delta_date_change", "kn_page_id"), ">", "after")
-    assert "kn_delta_date_change > :after_0" in predicate
-    assert "kn_delta_date_change = :after_0 AND kn_page_id > :after_1" in predicate
+    upper = sync.tuple_predicate((sync.ONLY_NEW_WATERMARK, "source_id"), "<=", "upper")
+    assert f"{sync.ONLY_NEW_WATERMARK} < :upper_0" in upper
+    assert f"{sync.ONLY_NEW_WATERMARK} = :upper_0 AND source_id <= :upper_1" in upper
+    predicate = sync.tuple_predicate((sync.ONLY_NEW_WATERMARK, "source_id"), ">", "after")
+    assert f"{sync.ONLY_NEW_WATERMARK} > :after_0" in predicate
+    assert f"{sync.ONLY_NEW_WATERMARK} = :after_0 AND source_id > :after_1" in predicate
     three_part_upper = sync.tuple_predicate(("a", "b", "c"), "<=", "upper")
     assert "a < :upper_0" in three_part_upper
     assert "a = :upper_0 AND b < :upper_1" in three_part_upper
     assert "a = :upper_0 AND b = :upper_1 AND c <= :upper_2" in three_part_upper
 
 
-def test_incremental_source_page_strips_watermark_and_page_aliases(monkeypatch) -> None:
+def test_only_new_uses_existing_date_change_and_two_hour_lookback() -> None:
+    query = sync.only_new_query("SELECT source_id, date_change FROM example", "date_change")
+    assert "source_rows.*" in query
+    assert "TO_TIMESTAMP_TZ(source_rows.date_change" in query
+    assert sync.ONLY_NEW_WATERMARK in query
+    assert "kn_delta" not in query and "kn_page" not in query
+    assert sync.only_new_lower_bound(datetime(2025, 10, 26, 3, 30)) == datetime(2025, 10, 26, 1, 30)
+
+
+def test_incremental_source_page_strips_internal_watermark(monkeypatch) -> None:
     def page(*_args, **_kwargs):
-        return ["synthetic_pk", "date_change", "kn_page_id", "kn_delta_date_change"], [
-            ("row-1", "2025-01-01T00:00:00", "oracle-1", datetime(2025, 1, 1))
+        return ["synthetic_pk", "date_change", sync.ONLY_NEW_WATERMARK], [
+            ("row-1", "2025-01-01T00:00:00", datetime(2025, 1, 1))
         ]
 
     monkeypatch.setattr(sync, "oracle_delta_page", page)
     rows, cursors, next_cursor = sync.source_delta_full_page(
         object(), "SELECT 1", "synthetic_pk", ["synthetic_pk", "date_change"],
-        "kn_delta_date_change", ("kn_page_id",), None,
-        (datetime(2025, 1, 1), "oracle-1"), None, 100,
+        sync.ONLY_NEW_WATERMARK, ("synthetic_pk",), None,
+        (datetime(2025, 1, 1), "row-1"), None, 100,
     )
 
     assert rows == {"row-1": ("row-1", "2025-01-01T00:00:00")}
-    assert cursors == {"row-1": (datetime(2025, 1, 1), "oracle-1")}
-    assert next_cursor == (datetime(2025, 1, 1), "oracle-1")
+    assert cursors == {"row-1": (datetime(2025, 1, 1), "row-1")}
+    assert next_cursor == (datetime(2025, 1, 1), "row-1")
 
 
 def test_incremental_dry_projection_uses_only_key_change_watermark_and_page_key(monkeypatch) -> None:
@@ -197,19 +206,19 @@ def test_incremental_dry_projection_uses_only_key_change_watermark_and_page_key(
 
     def page(_db, _query, _watermark, _page_key, projection, *_args, **_kwargs):
         seen.append(projection)
-        return ["synthetic_pk", "date_change", "kn_delta_date_change", "kn_page_id"], [
-            ("row-1", "2025-01-01", datetime(2025, 1, 1), "oracle-1")
+        return ["synthetic_pk", "date_change", sync.ONLY_NEW_WATERMARK], [
+            ("row-1", "2025-01-01", datetime(2025, 1, 1))
         ]
 
     monkeypatch.setattr(sync, "oracle_delta_page", page)
     changes, cursor = sync.source_delta_change_page(
-        object(), "SELECT 1", "synthetic_pk", "date_change", "kn_delta_date_change",
-        ("kn_page_id",), None, (datetime(2025, 1, 1), "oracle-1"), None, 100,
+        object(), "SELECT 1", "synthetic_pk", "date_change", sync.ONLY_NEW_WATERMARK,
+        ("synthetic_pk",), None, (datetime(2025, 1, 1), "row-1"), None, 100,
     )
 
-    assert seen == ["synthetic_pk, date_change, kn_delta_date_change, kn_page_id"]
+    assert seen == [f"synthetic_pk, date_change, {sync.ONLY_NEW_WATERMARK}"]
     assert changes == {"row-1": "2025-01-01"}
-    assert cursor == (datetime(2025, 1, 1), "oracle-1")
+    assert cursor == (datetime(2025, 1, 1), "row-1")
 
 
 def test_source_page_key_requires_distinct_identifiers() -> None:
@@ -249,12 +258,7 @@ def test_typed_cursor_codec_round_trips_uuid() -> None:
     assert sync.decode_value(sync.encode_value(value)) == value
 
 
-def test_page_only_output_columns_are_allowed_but_unknown_extras_are_not() -> None:
-    sync.validate_source_output(
-        ["synthetic_pk", "date_change", "kn_page_id"],
-        ["synthetic_pk", "date_change"],
-        ("kn_page_id",),
-    )
+def test_source_output_rejects_all_extra_columns() -> None:
     try:
         sync.validate_source_output(
             ["synthetic_pk", "date_change", "unexpected"],
@@ -283,18 +287,18 @@ def test_sqlite_source_index_preserves_typed_mapping(tmp_path: Path) -> None:
         database.close()
 
 
-def test_source_full_page_strips_page_only_column(monkeypatch) -> None:
+def test_source_full_page_uses_stored_page_column(monkeypatch) -> None:
     def page(*_args, **_kwargs):
-        return ["synthetic_pk", "value", "kn_page_id"], [("row-1", "payload", "oracle-1")]
+        return ["synthetic_pk", "value"], [("row-1", "payload")]
 
     monkeypatch.setattr(sync, "oracle_page", page)
     rows, cursors, next_cursor = sync.source_full_page(
-        object(), "SELECT 1", "synthetic_pk", ["synthetic_pk", "value"], ("kn_page_id",), None, 100
+        object(), "SELECT 1", "synthetic_pk", ["synthetic_pk", "value"], ("synthetic_pk",), None, 100
     )
 
     assert rows == {"row-1": ("row-1", "payload")}
-    assert cursors == {"row-1": ("oracle-1",)}
-    assert next_cursor == ("oracle-1",)
+    assert cursors == {"row-1": ("row-1",)}
+    assert next_cursor == ("row-1",)
 
 
 def test_staging_advisory_lock_uses_autocommit_and_releases(monkeypatch) -> None:

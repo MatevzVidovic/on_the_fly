@@ -10,9 +10,9 @@ Pass a staging table name and a file containing the integration `SELECT`. The qu
 
 The normal mode is a complete reconciliation: it scans KN membership and deletes staging rows absent from KN. `--only-new` is the cheaper incremental alternative. It fetches only KN rows whose source watermark is at or after the persisted high-water timestamp, inserts missing keys, updates KN-newer matching rows, and **never deletes** staging rows.
 
-`--only-new --apply` requires `--resumable`, `--source-page-key`, and an explicit `--source-watermark-field`. The watermark must be a native Oracle-comparable timestamp alias, not the ISO text `date_change` field used for PostgreSQL comparison. The included SQL examples expose `kn_delta_date_change` for that purpose. The source page key breaks timestamp ties, so the checkpoint cursor is `(source watermark, native key...)`.
+`--only-new --apply` requires `--resumable` and `--source-page-key`. It uses the existing `date_change` selected by the integration SQL: the loader parses its ISO timezone text inside Oracle solely for filtering and ordering. The source page key breaks timestamp ties, so the checkpoint cursor is `(source watermark, native key...)`. No loader-only columns are added to integration SQL.
 
-On the first run, the completed watermark is the literal `MAX(date_change)` already in staging; an empty table imports all source rows. The lower timestamp bound is inclusive, so reruns replay equal-timestamp rows safely instead of missing ties. At the start of each invocation the loader freezes the greatest source `(watermark, native key...)` tuple and will not read past it. The completed watermark advances only after that window completes. `--restart` discards an incomplete window but retains the completed watermark.
+On the first run, the completed watermark is the literal `MAX(date_change)` already in staging; an empty table imports all source rows. Every later window starts two hours before its completed watermark, safely replaying equal timestamps and the DST repeated hour. At the start of each invocation the loader freezes the greatest source `(watermark, native key...)` tuple and will not read past it. The completed watermark advances only after that window completes. `--restart` discards an incomplete window but retains the completed watermark.
 
 Example (there are no deletes in this mode):
 
@@ -20,8 +20,7 @@ Example (there are no deletes in this mode):
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_dst_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_dst_pripis_podatki_h_kn.sql \
   --id-field dst_pripis_podatki_pk \
-  --source-page-key kn_page_id \
-  --source-watermark-field kn_delta_date_change \
+  --source-page-key dst_pripis_podatki_pk \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
   --only-new --resumable --apply --auto-page-size
@@ -29,8 +28,7 @@ Example (there are no deletes in this mode):
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
   --id-field parc_pripis_podatki_pk \
-  --source-page-key kn_page_id \
-  --source-watermark-field kn_delta_date_change \
+  --source-page-key parc_pripis_podatki_pk \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
   --only-new --resumable --apply --auto-page-size
@@ -82,7 +80,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_dst_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_dst_pripis_podatki_h_kn.sql \
   --id-field dst_pripis_podatki_pk \
-  --source-page-key kn_page_id \
+  --source-page-key dst_pripis_podatki_pk \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
   --resumable --apply --page-size 20000 --auto-page-size
@@ -90,7 +88,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
   --id-field parc_pripis_podatki_pk \
-  --source-page-key kn_page_id \
+  --source-page-key parc_pripis_podatki_pk \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
   --resumable --apply --page-size 20000 --auto-page-size
@@ -126,7 +124,7 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
   --resumable --apply --auto-page-size
 ```
 
-`--source-page-key` is required for resumable runs. It is the native KN key (one or more integration-query aliases) in the same order as an all-ascending KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. A paging field that is not a staging column must be selected with a `kn_page_` alias, for example `j."ID" AS kn_page_id`; those fields are never inserted or updated in PostgreSQL. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for the two direct-ID examples, use `kn_page_id`.
+`--source-page-key` is required for resumable runs. It is one or more normal stored integration columns in the same order as an all-ascending KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for the two direct-ID examples, use their selected `*_pripis_podatki_pk` field.
 
 Before writing, resumable mode validates that both the KN membership ID and the complete native page tuple are non-null and unique. By default, the staging membership column must have a non-partial unique index and a `NOT NULL` constraint. If those constraints are not present but you know the existing staging data is already unique and non-null, add `--trust-unique-non-null` to bypass only that metadata check. This is an operator assertion: duplicate or null staging keys can invalidate resumable update/delete behavior. The loader stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. The default initial page size and cap are both `50000`; use `--page-size N` to choose a smaller/larger starting size and `--page-size-cap N` to enforce a maximum for every resumable page, including learned auto sizes. Use `--max-pages N` to stop cleanly for testing.
 

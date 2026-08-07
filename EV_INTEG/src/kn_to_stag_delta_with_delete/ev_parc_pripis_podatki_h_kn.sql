@@ -1,6 +1,5 @@
 SELECT
     j."ID" AS parc_pripis_podatki_pk,
-    j."ID" AS kn_page_id,
     j."PC_MID" AS pc_mid,
     j."EID" AS eid,
     j."ID_MODEL" AS id_model,
@@ -52,7 +51,6 @@ SELECT
             'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,
     CAST(NULL AS VARCHAR2(40)) AS valid_to,
     TO_CHAR(FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
-            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change,
-    CAST(rf.CREATED AS TIMESTAMP) AS kn_delta_date_change
+            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change
 FROM EV.PARC_PRIPIS_PODATKI j
 JOIN EV.REVISION rf ON j."JN_REV_NUM" = rf.REV_NUM;
