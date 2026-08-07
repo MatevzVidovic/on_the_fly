@@ -35,7 +35,7 @@ def load_environment() -> None:
     load_dotenv(HERE / ".env", override=False)
 
 
-def pg_settings() -> dict[str, str | int]:
+def pg_settings(database: str) -> dict[str, str | int]:
     required = ("STAG_USER", "STAG_PASSWORD", "STAG_HOST", "STAG_PORT")
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
@@ -45,7 +45,7 @@ def pg_settings() -> dict[str, str | int]:
         "password": os.environ["STAG_PASSWORD"],
         "host": os.environ["STAG_HOST"],
         "port": int(os.environ["STAG_PORT"]),
-        "dbname": os.environ.get("STAG_DATABASE", "fmp_data_gurs"),
+        "dbname": database,
     }
 
 
@@ -87,22 +87,26 @@ def main() -> int:
             import psycopg
         except ImportError as error:
             raise RuntimeError("install requirements into .venv before running this script") from error
-        with psycopg.connect(**pg_settings()) as connection:
-            target_columns = columns(connection, table)
+        data_database = os.environ.get("STAG_DATABASE", "fmp_data_gurs")
+        with psycopg.connect(**pg_settings(data_database)) as staging_connection:
+            target_columns = columns(staging_connection, table)
             if "date_change" not in target_columns:
                 raise RuntimeError(f"staging table public.{table} does not have a date_change column")
-            metadata_columns = columns(connection, "attribute_table_integrations")
-            required_metadata = {"id", "attribute_table_id", "last_changed_datetime"}
-            missing_metadata = required_metadata - metadata_columns
-            if missing_metadata:
-                raise RuntimeError(f"public.attribute_table_integrations is missing: {', '.join(sorted(missing_metadata))}")
-            name_column = table_name_column(connection)
-
-            with connection.cursor() as cursor:
+            with staging_connection.cursor() as cursor:
                 cursor.execute(f'SELECT MAX("date_change") FROM {relation(table)}')
                 max_date_change = cursor.fetchone()[0]
                 if max_date_change is None:
                     raise RuntimeError(f"public.{table} has no non-NULL date_change value")
+
+        with psycopg.connect(**pg_settings("fmp")) as metadata_connection:
+            metadata_columns = columns(metadata_connection, "attribute_table_integrations")
+            required_metadata = {"id", "attribute_table_id", "last_changed_datetime"}
+            missing_metadata = required_metadata - metadata_columns
+            if missing_metadata:
+                raise RuntimeError(f"public.attribute_table_integrations is missing: {', '.join(sorted(missing_metadata))}")
+            name_column = table_name_column(metadata_connection)
+
+            with metadata_connection.cursor() as cursor:
                 cursor.execute(f'SELECT id, "{name_column}" FROM {relation("attribute_tables")} WHERE "{name_column}" = %s', (table,))
                 attribute_rows = cursor.fetchall()
                 if len(attribute_rows) != 1:
@@ -132,8 +136,8 @@ def main() -> int:
             print(json.dumps(preview, default=str, ensure_ascii=False, indent=2))
             if not args.apply:
                 return 0
-            with connection.transaction():
-                with connection.cursor() as cursor:
+            with metadata_connection.transaction():
+                with metadata_connection.cursor() as cursor:
                     cursor.execute(
                         f'UPDATE {relation("attribute_table_integrations")} SET last_changed_datetime = %s WHERE id = %s',
                         (max_date_change, integration_id),

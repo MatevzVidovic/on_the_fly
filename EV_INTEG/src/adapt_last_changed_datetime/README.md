@@ -1,6 +1,6 @@
 # Adapt integration last-changed timestamp
 
-Create `src/adapt_last_changed_datetime/.env` from `.env.example`. It connects only to the staging PostgreSQL database `fmp_data_gurs`; every table is in schema `public`.
+Create `src/adapt_last_changed_datetime/.env` from `.env.example`. It uses the same `STAG_*` server credentials twice, both in schema `public`: `STAG_DATABASE` (normally `fmp_data_gurs`) reads `MAX(date_change)` from the data table, while database `fmp` resolves and updates the FMP system tables.
 
 The utility finds `MAX(date_change)` in the supplied staging table, resolves that table's row in `public.attribute_tables`, then resolves the single matching row in `public.attribute_table_integrations` through `attribute_table_id`. It updates that row's `last_changed_datetime` to the maximum value.
 
