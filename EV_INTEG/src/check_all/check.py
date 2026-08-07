@@ -299,10 +299,12 @@ def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict
         failures.append("does not contain revision history join")
     if spec.get("from_2025") and not re.search(r"rf\s*\.\s*\"?created\"?\s*>=\s*timestamp\s*'2025-01-01\s+00:00:00'", lower):
         failures.append("does not contain required rf.created >= TIMESTAMP '2025-01-01 00:00:00' filter")
-    # Match an actual column token, not strings such as DST_PRIPIS_PODATKI
-    # or dst_pripis_podatki_pk which are required identifiers in this domain.
-    if re.search(r"(?:\.\s*|\b)(?:\"podatki\"|podatki)\b", lower):
-        failures.append("references forbidden PODATKI column")
+    if spec.get("forbid_podatki"):
+        # Match an actual column token, not strings such as
+        # DST_PRIPIS_PODATKI or dst_pripis_podatki_pk.  Only the two split
+        # ENOTA integrations are required to omit this payload attribute.
+        if re.search(r"(?:\.\s*|\b)(?:\"podatki\"|podatki)\b", lower):
+            failures.append("references forbidden PODATKI column")
     required = [spec["pk"], "date_change", "valid_from", "valid_to", *spec["source_page_keys"]]
     if spec.get("requires_jn_status"):
         required.append("jn_status")
@@ -313,7 +315,7 @@ def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict
     for name in required:
         if name.lower() not in output:
             failures.append(f"missing output alias {name}")
-    if "podatki" in output:
+    if spec.get("forbid_podatki") and "podatki" in output:
         failures.append("forbidden output alias podatki")
     return sql, output, failures
 
