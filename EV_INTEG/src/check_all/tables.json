@@ -1,0 +1,14 @@
+{"version":2,"tables":[
+{"key":"ev_dst_pripis_podatki_h","staging_table":"ev_dst_pripis_podatki_h","prod_table":"ev_dst_pripis_podatki_h","kn_table":"DST_PRIPIS_PODATKI","pk":"dst_pripis_podatki_pk","source_page_keys":["dst_pripis_podatki_pk"],"requires_jn_status":false},
+{"key":"ev_del_stavbe_h","staging_table":"ev_del_stavbe_h","prod_table":"ev_del_stavbe_h","kn_table":"JN_DEL_STAVBE","pk":"jn_del_stavbe_pk","source_page_keys":["dst_sid","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_del_stavbe_enota_h_2025_danes","staging_table":"ev_del_stavbe_enota_h_2025_danes","prod_table":"ev_del_stavbe_enota_h_2025_danes","kn_table":"JN_DEL_STAVBE_ENOTA","pk":"jn_del_stavbe_enota_pk","source_page_keys":["dst_sid","jn_rev_num"],"requires_jn_status":true,"from_2025":true},
+{"key":"ev_parc_del_h","staging_table":"ev_parc_del_h","prod_table":"ev_parc_del_h","kn_table":"JN_PARC_DEL","pk":"jn_parcela_del_pk","source_page_keys":["id_parc_del","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_parc_enota_h_2025_danes","staging_table":"ev_parc_enota_h_2025_danes","prod_table":"ev_parc_enota_h_2025_danes","kn_table":"JN_PARC_ENOTA","pk":"jn_parcela_enota_pk","source_page_keys":["id_parc_enota","jn_rev_num"],"requires_jn_status":true,"from_2025":true},
+{"key":"ev_parcela_h","staging_table":"ev_parcela_h","prod_table":"ev_parcela_h","kn_table":"JN_PARCELA","pk":"jn_parcela_pk","source_page_keys":["pc_mid","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_pe_dst_h","staging_table":"ev_pe_dst_h","prod_table":"ev_pe_dst_h","kn_table":"JN_PE_DST","pk":"jn_pe_dst_pk","source_page_keys":["id_pe_dst","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_pe_parc_h","staging_table":"ev_pe_parc_h","prod_table":"ev_pe_parc_h","kn_table":"JN_PE_PARC","pk":"jn_pe_parc_pk","source_page_keys":["id_pe_parc","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_posebna_enota_h","staging_table":"ev_posebna_enota_h","prod_table":"ev_posebna_enota_h","kn_table":"JN_POSEBNA_ENOTA","pk":"jn_posebna_enota_pk","source_page_keys":["id_pe","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_prostor_h","staging_table":"ev_prostor_h","prod_table":"ev_prostor_h","kn_table":"JN_PROSTOR","pk":"jn_prostor_pk","source_page_keys":["pro_id","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_stavba_h","staging_table":"ev_stavba_h","prod_table":"ev_stavba_h","kn_table":"JN_STAVBA","pk":"jn_sta_pk","source_page_keys":["sta_sid","jn_rev_num"],"requires_jn_status":true},
+{"key":"ev_parc_pripis_podatki_h","staging_table":"ev_parc_pripis_podatki_h","prod_table":"ev_parc_pripis_podatki_h","kn_table":"PARC_PRIPIS_PODATKI","pk":"parc_pripis_podatki_pk","source_page_keys":["parc_pripis_podatki_pk"],"requires_jn_status":false}
+]}
