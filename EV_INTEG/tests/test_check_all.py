@@ -28,9 +28,40 @@ def test_normalize_equalizes_aware_and_naive_wall_time_contract():
 
 def test_page_sql_uses_oracle_output_names_and_keyset():
     value = check.page_sql("SELECT 1", "SOURCE_PK", "DATE_CHANGE", ["ID_A", "REV"], (10, 2))
+    assert 'TO_CHAR(CAST("DATE_CHANGE" AS TIMESTAMP)' in value
+    assert 'AS "__CHECK_DATE_CHANGE"' in value
     assert '"ID_A" > :after_0' in value
     assert '"ID_A" = :after_0 AND "REV" > :after_1' in value
     assert 'ORDER BY "ID_A", "REV"' in value
+
+
+def test_safe_validation_sql_converts_all_temporal_output_fields_inside_oracle():
+    value = check.safe_validation_sql(
+        "SELECT 1", ["synthetic_pk", "date_change", "valid_from", "valid_to", "jn_status"]
+    )
+    assert 'q."SYNTHETIC_PK" AS "SYNTHETIC_PK"' in value
+    for name in ("DATE_CHANGE", "VALID_FROM", "VALID_TO"):
+        assert f'TO_CHAR(CAST(q."{name}" AS TIMESTAMP)' in value
+        assert f'AS "{name}"' in value
+    assert 'q."JN_STATUS" AS "JN_STATUS"' in value
+
+
+def test_validate_sql_uses_safe_zero_row_projection_for_tstz(monkeypatch):
+    statements = []
+
+    class Oracle:
+        def cursor(self):
+            class C:
+                description = [("SYNTHETIC_PK",), ("DATE_CHANGE",), ("VALID_FROM",), ("VALID_TO",)]
+                def __enter__(self): return self
+                def __exit__(self, *_args): return False
+                def execute(self, statement, *_args): statements.append(statement)
+            return C()
+
+    spec = {"kn_table": "EXAMPLE", "pk": "synthetic_pk", "source_page_keys": ["synthetic_pk"], "requires_jn_status": False}
+    check.validate_sql(Oracle(), "SELECT x FROM EV.EXAMPLE", spec)
+    assert 'SELECT * FROM (' not in statements[0]
+    assert 'TO_CHAR(CAST(q."DATE_CHANGE" AS TIMESTAMP)' in statements[0]
 
 
 def test_manifest_contains_only_split_2025_targets():

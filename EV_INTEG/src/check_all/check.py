@@ -20,6 +20,12 @@ CACHE_PATH = HERE / ".state" / "data_correct.json"
 CACHE_VERSION = 1
 SCHEMA = "public"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
+# Do not ask python-oracledb to describe or fetch a TIMESTAMP WITH TIME ZONE.
+# The KN JDBC integrations expose the three temporal fields as TSTZ; on some
+# client/server version combinations their type descriptor raises ORA-01805.
+# LIFT stores wall-clock PostgreSQL timestamps, so an ISO wall-clock string is
+# also the value we need for the checker comparison.
+ORACLE_TIMESTAMP_FORMAT = "YYYY-MM-DD\"T\"HH24:MI:SS.FF6"
 
 
 def quote(name: str) -> str:
@@ -195,6 +201,32 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
             "sql": source_sql, "connection_name": conn_name, "titles": translations}
 
 
+def oracle_timestamp_text(expression: str, alias: str) -> str:
+    """Project an Oracle DATE/TIMESTAMP/TSTZ as a safe ISO wall-clock string."""
+    return f"TO_CHAR(CAST({expression} AS TIMESTAMP), '{ORACLE_TIMESTAMP_FORMAT}') AS {quote(alias)}"
+
+
+def safe_validation_sql(sql: str, required: list[str]) -> str:
+    """Describe required integration aliases without exposing TSTZ to the driver.
+
+    Oracle resolves every quoted reference in this zero-row projection, so a
+    missing required alias still produces the expected ORA-00904 validation
+    error.  The temporal aliases are converted inside Oracle before the
+    driver receives their metadata.
+    """
+    temporal = {"date_change", "valid_from", "valid_to"}
+    projections = []
+    # A single-column native page key is often the destination PK.  Project
+    # it once; duplicate aliases in Oracle's derived table are ambiguous.
+    for name in dict.fromkeys(required):
+        source = f"q.{quote(name.upper())}"
+        projections.append(
+            oracle_timestamp_text(source, name.upper()) if name.lower() in temporal
+            else f"{source} AS {quote(name.upper())}"
+        )
+    return f"SELECT {', '.join(projections)} FROM ({sql}) q WHERE 1 = 0"
+
+
 def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict[str, str], list[str]]:
     sql = clean_sql(str(sql or ""))
     lower = uncomment(sql).lower()
@@ -211,12 +243,18 @@ def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict
     # or dst_pripis_podatki_pk which are required identifiers in this domain.
     if re.search(r"(?:\.\s*|\b)(?:\"podatki\"|podatki)\b", lower):
         failures.append("references forbidden PODATKI column")
-    with oracle.cursor() as cur:
-        cur.execute(f"SELECT * FROM ({sql}) q WHERE 1 = 0")
-        output = {str(column[0]).lower(): str(column[0]) for column in cur.description}
     required = [spec["pk"], "date_change", "valid_from", "valid_to", *spec["source_page_keys"]]
     if spec.get("requires_jn_status"):
         required.append("jn_status")
+    try:
+        with oracle.cursor() as cur:
+            cur.execute(safe_validation_sql(sql, required))
+            output = {str(column[0]).lower(): str(column[0]) for column in cur.description}
+    except Exception as error:
+        failures.append(f"cannot validate required integration output aliases: {error}")
+        # The names are still deterministic for the later code path, but this
+        # table remains a metadata failure and no data query will run.
+        output = {name.lower(): name.upper() for name in required}
     for name in required:
         if name.lower() not in output:
             failures.append(f"missing output alias {name}")
@@ -297,7 +335,7 @@ def keyset_predicate(keys: list[str]) -> str:
 
 
 def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], after: tuple[Any, ...] | None) -> str:
-    columns = ", ".join([quote(source_pk), quote(source_date), *map(quote, page_keys)])
+    columns = ", ".join([quote(source_pk), oracle_timestamp_text(quote(source_date), "__CHECK_DATE_CHANGE"), *map(quote, page_keys)])
     where = "" if after is None else " WHERE " + keyset_predicate(page_keys)
     return f"SELECT {columns} FROM ({sql}) q{where} ORDER BY {', '.join(map(quote, page_keys))} FETCH NEXT :limit ROWS ONLY"
 

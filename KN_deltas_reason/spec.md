@@ -11,6 +11,10 @@ We will do the matching on:  PK composite columns / DATE_CHANGED
 We will identify what rows are the deltas. Then if the 2 delta sets (extra in each direction) are not too big, we will also download them locally so we know everything about them and can identify the reasons.
 
 
+look at EV_INTEG to see how kn connection works and other conections work and all that
+
+
+
 
 
 
