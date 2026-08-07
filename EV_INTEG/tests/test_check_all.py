@@ -46,6 +46,23 @@ def test_safe_validation_sql_converts_all_temporal_output_fields_inside_oracle()
     assert 'q."JN_STATUS" AS "JN_STATUS"' in value
 
 
+def test_documented_iso_text_aliases_are_detected_and_projected_without_nls_casting():
+    integration_sql = '''
+        SELECT TO_CHAR(FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
+                       'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS "date_change"
+        FROM EV.EXAMPLE rf
+    '''
+    aliases = check.documented_text_temporal_aliases(integration_sql, {"date_change", "valid_from"})
+    assert aliases == {"date_change"}
+    value = check.safe_validation_sql("SELECT 1", ["date_change", "valid_from"], aliases)
+    assert 'q."DATE_CHANGE" AS "DATE_CHANGE"' in value
+    assert 'CAST(q."DATE_CHANGE" AS TIMESTAMP)' not in value
+    assert 'TO_CHAR(CAST(q."VALID_FROM" AS TIMESTAMP)' in value
+    page = check.page_sql("SELECT 1", "PK", "DATE_CHANGE", ["PK"], None, date_is_text=True)
+    assert 'TO_CHAR(CAST("DATE_CHANGE" AS TIMESTAMP)' not in page
+    assert 'SELECT "PK", "DATE_CHANGE", "PK" FROM' in page
+
+
 def test_validate_sql_uses_safe_zero_row_projection_for_tstz(monkeypatch):
     statements = []
 
@@ -109,6 +126,16 @@ def test_diff_data_reports_first_date_mismatch():
     assert not passed and "date_change mismatch" in str(reason)
 
 
+def test_diff_data_rejects_a_short_final_page_before_the_expected_kn_count():
+    oracle = _Connection([[('A', datetime(2025, 1, 1), 1, 1)]])
+    pg = _Connection([[('A', datetime(2025, 1, 1))]])
+    spec = {"pk": "synthetic_pk", "table": "target", "source_page_keys": ["native_id", "jn_rev_num"]}
+    output = {"synthetic_pk": "SYNTHETIC_PK", "date_change": "DATE_CHANGE", "native_id": "NATIVE_ID", "jn_rev_num": "JN_REV_NUM"}
+    passed, reason = check.diff_data(oracle, pg, "SELECT 1", spec, output, 10, 2)
+    assert not passed
+    assert reason == "KN scan count 1 != COUNT(*) 2"
+
+
 def test_podatki_column_reference_is_rejected_but_pripis_table_is_allowed(monkeypatch):
     class Oracle:
         def cursor(self):
@@ -138,6 +165,22 @@ def test_zero_newer_oracle_predicate_casts_tstz_to_timestamp():
     output = {"date_change": "DATE_CHANGE"}
     assert check.highwater_and_delta(Connection(), Connection(), "SELECT 1", spec, output, datetime(2025, 1, 1))[0]
     assert 'CAST("DATE_CHANGE" AS TIMESTAMP) > :highwater' in statements[-1]
+
+
+def test_zero_newer_oracle_predicate_parses_documented_iso_text_date_change():
+    statements = []
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, statement, _params=None): statements.append(statement)
+        def fetchone(self): return (datetime(2025, 1, 1),) if "MAX" in statements[-1] else (0,)
+    class Connection:
+        def cursor(self): return Cursor()
+    integration_sql = '''SELECT TO_CHAR(FROM_TZ(CAST(x.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
+        'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change FROM EV.EXAMPLE x'''
+    assert check.highwater_and_delta(Connection(), Connection(), integration_sql, {"table": "target"}, {"date_change": "DATE_CHANGE"}, datetime(2025, 1, 1))[0]
+    assert 'CAST(TO_TIMESTAMP_TZ("DATE_CHANGE", ' in statements[-1]
+    assert check.DOCUMENTED_ISO_TZ_FORMAT in statements[-1]
 
 
 def test_initialise_sessions_sets_ljubljana_on_both_connections():

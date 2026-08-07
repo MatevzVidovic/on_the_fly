@@ -9,7 +9,7 @@
 | ev_parc_enota_h_2025_danes | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_parcela_h | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_pe_dst_h | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
-| ev_pe_parc_h | PASS | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
+| ev_pe_parc_h | PASS | PASS | PASS | FAIL | **FAIL** |
 | ev_posebna_enota_h | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_prostor_h | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_stavba_h | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
@@ -31,7 +31,8 @@
 - expected exactly one integration total and it must use KN ORACLE for 'ev_parc_del_h'; found 1 (connections: ['GURS ORCL'])
 ### ev_parc_enota_h_2025_danes
 
-- does not exclude JN_STATUS = 'X'; missing output alias jn_rev_num
+- does not exclude JN_STATUS = 'X'; cannot validate required integration output aliases: ORA-00904: "Q"."JN_REV_NUM": invalid identifier
+Help: https://docs.oracle.com/error-help/db/ora-00904/
 ### ev_parcela_h
 
 - expected exactly one integration total and it must use KN ORACLE for 'ev_parcela_h'; found 1 (connections: ['GURS ORCL'])
@@ -40,8 +41,7 @@
 - expected exactly one integration total and it must use KN ORACLE for 'ev_pe_dst_h'; found 1 (connections: ['GURS ORCL'])
 ### ev_pe_parc_h
 
-- ORA-01805: possible error in date/time operation
-Help: https://docs.oracle.com/error-help/db/ora-01805/
+- integration=26856cbc-ae67-11f0-8b08-169cd02558fe; connection='KN ORACLE'; titles=['EV H - PE parc']; counts KN/target=191788/191788; 2 KN rows are newer than high-water mark
 ### ev_posebna_enota_h
 
 - expected exactly one integration total and it must use KN ORACLE for 'ev_posebna_enota_h'; found 1 (connections: ['GURS ORCL'])

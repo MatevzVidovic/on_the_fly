@@ -26,6 +26,10 @@ IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 # LIFT stores wall-clock PostgreSQL timestamps, so an ISO wall-clock string is
 # also the value we need for the checker comparison.
 ORACLE_TIMESTAMP_FORMAT = "YYYY-MM-DD\"T\"HH24:MI:SS.FF6"
+# This is the documented integration output format.  It is deliberately kept
+# separate from ORACLE_TIMESTAMP_FORMAT: the former includes an offset, while
+# the latter is the wall-clock value compared with LIFT's timestamp column.
+DOCUMENTED_ISO_TZ_FORMAT = "YYYY-MM-DD\"T\"HH24:MI:SS.FF TZH:TZM"
 
 
 def quote(name: str) -> str:
@@ -206,7 +210,31 @@ def oracle_timestamp_text(expression: str, alias: str) -> str:
     return f"TO_CHAR(CAST({expression} AS TIMESTAMP), '{ORACLE_TIMESTAMP_FORMAT}') AS {quote(alias)}"
 
 
-def safe_validation_sql(sql: str, required: list[str]) -> str:
+def documented_text_temporal_aliases(sql: str, aliases: Iterable[str]) -> set[str]:
+    """Return documented ISO-TZ temporal aliases that are already VARCHAR2.
+
+    Integrations may use the project-standard ``TO_CHAR(FROM_TZ(...),
+    'YYYY-MM-DD\"T\"HH24:MI:SS.FF TZH:TZM') AS date_change`` form.  Applying
+    ``CAST(alias AS TIMESTAMP)`` to that text relies on Oracle's NLS parsing
+    settings, so keep it as text until Python normalises it.
+    """
+    source = uncomment(sql)
+    matched: set[str] = set()
+    format_pattern = re.escape(DOCUMENTED_ISO_TZ_FORMAT)
+    for alias in aliases:
+        # Non-greedy matching lets the expression contain nested calls such as
+        # FROM_TZ(CAST(...), 'Europe/Ljubljana').  The exact format literal
+        # keeps this limited to the documented ISO-TZ output contract.
+        pattern = (
+            rf"\bto_char\s*\(.*?,\s*'{format_pattern}'\s*\)\s*"
+            rf"(?:as\s+)?\"?{re.escape(alias)}\"?(?![A-Za-z0-9_$])"
+        )
+        if re.search(pattern, source, flags=re.I | re.S):
+            matched.add(alias.lower())
+    return matched
+
+
+def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: set[str] | None = None) -> str:
     """Describe required integration aliases without exposing TSTZ to the driver.
 
     Oracle resolves every quoted reference in this zero-row projection, so a
@@ -215,13 +243,14 @@ def safe_validation_sql(sql: str, required: list[str]) -> str:
     driver receives their metadata.
     """
     temporal = {"date_change", "valid_from", "valid_to"}
+    text_temporal_aliases = text_temporal_aliases or set()
     projections = []
     # A single-column native page key is often the destination PK.  Project
     # it once; duplicate aliases in Oracle's derived table are ambiguous.
     for name in dict.fromkeys(required):
         source = f"q.{quote(name.upper())}"
         projections.append(
-            oracle_timestamp_text(source, name.upper()) if name.lower() in temporal
+            oracle_timestamp_text(source, name.upper()) if name.lower() in temporal and name.lower() not in text_temporal_aliases
             else f"{source} AS {quote(name.upper())}"
         )
     return f"SELECT {', '.join(projections)} FROM ({sql}) q WHERE 1 = 0"
@@ -246,9 +275,10 @@ def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict
     required = [spec["pk"], "date_change", "valid_from", "valid_to", *spec["source_page_keys"]]
     if spec.get("requires_jn_status"):
         required.append("jn_status")
+    text_temporal_aliases = documented_text_temporal_aliases(sql, {"date_change", "valid_from", "valid_to"})
     try:
         with oracle.cursor() as cur:
-            cur.execute(safe_validation_sql(sql, required))
+            cur.execute(safe_validation_sql(sql, required, text_temporal_aliases))
             output = {str(column[0]).lower(): str(column[0]) for column in cur.description}
     except Exception as error:
         failures.append(f"cannot validate required integration output aliases: {error}")
@@ -334,8 +364,9 @@ def keyset_predicate(keys: list[str]) -> str:
     return " OR ".join(parts)
 
 
-def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], after: tuple[Any, ...] | None) -> str:
-    columns = ", ".join([quote(source_pk), oracle_timestamp_text(quote(source_date), "__CHECK_DATE_CHANGE"), *map(quote, page_keys)])
+def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], after: tuple[Any, ...] | None, *, date_is_text: bool = False) -> str:
+    date_column = quote(source_date) if date_is_text else oracle_timestamp_text(quote(source_date), "__CHECK_DATE_CHANGE")
+    columns = ", ".join([quote(source_pk), date_column, *map(quote, page_keys)])
     where = "" if after is None else " WHERE " + keyset_predicate(page_keys)
     return f"SELECT {columns} FROM ({sql}) q{where} ORDER BY {', '.join(map(quote, page_keys))} FETCH NEXT :limit ROWS ONLY"
 
@@ -343,11 +374,12 @@ def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], a
 def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], page_size: int, expected_count: int) -> tuple[bool, str | None]:
     pk = spec["pk"].lower(); after: tuple[Any, ...] | None = None; seen = 0
     source_keys = [source_output[key.lower()] for key in spec["source_page_keys"]]
+    date_is_text = "date_change" in documented_text_temporal_aliases(sql, {"date_change"})
     while True:
         with oracle.cursor() as cur:
             params = {"limit": page_size}
             if after is not None: params.update({f"after_{index}": value for index, value in enumerate(after)})
-            cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after), params)
+            cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after, date_is_text=date_is_text), params)
             rows = cur.fetchall()
         if not rows: return (seen == expected_count, None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}")
         keys = [row[0] for row in rows]
@@ -374,7 +406,11 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
             if expected != actual:
                 return False, f"date_change mismatch for PK {key!r}: KN={expected}, target={actual}"
         seen += len(rows); after = tuples[-1]
-        if len(rows) < page_size: return True, None
+        if len(rows) < page_size:
+            return (
+                seen == expected_count,
+                None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}",
+            )
 
 
 def highwater_and_delta(pg: Any, oracle: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], highwater: Any) -> tuple[bool, str, int]:
@@ -392,7 +428,12 @@ def highwater_and_delta(pg: Any, oracle: Any, sql: str, spec: dict[str, Any], so
         # LIFT stores a naïve PostgreSQL timestamp; KN's FROM_TZ output is a
         # TSTZ. Cast to TIMESTAMP so this uses the same Ljubljana wall-clock
         # contract as normalize()/the data comparison.
-        cur.execute(f"SELECT COUNT(*) FROM ({sql}) q WHERE CAST({quote(source_output['date_change'])} AS TIMESTAMP) > :highwater", {"highwater": highwater})
+        source_date = quote(source_output["date_change"])
+        if "date_change" in documented_text_temporal_aliases(sql, {"date_change"}):
+            source_date = f"CAST(TO_TIMESTAMP_TZ({source_date}, '{DOCUMENTED_ISO_TZ_FORMAT}') AS TIMESTAMP)"
+        else:
+            source_date = f"CAST({source_date} AS TIMESTAMP)"
+        cur.execute(f"SELECT COUNT(*) FROM ({sql}) q WHERE {source_date} > :highwater", {"highwater": highwater})
         delta = int(cur.fetchone()[0])
     return delta == 0, ("ok" if delta == 0 else f"{delta} KN rows are newer than high-water mark"), delta
 
