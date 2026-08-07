@@ -162,7 +162,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
     # actual missing relation/column precisely.
     ats = column_names(connection, "attribute_tables") or {"id", "name"}
     ais = column_names(connection, "attribute_table_integrations") or {
-        "id", "attribute_table_id", "last_changed_datetime", "url",
+        "id", "attribute_table_id", "last_changed_datetime", "last_sync_start", "url",
         "attribute_table_sql_connection_id",
     }
     acs = column_names(connection, "attribute_table_sql_connections") or {"id", "name"}
@@ -170,7 +170,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
     sql_col = pick(ais, ("url", "sql", "select_sql", "integration_sql", "query", "source_sql"), "integration SQL column")
     connection_fk = pick(ais, ("attribute_table_sql_connection_id", "sql_connection_id"), "SQL connection id column")
     connection_name = pick(acs, ("name",), "SQL connection name column")
-    required = {"id", "attribute_table_id", "last_changed_datetime"}
+    required = {"id", "attribute_table_id", "last_changed_datetime", "last_sync_start"}
     if missing := required - ais:
         raise RuntimeError("attribute_table_integrations missing: " + ", ".join(sorted(missing)))
     with connection.cursor() as cur:
@@ -184,7 +184,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         # ``len()`` on it while processing query parameters.
         attribute_id_parameter = (attribute_id,)
         cur.execute(
-            f"SELECT i.id, i.last_changed_datetime, i.{quote(sql_col)}, c.{quote(connection_name)} "
+            f"SELECT i.id, i.last_changed_datetime, i.last_sync_start, i.{quote(sql_col)}, c.{quote(connection_name)} "
             f"FROM {relation('attribute_table_integrations')} i "
             f"LEFT JOIN {relation('attribute_table_sql_connections')} c ON c.id=i.{quote(connection_fk)} "
             "WHERE i.attribute_table_id=%s", attribute_id_parameter)
@@ -198,7 +198,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
                 f"expected exactly one integration total for {table!r}; found "
                 f"{len(integrations)} (connections: {[r[3] for r in integrations]!r})"
             )
-        integration_id, highwater, source_sql, conn_name = integrations[0]
+        integration_id, highwater, last_sync_start, source_sql, conn_name = integrations[0]
         translations: list[Any] = []
         try:
             trans = column_names(connection, "attribute_table_translations")
@@ -207,7 +207,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
             translations = [row[0] for row in cur.fetchall()]
         except RuntimeError:
             raise
-    return {"attribute_id": attribute_id, "integration_id": integration_id, "highwater": highwater,
+    return {"attribute_id": attribute_id, "integration_id": integration_id, "highwater": highwater, "last_sync_start": last_sync_start,
             "sql": source_sql, "connection_name": conn_name, "titles": translations}
 
 
@@ -481,10 +481,10 @@ def highwater_and_delta(pg: Any, oracle: Any, sql: str, spec: dict[str, Any], so
 
 
 def markdown(results: list[dict[str, Any]], environment: str) -> str:
-    lines = [f"# EV integration state check ({environment})", "", "| Table | Metadata | Data | High-water | Zero newer rows | Result |", "|---|---|---|---|---|---|"]
+    lines = [f"# EV integration state check ({environment})", "", "| Table | Metadata | Last sync start | Data | High-water | Zero newer rows | Result |", "|---|---|---|---|---|---|---|"]
     for item in results:
-        lines.append("| {table} | {metadata} | {data} | {water} | {delta} | **{result}** |".format(
-            table=item["table"], metadata=item["metadata"], data=item["data"], water=item["highwater"], delta=item["delta"], result=item["result"]))
+        lines.append("| {table} | {metadata} | {sync_start} | {data} | {water} | {delta} | **{result}** |".format(
+            table=item["table"], metadata=item["metadata"], sync_start=item["sync_start"], data=item["data"], water=item["highwater"], delta=item["delta"], result=item["result"]))
     lines += ["", "## Details", ""]
     for item in results:
         lines += [f"### {item['table']}", "", f"- {item['detail']}"]
@@ -499,7 +499,7 @@ def write_report(path: Path, results: list[dict[str, Any]], environment: str) ->
 
 def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str) -> dict[str, Any]:
     table = target_table(spec, environment); local = {**spec, "table": table}
-    result = {"table": table, "metadata": "FAIL", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
+    result = {"table": table, "metadata": "FAIL", "sync_start": "NOT_CHECKED", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
     try:
         heartbeat(f"[{table}] heartbeat: resolving LIFT metadata and validating KN SQL")
         info = metadata(metadata_pg, table)
@@ -507,6 +507,11 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         sql, output, failures = validate_sql(oracle, info["sql"], local)
         if title_bad: failures.append(f"titles must all start with EV H; got {info['titles']!r}")
         if str(info["connection_name"] or "").upper() != "KN ORACLE": failures.append("integration connection is not KN ORACLE")
+        if info["last_sync_start"] is None:
+            failures.append("last_sync_start is NULL; LIFT would run a full integration and ignore the delta high-water mark")
+            result["sync_start"] = "FAIL"
+        else:
+            result["sync_start"] = "PASS"
         result["metadata"] = "FAIL" if failures else "PASS"
         # Full validation includes presentation/spec fields such as JN_STATUS
         # and valid_from.  Comparison needs only PK/date/page tuple.  Retry a
@@ -549,7 +554,7 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         result["delta"] = "PASS" if ok else "FAIL"
         metadata_detail = "; ".join(failures)
         result["detail"] = ((metadata_detail + "; " if metadata_detail else "") + f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
-                            f"titles={info['titles']!r}; counts KN/target={kn_count}/{target_count}; {detail}")
+                            f"titles={info['titles']!r}; last_sync_start={normalize(info['last_sync_start'])}; counts KN/target={kn_count}/{target_count}; {detail}")
         result["result"] = "PASS" if result["metadata"] == "PASS" and ok and data_ok else "FAIL"
         return result
     except Exception as error:
