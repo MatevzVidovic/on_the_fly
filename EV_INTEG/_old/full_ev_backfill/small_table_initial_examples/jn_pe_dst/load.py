@@ -2,7 +2,7 @@ from pathlib import Path
 import sys
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
-from ev_backfill import TableSpec, run_loader
+from EV_INTEG._old.full_ev_backfill.ev_backfill import TableSpec, run_loader
 
 SPEC = TableSpec(
     "jn_pe_dst",
