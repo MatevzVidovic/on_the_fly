@@ -52,6 +52,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
   --id-field dst_pripis_podatki_pk \
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
+  --trust-unique-non-null \
   --resumable --apply --page-size 20000
 
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
@@ -59,6 +60,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
   --id-field parc_pripis_podatki_pk \
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
+  --trust-unique-non-null \
   --resumable --apply --page-size 20000
 ```
 
@@ -94,7 +96,7 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
 
 `--source-page-key` is required for resumable runs. It is the native KN key (one or more integration-query aliases) in the same order as an all-ascending KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. A paging field that is not a staging column must be selected with a `kn_page_` alias, for example `j."ID" AS kn_page_id`; those fields are never inserted or updated in PostgreSQL. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for the two direct-ID examples, use `kn_page_id`.
 
-Before writing, resumable mode validates that both the KN membership ID and the complete native page tuple are non-null and unique. The staging membership column must have a non-partial unique index and a `NOT NULL` constraint. The loader stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
+Before writing, resumable mode validates that both the KN membership ID and the complete native page tuple are non-null and unique. By default, the staging membership column must have a non-partial unique index and a `NOT NULL` constraint. If those constraints are not present but you know the existing staging data is already unique and non-null, add `--trust-unique-non-null` to bypass only that metadata check. This is an operator assertion: duplicate or null staging keys can invalidate resumable update/delete behavior. The loader stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
 
 ```sh
 # Inspect progress without database credentials.

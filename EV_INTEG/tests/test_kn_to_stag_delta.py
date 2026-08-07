@@ -44,6 +44,13 @@ def test_resumable_state_paths_are_isolated_per_integration() -> None:
     assert second[0].parent.name == "b" * 64
 
 
+def test_trust_constraint_assertion_uses_its_own_checkpoint() -> None:
+    standard = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",))
+    trusted = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), True)
+
+    assert standard != trusted
+
+
 def test_insert_statement_generates_lift_owned_id_and_timestamps() -> None:
     statement = sync.insert_statement("public", "ev_pe_parc_h", ["jn_pe_parc_pk", "date_change"], ["id", "created_at", "created_by", "updated_at", "updated_by", "jn_pe_parc_pk", "date_change"])
 

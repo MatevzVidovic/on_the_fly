@@ -12,6 +12,8 @@ import json
 import os
 import re
 import sys
+import uuid
+from decimal import Decimal
 from collections import Counter
 from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
@@ -73,6 +75,8 @@ def norm_date(value: Any) -> datetime:
 def jsonable(v: Any) -> Any:
     if isinstance(v, (datetime, date)): return v.isoformat()
     if isinstance(v, bytes): return v.hex()
+    if isinstance(v, Decimal): return str(v)
+    if isinstance(v, uuid.UUID): return str(v)
     return v
 
 
@@ -203,8 +207,9 @@ def forward_key_lookup(rows: Iterable[dict[str, Any]], names: list[str]):
     it = iter(rows); current = next(it, None)
     def contains(key):
         nonlocal current
-        while current is not None and key_of(current, names) < key: current = next(it, None)
-        return current is not None and key_of(current, names) == key
+        token = ordering_key(key)
+        while current is not None and ordering_key(key_of(current, names)) < token: current = next(it, None)
+        return current is not None and ordering_key(key_of(current, names)) == token
     return contains
 
 def integration_for(conn, integration_id: str, expected_table: str) -> dict[str, Any]:
@@ -218,7 +223,7 @@ def integration_for(conn, integration_id: str, expected_table: str) -> dict[str,
     if not sql: raise AuditError("saved integration SQL is unavailable in metadata")
     return {"sql": validated_select(sql), "sql_hash": hashlib.sha256(sql.encode()).hexdigest(), "connection": found[0]["connection_name"]}
 
-def audit_selection(p: dict[str, str], s: Selection, cutoff: datetime, limit: int) -> tuple[dict[str, Any], dict[str, list[dict[str, Any]]]]:
+def audit_selection(p: dict[str, str], s: Selection, cutoff: datetime, limit: int, export_dir=None, max_export_rows: int = 1000, allow_large_export: bool = False):
     """Run a single streaming, read-only comparison. Connections are closed on every path."""
     meta = pg_connect(p, metadata=True)
     try: integ = integration_for(meta, s.integration_id, s.target_table)
@@ -231,16 +236,21 @@ def audit_selection(p: dict[str, str], s: Selection, cutoff: datetime, limit: in
         with tc.cursor() as c: c.execute("SET TRANSACTION READ ONLY; SET TIME ZONE 'Europe/Ljubljana'")
         sk, tk = [x.source for x in s.keys], [x.target for x in s.keys]
         order_s, order_t = ", ".join("x." + qi(x) for x in sk), ", ".join(qi(x) for x in tk)
-        source_cols = ", ".join(f'x.{qi(x)} AS {qi(x)}' for x in [*sk, s.source_date])
-        target_cols = ", ".join(qi(x) for x in [*tk, s.target_date])
-        null_s = " OR ".join(f'x.{qi(x)} IS NULL' for x in [*sk, s.source_date])
-        null_t = " OR ".join(f'{qi(x)} IS NULL' for x in [*tk, s.target_date])
+        source_cols = "x.*" if export_dir else ", ".join(f'x.{qi(x)} AS {qi(x)}' for x in [*sk, s.source_date])
+        target_cols = "*" if export_dir else ", ".join(qi(x) for x in [*tk, s.target_date])
+        # As-of audit validity is scoped to eligible rows; future/null-date records do not invalidate it.
+        null_s = " OR ".join(f'x.{qi(x)} IS NULL' for x in sk)
+        null_t = " OR ".join(f'{qi(x)} IS NULL' for x in tk)
         with oc.cursor() as c:
-            c.execute(f'SELECT 1 FROM ({integ["sql"]}) x WHERE {null_s} AND ROWNUM=1')
-            if c.fetchone(): raise AuditError("null composite key or date in source integration output")
+            c.execute(f'SELECT 1 FROM ({integ["sql"]}) x WHERE x.{qi(s.source_date)} IS NULL AND ROWNUM=1')
+            if c.fetchone(): raise AuditError("null configured source date is a data-quality error")
+            c.execute(f'SELECT 1 FROM ({integ["sql"]}) x WHERE x.{qi(s.source_date)} < :cutoff AND ({null_s}) AND ROWNUM=1', cutoff=cutoff.astimezone(LJ).replace(tzinfo=None))
+            if c.fetchone(): raise AuditError("null composite key in eligible source integration output")
         with tc.cursor() as c:
-            c.execute(f'SELECT 1 FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {null_t} LIMIT 1')
-            if c.fetchone(): raise AuditError("null composite key or date in target")
+            c.execute(f'SELECT 1 FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {qi(s.target_date)} IS NULL LIMIT 1')
+            if c.fetchone(): raise AuditError("null configured target date is a data-quality error")
+            c.execute(f'SELECT 1 FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {qi(s.target_date)} < %s AND ({null_t}) LIMIT 1', (cutoff,))
+            if c.fetchone(): raise AuditError("null composite key in eligible target")
         source_sql = f'SELECT {source_cols} FROM ({integ["sql"]}) x WHERE x.{qi(s.source_date)} < :cutoff ORDER BY {order_s}'
         target_sql = f'SELECT {target_cols} FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {qi(s.target_date)} < %s ORDER BY {order_t}'
         sc = oc.cursor(); sc.execute(source_sql, cutoff=cutoff.astimezone(LJ).replace(tzinfo=None))
@@ -250,13 +260,63 @@ def audit_selection(p: dict[str, str], s: Selection, cutoff: datetime, limit: in
         tnc = tc.cursor(); tnc.execute(f'SELECT {", ".join(qi(x) for x in tk)} FROM {qi(s.target_schema)}.{qi(s.target_table)} WHERE {qi(s.target_date)} >= %s ORDER BY {order_t}', (cutoff,))
         s_after = forward_key_lookup(cursor_rows(snc), sk)
         t_after = forward_key_lookup(cursor_rows(tnc), tk)
-        counts, samples = compare_rows(cursor_rows(sc), cursor_rows(tcurs), sk, tk, s.source_date, s.target_date, cutoff, s_after, t_after, limit)
-        return {"table":s.name, "integration_id":s.integration_id, "sql_hash":integ["sql_hash"], "keys":[asdict(x) for x in s.keys], "source_date":s.source_date, "target_date":s.target_date, "counts":counts}, samples
+        spool_files, handles, spool_rows, overflow = {}, {}, Counter(), set()
+        if export_dir:
+            safe = re.sub(r"[^A-Za-z0-9_.-]+", "_", s.name).strip("._") or "table"
+            for kind, sides in (("source_only", ("source",)), ("target_only", ("target",)), ("date_changed_mismatch", ("source", "target"))):
+                spool_files[kind] = {}
+                for side in sides:
+                    path = export_dir / f".{safe}_{s.integration_id}_{kind}_{side}.spool.jsonl"
+                    spool_files[kind][side], handles[(kind, side)] = path, path.open("w")
+        def spool(kind, payload):
+            for side, row in payload.items():
+                handle = handles.get((kind, side))
+                if not handle: continue
+                # Normal export requests keep bounded evidence only; counting continues regardless.
+                if not allow_large_export and spool_rows[kind] >= max_export_rows + 1:
+                    overflow.add(kind); continue
+                handle.write(json.dumps(row, default=jsonable, sort_keys=True) + "\n")
+            spool_rows[kind] += 1
+        try:
+            counts, samples = compare_rows(cursor_rows(sc), cursor_rows(tcurs), sk, tk, s.source_date, s.target_date, cutoff, s_after, t_after, limit, spool)
+        finally:
+            for h in handles.values(): h.close()
+        table = {"table":s.name, "integration_id":s.integration_id, "sql_hash":integ["sql_hash"], "keys":[asdict(x) for x in s.keys], "source_date":s.source_date, "target_date":s.target_date, "counts":counts}
+        if export_dir:
+            table["export"] = finalize_spools(spool_files, counts, export_dir, max_export_rows, allow_large_export, overflow)
+        return table, samples
     finally:
         try: oc.close()
         finally: tc.close()
 
+def finalize_spools(spools: dict, counts: dict[str, int], out: Path, cap: int, allow_large: bool, overflow: set) -> dict:
+    """Publish first-pass payload spools only after exact counts are known."""
+    result = {"skipped": False, "files": {}}
+    for kind, sides in spools.items():
+        if kind in overflow or (counts[kind] > cap and not allow_large):
+            for path in sides.values(): path.unlink(missing_ok=True)
+            result["files"][kind] = {"skipped": True, "reason": f"category exceeds {cap} rows", "complete": False}
+            continue
+        published, complete = {}, True
+        for side, path in sides.items():
+            actual = sum(1 for _ in path.open())
+            if actual != counts[kind]: complete = False
+            final = path.with_name(path.name.replace(".spool", "_full")); path.replace(final); published[side] = final.name
+        result["files"][kind] = {"skipped": False, "complete": complete, "expected_rows": counts[kind], "paths": published, "override": bool(counts[kind] > cap and allow_large)}
+    return result
+
 def key_of(row: dict[str, Any], names: list[str]) -> tuple[Any, ...]: return tuple(row[x] for x in names)
+
+def ordering_key(key: tuple[Any, ...]) -> tuple[tuple[str, Any], ...]:
+    """Canonical key tokens. Text and UUID are deliberately distinct families."""
+    out = []
+    for v in key:
+        if isinstance(v, bool): raise AuditError("boolean composite keys are unsupported")
+        if isinstance(v, (int, float, Decimal)): out.append(("number", Decimal(str(v))))
+        elif isinstance(v, str): out.append(("text", v))
+        elif isinstance(v, uuid.UUID): out.append(("uuid", str(v)))
+        else: raise AuditError(f"unsupported composite key type: {type(v).__name__}")
+    return tuple(out)
 
 def validated_stream(rows: Iterable[dict[str, Any]], keys: list[str], datecol: str) -> Iterator[dict[str, Any]]:
     """Validate a pre-ordered stream. Adjacent duplicate detection permits paging."""
@@ -266,12 +326,13 @@ def validated_stream(rows: Iterable[dict[str, Any]], keys: list[str], datecol: s
         if any(k not in row for k in keys) or datecol not in row: raise AuditError("source/target aliases missing from query output")
         key = key_of(row, keys)
         if any(v is None for v in key): raise AuditError("null composite key")
-        families = tuple("text" if isinstance(v, str) else "number" if isinstance(v, (int, float)) and not isinstance(v, bool) else type(v).__name__ for v in key)
+        families = tuple(x[0] for x in ordering_key(key))
         if types is None: types = families
         elif families != types: raise AuditError("incompatible composite key types; supported keys must be consistently text or numeric")
-        if previous is not None and key <= previous:
+        token = ordering_key(key)
+        if previous is not None and token <= previous:
             raise AuditError("duplicate or unordered composite key")
-        previous = key; norm_date(row[datecol]); yield row
+        previous = token; norm_date(row[datecol]); yield row
 
 def compare_rows(source: Iterable[dict[str, Any]], target: Iterable[dict[str, Any]], skeys: list[str], tkeys: list[str], sdate: str, tdate: str, cutoff: datetime,
                  source_after=lambda k: False, target_after=lambda k: False, limit: int = 20, on_delta=None) -> tuple[dict[str, int], dict[str, list[dict[str, Any]]]]:
@@ -286,9 +347,12 @@ def compare_rows(source: Iterable[dict[str, Any]], target: Iterable[dict[str, An
     while s is not None or t is not None:
         if s is None: key = key_of(t, tkeys); add("post_cutoff_volatile" if source_after(key) else "target_only", {"target": t}); t = next(ti, None); continue
         if t is None: key = key_of(s, skeys); add("post_cutoff_volatile" if target_after(key) else "source_only", {"source": s}); s = next(si, None); continue
-        a,b = key_of(s, skeys), key_of(t, tkeys)
-        if a < b: add("post_cutoff_volatile" if target_after(a) else "source_only", {"source": s}); s = next(si, None)
-        elif b < a: add("post_cutoff_volatile" if source_after(b) else "target_only", {"target": t}); t = next(ti, None)
+        raw_a, raw_b = key_of(s, skeys), key_of(t, tkeys)
+        a,b = ordering_key(raw_a), ordering_key(raw_b)
+        if tuple(x[0] for x in a) != tuple(x[0] for x in b):
+            raise AuditError("incompatible source/target composite key type families")
+        if a < b: add("post_cutoff_volatile" if target_after(raw_a) else "source_only", {"source": s}); s = next(si, None)
+        elif b < a: add("post_cutoff_volatile" if source_after(raw_b) else "target_only", {"target": t}); t = next(ti, None)
         else:
             if norm_date(s[sdate]) != norm_date(t[tdate]): add("date_changed_mismatch", {"source":s, "target":t})
             s = next(si, None); t = next(ti, None)
@@ -321,25 +385,14 @@ def main(argv: list[str] | None = None) -> int:
         if args.limit < 0: raise AuditError("--limit must be non-negative")
         for s in selections:
             try:
-                capture_limit = 1001 if args.export else args.limit
-                table, samples = audit_selection(p, s, cutoff, capture_limit)
+                table, samples = audit_selection(p, s, cutoff, args.limit, d if args.export else None, args.max_export_rows, args.allow_large_export)
+                if args.export and any(not info.get("complete", False) and not info.get("skipped", False) for info in table.get("export", {}).get("files", {}).values()):
+                    raise AuditError("full export replay drift detected; see replay_drift artifact")
                 table["sample_files"] = {}
                 for kind, records in samples.items():
                     safe = re.sub(r"[^A-Za-z0-9_.-]+", "_", s.name).strip("._") or "table"
                     path = d / f"{safe}_{s.integration_id}_{kind}_samples.jsonl"; write_jsonl(path, records[:args.limit])
                     table["sample_files"][kind] = path.name
-                if args.export:
-                    largest = max(table["counts"].values(), default=0)
-                    if largest > args.max_export_rows and not args.allow_large_export:
-                        table["export"] = {"skipped": True, "reason": f"category exceeds {args.max_export_rows} rows; pass --allow-large-export"}
-                    else:
-                        exports = {}
-                        for kind, records in samples.items():
-                            # If a category is above 1,000, explicit override permits the bounded evidence captured
-                            # during this streaming pass; it is labelled partial rather than misrepresented as full.
-                            path = d / f"{s.name}_{kind}_source_target_rows.jsonl"; write_jsonl(path, records)
-                            exports[kind] = {"path": path.name, "rows_written": len(records), "complete": table["counts"][kind] <= len(records)}
-                        table["export"] = {"skipped": False, "files": exports}
                 manifest["tables"].append(table)
             except Exception as e:
                 manifest["errors"].append({"table":s.name, "error":str(e)})

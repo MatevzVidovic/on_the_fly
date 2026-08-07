@@ -251,7 +251,9 @@ def target_columns(connection: Any, schema: str, table: str, id_field: str) -> t
     return source_columns, destination_columns
 
 
-def require_unique_key(connection: Any, schema: str, table: str, id_field: str) -> None:
+def require_unique_key(connection: Any, schema: str, table: str, id_field: str, trust_unique_non_null: bool = False) -> None:
+    if trust_unique_non_null:
+        return
     query = """
         SELECT 1
         FROM pg_index i
@@ -515,8 +517,8 @@ def resumable_paths(fingerprint: str) -> tuple[Path, Path, Path]:
     return state_dir / "checkpoint.json", state_dir / "source_keys.sqlite3", state_dir / "loader.lock"
 
 
-def sync_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...]) -> str:
-    payload = json.dumps({"format": STATE_FORMAT, "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": ignore_change_field, "source_page_key": page_key}, sort_keys=True)
+def sync_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...], trust_unique_non_null: bool = False) -> str:
+    payload = json.dumps({"format": STATE_FORMAT, "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": ignore_change_field, "source_page_key": page_key, "trust_unique_non_null": trust_unique_non_null}, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -710,7 +712,7 @@ def save_state(path: Path, state: dict[str, Any], *, phase: str, cursor: Any, pa
 
 
 def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
-    fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key)
+    fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.trust_unique_non_null)
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
     if not args.apply:
         raise RuntimeError("--resumable is only available with --apply; dry-run is already read-only")
@@ -722,6 +724,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             expected = {
                 "schema": schema, "table": table, "id_field": id_field, "change_field": change_field,
                 "ignore_change_field": args.ignore_change_field, "source_page_key": list(page_key),
+                "trust_unique_non_null": args.trust_unique_non_null,
             }
             if any(state.get(name) != value for name, value in expected.items()):
                 raise RuntimeError("checkpoint settings are inconsistent; use --restart")
@@ -732,7 +735,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             raise RuntimeError(f"resumable sync is in terminal state {state.get('status', state['phase'])}; resolve the cause and use --restart")
         with psycopg.connect(**pg_settings()) as connection:
             source_columns, destination_columns = target_columns(connection, schema, table, id_field)
-            require_unique_key(connection, schema, table, id_field)
+            require_unique_key(connection, schema, table, id_field, args.trust_unique_non_null)
         if not args.ignore_change_field and change_field not in source_columns:
             raise RuntimeError(f"integration/staging table must contain {change_field}, or use --ignore-change-field")
         if not state:
@@ -740,7 +743,8 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             state = {
                 "format": STATE_FORMAT, "fingerprint": fingerprint, "schema": schema, "table": table,
                 "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key),
-                "ignore_change_field": args.ignore_change_field, "phase": "preflight", "source_cursor": None,
+                "ignore_change_field": args.ignore_change_field, "trust_unique_non_null": args.trust_unique_non_null,
+                "phase": "preflight", "source_cursor": None,
                 "verify_cursor": None, "delete_cursor": None, "pages": 0, "rows": 0, "status": "running",
                 "preflight_rows": 0, "applied_rows": 0, "verified_rows": 0, "delete_scanned": 0, "deleted": 0,
             }
@@ -899,6 +903,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--ignore-change-field", action="store_true", help="use only key membership: delete absent staging keys and insert absent KN keys, but do not update or compare matching keys")
     parser.add_argument("--resumable", action="store_true", help="use local checkpointing and page-by-page commits (requires --apply)")
     parser.add_argument("--source-page-key", help="comma-separated native KN columns, in index order; required with --resumable")
+    parser.add_argument("--trust-unique-non-null", action="store_true", help="skip staging UNIQUE/NOT NULL metadata checks in resumable mode; use only when the data is known to satisfy both")
     parser.add_argument("--status", action="store_true", help="show the resumable checkpoint and exit")
     parser.add_argument("--restart", action="store_true", help="remove only this integration's resumable checkpoint and key index")
     parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
@@ -912,6 +917,8 @@ def parse_args() -> argparse.Namespace:
         parser.error("--status and --restart require --resumable")
     if args.resumable and not args.source_page_key:
         parser.error("--resumable requires --source-page-key")
+    if args.trust_unique_non_null and not args.resumable:
+        parser.error("--trust-unique-non-null requires --resumable")
     return args
 
 
@@ -927,7 +934,7 @@ def main() -> int:
         schema = valid_identifier(args.schema or os.environ.get("STAG_SCHEMA", "public"), "schema")
         query = read_select(args.integration_sql)
         if args.resumable and (args.status or args.restart):
-            fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key)
+            fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.trust_unique_non_null)
             checkpoint, key_path, lock_path = resumable_paths(fingerprint)
             if args.status:
                 print(json.dumps(read_checkpoint(checkpoint) or {"status": "not started"}, indent=2, default=str))
