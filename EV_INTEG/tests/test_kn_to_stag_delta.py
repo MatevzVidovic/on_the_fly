@@ -304,11 +304,49 @@ def test_active_legacy_incremental_checkpoint_requires_restart_but_complete_does
 def test_only_new_uses_existing_date_change_and_two_hour_lookback() -> None:
     query = sync.only_new_query("SELECT source_id, date_change FROM example", "date_change")
     assert "source_rows.*" in query
-    assert "TO_TIMESTAMP_TZ(source_rows.date_change" in query
+    assert "CAST(source_rows.date_change AS TIMESTAMP)" in query
     assert sync.ONLY_NEW_WATERMARK in query
     assert sync.ONLY_NEW_WATERMARK[0].isalpha()
     assert "kn_delta" not in query and "kn_page" not in query
     assert sync.only_new_lower_bound(datetime(2025, 10, 26, 3, 30)) == datetime(2025, 10, 26, 1, 30)
+
+
+def test_materialized_key_list_is_typed_and_ordered_for_payload_resume(tmp_path: Path) -> None:
+    database = sync.key_database(tmp_path / "delta.sqlite3")
+    sync.remember_keys(database, [
+        ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1)),
+        ("second", (datetime(2025, 1, 1), "second"), datetime(2025, 1, 1)),
+    ])
+    page = sync.materialized_key_page(database, 0, 1)
+    assert page[0][1:] == ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1))
+    assert sync.materialized_key_page(database, page[0][0], 10)[0][1] == "second"
+    database.close()
+
+
+def test_materialization_cursor_executes_one_narrow_ordered_query(monkeypatch) -> None:
+    class Cursor:
+        def __init__(self) -> None:
+            self.executions: list[tuple[str, dict[str, object]]] = []
+        def setinputsizes(self, **_values: object) -> None: pass
+        def execute(self, sql: str, binds: dict[str, object]) -> None: self.executions.append((sql, binds))
+    class Connection:
+        def __init__(self) -> None: self.value = Cursor()
+        def cursor(self) -> Cursor: return self.value
+        def close(self) -> None: pass
+    class Oracle:
+        DB_TYPE_TIMESTAMP = object()
+        def __init__(self) -> None: self.connections: list[Connection] = []
+        def connect(self, **_settings: object) -> Connection:
+            connection = Connection(); self.connections.append(connection); return connection
+    oracle = Oracle()
+    monkeypatch.setattr(sync, "oracle_settings", lambda _oracle: {})
+    connection, cursor = sync.open_materialize_cursor(oracle, "SELECT source_id, date_change FROM source", "source_id", "date_change", ("source_id",), None, (datetime(2025, 1, 2), "z"), None)
+    assert connection is oracle.connections[0]
+    assert len(oracle.connections) == len(cursor.executions) == 1
+    sql = cursor.executions[0][0]
+    assert "source_rows.source_id AS only_new_materialized_id" in sql
+    assert "source_rows.source_id AS only_new_materialized_page_0" in sql
+    assert "ORDER BY only_new_watermark, source_id" in sql
 
 
 def test_incremental_source_page_strips_internal_watermark(monkeypatch) -> None:

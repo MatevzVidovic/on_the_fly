@@ -34,7 +34,7 @@ LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at",
 STATE_FORMAT = 3  # Full-reconciliation checkpoint format: do not change.
 # Incremental state v1 required loader-only SELECT aliases.  Do not reuse it:
 # v2 builds its watermark solely from the selected DATE_CHANGE column.
-ONLY_NEW_STATE_FORMAT = 2
+ONLY_NEW_STATE_FORMAT = 3
 ONLY_NEW_TIMESTAMP_BIND_CAPABILITY = "explicit_timestamp_v1"
 # This becomes an unquoted Oracle column alias in an internal wrapper query.
 # Oracle identifiers must start with a letter, so do not use a leading
@@ -687,8 +687,9 @@ def key_database(path: Path) -> sqlite3.Connection:
     connection.execute("PRAGMA synchronous=FULL")
     connection.execute("""
         CREATE TABLE IF NOT EXISTS source_keys (
-            key TEXT PRIMARY KEY,
-            page_key TEXT NOT NULL UNIQUE,
+            position INTEGER PRIMARY KEY AUTOINCREMENT,
+            key TEXT NOT NULL UNIQUE,
+            cursor_key TEXT NOT NULL UNIQUE,
             change_value TEXT
         )
     """)
@@ -704,13 +705,13 @@ def remember_keys(connection: sqlite3.Connection, records: Iterable[tuple[Any, t
     # replaced replays this page.  Accept only an identical replay; a changed
     # ID/page tuple/change value is still an invariant failure.
     connection.executemany(
-        "INSERT INTO source_keys (key, page_key, change_value) VALUES (?, ?, ?) "
+        "INSERT INTO source_keys (key, cursor_key, change_value) VALUES (?, ?, ?) "
         "ON CONFLICT DO NOTHING",
         encoded_records,
     )
     for key, page_key, change_value in encoded_records:
         found = connection.execute(
-            "SELECT 1 FROM source_keys WHERE key = ? AND page_key = ? AND change_value IS ?",
+            "SELECT 1 FROM source_keys WHERE key = ? AND cursor_key = ? AND change_value IS ?",
             (key, page_key, change_value),
         ).fetchone()
         if found is None:
@@ -720,7 +721,7 @@ def remember_keys(connection: sqlite3.Connection, records: Iterable[tuple[Any, t
 
 def known_record(connection: sqlite3.Connection, identifier: Any, page_cursor: tuple[Any, ...], changed_at: Any) -> bool:
     return connection.execute(
-        "SELECT 1 FROM source_keys WHERE key = ? AND page_key = ? AND change_value IS ?",
+        "SELECT 1 FROM source_keys WHERE key = ? AND cursor_key = ? AND change_value IS ?",
         (encoded_key(identifier), encoded_tuple(page_cursor), None if changed_at is None else encoded_key(changed_at)),
     ).fetchone() is not None
 
@@ -772,18 +773,10 @@ def tuple_predicate(fields: tuple[str, ...], operator: str, bind_prefix: str) ->
 
 
 def only_new_query(query: str, change_field: str) -> str:
-    """Add an internal Oracle timestamp watermark without changing integration SQL.
-
-    KN integrations deliberately expose DATE_CHANGE as ISO TSTZ text to avoid
-    python-oracledb's timezone fetch issue.  Parse it inside Oracle and reduce
-    it to the same Ljubljana wall-clock TIMESTAMP representation PostgreSQL
-    keeps in its `timestamp` destination column.
-    """
+    """Expose the selected native Oracle timestamp as the internal watermark."""
     return (
         f"SELECT source_rows.*, "
-        f"CAST(TO_TIMESTAMP_TZ(source_rows.{change_field}, "
-        f"'YYYY-MM-DD\"T\"HH24:MI:SS.FF TZH:TZM') "
-        f"AT TIME ZONE 'Europe/Ljubljana' AS TIMESTAMP) AS {ONLY_NEW_WATERMARK} "
+        f"CAST(source_rows.{change_field} AS TIMESTAMP) AS {ONLY_NEW_WATERMARK} "
         f"FROM ({query}) source_rows"
     )
 
@@ -971,8 +964,15 @@ def oracle_column_metadata(oracledb: Any, query: str) -> dict[str, Any]:
 
 
 def require_only_new_source_shape(oracledb: Any, query: str, source_columns: list[str], page_key: tuple[str, ...]) -> None:
-    """Only normal destination columns may appear in an incremental SQL file."""
-    validate_source_output(oracle_columns(oracledb, query), source_columns, page_key)
+    """Only destination columns plus declared native paging-key aliases are allowed."""
+    names = oracle_columns(oracledb, query)
+    if len(set(names)) != len(names):
+        raise RuntimeError("integration SQL output contains duplicate column names")
+    missing = sorted(set(source_columns) - set(names))
+    missing_page = sorted(set(page_key) - set(names))
+    extras = sorted(set(names) - set(source_columns) - set(page_key))
+    if missing or missing_page or extras:
+        raise RuntimeError(f"only-new integration SQL columns are invalid; missing: {missing or '-'}; missing page keys: {missing_page or '-'}; extra: {extras or '-'}")
 
 
 def delta_conditions(watermark_field: str, page_key: tuple[str, ...], lower_watermark: Any | None, upper_cursor: tuple[Any, ...], after_cursor: tuple[Any, ...] | None = None) -> tuple[str, dict[str, Any]]:
@@ -1106,6 +1106,24 @@ def delta_fingerprint_args(query: str, schema: str, table: str, id_field: str, c
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
+def legacy_only_new_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], trust_unique_non_null: bool) -> str:
+    """Locate v2 windows only to retain their already-completed watermark."""
+    payload = json.dumps({"format": 2, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": page_key, "watermark": "date_change_iso_ljubljana_v1", "trust_unique_non_null": trust_unique_non_null}, sort_keys=True)
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def prior_only_new_state(schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...]) -> tuple[Path, dict[str, Any]] | None:
+    """Find an old-format state even if its SQL changed for native timestamps."""
+    root = HERE / ".state"
+    if not root.exists():
+        return None
+    for candidate in root.glob("*/checkpoint.json"):
+        state = read_checkpoint(candidate)
+        if state.get("mode") == "only_new" and state.get("format") != ONLY_NEW_STATE_FORMAT and all(state.get(field) == value for field, value in {"schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key)}.items()):
+            return candidate, state
+    return None
+
+
 def only_new_auto_page_size_profile_key(query: str, schema: str, table: str, id_field: str, page_key: tuple[str, ...]) -> str:
     payload = json.dumps({"format": ONLY_NEW_STATE_FORMAT, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "source_page_key": page_key, "category": "data"}, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()
@@ -1124,7 +1142,7 @@ def initialise_only_new_state(checkpoint: Path, query: str, schema: str, table: 
         "inserted": 0, "updated": 0, "unchanged": 0, "phase_pages": {"delta": 0}, "timing": {},
     }
     if args.auto_page_size:
-        state["effective_page_sizes"] = {"data": min(learned_page_size(profile) or args.page_size, args.page_size)}
+        state["effective_page_sizes"] = {"materialize": min(learned_page_size(profile) or args.page_size, args.page_size_cap)}
     atomic_json_write(checkpoint, state)
     return state
 
@@ -1147,7 +1165,7 @@ def require_only_new_timestamp_bind_capability(state: dict[str, Any] | None) -> 
         )
 
 
-def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
+def run_only_new_legacy(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
     """Resumable insert/update-only delta.  It intentionally has no delete phase."""
     fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
     data_profile = only_new_auto_page_size_profile_key(query, schema, table, id_field, page_key)
@@ -1219,6 +1237,13 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
             staging_hwm = staging_max_change(connection, schema, table, change_field)
         require_only_new_source_shape(oracledb, query, source_columns, page_key)
         if not state:
+            prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
+            if prior:
+                _legacy_checkpoint, legacy = prior
+                if legacy.get("phase") != "complete":
+                    raise RuntimeError("an older active only-new checkpoint exists; use --restart first to discard its active window while retaining its completed watermark")
+                if legacy.get("completed_watermark") is not None:
+                    staging_hwm = decode_value(legacy["completed_watermark"])
             state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.trust_unique_non_null, args, staging_hwm)
         elif args.auto_page_size or state.get("auto_page_size"):
             args.auto_page_size = True
@@ -1315,6 +1340,256 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                 atomic_json_write(checkpoint, state)
                 print(f"stopped safely after checkpoint: {slow}", file=sys.stderr)
                 return 3
+
+
+def open_materialize_cursor(oracledb: Any, delta_query: str, id_field: str, change_field: str, page_key: tuple[str, ...], lower: Any | None, upper: tuple[Any, ...], after: tuple[Any, ...] | None) -> tuple[Any, Any]:
+    """Open the single narrow Oracle query used for normal materialization."""
+    condition, binds = delta_conditions(ONLY_NEW_WATERMARK, page_key, lower, upper, after)
+    # The destination ID and native page key are often the same column.  Oracle
+    # rejects duplicate unnamed expressions in this derived query, so every
+    # selected value gets its own local alias.  Consumers use column position.
+    projection = [
+        f"source_rows.{id_field} AS only_new_materialized_id",
+        f"source_rows.{change_field} AS only_new_materialized_change",
+        f"source_rows.{ONLY_NEW_WATERMARK} AS only_new_materialized_watermark",
+        *[
+            f"source_rows.{field} AS only_new_materialized_page_{index}"
+            for index, field in enumerate(page_key)
+        ],
+    ]
+    connection = oracledb.connect(**oracle_settings(oracledb))
+    try:
+        cursor = connection.cursor()
+        bind_oracle_delta_timestamps(cursor, oracledb, binds)
+        cursor.execute(f"SELECT {', '.join(projection)} FROM ({delta_query}) source_rows WHERE {condition} ORDER BY {ONLY_NEW_WATERMARK}, {', '.join(page_key)}", binds)
+        return connection, cursor
+    except Exception:
+        connection.close()
+        raise
+
+
+def decode_materialized_rows(rows: list[tuple[Any, ...]], id_field: str) -> tuple[list[tuple[Any, tuple[Any, ...], Any]], tuple[Any, ...] | None]:
+    records: list[tuple[Any, tuple[Any, ...], Any]] = []
+    seen_ids: set[Any] = set(); seen_cursors: set[tuple[Any, ...]] = set()
+    for raw in rows:
+        identifier, changed_at, watermark, *native = (scalar(value) for value in raw)
+        cursor = (watermark, *native)
+        if identifier is None or identifier in seen_ids:
+            raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values in each materialized page")
+        require_non_null_delta_cursor(cursor, "integration SQL incremental key cursor")
+        if cursor in seen_cursors:
+            raise RuntimeError("integration SQL must return unique watermark/source page-key tuples in each materialized page")
+        records.append((identifier, cursor, changed_at)); seen_ids.add(identifier); seen_cursors.add(cursor)
+    return records, (records[-1][1] if records else None)
+
+
+def materialized_key_page(connection: sqlite3.Connection, after_position: int, limit: int) -> list[tuple[int, Any, tuple[Any, ...], Any]]:
+    return [
+        (int(position), decode_value(json.loads(key)), decode_tuple(json.loads(page_key)) or (),
+         None if change is None else decode_value(json.loads(change)))
+        for position, key, page_key, change in connection.execute(
+            "SELECT position, key, cursor_key, change_value FROM source_keys WHERE position > ? ORDER BY position LIMIT ?",
+            (after_position, limit),
+        )
+    ]
+
+
+def payload_rows_by_native_keys(oracledb: Any, query: str, id_field: str, source_columns: list[str], page_key: tuple[str, ...], records: list[tuple[int, Any, tuple[Any, ...], Any]]) -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]]]:
+    """Retrieve payload by native source PK tuple(s), not synthetic destination IDs."""
+    if len(records) > 1000:
+        raise ValueError("Oracle payload batches may contain at most 1000 source keys")
+    binds: dict[str, Any] = {}
+    branches: list[str] = []
+    for row_index, (_position, _identifier, cursor, _change) in enumerate(records):
+        native = cursor[1:]
+        branches.append("(" + " AND ".join(f"source_rows.{field} = :only_new_key_{row_index}_{field_index}" for field_index, field in enumerate(page_key)) + ")")
+        binds.update({f"only_new_key_{row_index}_{field_index}": value for field_index, value in enumerate(native)})
+    def operation() -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]]]:
+        with oracledb.connect(**oracle_settings(oracledb)) as connection:
+            sql = f"SELECT source_rows.* FROM ({query}) source_rows WHERE {' OR '.join(branches)}"
+            with connection.cursor() as cursor:
+                cursor.execute(sql, binds)
+                names = [description[0].lower() for description in cursor.description]
+                if set(source_columns) - set(names) or set(names) - set(source_columns) - set(page_key):
+                    raise RuntimeError("payload query output did not match the integration columns")
+                result: dict[Any, tuple[Any, ...]] = {}
+                native_keys: dict[Any, tuple[Any, ...]] = {}
+                key_position = source_columns.index(id_field)
+                source_positions = [names.index(column) for column in source_columns]
+                native_positions = [names.index(column) for column in page_key]
+                for raw in cursor.fetchall():
+                    raw = tuple(scalar(value) for value in raw)
+                    row = tuple(raw[position] for position in source_positions)
+                    identifier = row[key_position]
+                    if identifier is None or identifier in result:
+                        raise RuntimeError(f"payload query returned duplicate or NULL {id_field}")
+                    result[identifier] = row
+                    native_keys[identifier] = tuple(raw[position] for position in native_positions)
+                return result, native_keys
+    return retry(operation)
+
+
+def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
+    """Materialize a frozen key window once, then retrieve payload by source ID."""
+    if not args.apply:
+        # The normal dry-run is intentionally read-only; retain its detailed comparison output.
+        return run_only_new_legacy(args, query, schema, table, id_field, change_field, page_key, oracledb, psycopg)
+    fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
+    checkpoint, key_path, lock_path = resumable_paths(fingerprint)
+    profile = only_new_auto_page_size_profile_key(query, schema, table, id_field, page_key)
+    delta_query = only_new_query(query, change_field)
+    with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table) as heartbeat:
+        state = read_checkpoint(checkpoint)
+        if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
+            raise RuntimeError("active only-new checkpoint uses an older incompatible format; run the identical command with --restart (completed watermark is retained)")
+        with psycopg.connect(**pg_settings()) as pg:
+            source_columns, destination_columns = target_columns(pg, schema, table, id_field)
+            require_unique_key(pg, schema, table, id_field, args.trust_unique_non_null, require_not_null=False)
+            staging_hwm = staging_max_change(pg, schema, table, change_field)
+        require_only_new_source_shape(oracledb, query, source_columns, page_key)
+        if not state:
+            state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.trust_unique_non_null, args, staging_hwm)
+        elif args.auto_page_size or state.get("auto_page_size"):
+            args.auto_page_size = True
+            state["auto_page_size"] = True
+            sizes = state.setdefault("effective_page_sizes", {})
+            sizes["materialize"] = min(int(sizes.get("materialize", learned_page_size(profile) or args.page_size)), args.page_size_cap)
+        if state.get("phase") == "complete":
+            completed = None if state.get("completed_watermark") is None else decode_value(state["completed_watermark"])
+            lower = only_new_lower_bound(completed)
+            print("only-new: finding the frozen upper source timestamp...", flush=True)
+            upper = oracle_delta_upper(oracledb, delta_query, ONLY_NEW_WATERMARK, page_key, lower)
+            if upper is None:
+                print(f"only-new complete: no source rows at or above watermark {lower!r}")
+                return 0
+            # This is a genuinely new frozen window.  Remove the completed
+            # window's local list before publishing the active-window state;
+            # an active materialize/payload state never takes this path.
+            for path in (key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
+                if path.exists():
+                    path.unlink()
+            state.update(phase="materialize", status="running", window_lower=None if lower is None else encode_value(lower), window_upper=encode_tuple(upper), materialize_cursor=None, payload_position=0, materialized_rows=0, delta_rows=0, inserted=0, updated=0, unchanged=0, pages=0, rows=0, phase_pages={"materialize": 0, "payload": 0}, timing={})
+            atomic_json_write(checkpoint, state)
+            print(f"only-new opened window through {upper[0]!r}; completed watermark {completed!r}; replay lower bound {lower!r}", flush=True)
+        lower = decode_value(state["window_lower"]) if state.get("window_lower") else None
+        upper = decode_tuple(state.get("window_upper"))
+        if upper is None:
+            raise RuntimeError("incremental checkpoint has no frozen upper watermark; use --restart")
+        with key_database(key_path) as keys:
+            if state.get("phase") == "materialize":
+                cursor = decode_tuple(state.get("materialize_cursor"))
+                print("only-new: materializing changed source keys (no payload columns)...", flush=True)
+                sizes = state.setdefault("effective_page_sizes", {})
+                materialize_size = int(sizes.get("materialize", min(args.page_size, args.page_size_cap)))
+                recovery_attempts = 0
+                while True:  # reconnect/re-execute only after a failed fetch
+                    connection = db_cursor = None
+                    try:
+                        connection, db_cursor = retry(lambda: open_materialize_cursor(oracledb, delta_query, id_field, change_field, page_key, lower, upper, cursor))
+                        while True:
+                            heartbeat()
+                            fetch_started = time.perf_counter()
+                            try:
+                                raw_rows = db_cursor.fetchmany(materialize_size)
+                            except Exception as error:
+                                if args.auto_page_size and is_size_relevant_failure(error) and materialize_size > 1:
+                                    materialize_size = max(1, materialize_size // AUTO_PAGE_SIZE_DIVISOR)
+                                    sizes["materialize"] = materialize_size
+                                    atomic_json_write(checkpoint, state)
+                                    print(f"only-new key fetch failed; retrying from checkpoint at page size {materialize_size}", file=sys.stderr, flush=True)
+                                    break
+                                if is_transient(error):
+                                    recovery_attempts += 1
+                                    if recovery_attempts > 4:
+                                        raise
+                                    print(f"only-new key fetch failed transiently: {error}; reconnecting from checkpoint", file=sys.stderr, flush=True)
+                                    time.sleep(min(30.0, 0.5 * (2 ** (recovery_attempts - 1))) + random.uniform(0, 0.25))
+                                    break
+                                raise
+                            if not raw_rows:
+                                state.update(phase="payload", materialized_rows=key_count(keys), source_key_count=key_count(keys), payload_position=0)
+                                atomic_json_write(checkpoint, state)
+                                print(f"only-new: materialized {state['source_key_count']} changed keys; fetching payload by native-key batches of at most {min(args.batch_size, 1000)}", flush=True)
+                                connection.close(); connection = None
+                                break
+                            records, next_cursor = decode_materialized_rows(raw_rows, id_field)
+                            recovery_attempts = 0
+                            require_cursor_progress(cursor, next_cursor)
+                            remember_keys(keys, records)
+                            cursor = next_cursor
+                            state["materialize_cursor"] = encode_tuple(cursor)
+                            state["materialized_rows"] = key_count(keys)
+                            page = phase_page_number(state, "materialize")
+                            rate, _eta, slow = record_page_timing(state, "materialize", len(records), materialize_size, time.perf_counter() - fetch_started, time.perf_counter() - fetch_started)
+                            atomic_json_write(checkpoint, state)
+                            if args.auto_page_size:
+                                remember_page_size(profile, materialize_size, schema, table)
+                            print(f"only-new materialized key page {page} ({len(records)} keys; total {state['materialized_rows']}; page size {materialize_size}; {rate:,.0f} keys/s)", flush=True)
+                            if slow:
+                                state["status"] = "paused_performance_degraded"
+                                atomic_json_write(checkpoint, state)
+                                print(f"stopped safely after checkpoint: {slow}", file=sys.stderr)
+                                return 3
+                        if state.get("phase") == "payload":
+                            break
+                    finally:
+                        if connection is not None:
+                            connection.close()
+            if state.get("phase") != "payload":
+                raise RuntimeError(f"unknown only-new phase: {state.get('phase')}")
+            invocation_start_pages = int(state.get("pages", 0))
+            while True:
+                heartbeat()
+                if _SIGINT_COUNT:
+                    print("stopped after the last committed only-new page; rerun the identical command to resume")
+                    return 130
+                if args.max_pages and int(state.get("pages", 0)) - invocation_start_pages >= args.max_pages:
+                    print("stopped at --max-pages; rerun the identical command to continue")
+                    return 0
+                page_records = materialized_key_page(keys, int(state.get("payload_position", 0)), min(args.batch_size, 1000))
+                if not page_records:
+                    state.update(phase="complete", status="complete", completed_watermark=encode_value(upper[0]), window_lower=None, window_upper=None, materialize_cursor=None, completed_at=datetime.now().astimezone().isoformat())
+                    atomic_json_write(checkpoint, state)
+                    print(f"only-new complete: inserted={state['inserted']}, updated={state['updated']}, unchanged={state['unchanged']}; watermark advanced to {upper[0]!r}")
+                    return 0
+                identifiers = [record[1] for record in page_records]
+                expected_change = {record[1]: record[3] for record in page_records}
+                started = time.perf_counter()
+                source, native_keys = payload_rows_by_native_keys(oracledb, query, id_field, source_columns, page_key, page_records)
+                if set(source) != set(identifiers):
+                    raise RuntimeError("payload rows no longer exactly match the frozen materialized source IDs; no payload page was committed")
+                expected_native = {record[1]: record[2][1:] for record in page_records}
+                if native_keys != expected_native:
+                    raise RuntimeError("payload native source keys differ from the frozen materialized key list; no payload page was committed")
+                change_position = source_columns.index(change_field)
+                if any(normalize_change_pair(source[key][change_position], expected_change[key])[0] != normalize_change_pair(source[key][change_position], expected_change[key])[1] for key in identifiers):
+                    raise RuntimeError("payload DATE_CHANGE differs from the frozen materialized key list; no payload page was committed")
+                changes = {key: source[key][change_position] for key in identifiers}
+                with psycopg.connect(**pg_settings()) as pg:
+                    with pg.transaction():
+                        staging = staging_changes_for_keys(pg, schema, table, id_field, change_field, identifiers)
+                        _d, inserts, unchanged, updates, conflicts = make_plan(changes, staging, change_field, False)
+                        if conflicts:
+                            state.update(phase="conflict", status="staging_newer_conflict")
+                            atomic_json_write(checkpoint, state)
+                            raise RuntimeError("staging became newer during only-new sync; payload page rolled back")
+                        insert_sql = insert_statement(schema, table, source_columns, destination_columns)
+                        update_columns = [column for column in source_columns if column != id_field]
+                        updated_at = ', "updated_at" = CURRENT_TIMESTAMP' if "updated_at" in destination_columns else ''
+                        update_sql = f'UPDATE {relation_sql(schema, table)} SET {", ".join(f"\"{column}\" = %s" for column in update_columns)}{updated_at} WHERE "{id_field}" = %s'
+                        with pg.cursor() as cur:
+                            cur.executemany(insert_sql, (source[key] for key in inserts))
+                            cur.executemany(update_sql, ((*[source[key][source_columns.index(column)] for column in update_columns], key) for key in updates))
+                state["payload_position"] = page_records[-1][0]
+                state["delta_rows"] = int(state.get("delta_rows", 0)) + len(identifiers)
+                state["inserted"] += len(inserts); state["updated"] += len(updates); state["unchanged"] += len(unchanged)
+                page = phase_page_number(state, "payload")
+                state["pages"] = int(state.get("pages", 0)) + 1
+                atomic_json_write(checkpoint, state)
+                elapsed = time.perf_counter() - started
+                total = int(state.get("source_key_count", 0)); done = int(state["delta_rows"])
+                eta = format_duration((total - done) * elapsed / len(identifiers)) if done < total else "0:00"
+                print(f"only-new committed payload page {page} ({len(identifiers)} rows; total {done}/{total}; inserted {len(inserts)}, updated {len(updates)}, unchanged {len(unchanged)}; {len(identifiers) / elapsed:,.0f} rows/s; ETA {eta})", flush=True)
 
 
 def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
@@ -1658,11 +1933,22 @@ def main() -> int:
             with file_lock(lock_path):
                 if args.only_new:
                     state = read_checkpoint(checkpoint)
+                    if not state:
+                        prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
+                        if prior:
+                            old_checkpoint, old_state = prior
+                            old_state.update(phase="complete", status="complete", window_lower=None, window_upper=None, delta_cursor=None, materialize_cursor=None, payload_position=0)
+                            atomic_json_write(old_checkpoint, old_state)
+                            print("discarded the old-format active only-new window; the completed watermark was kept")
+                            return 0
                     if state and state.get("phase") != "complete":
                         state.update(phase="complete", status="complete", window_lower=None, window_upper=None, delta_cursor=None,
                                      pages=0, rows=0, delta_rows=0, inserted=0, updated=0, unchanged=0,
                                      phase_pages={"delta": 0}, timing={})
                         atomic_json_write(checkpoint, state)
+                        for path in (key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
+                            if path.exists():
+                                path.unlink()
                     print("discarded the active only-new window; the completed watermark was kept")
                 else:
                     for path in (checkpoint, key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):

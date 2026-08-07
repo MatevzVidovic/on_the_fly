@@ -45,7 +45,6 @@ SELECT
     TO_CHAR(FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
             'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,
     CAST(NULL AS VARCHAR2(40)) AS valid_to,
-    TO_CHAR(FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
-            'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS date_change
+    CAST(rf.CREATED AS TIMESTAMP) AS date_change
 FROM EV.DST_PRIPIS_PODATKI j
 JOIN EV.REVISION rf ON j."JN_REV_NUM" = rf.REV_NUM;
