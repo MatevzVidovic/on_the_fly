@@ -101,24 +101,27 @@ def oracle_settings(driver: Any) -> dict[str, Any]:
             "dsn": driver.makedsn(os.environ["KN_HOST"], int(os.environ["KN_PORT"]), service_name=os.environ["KN_SERVICE"])}
 
 
-def pg_settings(environment: str) -> dict[str, Any]:
+def pg_settings(environment: str, *, metadata: bool = False) -> dict[str, Any]:
     prefix = "STAG" if environment == "staging" else "PROD"
     required = [f"{prefix}_{key}" for key in ("USER", "PASSWORD", "HOST", "PORT")]
     missing = [key for key in required if not os.getenv(key)]
     if missing:
         raise RuntimeError(f"missing {environment} variables: " + ", ".join(missing))
+    database_variable = f"{prefix}_{'METADATA_DATABASE' if metadata else 'DATABASE'}"
+    default_database = "fmp" if metadata else "fmp_data_gurs"
     return {"user": os.environ[f"{prefix}_USER"], "password": os.environ[f"{prefix}_PASSWORD"],
             "host": os.environ[f"{prefix}_HOST"], "port": int(os.environ[f"{prefix}_PORT"]),
-            "dbname": os.getenv(f"{prefix}_DATABASE", "fmp_data_gurs")}
+            "dbname": os.getenv(database_variable, default_database)}
 
 
-def initialise_sessions(oracle: Any, pg: Any) -> None:
+def initialise_sessions(oracle: Any, *pg_connections: Any) -> None:
     """Fix both sides to the KN/LIFT business timezone before any query."""
     try:
         with oracle.cursor() as cur:
             cur.execute("ALTER SESSION SET TIME_ZONE = 'Europe/Ljubljana'")
-        with pg.cursor() as cur:
-            cur.execute("SET TIME ZONE 'Europe/Ljubljana'")
+        for pg in pg_connections:
+            with pg.cursor() as cur:
+                cur.execute("SET TIME ZONE 'Europe/Ljubljana'")
     except Exception as error:
         raise RuntimeError(f"could not set Oracle/PostgreSQL session timezone to Europe/Ljubljana: {error}") from error
 
@@ -142,9 +145,17 @@ def rows_as_dicts(cursor: Any) -> list[dict[str, Any]]:
 
 
 def metadata(connection: Any, table: str) -> dict[str, Any]:
-    ats = column_names(connection, "attribute_tables")
-    ais = column_names(connection, "attribute_table_integrations")
-    acs = column_names(connection, "attribute_table_sql_connections")
+    # `information_schema.columns` can be empty for a role that can query a
+    # LIFT metadata relation through a view/role grant but cannot inspect its
+    # columns there.  The metadata contract used by this checker is explicit,
+    # so use it as a fallback and let the subsequent real query report an
+    # actual missing relation/column precisely.
+    ats = column_names(connection, "attribute_tables") or {"id", "name"}
+    ais = column_names(connection, "attribute_table_integrations") or {
+        "id", "attribute_table_id", "last_changed_datetime", "url",
+        "attribute_table_sql_connection_id",
+    }
+    acs = column_names(connection, "attribute_table_sql_connections") or {"id", "name"}
     table_name = pick(ats, ("name", "table_name"), "attribute table name column")
     sql_col = pick(ais, ("url", "sql", "select_sql", "integration_sql", "query", "source_sql"), "integration SQL column")
     connection_fk = pick(ais, ("attribute_table_sql_connection_id", "sql_connection_id"), "SQL connection id column")
@@ -356,11 +367,11 @@ def markdown(results: list[dict[str, Any]], environment: str) -> str:
     return "\n".join(lines)
 
 
-def check_one(pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str) -> dict[str, Any]:
+def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str) -> dict[str, Any]:
     table = target_table(spec, environment); local = {**spec, "table": table}
     result = {"table": table, "metadata": "FAIL", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
     try:
-        info = metadata(pg, table)
+        info = metadata(metadata_pg, table)
         title_bad = not info["titles"] or any(not str(title or "").startswith("EV H") for title in info["titles"])
         sql, output, failures = validate_sql(oracle, info["sql"], local)
         if title_bad: failures.append(f"titles must all start with EV H; got {info['titles']!r}")
@@ -373,20 +384,20 @@ def check_one(pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cach
         kn_count = entry.get("kn_count")
         if kn_count is None or refresh:
             kn_count = oracle_count(oracle, sql); entry["kn_count"] = kn_count
-        target_count = pg_count(pg, table)
+        target_count = pg_count(target_pg, table)
         data_ok = True
         if target_count != kn_count:
             result["data"] = "FAIL"; result["detail"] = f"counts: KN={kn_count}, target={target_count}"; entry.pop("last_check_passed", None); data_ok = False
         if entry.get("last_check_passed") and not refresh:
             if data_ok: result["data"] = "CACHED"
         elif data_ok:
-            same, reason = diff_data(oracle, pg, sql, local, output, page_size, kn_count)
+            same, reason = diff_data(oracle, target_pg, sql, local, output, page_size, kn_count)
             if not same:
                 result["data"] = "FAIL"; result["detail"] = reason or "PK/date diff failed"; entry.pop("last_check_passed", None); data_ok = False
             else:
                 entry["last_check_passed"] = True; result["data"] = "PASS"
         cache["entries"][identity] = entry
-        ok, detail, delta = highwater_and_delta(pg, oracle, sql, local, output, info["highwater"])
+        ok, detail, delta = highwater_and_delta(target_pg, oracle, sql, local, output, info["highwater"])
         result["highwater"] = "FAIL" if delta == -1 else "PASS"
         result["delta"] = "PASS" if ok else "FAIL"
         result["detail"] = ((result["detail"] + "; " if result["detail"] else "") + f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
@@ -417,9 +428,13 @@ def main() -> int:
         if unknown: raise RuntimeError("unknown table key(s): " + ", ".join(sorted(unknown)))
         selected = [by_key[key] for key in args.tables] if args.tables else specs
         load_env(); oracle_driver, psycopg = drivers(); cache = cache_read(); mhash = manifest_hash(manifest)
-        with oracle_driver.connect(**oracle_settings(oracle_driver)) as oracle, psycopg.connect(**pg_settings(args.environment)) as pg:
-            initialise_sessions(oracle, pg)
-            results = [check_one(pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash) for spec in selected]
+        with (
+            oracle_driver.connect(**oracle_settings(oracle_driver)) as oracle,
+            psycopg.connect(**pg_settings(args.environment)) as target_pg,
+            psycopg.connect(**pg_settings(args.environment, metadata=True)) as metadata_pg,
+        ):
+            initialise_sessions(oracle, target_pg, metadata_pg)
+            results = [check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash) for spec in selected]
         cache_write(cache)
         report = markdown(results, args.environment); args.report.parent.mkdir(parents=True, exist_ok=True); args.report.write_text(report, encoding="utf-8")
         print(report)

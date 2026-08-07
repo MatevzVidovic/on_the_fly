@@ -19,39 +19,39 @@
 
 ### ev_dst_pripis_podatki_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_del_stavbe_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_del_stavbe_enota_h_2025_danes
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_parc_del_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_parc_enota_h_2025_danes
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_parcela_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_pe_dst_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_pe_parc_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_posebna_enota_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_prostor_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_stavba_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 ### ev_parc_pripis_podatki_h
 
-- cannot find attribute table name column; available columns: 
+- object of type 'UUID' has no len()
 
 A passing `Zero newer rows` result is the precondition for manually running LIFT; that LIFT run should transfer zero records.

@@ -7,6 +7,11 @@ rows newer than that mark.  It never runs or changes a LIFT integration.
 
 Copy `.env.example` to `.env` and fill in KN, staging, and production credentials.
 
+For each environment the checker uses two PostgreSQL databases on the same
+configured host and credentials: `*_DATABASE` (default `fmp_data_gurs`) for
+the EV data tables, and `*_METADATA_DATABASE` (default `fmp`) for LIFT
+metadata such as `attribute_tables` and its integration rows.
+
 ```sh
 .venv/bin/python src/check_all/check.py
 .venv/bin/python src/check_all/check.py --environment prod ev_pe_parc_h
