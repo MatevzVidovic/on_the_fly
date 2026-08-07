@@ -314,16 +314,16 @@ def test_only_new_uses_existing_date_change_and_two_hour_lookback() -> None:
 def test_materialized_key_list_is_typed_and_ordered_for_payload_resume(tmp_path: Path) -> None:
     database = sync.key_database(tmp_path / "delta.sqlite3")
     sync.remember_keys(database, [
-        ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1)),
-        ("second", (datetime(2025, 1, 1), "second"), datetime(2025, 1, 1)),
+        ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1), ("first", 1)),
+        ("second", (datetime(2025, 1, 1), "second"), datetime(2025, 1, 1), ("second", 2)),
     ])
     page = sync.materialized_key_page(database, 0, 1)
-    assert page[0][1:] == ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1))
+    assert page[0][1:] == ("first", (datetime(2025, 1, 1), "first"), datetime(2025, 1, 1), ("first", 1))
     assert sync.materialized_key_page(database, page[0][0], 10)[0][1] == "second"
     database.close()
 
 
-def test_materialization_cursor_executes_one_narrow_ordered_query(monkeypatch) -> None:
+def test_materialization_cursor_executes_one_payload_ordered_query(monkeypatch) -> None:
     class Cursor:
         def __init__(self) -> None:
             self.executions: list[tuple[str, dict[str, object]]] = []
@@ -340,13 +340,49 @@ def test_materialization_cursor_executes_one_narrow_ordered_query(monkeypatch) -
             connection = Connection(); self.connections.append(connection); return connection
     oracle = Oracle()
     monkeypatch.setattr(sync, "oracle_settings", lambda _oracle: {})
-    connection, cursor = sync.open_materialize_cursor(oracle, "SELECT source_id, date_change FROM source", "source_id", "date_change", ("source_id",), None, (datetime(2025, 1, 2), "z"), None)
+    connection, cursor = sync.open_materialize_cursor(oracle, "SELECT source_id, date_change FROM source", ["source_id", "date_change"], ("source_id",), None, (datetime(2025, 1, 2), "z"), None)
     assert connection is oracle.connections[0]
     assert len(oracle.connections) == len(cursor.executions) == 1
     sql = cursor.executions[0][0]
-    assert "source_rows.source_id AS only_new_materialized_id" in sql
-    assert "source_rows.source_id AS only_new_materialized_page_0" in sql
+    assert "source_rows.source_id AS only_new_materialized_0" in sql
+    assert "source_rows.date_change AS only_new_materialized_1" in sql
+    assert "source_rows.only_new_watermark AS only_new_materialized_2" in sql
     assert "ORDER BY only_new_watermark, source_id" in sql
+
+
+def test_materialized_rows_keep_payload_and_native_cursor() -> None:
+    rows = [("synthetic-1", datetime(2025, 1, 1, 12), "native-1", datetime(2025, 1, 1, 12))]
+    records, cursor = sync.decode_materialized_rows(
+        rows, ["synthetic_pk", "date_change"], "synthetic_pk", "date_change", ("native_id",)
+    )
+    assert records == [
+        ("synthetic-1", (datetime(2025, 1, 1, 12), "native-1"), datetime(2025, 1, 1, 12),
+         ("synthetic-1", datetime(2025, 1, 1, 12)))
+    ]
+    assert cursor == records[0][1]
+
+
+def test_materialized_payload_sqlite_roundtrips_nullable_typed_values(tmp_path: Path) -> None:
+    database = sync.key_database(tmp_path / "payload.sqlite3")
+    try:
+        changed_at = datetime(2025, 1, 1, 12, 30, 1, 2, tzinfo=timezone.utc)
+        payload = (None, changed_at, Decimal("12.30"), True, 1.25, b"\x00raw")
+        sync.remember_keys(database, [("row-1", (changed_at, "native-1"), changed_at, payload)])
+        page = sync.materialized_key_page(database, 0, 1)
+        assert page[0][1] == "row-1"
+        assert page[0][4] == payload
+    finally:
+        database.close()
+
+
+def test_only_new_materialization_uses_the_shared_safe_page_budget(monkeypatch) -> None:
+    args = SimpleNamespace(max_pages=1)
+    state = {"pages": 7, "phase": "materialize"}
+    monkeypatch.setattr(sync, "_SIGINT_COUNT", 0)
+    assert sync.only_new_stop_reason(args, state, 6) == "max_pages"
+    assert sync.only_new_stop_reason(args, state, 7) is None
+    monkeypatch.setattr(sync, "_SIGINT_COUNT", 1)
+    assert sync.only_new_stop_reason(args, state, 7) == "signal"
 
 
 def test_incremental_source_page_strips_internal_watermark(monkeypatch) -> None:

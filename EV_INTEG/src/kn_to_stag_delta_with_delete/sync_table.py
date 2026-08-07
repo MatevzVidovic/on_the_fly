@@ -9,6 +9,7 @@ defaults to `id`, but can be selected with --id-field.
 from __future__ import annotations
 
 import argparse
+import base64
 import hashlib
 import json
 import os
@@ -34,7 +35,10 @@ LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at",
 STATE_FORMAT = 3  # Full-reconciliation checkpoint format: do not change.
 # Incremental state v1 required loader-only SELECT aliases.  Do not reuse it:
 # v2 builds its watermark solely from the selected DATE_CHANGE column.
-ONLY_NEW_STATE_FORMAT = 3
+# v4 persists the complete, already-selected source row alongside each frozen
+# key.  This avoids repeatedly executing an arbitrary integration SELECT with
+# a thousand ``OR`` predicates during the payload phase.
+ONLY_NEW_STATE_FORMAT = 4
 ONLY_NEW_TIMESTAMP_BIND_CAPABILITY = "explicit_timestamp_v1"
 # This becomes an unquoted Oracle column alias in an internal wrapper query.
 # Oracle identifiers must start with a letter, so do not use a leading
@@ -250,6 +254,15 @@ def phase_page_number(state: dict[str, Any], phase: str) -> int:
     counts = state.setdefault("phase_pages", {})
     counts[phase] = int(counts.get(phase, 0)) + 1
     return counts[phase]
+
+
+def only_new_stop_reason(args: argparse.Namespace, state: dict[str, Any], invocation_start_pages: int) -> str | None:
+    """Return a safe-stop reason before another only-new page starts."""
+    if _SIGINT_COUNT:
+        return "signal"
+    if args.max_pages and int(state.get("pages", 0)) - invocation_start_pages >= args.max_pages:
+        return "max_pages"
+    return None
 
 
 def is_size_relevant_failure(error: Exception) -> bool:
@@ -514,6 +527,76 @@ def decode_tuple(values: Any) -> tuple[Any, ...] | None:
     return tuple(decode_value(value) for value in values)
 
 
+def encode_payload_value(value: Any) -> dict[str, str | bool]:
+    """Losslessly persist nullable Oracle payload values, separate from keys."""
+    if value is None:
+        return {"type": "null", "value": ""}
+    if isinstance(value, bool):
+        return {"type": "bool", "value": value}
+    if isinstance(value, float):
+        return {"type": "float", "value": value.hex()}
+    if isinstance(value, (bytes, bytearray)):
+        return {"type": "bytes", "value": base64.b64encode(bytes(value)).decode("ascii")}
+    if isinstance(value, str):
+        return {"type": "str", "value": value}
+    if isinstance(value, int):
+        return {"type": "int", "value": str(value)}
+    if isinstance(value, Decimal):
+        return {"type": "decimal", "value": str(value)}
+    if isinstance(value, UUID):
+        return {"type": "uuid", "value": str(value)}
+    if isinstance(value, datetime):
+        return {"type": "datetime", "value": value.isoformat()}
+    if isinstance(value, date):
+        return {"type": "date", "value": value.isoformat()}
+    raise RuntimeError(
+        "unsupported materialized payload value type "
+        f"{type(value).__name__}; use a destination-compatible scalar SQL expression"
+    )
+
+
+def decode_payload_value(value: Any) -> Any:
+    if not isinstance(value, dict) or set(value) != {"type", "value"}:
+        raise RuntimeError("materialized payload is invalid; use --restart")
+    kind, raw = value["type"], value["value"]
+    if kind == "null" and raw == "":
+        return None
+    if kind == "bool" and isinstance(raw, bool):
+        return raw
+    if not isinstance(raw, str):
+        raise RuntimeError("materialized payload is invalid; use --restart")
+    try:
+        if kind == "float":
+            return float.fromhex(raw)
+        if kind == "bytes":
+            return base64.b64decode(raw.encode("ascii"), validate=True)
+        if kind == "str":
+            return raw
+        if kind == "int":
+            return int(raw)
+        if kind == "decimal":
+            return Decimal(raw)
+        if kind == "uuid":
+            return UUID(raw)
+        if kind == "date":
+            return date.fromisoformat(raw)
+        if kind == "datetime":
+            return datetime.fromisoformat(raw)
+    except (ValueError, TypeError) as error:
+        raise RuntimeError("materialized payload is invalid; use --restart") from error
+    raise RuntimeError("materialized payload has an unsupported type; use --restart")
+
+
+def encoded_payload_tuple(values: tuple[Any, ...]) -> str:
+    return json.dumps([encode_payload_value(value) for value in values], sort_keys=True, separators=(",", ":"))
+
+
+def decode_payload_tuple(value: Any) -> tuple[Any, ...]:
+    if not isinstance(value, list):
+        raise RuntimeError("materialized payload is invalid; use --restart")
+    return tuple(decode_payload_value(item) for item in value)
+
+
 def encoded_key(value: Any) -> str:
     return json.dumps(encode_value(value), sort_keys=True, separators=(",", ":"))
 
@@ -690,29 +773,47 @@ def key_database(path: Path) -> sqlite3.Connection:
             position INTEGER PRIMARY KEY AUTOINCREMENT,
             key TEXT NOT NULL UNIQUE,
             cursor_key TEXT NOT NULL UNIQUE,
-            change_value TEXT
+            change_value TEXT,
+            payload TEXT
         )
     """)
+    # Existing v3 databases are not resumed (the checkpoint format protects
+    # that), but keeping this migration makes the helper safe to inspect and
+    # reuse independently as well.
+    columns = {row[1] for row in connection.execute("PRAGMA table_info(source_keys)")}
+    if "payload" not in columns:
+        connection.execute("ALTER TABLE source_keys ADD COLUMN payload TEXT")
     return connection
 
 
-def remember_keys(connection: sqlite3.Connection, records: Iterable[tuple[Any, tuple[Any, ...], Any]]) -> None:
-    encoded_records = [
-        (encoded_key(identifier), encoded_tuple(page_cursor), None if changed_at is None else encoded_key(changed_at))
-        for identifier, page_cursor, changed_at in records
-    ]
+def remember_keys(connection: sqlite3.Connection, records: Iterable[tuple[Any, ...]]) -> None:
+    """Persist frozen records; three-item callers intentionally have no payload."""
+    encoded_records = []
+    for record in records:
+        if len(record) == 3:
+            identifier, page_cursor, changed_at = record
+            payload = None
+        elif len(record) == 4:
+            identifier, page_cursor, changed_at, payload = record
+        else:
+            raise ValueError("materialized record must contain key, cursor, change, and optional payload")
+        encoded_records.append((
+            encoded_key(identifier), encoded_tuple(page_cursor),
+            None if changed_at is None else encoded_key(changed_at),
+            None if payload is None else encoded_payload_tuple(payload),
+        ))
     # A crash after SQLite commits but before checkpoint.json is atomically
     # replaced replays this page.  Accept only an identical replay; a changed
     # ID/page tuple/change value is still an invariant failure.
     connection.executemany(
-        "INSERT INTO source_keys (key, cursor_key, change_value) VALUES (?, ?, ?) "
+        "INSERT INTO source_keys (key, cursor_key, change_value, payload) VALUES (?, ?, ?, ?) "
         "ON CONFLICT DO NOTHING",
         encoded_records,
     )
-    for key, page_key, change_value in encoded_records:
+    for key, page_key, change_value, payload in encoded_records:
         found = connection.execute(
-            "SELECT 1 FROM source_keys WHERE key = ? AND cursor_key = ? AND change_value IS ?",
-            (key, page_key, change_value),
+            "SELECT 1 FROM source_keys WHERE key = ? AND cursor_key = ? AND change_value IS ? AND payload IS ?",
+            (key, page_key, change_value, payload),
         ).fetchone()
         if found is None:
             raise RuntimeError("integration SQL returned duplicate source ID or source page tuple")
@@ -1342,20 +1443,15 @@ def run_only_new_legacy(args: argparse.Namespace, query: str, schema: str, table
                 return 3
 
 
-def open_materialize_cursor(oracledb: Any, delta_query: str, id_field: str, change_field: str, page_key: tuple[str, ...], lower: Any | None, upper: tuple[Any, ...], after: tuple[Any, ...] | None) -> tuple[Any, Any]:
-    """Open the single narrow Oracle query used for normal materialization."""
+def open_materialize_cursor(oracledb: Any, delta_query: str, source_columns: list[str], page_key: tuple[str, ...], lower: Any | None, upper: tuple[Any, ...], after: tuple[Any, ...] | None) -> tuple[Any, Any]:
+    """Open the one Oracle query that freezes both keys and selected payload."""
     condition, binds = delta_conditions(ONLY_NEW_WATERMARK, page_key, lower, upper, after)
-    # The destination ID and native page key are often the same column.  Oracle
-    # rejects duplicate unnamed expressions in this derived query, so every
-    # selected value gets its own local alias.  Consumers use column position.
+    # A page key is often also the destination ID.  Give every selected
+    # expression a distinct local alias; consumers intentionally use position.
+    fields = list(dict.fromkeys([*source_columns, *page_key, ONLY_NEW_WATERMARK]))
     projection = [
-        f"source_rows.{id_field} AS only_new_materialized_id",
-        f"source_rows.{change_field} AS only_new_materialized_change",
-        f"source_rows.{ONLY_NEW_WATERMARK} AS only_new_materialized_watermark",
-        *[
-            f"source_rows.{field} AS only_new_materialized_page_{index}"
-            for index, field in enumerate(page_key)
-        ],
+        f"source_rows.{field} AS only_new_materialized_{index}"
+        for index, field in enumerate(fields)
     ]
     connection = oracledb.connect(**oracle_settings(oracledb))
     try:
@@ -1368,69 +1464,42 @@ def open_materialize_cursor(oracledb: Any, delta_query: str, id_field: str, chan
         raise
 
 
-def decode_materialized_rows(rows: list[tuple[Any, ...]], id_field: str) -> tuple[list[tuple[Any, tuple[Any, ...], Any]], tuple[Any, ...] | None]:
-    records: list[tuple[Any, tuple[Any, ...], Any]] = []
+def decode_materialized_rows(rows: list[tuple[Any, ...]], source_columns: list[str], id_field: str, change_field: str, page_key: tuple[str, ...]) -> tuple[list[tuple[Any, tuple[Any, ...], Any, tuple[Any, ...]]], tuple[Any, ...] | None]:
+    """Validate one frozen Oracle page and retain its actual insert payload."""
+    fields = list(dict.fromkeys([*source_columns, *page_key, ONLY_NEW_WATERMARK]))
+    positions = {field: index for index, field in enumerate(fields)}
+    records: list[tuple[Any, tuple[Any, ...], Any, tuple[Any, ...]]] = []
     seen_ids: set[Any] = set(); seen_cursors: set[tuple[Any, ...]] = set()
     for raw in rows:
-        identifier, changed_at, watermark, *native = (scalar(value) for value in raw)
-        cursor = (watermark, *native)
+        values = tuple(scalar(value) for value in raw)
+        if len(values) != len(fields):
+            raise RuntimeError("materialized Oracle row did not match the selected integration columns")
+        payload = tuple(values[positions[field]] for field in source_columns)
+        identifier = values[positions[id_field]]
+        changed_at = values[positions[change_field]]
+        cursor = tuple(values[positions[field]] for field in (ONLY_NEW_WATERMARK, *page_key))
         if identifier is None or identifier in seen_ids:
             raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values in each materialized page")
         require_non_null_delta_cursor(cursor, "integration SQL incremental key cursor")
         if cursor in seen_cursors:
             raise RuntimeError("integration SQL must return unique watermark/source page-key tuples in each materialized page")
-        records.append((identifier, cursor, changed_at)); seen_ids.add(identifier); seen_cursors.add(cursor)
+        records.append((identifier, cursor, changed_at, payload)); seen_ids.add(identifier); seen_cursors.add(cursor)
     return records, (records[-1][1] if records else None)
 
 
-def materialized_key_page(connection: sqlite3.Connection, after_position: int, limit: int) -> list[tuple[int, Any, tuple[Any, ...], Any]]:
+def materialized_key_page(connection: sqlite3.Connection, after_position: int, limit: int) -> list[tuple[int, Any, tuple[Any, ...], Any, tuple[Any, ...] | None]]:
     return [
         (int(position), decode_value(json.loads(key)), decode_tuple(json.loads(page_key)) or (),
-         None if change is None else decode_value(json.loads(change)))
-        for position, key, page_key, change in connection.execute(
-            "SELECT position, key, cursor_key, change_value FROM source_keys WHERE position > ? ORDER BY position LIMIT ?",
+         None if change is None else decode_value(json.loads(change)), None if payload is None else decode_payload_tuple(json.loads(payload)))
+        for position, key, page_key, change, payload in connection.execute(
+            "SELECT position, key, cursor_key, change_value, payload FROM source_keys WHERE position > ? ORDER BY position LIMIT ?",
             (after_position, limit),
         )
     ]
 
 
-def payload_rows_by_native_keys(oracledb: Any, query: str, id_field: str, source_columns: list[str], page_key: tuple[str, ...], records: list[tuple[int, Any, tuple[Any, ...], Any]]) -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]]]:
-    """Retrieve payload by native source PK tuple(s), not synthetic destination IDs."""
-    if len(records) > 1000:
-        raise ValueError("Oracle payload batches may contain at most 1000 source keys")
-    binds: dict[str, Any] = {}
-    branches: list[str] = []
-    for row_index, (_position, _identifier, cursor, _change) in enumerate(records):
-        native = cursor[1:]
-        branches.append("(" + " AND ".join(f"source_rows.{field} = :only_new_key_{row_index}_{field_index}" for field_index, field in enumerate(page_key)) + ")")
-        binds.update({f"only_new_key_{row_index}_{field_index}": value for field_index, value in enumerate(native)})
-    def operation() -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]]]:
-        with oracledb.connect(**oracle_settings(oracledb)) as connection:
-            sql = f"SELECT source_rows.* FROM ({query}) source_rows WHERE {' OR '.join(branches)}"
-            with connection.cursor() as cursor:
-                cursor.execute(sql, binds)
-                names = [description[0].lower() for description in cursor.description]
-                if set(source_columns) - set(names) or set(names) - set(source_columns) - set(page_key):
-                    raise RuntimeError("payload query output did not match the integration columns")
-                result: dict[Any, tuple[Any, ...]] = {}
-                native_keys: dict[Any, tuple[Any, ...]] = {}
-                key_position = source_columns.index(id_field)
-                source_positions = [names.index(column) for column in source_columns]
-                native_positions = [names.index(column) for column in page_key]
-                for raw in cursor.fetchall():
-                    raw = tuple(scalar(value) for value in raw)
-                    row = tuple(raw[position] for position in source_positions)
-                    identifier = row[key_position]
-                    if identifier is None or identifier in result:
-                        raise RuntimeError(f"payload query returned duplicate or NULL {id_field}")
-                    result[identifier] = row
-                    native_keys[identifier] = tuple(raw[position] for position in native_positions)
-                return result, native_keys
-    return retry(operation)
-
-
 def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
-    """Materialize a frozen key window once, then retrieve payload by source ID."""
+    """Materialize a frozen source window once, then apply its local payload."""
     if not args.apply:
         # The normal dry-run is intentionally read-only; retain its detailed comparison output.
         return run_only_new_legacy(args, query, schema, table, id_field, change_field, page_key, oracledb, psycopg)
@@ -1445,15 +1514,40 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
         with psycopg.connect(**pg_settings()) as pg:
             source_columns, destination_columns = target_columns(pg, schema, table, id_field)
             require_unique_key(pg, schema, table, id_field, args.trust_unique_non_null, require_not_null=False)
+            if change_field not in source_columns:
+                raise RuntimeError(f"integration/staging table must contain {change_field}")
             staging_hwm = staging_max_change(pg, schema, table, change_field)
         require_only_new_source_shape(oracledb, query, source_columns, page_key)
         if not state:
+            # A v3 window has keys but not their payload.  Continuing it would
+            # either require the slow OR-of-keys query again or silently change
+            # its frozen snapshot, so require the explicit restart operator
+            # action.  A completed prior state contributes its durable HWM.
+            prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
+            if prior:
+                _old_checkpoint, old_state = prior
+                if old_state.get("phase") != "complete":
+                    raise RuntimeError(
+                        "an older active only-new checkpoint has no stored payload; "
+                        "run the identical command with --restart to discard its active window "
+                        "while retaining its completed watermark"
+                    )
+                if old_state.get("completed_watermark") is not None:
+                    staging_hwm = decode_value(old_state["completed_watermark"])
             state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.trust_unique_non_null, args, staging_hwm)
         elif args.auto_page_size or state.get("auto_page_size"):
             args.auto_page_size = True
             state["auto_page_size"] = True
             sizes = state.setdefault("effective_page_sizes", {})
             sizes["materialize"] = min(int(sizes.get("materialize", learned_page_size(profile) or args.page_size)), args.page_size_cap)
+        if state.get("phase") == "conflict":
+            raise RuntimeError("only-new sync is in terminal staging-newer conflict state; resolve it and use --restart (completed watermark is retained)")
+        if state.get("status") == "paused_performance_degraded":
+            state["status"] = "running"
+            for metrics in state.setdefault("timing", {}).values():
+                if isinstance(metrics, dict):
+                    metrics["full_page_seconds_per_row"] = []
+            atomic_json_write(checkpoint, state)
         if state.get("phase") == "complete":
             completed = None if state.get("completed_watermark") is None else decode_value(state["completed_watermark"])
             lower = only_new_lower_bound(completed)
@@ -1476,18 +1570,29 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
         if upper is None:
             raise RuntimeError("incremental checkpoint has no frozen upper watermark; use --restart")
         with key_database(key_path) as keys:
+            # ``pages`` is the window-wide durable page count: source
+            # materialization and local payload application share one
+            # --max-pages budget for this invocation.
+            invocation_start_pages = int(state.get("pages", 0))
             if state.get("phase") == "materialize":
                 cursor = decode_tuple(state.get("materialize_cursor"))
-                print("only-new: materializing changed source keys (no payload columns)...", flush=True)
+                print("only-new: materializing changed source rows into the local resumable store...", flush=True)
                 sizes = state.setdefault("effective_page_sizes", {})
                 materialize_size = int(sizes.get("materialize", min(args.page_size, args.page_size_cap)))
                 recovery_attempts = 0
                 while True:  # reconnect/re-execute only after a failed fetch
                     connection = db_cursor = None
                     try:
-                        connection, db_cursor = retry(lambda: open_materialize_cursor(oracledb, delta_query, id_field, change_field, page_key, lower, upper, cursor))
+                        connection, db_cursor = retry(lambda: open_materialize_cursor(oracledb, delta_query, source_columns, page_key, lower, upper, cursor))
                         while True:
                             heartbeat()
+                            stop_reason = only_new_stop_reason(args, state, invocation_start_pages)
+                            if stop_reason == "signal":
+                                print("stopped after the last committed only-new page; rerun the identical command to resume")
+                                return 130
+                            if stop_reason == "max_pages":
+                                print("stopped at --max-pages; rerun the identical command to continue")
+                                return 0
                             fetch_started = time.perf_counter()
                             try:
                                 raw_rows = db_cursor.fetchmany(materialize_size)
@@ -1496,40 +1601,53 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                                     materialize_size = max(1, materialize_size // AUTO_PAGE_SIZE_DIVISOR)
                                     sizes["materialize"] = materialize_size
                                     atomic_json_write(checkpoint, state)
-                                    print(f"only-new key fetch failed; retrying from checkpoint at page size {materialize_size}", file=sys.stderr, flush=True)
+                                    print(f"only-new source fetch failed; retrying from checkpoint at page size {materialize_size}", file=sys.stderr, flush=True)
                                     break
                                 if is_transient(error):
                                     recovery_attempts += 1
                                     if recovery_attempts > 4:
                                         raise
-                                    print(f"only-new key fetch failed transiently: {error}; reconnecting from checkpoint", file=sys.stderr, flush=True)
+                                    print(f"only-new source fetch failed transiently: {error}; reconnecting from checkpoint", file=sys.stderr, flush=True)
                                     time.sleep(min(30.0, 0.5 * (2 ** (recovery_attempts - 1))) + random.uniform(0, 0.25))
                                     break
                                 raise
+                            oracle_fetch_elapsed = time.perf_counter() - fetch_started
                             if not raw_rows:
                                 state.update(phase="payload", materialized_rows=key_count(keys), source_key_count=key_count(keys), payload_position=0)
                                 atomic_json_write(checkpoint, state)
-                                print(f"only-new: materialized {state['source_key_count']} changed keys; fetching payload by native-key batches of at most {min(args.batch_size, 1000)}", flush=True)
+                                print(f"only-new: materialized {state['source_key_count']} changed source rows; applying local payload batches of at most {min(args.batch_size, 1000)}", flush=True)
                                 connection.close(); connection = None
                                 break
-                            records, next_cursor = decode_materialized_rows(raw_rows, id_field)
+                            local_started = time.perf_counter()
+                            records, next_cursor = decode_materialized_rows(raw_rows, source_columns, id_field, change_field, page_key)
                             recovery_attempts = 0
                             require_cursor_progress(cursor, next_cursor)
                             remember_keys(keys, records)
+                            local_persist_elapsed = time.perf_counter() - local_started
                             cursor = next_cursor
                             state["materialize_cursor"] = encode_tuple(cursor)
                             state["materialized_rows"] = key_count(keys)
                             page = phase_page_number(state, "materialize")
-                            rate, _eta, slow = record_page_timing(state, "materialize", len(records), materialize_size, time.perf_counter() - fetch_started, time.perf_counter() - fetch_started)
+                            state["pages"] = int(state.get("pages", 0)) + 1
+                            rate, _eta, slow = record_page_timing(state, "materialize", len(records), materialize_size, oracle_fetch_elapsed + local_persist_elapsed, oracle_fetch_elapsed + local_persist_elapsed)
+                            checkpoint_started = time.perf_counter()
                             atomic_json_write(checkpoint, state)
+                            checkpoint_elapsed = time.perf_counter() - checkpoint_started
                             if args.auto_page_size:
                                 remember_page_size(profile, materialize_size, schema, table)
-                            print(f"only-new materialized key page {page} ({len(records)} keys; total {state['materialized_rows']}; page size {materialize_size}; {rate:,.0f} keys/s)", flush=True)
+                            print(f"only-new materialized source page {page} ({len(records)} rows; total {state['materialized_rows']}; page size {materialize_size}; Oracle fetchmany {format_duration(oracle_fetch_elapsed)}; local SQLite decode/persist {format_duration(local_persist_elapsed)}; checkpoint {format_duration(checkpoint_elapsed)}; {rate:,.0f} rows/s)", flush=True)
                             if slow:
                                 state["status"] = "paused_performance_degraded"
                                 atomic_json_write(checkpoint, state)
                                 print(f"stopped safely after checkpoint: {slow}", file=sys.stderr)
                                 return 3
+                            stop_reason = only_new_stop_reason(args, state, invocation_start_pages)
+                            if stop_reason == "signal":
+                                print("stopped after the last committed only-new page; rerun the identical command to resume")
+                                return 130
+                            if stop_reason == "max_pages":
+                                print("stopped at --max-pages; rerun the identical command to continue")
+                                return 0
                         if state.get("phase") == "payload":
                             break
                     finally:
@@ -1537,13 +1655,13 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                             connection.close()
             if state.get("phase") != "payload":
                 raise RuntimeError(f"unknown only-new phase: {state.get('phase')}")
-            invocation_start_pages = int(state.get("pages", 0))
             while True:
                 heartbeat()
-                if _SIGINT_COUNT:
+                stop_reason = only_new_stop_reason(args, state, invocation_start_pages)
+                if stop_reason == "signal":
                     print("stopped after the last committed only-new page; rerun the identical command to resume")
                     return 130
-                if args.max_pages and int(state.get("pages", 0)) - invocation_start_pages >= args.max_pages:
+                if stop_reason == "max_pages":
                     print("stopped at --max-pages; rerun the identical command to continue")
                     return 0
                 page_records = materialized_key_page(keys, int(state.get("payload_position", 0)), min(args.batch_size, 1000))
@@ -1554,17 +1672,19 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                     return 0
                 identifiers = [record[1] for record in page_records]
                 expected_change = {record[1]: record[3] for record in page_records}
-                started = time.perf_counter()
-                source, native_keys = payload_rows_by_native_keys(oracledb, query, id_field, source_columns, page_key, page_records)
-                if set(source) != set(identifiers):
-                    raise RuntimeError("payload rows no longer exactly match the frozen materialized source IDs; no payload page was committed")
-                expected_native = {record[1]: record[2][1:] for record in page_records}
-                if native_keys != expected_native:
-                    raise RuntimeError("payload native source keys differ from the frozen materialized key list; no payload page was committed")
+                page = int(state.get("phase_pages", {}).get("payload", 0)) + 1
+                print(f"only-new starting local payload page {page} ({len(identifiers)} rows)...", flush=True)
+                page_started = time.perf_counter()
+                source = {record[1]: record[4] for record in page_records}
+                local_payload_elapsed = time.perf_counter() - page_started
+                if any(row is None or len(row) != len(source_columns) for row in source.values()):
+                    raise RuntimeError("local materialized payload is incomplete; use --restart to rebuild the frozen window")
                 change_position = source_columns.index(change_field)
                 if any(normalize_change_pair(source[key][change_position], expected_change[key])[0] != normalize_change_pair(source[key][change_position], expected_change[key])[1] for key in identifiers):
-                    raise RuntimeError("payload DATE_CHANGE differs from the frozen materialized key list; no payload page was committed")
+                    raise RuntimeError("local materialized payload DATE_CHANGE differs from its frozen key list; use --restart")
                 changes = {key: source[key][change_position] for key in identifiers}
+                print(f"only-new payload page {page}: reading staging and writing changes...", flush=True)
+                staging_started = time.perf_counter()
                 with psycopg.connect(**pg_settings()) as pg:
                     with pg.transaction():
                         staging = staging_changes_for_keys(pg, schema, table, id_field, change_field, identifiers)
@@ -1580,16 +1700,19 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                         with pg.cursor() as cur:
                             cur.executemany(insert_sql, (source[key] for key in inserts))
                             cur.executemany(update_sql, ((*[source[key][source_columns.index(column)] for column in update_columns], key) for key in updates))
+                staging_write_elapsed = time.perf_counter() - staging_started
                 state["payload_position"] = page_records[-1][0]
                 state["delta_rows"] = int(state.get("delta_rows", 0)) + len(identifiers)
                 state["inserted"] += len(inserts); state["updated"] += len(updates); state["unchanged"] += len(unchanged)
                 page = phase_page_number(state, "payload")
                 state["pages"] = int(state.get("pages", 0)) + 1
+                checkpoint_started = time.perf_counter()
                 atomic_json_write(checkpoint, state)
-                elapsed = time.perf_counter() - started
+                checkpoint_elapsed = time.perf_counter() - checkpoint_started
+                elapsed = time.perf_counter() - page_started
                 total = int(state.get("source_key_count", 0)); done = int(state["delta_rows"])
                 eta = format_duration((total - done) * elapsed / len(identifiers)) if done < total else "0:00"
-                print(f"only-new committed payload page {page} ({len(identifiers)} rows; total {done}/{total}; inserted {len(inserts)}, updated {len(updates)}, unchanged {len(unchanged)}; {len(identifiers) / elapsed:,.0f} rows/s; ETA {eta})", flush=True)
+                print(f"only-new committed local payload page {page} ({len(identifiers)} rows; total {done}/{total}; inserted {len(inserts)}, updated {len(updates)}, unchanged {len(unchanged)}; local read {format_duration(local_payload_elapsed)}, staging compare/write {format_duration(staging_write_elapsed)}, checkpoint {format_duration(checkpoint_elapsed)}; {len(identifiers) / elapsed:,.0f} rows/s; ETA {eta})", flush=True)
 
 
 def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
