@@ -1,6 +1,7 @@
 import importlib.util
 from datetime import datetime
 from pathlib import Path
+from uuid import UUID
 
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "src" / "check_all" / "check.py"
@@ -118,3 +119,39 @@ def test_initialise_sessions_sets_ljubljana_on_both_connections():
         def cursor(self): return Cursor()
     check.initialise_sessions(Connection(), Connection())
     assert seen == ["ALTER SESSION SET TIME_ZONE = 'Europe/Ljubljana'", "SET TIME ZONE 'Europe/Ljubljana'"]
+
+
+def test_metadata_binds_uuid_attribute_id_as_one_element_sequence(monkeypatch):
+    """A UUID parameter still needs the DB-API one-element tuple comma."""
+    attribute_id = UUID("12345678-1234-5678-1234-567812345678")
+    seen_params = []
+
+    class Cursor:
+        def __init__(self, connection): self.connection = connection
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, _statement, params=None):
+            seen_params.append(params)
+            self.rows = self.connection.batches.pop(0)
+        def fetchall(self): return self.rows
+
+    class Connection:
+        def __init__(self):
+            self.batches = [
+                [(attribute_id,)],
+                [(UUID("87654321-4321-8765-4321-876543218765"), datetime(2025, 1, 1), "SELECT 1", "KN ORACLE")],
+                [("EV H example",)],
+            ]
+        def cursor(self): return Cursor(self)
+
+    columns = {
+        "attribute_tables": {"id", "name"},
+        "attribute_table_integrations": {"id", "attribute_table_id", "last_changed_datetime", "url", "attribute_table_sql_connection_id"},
+        "attribute_table_sql_connections": {"id", "name"},
+        "attribute_table_translations": {"attribute_table_id", "title"},
+    }
+    monkeypatch.setattr(check, "column_names", lambda _connection, table: columns[table])
+    info = check.metadata(Connection(), "ev_example_h")
+    assert info["attribute_id"] == attribute_id
+    assert seen_params[1] == (attribute_id,)
+    assert seen_params[2] == (attribute_id,)

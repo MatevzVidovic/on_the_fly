@@ -169,11 +169,15 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         if len(attributes) != 1:
             raise RuntimeError(f"expected exactly one attribute_tables row named {table!r}; found {len(attributes)}")
         attribute_id = attributes[0][0]
+        # DB-API parameters must always be a sequence.  The original
+        # ``(attribute_id)`` was just a UUID value, causing psycopg to call
+        # ``len()`` on it while processing query parameters.
+        attribute_id_parameter = (attribute_id,)
         cur.execute(
             f"SELECT i.id, i.last_changed_datetime, i.{quote(sql_col)}, c.{quote(connection_name)} "
             f"FROM {relation('attribute_table_integrations')} i "
             f"LEFT JOIN {relation('attribute_table_sql_connections')} c ON c.id=i.{quote(connection_fk)} "
-            "WHERE i.attribute_table_id=%s", (attribute_id))
+            "WHERE i.attribute_table_id=%s", attribute_id_parameter)
         integrations = cur.fetchall()
         kn = [row for row in integrations if str(row[3] or "").upper() == "KN ORACLE"]
         if len(integrations) != 1 or len(kn) != 1:
@@ -183,7 +187,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         try:
             trans = column_names(connection, "attribute_table_translations")
             title = pick(trans, ("title", "name"), "translation title column")
-            cur.execute(f"SELECT {quote(title)} FROM {relation('attribute_table_translations')} WHERE attribute_table_id=%s", (attribute_id,))
+            cur.execute(f"SELECT {quote(title)} FROM {relation('attribute_table_translations')} WHERE attribute_table_id=%s", attribute_id_parameter)
             translations = [row[0] for row in cur.fetchall()]
         except RuntimeError:
             raise
