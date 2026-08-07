@@ -1,0 +1,12 @@
+[project]
+name = "kn-delta-audit"
+version = "0.1.0"
+description = "Read-only audit of KN Oracle integration deltas"
+requires-python = ">=3.10"
+dependencies = ["psycopg[binary]>=3.1", "oracledb>=2.0"]
+
+[project.scripts]
+kn-delta-audit = "kn_delta_audit:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

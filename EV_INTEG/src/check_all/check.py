@@ -189,10 +189,16 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
             f"LEFT JOIN {relation('attribute_table_sql_connections')} c ON c.id=i.{quote(connection_fk)} "
             "WHERE i.attribute_table_id=%s", attribute_id_parameter)
         integrations = cur.fetchall()
-        kn = [row for row in integrations if str(row[3] or "").upper() == "KN ORACLE"]
-        if len(integrations) != 1 or len(kn) != 1:
-            raise RuntimeError(f"expected exactly one integration total and it must use KN ORACLE for {table!r}; found {len(integrations)} (connections: {[r[3] for r in integrations]!r})")
-        integration_id, highwater, source_sql, conn_name = kn[0]
+        # There must be one integration, but its connection is a *reported
+        # metadata defect*, not a reason to hide independently verifiable
+        # target/KN data state.  We can still execute its saved SQL against
+        # KN for those checks.
+        if len(integrations) != 1:
+            raise RuntimeError(
+                f"expected exactly one integration total for {table!r}; found "
+                f"{len(integrations)} (connections: {[r[3] for r in integrations]!r})"
+            )
+        integration_id, highwater, source_sql, conn_name = integrations[0]
         translations: list[Any] = []
         try:
             trans = column_names(connection, "attribute_table_translations")
@@ -256,6 +262,31 @@ def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: se
     return f"SELECT {', '.join(projections)} FROM ({sql}) q WHERE 1 = 0"
 
 
+def describe_output_aliases(oracle: Any, sql: str, aliases: list[str], temporal_aliases: set[str]) -> tuple[dict[str, str], str | None]:
+    """Safely prove that a specific set of integration output aliases exists."""
+    try:
+        with oracle.cursor() as cur:
+            cur.execute(safe_validation_sql(sql, aliases, temporal_aliases))
+            return ({str(column[0]).lower(): str(column[0]) for column in cur.description}, None)
+    except Exception as error:
+        return {}, str(error)
+
+
+def data_output_aliases(oracle: Any, sql: str, spec: dict[str, Any], output: dict[str, str]) -> tuple[dict[str, str] | None, str | None]:
+    """Return the aliases needed for comparison, independently of full spec checks."""
+    required = list(dict.fromkeys([spec["pk"], "date_change", *spec["source_page_keys"]]))
+    if all(name.lower() in output for name in required):
+        return ({name.lower(): output[name.lower()] for name in required}, None)
+    temporal = documented_text_temporal_aliases(sql, {"date_change"})
+    verified, error = describe_output_aliases(oracle, sql, required, temporal)
+    if error:
+        return None, f"cannot validate data-critical output aliases: {error}"
+    missing = [name for name in required if name.lower() not in verified]
+    if missing:
+        return None, "missing data-critical output alias(es): " + ", ".join(missing)
+    return verified, None
+
+
 def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict[str, str], list[str]]:
     sql = clean_sql(str(sql or ""))
     lower = uncomment(sql).lower()
@@ -276,15 +307,9 @@ def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict
     if spec.get("requires_jn_status"):
         required.append("jn_status")
     text_temporal_aliases = documented_text_temporal_aliases(sql, {"date_change", "valid_from", "valid_to"})
-    try:
-        with oracle.cursor() as cur:
-            cur.execute(safe_validation_sql(sql, required, text_temporal_aliases))
-            output = {str(column[0]).lower(): str(column[0]) for column in cur.description}
-    except Exception as error:
+    output, error = describe_output_aliases(oracle, sql, required, text_temporal_aliases)
+    if error:
         failures.append(f"cannot validate required integration output aliases: {error}")
-        # The names are still deterministic for the later code path, but this
-        # table remains a metadata failure and no data query will run.
-        output = {name.lower(): name.upper() for name in required}
     for name in required:
         if name.lower() not in output:
             failures.append(f"missing output alias {name}")
@@ -459,10 +484,19 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         sql, output, failures = validate_sql(oracle, info["sql"], local)
         if title_bad: failures.append(f"titles must all start with EV H; got {info['titles']!r}")
         if str(info["connection_name"] or "").upper() != "KN ORACLE": failures.append("integration connection is not KN ORACLE")
-        if failures:
-            result["detail"] = "; ".join(failures); return result
-        result["metadata"] = "PASS"
-        identity = hashlib.sha256(json.dumps({"env": environment, "table": table, "integration": str(info["integration_id"]), "sql": sql_hash(sql), "manifest": mhash, "pk": spec["pk"]}, sort_keys=True).encode()).hexdigest()
+        result["metadata"] = "FAIL" if failures else "PASS"
+        # Full validation includes presentation/spec fields such as JN_STATUS
+        # and valid_from.  Comparison needs only PK/date/page tuple.  Retry a
+        # minimal, zero-row projection when the full projection failed.
+        data_output, data_output_error = data_output_aliases(oracle, sql, local, output)
+        if data_output is None:
+            result["detail"] = "; ".join([*failures, data_output_error or "data aliases unavailable"])
+            return result
+        identity = hashlib.sha256(json.dumps({
+            "env": environment, "table": table, "integration": str(info["integration_id"]),
+            "sql": sql_hash(sql), "manifest": mhash, "pk": spec["pk"],
+            "date_change": "date_change", "source_page_keys": spec["source_page_keys"],
+        }, sort_keys=True).encode()).hexdigest()
         entry = cache["entries"].get(identity, {})
         kn_count = entry.get("kn_count")
         if kn_count is None or refresh:
@@ -474,18 +508,19 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         if entry.get("last_check_passed") and not refresh:
             if data_ok: result["data"] = "CACHED"
         elif data_ok:
-            same, reason = diff_data(oracle, target_pg, sql, local, output, page_size, kn_count)
+            same, reason = diff_data(oracle, target_pg, sql, local, data_output, page_size, kn_count)
             if not same:
                 result["data"] = "FAIL"; result["detail"] = reason or "PK/date diff failed"; entry.pop("last_check_passed", None); data_ok = False
             else:
                 entry["last_check_passed"] = True; result["data"] = "PASS"
         cache["entries"][identity] = entry
-        ok, detail, delta = highwater_and_delta(target_pg, oracle, sql, local, output, info["highwater"])
+        ok, detail, delta = highwater_and_delta(target_pg, oracle, sql, local, data_output, info["highwater"])
         result["highwater"] = "FAIL" if delta == -1 else "PASS"
         result["delta"] = "PASS" if ok else "FAIL"
-        result["detail"] = ((result["detail"] + "; " if result["detail"] else "") + f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
+        metadata_detail = "; ".join(failures)
+        result["detail"] = ((metadata_detail + "; " if metadata_detail else "") + f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
                             f"titles={info['titles']!r}; counts KN/target={kn_count}/{target_count}; {detail}")
-        result["result"] = "PASS" if ok and data_ok else "FAIL"
+        result["result"] = "PASS" if result["metadata"] == "PASS" and ok and data_ok else "FAIL"
         return result
     except Exception as error:
         result["detail"] = str(error); return result

@@ -229,3 +229,59 @@ def test_metadata_binds_uuid_attribute_id_as_one_element_sequence(monkeypatch):
     assert info["attribute_id"] == attribute_id
     assert seen_params[1] == (attribute_id,)
     assert seen_params[2] == (attribute_id,)
+
+
+def _comparison_spec():
+    return {
+        "staging_table": "ev_example_h", "prod_table": "ev_example_h",
+        "pk": "example_pk", "source_page_keys": ["native_id"],
+        "kn_table": "EXAMPLE", "requires_jn_status": True,
+    }
+
+
+def _install_check_one_mocks(monkeypatch, *, titles=("EV H Example",), connection="KN ORACLE", output=None):
+    calls = []
+    monkeypatch.setattr(check, "metadata", lambda *_args: {
+        "integration_id": "integration-1", "highwater": datetime(2025, 1, 1),
+        "sql": "SELECT 1 FROM EV.EXAMPLE", "connection_name": connection, "titles": list(titles),
+    })
+    output = output or {"example_pk": "EXAMPLE_PK", "date_change": "DATE_CHANGE", "native_id": "NATIVE_ID"}
+    monkeypatch.setattr(check, "validate_sql", lambda *_args: ("SELECT 1 FROM EV.EXAMPLE", output, ["missing output alias jn_status"] if "jn_status" not in output else []))
+    monkeypatch.setattr(check, "oracle_count", lambda *_args: calls.append("count") or 1)
+    monkeypatch.setattr(check, "pg_count", lambda *_args: calls.append("pg-count") or 1)
+    monkeypatch.setattr(check, "diff_data", lambda *_args: calls.append("diff") or (True, None))
+    monkeypatch.setattr(check, "highwater_and_delta", lambda *_args: calls.append("water") or (True, "ok", 0))
+    return calls
+
+
+def test_wrong_title_keeps_independent_data_and_highwater_checks_running(monkeypatch):
+    calls = _install_check_one_mocks(monkeypatch, titles=("EV - Example H",))
+    result = check.check_one(None, None, None, _comparison_spec(), "staging", {"entries": {}}, False, 10, "manifest")
+    assert result["metadata"] == "FAIL"
+    assert result["data"] == "PASS" and result["highwater"] == "PASS" and result["delta"] == "PASS"
+    assert result["result"] == "FAIL"
+    assert calls == ["count", "pg-count", "diff", "water"]
+
+
+def test_gurs_connection_keeps_independent_data_and_highwater_checks_running(monkeypatch):
+    calls = _install_check_one_mocks(monkeypatch, connection="GURS ORCL")
+    result = check.check_one(None, None, None, _comparison_spec(), "staging", {"entries": {}}, False, 10, "manifest")
+    assert result["metadata"] == "FAIL" and result["data"] == "PASS"
+    assert result["highwater"] == "PASS" and result["delta"] == "PASS"
+    assert "integration connection is not KN ORACLE" in result["detail"]
+    assert calls == ["count", "pg-count", "diff", "water"]
+
+
+def test_missing_jn_status_with_data_aliases_still_runs_comparison(monkeypatch):
+    calls = _install_check_one_mocks(monkeypatch)
+    result = check.check_one(None, None, None, _comparison_spec(), "staging", {"entries": {}}, False, 10, "manifest")
+    assert result["metadata"] == "FAIL" and result["data"] == "PASS"
+    assert calls == ["count", "pg-count", "diff", "water"]
+
+
+def test_missing_native_page_alias_does_not_start_data_checks(monkeypatch):
+    calls = _install_check_one_mocks(monkeypatch, output={"example_pk": "EXAMPLE_PK", "date_change": "DATE_CHANGE"})
+    monkeypatch.setattr(check, "data_output_aliases", lambda *_args: (None, "missing data-critical output alias(es): native_id"))
+    result = check.check_one(None, None, None, _comparison_spec(), "staging", {"entries": {}}, False, 10, "manifest")
+    assert result["data"] == "NOT_CHECKED" and result["highwater"] == "NOT_CHECKED"
+    assert calls == []
