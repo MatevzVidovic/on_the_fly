@@ -174,6 +174,133 @@ def test_incremental_delta_predicates_have_inclusive_lower_and_bounded_tuple() -
     assert "a = :upper_0 AND b = :upper_1 AND c <= :upper_2" in three_part_upper
 
 
+def test_incremental_timestamp_binds_keep_fractional_seconds() -> None:
+    class Cursor:
+        def __init__(self) -> None:
+            self.sizes: dict[str, object] = {}
+
+        def setinputsizes(self, **sizes: object) -> None:
+            self.sizes.update(sizes)
+
+    oracle = SimpleNamespace(DB_TYPE_TIMESTAMP=object())
+    cursor = Cursor()
+    binds = {
+        "lower_watermark": datetime(2026, 8, 6, 23, 59, 59, 999000),
+        "upper_0": datetime(2026, 8, 6, 23, 59, 59, 999000),
+        "upper_1": datetime(2026, 8, 6, 23, 59, 59, 999001),
+        "after_0": datetime(2026, 8, 6, 23, 59, 59, 999000),
+        "after_1": datetime(2026, 8, 6, 23, 59, 59, 999001),
+    }
+
+    sync.bind_oracle_delta_timestamps(cursor, oracle, binds)
+
+    assert cursor.sizes == {
+        "lower_watermark": oracle.DB_TYPE_TIMESTAMP,
+        "upper_0": oracle.DB_TYPE_TIMESTAMP,
+        "upper_1": oracle.DB_TYPE_TIMESTAMP,
+        "after_0": oracle.DB_TYPE_TIMESTAMP,
+        "after_1": oracle.DB_TYPE_TIMESTAMP,
+    }
+
+
+def test_incremental_cursor_must_advance_between_nonempty_pages() -> None:
+    cursor = (datetime(2026, 8, 6, 23, 59, 59, 999000), "row-1")
+
+    sync.require_cursor_progress(cursor, (datetime(2026, 8, 6, 23, 59, 59, 999000), "row-2"))
+    try:
+        sync.require_cursor_progress(cursor, cursor)
+    except RuntimeError as error:
+        assert "did not advance" in str(error)
+    else:
+        raise AssertionError("a repeated cursor must stop the incremental run")
+
+    try:
+        sync.require_cursor_progress(cursor, (datetime(2026, 8, 6, 23, 59, 59, 998999), "row-9"))
+    except RuntimeError as error:
+        assert "did not advance" in str(error)
+    else:
+        raise AssertionError("a backwards cursor must stop the incremental run")
+
+
+def test_all_delta_oracle_paths_size_timestamp_binds_before_execute(monkeypatch) -> None:
+    class Cursor:
+        def __init__(self, responses: list[tuple[object, ...] | None]) -> None:
+            self.responses = responses
+            self.events: list[str] = []
+            self.description = [(sync.ONLY_NEW_WATERMARK, object()), ("source_id", object())]
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def setinputsizes(self, **_sizes: object) -> None:
+            self.events.append("sizes")
+
+        def execute(self, _sql: str, binds: dict[str, object]) -> None:
+            assert any(isinstance(value, datetime) for value in binds.values())
+            assert self.events and self.events[-1] == "sizes"
+            self.events.append("execute")
+
+        def fetchone(self):
+            return self.responses.pop(0) if self.responses else None
+
+        def fetchall(self):
+            return []
+
+    class Connection:
+        def __init__(self, cursor: Cursor) -> None:
+            self.cursor_value = cursor
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+        def cursor(self) -> Cursor:
+            return self.cursor_value
+
+    class Oracle:
+        DB_TYPE_TIMESTAMP = object()
+
+        def __init__(self) -> None:
+            self.cursors: list[Cursor] = []
+            self.response_sets = [
+                [(datetime(2026, 8, 6, 23, 59, 59, 999000), "upper")],
+                [(1,)],
+                [],
+            ]
+
+        def connect(self, **_settings: object) -> Connection:
+            cursor = Cursor(self.response_sets[len(self.cursors)])
+            self.cursors.append(cursor)
+            return Connection(cursor)
+
+    oracle = Oracle()
+    monkeypatch.setattr(sync, "oracle_settings", lambda _oracle: {})
+    lower = datetime(2026, 8, 6, 21, 59, 59, 999000)
+    upper = (datetime(2026, 8, 6, 23, 59, 59, 999000), "upper")
+    after = (datetime(2026, 8, 6, 22, 59, 59, 999000), "after")
+
+    assert sync.oracle_delta_upper(oracle, "SELECT 1 AS source_id FROM dual", sync.ONLY_NEW_WATERMARK, ("source_id",), lower) == upper
+    assert sync.oracle_delta_count(oracle, "SELECT 1 AS source_id FROM dual", sync.ONLY_NEW_WATERMARK, ("source_id",), lower, upper, after) == 1
+    assert sync.oracle_delta_page(oracle, "SELECT 1 AS source_id FROM dual", sync.ONLY_NEW_WATERMARK, ("source_id",), "source_rows.*", lower, upper, after, 10) == ([sync.ONLY_NEW_WATERMARK, "source_id"], [])
+
+
+def test_active_legacy_incremental_checkpoint_requires_restart_but_complete_does_not() -> None:
+    legacy_active = {"phase": "delta", "completed_watermark": sync.encode_value(datetime(2026, 8, 1))}
+    try:
+        sync.require_only_new_timestamp_bind_capability(legacy_active)
+    except RuntimeError as error:
+        assert "--restart" in str(error)
+        assert "completed watermark is retained" in str(error)
+    else:
+        raise AssertionError("legacy active window must not resume")
+    sync.require_only_new_timestamp_bind_capability({"phase": "complete"})
+
+
 def test_only_new_uses_existing_date_change_and_two_hour_lookback() -> None:
     query = sync.only_new_query("SELECT source_id, date_change FROM example", "date_change")
     assert "source_rows.*" in query
@@ -200,6 +327,35 @@ def test_incremental_source_page_strips_internal_watermark(monkeypatch) -> None:
     assert rows == {"row-1": ("row-1", "2025-01-01T00:00:00")}
     assert cursors == {"row-1": (datetime(2025, 1, 1), "row-1")}
     assert next_cursor == (datetime(2025, 1, 1), "row-1")
+
+
+def test_incremental_page_rejects_duplicate_cursor_tuple(monkeypatch) -> None:
+    def page(*_args, **_kwargs):
+        return ["synthetic_pk", "date_change", sync.ONLY_NEW_WATERMARK, "source_tie"], [
+            ("row-1", "2025-01-01T00:00:00", datetime(2025, 1, 1), "same-tie"),
+            ("row-2", "2025-01-01T00:00:00", datetime(2025, 1, 1), "same-tie"),
+        ]
+
+    monkeypatch.setattr(sync, "oracle_delta_page", page)
+    for reader, args in (
+        (sync.source_delta_full_page, (object(), "SELECT 1", "synthetic_pk", ["synthetic_pk", "date_change", "source_tie"], sync.ONLY_NEW_WATERMARK, ("source_tie",), None, (datetime(2025, 1, 1), "same-tie"), None, 100)),
+        (sync.source_delta_change_page, (object(), "SELECT 1", "synthetic_pk", "date_change", sync.ONLY_NEW_WATERMARK, ("source_tie",), None, (datetime(2025, 1, 1), "same-tie"), None, 100)),
+    ):
+        try:
+            reader(*args)
+        except RuntimeError as error:
+            assert "unique watermark/source page-key tuples" in str(error)
+        else:
+            raise AssertionError("duplicate incremental cursor tuple must be rejected")
+
+
+def test_incremental_upper_cursor_rejects_null_components() -> None:
+    try:
+        sync.require_non_null_delta_cursor((datetime(2025, 1, 1), None), "incremental window upper cursor")
+    except RuntimeError as error:
+        assert "upper cursor" in str(error)
+    else:
+        raise AssertionError("a NULL frozen upper cursor must be rejected")
 
 
 def test_incremental_dry_projection_uses_only_key_change_watermark_and_page_key(monkeypatch) -> None:

@@ -12,6 +12,8 @@ The normal mode is a complete reconciliation: it scans KN membership and deletes
 
 `--only-new --apply` requires `--resumable` and `--source-page-key`. It uses the existing `date_change` selected by the integration SQL: the loader parses its ISO timezone text inside Oracle solely for filtering and ordering. The source page key breaks timestamp ties, so the checkpoint cursor is `(source watermark, native key...)`. No loader-only columns are added to integration SQL.
 
+The incremental path trusts KN globally to provide non-null, unique membership IDs and non-null, unique `(watermark, source-page-key...)` cursor tuples; it does not perform an expensive full-window duplicate/null scan. Each fetched page is still checked before its PostgreSQL transaction, so malformed rows in that page stop the run and leave it uncommitted. A duplicate that occurs only across different pages remains a violated KN source contract and is not globally scanned.
+
 On the first run, the completed watermark is the literal `MAX(date_change)` already in staging; an empty table imports all source rows. Every later window starts two hours before its completed watermark, safely replaying equal timestamps and the DST repeated hour. At the start of each invocation the loader freezes the greatest source `(watermark, native key...)` tuple and will not read past it. The completed watermark advances only after that window completes. `--restart` discards an incomplete window but retains the completed watermark.
 
 Example (there are no deletes in this mode):

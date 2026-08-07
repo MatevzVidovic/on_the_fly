@@ -35,6 +35,7 @@ STATE_FORMAT = 3  # Full-reconciliation checkpoint format: do not change.
 # Incremental state v1 required loader-only SELECT aliases.  Do not reuse it:
 # v2 builds its watermark solely from the selected DATE_CHANGE column.
 ONLY_NEW_STATE_FORMAT = 2
+ONLY_NEW_TIMESTAMP_BIND_CAPABILITY = "explicit_timestamp_v1"
 # This becomes an unquoted Oracle column alias in an internal wrapper query.
 # Oracle identifiers must start with a letter, so do not use a leading
 # underscore here.
@@ -797,6 +798,28 @@ def only_new_lower_bound(completed_watermark: Any | None) -> Any | None:
     return value.replace(tzinfo=None) - ONLY_NEW_LOOKBACK
 
 
+def bind_oracle_delta_timestamps(cursor: Any, oracledb: Any, binds: dict[str, Any]) -> None:
+    """Keep incremental watermark predicates at Oracle TIMESTAMP precision.
+
+    python-oracledb otherwise infers a naïve ``datetime`` bind as Oracle DATE
+    in this query shape.  DATE drops fractional seconds, so a cursor at
+    ``...59.999000`` becomes ``...59`` and can re-read the same page forever.
+    This includes composite page-key components when they are timestamps.
+    """
+    timestamp_binds = {
+        name: oracledb.DB_TYPE_TIMESTAMP
+        for name, value in binds.items()
+        if isinstance(value, datetime)
+    }
+    if timestamp_binds:
+        cursor.setinputsizes(**timestamp_binds)
+
+
+def require_non_null_delta_cursor(cursor: tuple[Any, ...], context: str) -> None:
+    if any(value is None for value in cursor):
+        raise RuntimeError(f"{context} has a NULL watermark or source page-key component")
+
+
 def oracle_delta_upper(oracledb: Any, query: str, watermark_field: str, page_key: tuple[str, ...], lower_watermark: Any | None) -> tuple[Any, ...] | None:
     """Freeze the greatest Oracle `(watermark, native key)` tuple for this window."""
     fields = (watermark_field, *page_key)
@@ -809,9 +832,15 @@ def oracle_delta_upper(oracledb: Any, query: str, watermark_field: str, page_key
                 f"ORDER BY {', '.join(f'{field} DESC' for field in fields)} FETCH FIRST 1 ROWS ONLY"
             )
             with connection.cursor() as cursor:
-                cursor.execute(sql, {} if lower_watermark is None else {"lower_watermark": lower_watermark})
+                binds = {} if lower_watermark is None else {"lower_watermark": lower_watermark}
+                bind_oracle_delta_timestamps(cursor, oracledb, binds)
+                cursor.execute(sql, binds)
                 row = cursor.fetchone()
-                return None if row is None else tuple(scalar(value) for value in row)
+                if row is None:
+                    return None
+                upper = tuple(scalar(value) for value in row)
+                require_non_null_delta_cursor(upper, "incremental window upper cursor")
+                return upper
 
     return retry(operation)
 
@@ -829,6 +858,7 @@ def oracle_delta_page(oracledb: Any, query: str, watermark_field: str, page_key:
                 f"ORDER BY {', '.join(fields)} FETCH FIRST :page_size ROWS ONLY"
             )
             with connection.cursor() as cursor:
+                bind_oracle_delta_timestamps(cursor, oracledb, binds)
                 cursor.execute(sql, binds)
                 names = [description[0].lower() for description in cursor.description]
                 return names, [tuple(scalar(value) for value in row) for row in cursor.fetchall()]
@@ -844,6 +874,7 @@ def oracle_delta_count(oracledb: Any, query: str, watermark_field: str, page_key
         with oracledb.connect(**oracle_settings(oracledb)) as connection:
             condition, binds = delta_conditions(watermark_field, page_key, lower_watermark, upper_cursor, after_cursor)
             with connection.cursor() as cursor:
+                bind_oracle_delta_timestamps(cursor, oracledb, binds)
                 cursor.execute(f"SELECT COUNT(*) FROM ({query}) source_rows WHERE {condition}", binds)
                 return int(cursor.fetchone()[0])
 
@@ -860,16 +891,19 @@ def source_delta_full_page(oracledb: Any, query: str, id_field: str, source_colu
     cursor_positions = [names.index(field) for field in (watermark_field, *page_key)]
     result: dict[Any, tuple[Any, ...]] = {}
     cursors: dict[Any, tuple[Any, ...]] = {}
+    seen_cursors: set[tuple[Any, ...]] = set()
     for raw_row in rows:
         row = tuple(raw_row[position] for position in positions)
         identifier = row[key_position]
         page_cursor = tuple(raw_row[position] for position in cursor_positions)
         if identifier is None or identifier in result:
             raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values in the incremental window")
-        if any(value is None for value in page_cursor):
-            raise RuntimeError(f"integration SQL must return non-NULL {watermark_field} and source page keys in the incremental window")
+        require_non_null_delta_cursor(page_cursor, "integration SQL incremental page cursor")
+        if page_cursor in seen_cursors:
+            raise RuntimeError("integration SQL must return unique watermark/source page-key tuples in each incremental page")
         result[identifier] = row
         cursors[identifier] = page_cursor
+        seen_cursors.add(page_cursor)
     return result, cursors, cursors[next(reversed(cursors))] if cursors else None
 
 
@@ -881,14 +915,17 @@ def source_delta_change_page(oracledb: Any, query: str, id_field: str, change_fi
     positions = {name: index for index, name in enumerate(names)}
     changes: dict[Any, Any] = {}
     last_cursor: tuple[Any, ...] | None = None
+    seen_cursors: set[tuple[Any, ...]] = set()
     for row in rows:
         identifier = row[positions[id_field]]
         last_cursor = tuple(row[positions[field]] for field in (watermark_field, *page_key))
         if identifier is None or identifier in changes:
             raise RuntimeError(f"integration SQL must return unique, non-NULL {id_field} values in the incremental window")
-        if any(value is None for value in last_cursor):
-            raise RuntimeError(f"integration SQL must return non-NULL {watermark_field} and source page keys in the incremental window")
+        require_non_null_delta_cursor(last_cursor, "integration SQL incremental page cursor")
+        if last_cursor in seen_cursors:
+            raise RuntimeError("integration SQL must return unique watermark/source page-key tuples in each incremental page")
         changes[identifier] = row[positions[change_field]]
+        seen_cursors.add(last_cursor)
     return changes, last_cursor
 
 
@@ -951,23 +988,27 @@ def delta_conditions(watermark_field: str, page_key: tuple[str, ...], lower_wate
     return " AND ".join(conditions), binds
 
 
-def require_delta_invariants(oracledb: Any, query: str, id_field: str, watermark_field: str, page_key: tuple[str, ...], lower_watermark: Any | None, upper_cursor: tuple[Any, ...]) -> None:
-    """Validate identity/cursor uniqueness only in the frozen incremental window."""
-    conditions, binds = delta_conditions(watermark_field, page_key, lower_watermark, upper_cursor)
-
-    def operation() -> None:
-        with oracledb.connect(**oracle_settings(oracledb)) as connection:
-            with connection.cursor() as cursor:
-                cursor.execute(f"SELECT {id_field} FROM ({query}) source_rows WHERE {conditions} GROUP BY {id_field} HAVING {id_field} IS NULL OR COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY", binds)
-                invalid = cursor.fetchone()
-                if invalid:
-                    raise RuntimeError(f"incremental window returned NULL or duplicate {id_field}: {invalid[0]!r}")
-                fields = (watermark_field, *page_key)
-                nulls = " OR ".join(f"{field} IS NULL" for field in fields)
-                cursor.execute(f"SELECT 1 FROM ({query}) source_rows WHERE {conditions} GROUP BY {', '.join(fields)} HAVING ({nulls}) OR COUNT(*) > 1 FETCH FIRST 1 ROWS ONLY", binds)
-                if cursor.fetchone():
-                    raise RuntimeError(f"incremental window returned NULL or duplicate watermark/page tuple: {', '.join(fields)}")
-    retry(operation)
+def require_cursor_progress(previous: tuple[Any, ...] | None, current: tuple[Any, ...] | None) -> None:
+    """Fail safely instead of committing a repeated or backwards page."""
+    if current is None:
+        raise RuntimeError("incremental source page returned rows without a cursor")
+    if previous is None:
+        return
+    if len(current) != len(previous):
+        raise RuntimeError("incremental source cursor shape changed; no further pages were committed")
+    for index, (old, new) in enumerate(zip(previous, current, strict=True)):
+        if new == old:
+            continue
+        try:
+            if new > old:
+                return
+        except TypeError as error:
+            raise RuntimeError(
+                f"cannot compare incremental source cursor component {index}: "
+                f"{old!r} ({type(old).__name__}) vs {new!r} ({type(new).__name__})"
+            ) from error
+        raise RuntimeError("incremental source cursor did not advance; no further pages were committed")
+    raise RuntimeError("incremental source cursor did not advance; no further pages were committed")
 
 
 def require_source_invariants(oracledb: Any, query: str, id_field: str, page_key: tuple[str, ...], source_columns: list[str], watermark_field: str | None = None) -> None:
@@ -1076,6 +1117,7 @@ def initialise_only_new_state(checkpoint: Path, query: str, schema: str, table: 
         "format": ONLY_NEW_STATE_FORMAT, "fingerprint": fingerprint, "mode": "only_new",
         "schema": schema, "table": table, "id_field": id_field, "change_field": change_field,
         "source_page_key": list(page_key), "watermark": "date_change_iso_ljubljana_v1",
+        "timestamp_bind_capability": ONLY_NEW_TIMESTAMP_BIND_CAPABILITY,
         "trust_unique_non_null": trust_unique_non_null, "auto_page_size": args.auto_page_size,
         "phase": "complete", "status": "complete", "completed_watermark": None if completed_watermark is None else encode_value(completed_watermark),
         "window_lower": None, "window_upper": None, "delta_cursor": None, "pages": 0, "rows": 0, "delta_rows": 0,
@@ -1095,6 +1137,16 @@ def only_new_settings_match(state: dict[str, Any], schema: str, table: str, id_f
     }.items())
 
 
+def require_only_new_timestamp_bind_capability(state: dict[str, Any] | None) -> None:
+    """Do not resume a pre-fix active window whose cursor may have replayed."""
+    if state and state.get("phase") == "delta" and state.get("timestamp_bind_capability") != ONLY_NEW_TIMESTAMP_BIND_CAPABILITY:
+        raise RuntimeError(
+            "active only-new checkpoint predates precise Oracle TIMESTAMP binds; "
+            "run the identical command with --restart to discard its active window "
+            "(the completed watermark is retained)"
+        )
+
+
 def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
     """Resumable insert/update-only delta.  It intentionally has no delete phase."""
     fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
@@ -1108,6 +1160,7 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
         dry_state = read_checkpoint(checkpoint)
         if dry_state and (dry_state.get("format") != ONLY_NEW_STATE_FORMAT or dry_state.get("fingerprint") != fingerprint or not only_new_settings_match(dry_state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
             raise RuntimeError("checkpoint belongs to different incremental settings; use --restart after review")
+        require_only_new_timestamp_bind_capability(dry_state)
         with psycopg.connect(**pg_settings()) as connection:
             source_columns, _destination_columns = target_columns(connection, schema, table, id_field)
             bootstrap_lower = staging_max_change(connection, schema, table, change_field)
@@ -1119,17 +1172,21 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
             lower = decode_value(dry_state["window_lower"]) if dry_state.get("window_lower") else lower
         upper = decode_tuple(dry_state.get("window_upper")) if active else oracle_delta_upper(oracledb, delta_query, watermark_field, page_key, lower)
         cursor: tuple[Any, ...] | None = decode_tuple(dry_state.get("delta_cursor")) if active else None
-        if upper is not None:
-            require_delta_invariants(oracledb, delta_query, id_field, watermark_field, page_key, lower, upper)
         total = 0 if upper is None else oracle_delta_count(oracledb, delta_query, watermark_field, page_key, lower, upper, cursor)
         inserted = updated = unchanged = 0
         conflicts: list[tuple[Any, Any, Any]] = []
         insert_examples: list[tuple[Any, Any]] = []
         update_examples: list[tuple[Any, Any]] = []
+        ephemeral_auto_size_state: dict[str, Any] = {"effective_page_sizes": {}}
         while upper is not None:
-            changes, cursor = source_delta_change_page(oracledb, delta_query, id_field, change_field, watermark_field, page_key, lower, upper, cursor, args.page_size)
+            previous_cursor = cursor
+            (changes, cursor), _used_size, _fetch_elapsed, _wall_fetch_elapsed = adaptive_source_page(
+                args, ephemeral_auto_size_state, data_profile, schema, table, "dry-run delta", "data",
+                lambda size, retry_transient: source_delta_change_page(oracledb, delta_query, id_field, change_field, watermark_field, page_key, lower, upper, cursor, size, retry_transient),
+            )
             if not changes:
                 break
+            require_cursor_progress(previous_cursor, cursor)
             with psycopg.connect(**pg_settings()) as connection:
                 staging = staging_changes_for_keys(connection, schema, table, id_field, change_field, list(changes))
             _delete, page_inserts, page_unchanged, page_updates, page_conflicts = make_plan(changes, staging, change_field, False)
@@ -1151,6 +1208,7 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
         state = read_checkpoint(checkpoint)
         if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
             raise RuntimeError("checkpoint belongs to different incremental settings; use --restart after review")
+        require_only_new_timestamp_bind_capability(state)
         if state and state.get("phase") == "conflict":
             raise RuntimeError("only-new sync is in terminal conflict state; resolve staging rows and use --restart (completed watermark is retained)")
         with psycopg.connect(**pg_settings()) as connection:
@@ -1184,11 +1242,12 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                 print(f"only-new complete: no source rows at or above watermark {lower!r}")
                 return 0
             source_key_count = oracle_delta_count(oracledb, delta_query, watermark_field, page_key, lower, upper)
-            state.update(phase="delta", status="running", window_lower=None if lower is None else encode_value(lower), window_upper=encode_tuple(upper), delta_cursor=None,
+            state.update(timestamp_bind_capability=ONLY_NEW_TIMESTAMP_BIND_CAPABILITY,
+                         phase="delta", status="running", window_lower=None if lower is None else encode_value(lower), window_upper=encode_tuple(upper), delta_cursor=None,
                          delta_rows=0, inserted=0, updated=0, unchanged=0, pages=0, rows=0,
                          phase_pages={"delta": 0}, timing={}, source_key_count=source_key_count)
             atomic_json_write(checkpoint, state)
-            print(f"only-new opened window through {upper[0]!r}; completed watermark remains {lower!r}")
+            print(f"only-new opened window through {upper[0]!r}; completed watermark {completed!r}; replay lower bound {lower!r}")
         if state.get("phase") != "delta":
             raise RuntimeError(f"unknown incremental checkpoint phase: {state.get('phase')}")
         lower = decode_value(state["window_lower"]) if state.get("window_lower") else only_new_lower_bound(None if state.get("completed_watermark") is None else decode_value(state["completed_watermark"]))
@@ -1196,7 +1255,6 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
         cursor = decode_tuple(state.get("delta_cursor"))
         if upper is None:
             raise RuntimeError("incremental checkpoint has no frozen upper watermark; use --restart")
-        require_delta_invariants(oracledb, delta_query, id_field, watermark_field, page_key, lower, upper)
         invocation_start_pages = int(state.get("pages", 0))
         while True:
             heartbeat()
@@ -1219,6 +1277,7 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
                 atomic_json_write(checkpoint, state)
                 print(f"only-new complete: inserted={state['inserted']}, updated={state['updated']}, unchanged={state['unchanged']}; watermark advanced to {upper[0]!r}")
                 return 0
+            require_cursor_progress(cursor, next_cursor)
             changes = {identifier: source[identifier][source_columns.index(change_field)] for identifier in source}
             with psycopg.connect(**pg_settings()) as connection:
                 with connection.transaction():

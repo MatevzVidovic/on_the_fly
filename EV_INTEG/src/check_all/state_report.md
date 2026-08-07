@@ -2,24 +2,25 @@
 
 | Table | Metadata | Data | High-water | Zero newer rows | Result |
 |---|---|---|---|---|---|
-| ev_dst_pripis_podatki_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
+| ev_dst_pripis_podatki_h | PASS | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_del_stavbe_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_del_stavbe_enota_h_2025_danes | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_parc_del_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_parc_enota_h_2025_danes | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_parcela_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_pe_dst_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
-| ev_pe_parc_h | PASS | PASS | PASS | FAIL | **FAIL** |
+| ev_pe_parc_h | PASS | CACHED | PASS | FAIL | **FAIL** |
 | ev_posebna_enota_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_prostor_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_stavba_h | PASS | FAIL | PASS | FAIL | **FAIL** |
-| ev_parc_pripis_podatki_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
+| ev_parc_pripis_podatki_h | PASS | FAIL | PASS | FAIL | **FAIL** |
 
 ## Details
 
 ### ev_dst_pripis_podatki_h
 
-- integration=0b8f4fd2-9191-11f1-93da-0242ac12000d; connection='KN ORACLE'; titles=['EV H - Dst pripis podatki']; counts KN/target=1944791/1944720; target MAX(date_change)=2026-08-05T23:59:59.999000 != integration last_changed_datetime=None
+- ORA-00960: ambiguous column naming in select list
+Help: https://docs.oracle.com/error-help/db/ora-00960/
 ### ev_del_stavbe_h
 
 - integration=b867296c-ab2a-11f0-a252-169cd02558fe; connection='KN ORACLE'; titles=['EV H – Del stavbe']; counts KN/target=11047300/9940024; target MAX(date_change)=2026-01-20T23:59:59.999000 != integration last_changed_datetime=2025-05-10T09:56:01.000000
@@ -54,6 +55,6 @@ Help: https://docs.oracle.com/error-help/db/ora-00904/
 - integration=39aa410c-beff-11f0-a601-5212cffe39ac; connection='KN ORACLE'; titles=['EV H - Stavba']; counts KN/target=3184228/2021464; 2324449 KN rows are newer than high-water mark
 ### ev_parc_pripis_podatki_h
 
-- integration=ba04774e-9192-11f1-8088-0242ac12000d; connection='KN ORACLE'; titles=['EV H - Parc pripis podatki']; counts KN/target=8588801/8588500; target MAX(date_change)=2026-08-05T23:59:59.999000 != integration last_changed_datetime=None
+- integration=ba04774e-9192-11f1-8088-0242ac12000d; connection='KN ORACLE'; titles=['EV H - Parc pripis podatki']; counts KN/target=8588801/8588500; 2226 KN rows are newer than high-water mark
 
 A passing `Zero newer rows` result is the precondition for manually running LIFT; that LIFT run should transfer zero records.

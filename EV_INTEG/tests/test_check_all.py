@@ -33,6 +33,14 @@ def test_page_sql_uses_oracle_output_names_and_keyset():
     assert '"ID_A" > :after_0' in value
     assert '"ID_A" = :after_0 AND "REV" > :after_1' in value
     assert 'ORDER BY "ID_A", "REV"' in value
+    assert '"ID_A" AS "__CHECK_PAGE_0"' in value
+    assert '"REV" AS "__CHECK_PAGE_1"' in value
+
+
+def test_page_sql_gives_membership_pk_and_same_page_key_distinct_output_names():
+    value = check.page_sql("SELECT 1", "SOURCE_PK", "DATE_CHANGE", ["SOURCE_PK"], None)
+    assert value.count('"SOURCE_PK"') == 3  # membership select, private page alias, ORDER BY
+    assert '"SOURCE_PK" AS "__CHECK_PAGE_0"' in value
 
 
 def test_safe_validation_sql_converts_all_temporal_output_fields_inside_oracle():
@@ -60,7 +68,7 @@ def test_documented_iso_text_aliases_are_detected_and_projected_without_nls_cast
     assert 'TO_CHAR(CAST(q."VALID_FROM" AS TIMESTAMP)' in value
     page = check.page_sql("SELECT 1", "PK", "DATE_CHANGE", ["PK"], None, date_is_text=True)
     assert 'TO_CHAR(CAST("DATE_CHANGE" AS TIMESTAMP)' not in page
-    assert 'SELECT "PK", "DATE_CHANGE", "PK" FROM' in page
+    assert 'SELECT "PK", "DATE_CHANGE", "PK" AS "__CHECK_PAGE_0" FROM' in page
 
 
 def test_validate_sql_uses_safe_zero_row_projection_for_tstz(monkeypatch):

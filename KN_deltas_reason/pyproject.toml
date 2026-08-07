@@ -11,5 +11,8 @@ test = ["pytest>=8"]
 [project.scripts]
 kn-delta-audit = "kn_delta_audit:main"
 
+[tool.setuptools]
+py-modules = ["kn_delta_audit", "kn_audit_core"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]

@@ -34,7 +34,7 @@ open a KN Oracle connection or execute any integration SQL.
 .venv/bin/kn-delta-audit discover --environment test --output-dir artifacts
 ```
 
-The printed artifact directory contains `inventory.md` and `inventory.json`.
+The printed artifact directory contains `inventory.md` and `inventory.jsonl`.
 The inventory lists every FMP integration whose SQL connection is `KN ORACLE`,
 including table name, integration UUID, stored SQL, SQL hash, high-water mark,
 and duplicate-integration warning.
@@ -47,8 +47,15 @@ avoid guessing keys or aliases:
 {"tables":[{"name":"example","integration_id":"UUID-FROM-INVENTORY","target_table":"example",
 "target_schema":"public","keys":[{"source":"ID_A","target":"id_a"},
 {"source":"ID_B","target":"id_b"}],"source_date":"DATE_CHANGED",
-"target_date":"date_changed"}]}
+"target_date":"date_changed","source_temporal_mode":"oracle_native_local"}]}
 ```
+
+`source_temporal_mode` is required: use `oracle_native_local` for Oracle
+`DATE`/`TIMESTAMP` columns (naive values mean `Europe/Ljubljana`), or
+`iso8601_text` only for offset-bearing ISO-8601 text. Target values use the
+documented `postgres_timestamp` contract. Composite keys are deliberately
+limited to finite integer/`Decimal` values: text/UUID keys are rejected rather
+than risking an invalid cross-database merge under different collations.
 
 ## 2. Audit the selected tables
 
@@ -70,17 +77,20 @@ guard.
 
 - There is **no data cache**. A repeat intentionally reads live data again,
   because a cached delta result could be stale.
-- Without `--export`, each selected table executes the saved KN integration
-  SQL up to four times: null-date check, eligible null-key check, eligible
-  `DATE_CHANGED < as_of` stream, and post-cutoff key stream. PostgreSQL has
-  equivalent small validation queries plus its two streams.
+- Each normal audit executes exactly one saved KN integration key/date stream
+  and one PostgreSQL target key/date stream per selected table. Both streams
+  include all rows, are ordered by the numeric composite key, and are merged
+  locally; this globally validates null/duplicate/order problems and classifies
+  `DATE_CHANGED < as_of` without extra post-cutoff lookups.
 - `discover` is cheap relative to audit: one metadata query, no KN access.
 - The audit streams rows in batches of 1,000 and initially fetches only the
   composite key and date. It does not use `OFFSET`, load whole key sets into
   memory, or fetch full payloads unless `--export` is explicit.
 - `--limit` reduces artifact examples, **not** source scan workload.
-- `--export` is the heavy mode: it streams full row payloads. Run the audit
-  without it first; export only a confirmed, bounded delta set.
+- `--export` is the heavy mode: only after exact delta counts are known and
+  under the cap, it re-runs bounded per-key reads for the actual delta keys.
+  It never streams full-table payloads or writes a table spool. Evidence is a
+  later re-read (its timestamp is recorded), so it is not a global snapshot.
 
 Recommended repeat workflow:
 

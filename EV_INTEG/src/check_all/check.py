@@ -393,7 +393,11 @@ def keyset_predicate(keys: list[str]) -> str:
 
 def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], after: tuple[Any, ...] | None, *, date_is_text: bool = False) -> str:
     date_column = quote(source_date) if date_is_text else oracle_timestamp_text(quote(source_date), "__CHECK_DATE_CHANGE")
-    columns = ", ".join([quote(source_pk), date_column, *map(quote, page_keys)])
+    # A direct source ID is often both the destination membership PK and the
+    # native page key.  Oracle rejects the resulting duplicate output name in
+    # a derived SELECT, so page keys always receive private checker aliases.
+    page_columns = [f'{quote(key)} AS {quote(f"__CHECK_PAGE_{index}")}' for index, key in enumerate(page_keys)]
+    columns = ", ".join([quote(source_pk), date_column, *page_columns])
     where = "" if after is None else " WHERE " + keyset_predicate(page_keys)
     return f"SELECT {columns} FROM ({sql}) q{where} ORDER BY {', '.join(map(quote, page_keys))} FETCH NEXT :limit ROWS ONLY"
 

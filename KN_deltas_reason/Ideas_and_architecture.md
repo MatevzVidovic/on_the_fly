@@ -52,7 +52,7 @@ flowchart LR
   A[attribute_tables] --> C[attribute_table_integrations]
   B[attribute_table_sql_connections] --> C
   C --> D{connection name = KN ORACLE?}
-  D -- yes --> E[inventory.md + inventory.json]
+  D -- yes --> E[inventory.md + inventory.jsonl]
   D -- no --> X[exclude]
 ```
 
@@ -89,7 +89,8 @@ Create `selected_tables.json` from inventory.
         { "source": "DEL_STAVBE_H_ID", "target": "del_stavbe_h_id" }
       ],
       "source_date": "DATE_CHANGED",
-      "target_date": "date_changed"
+      "target_date": "date_changed",
+      "source_temporal_mode": "oracle_native_local"
     }
   ]
 }
@@ -101,7 +102,11 @@ Rules:
 - Do **not** use LIFT-generated `id`.
 - The saved SQL must expose every source key and `source_date` alias.
 - The PostgreSQL target must expose every target key and `target_date` column.
-- UUID values in the example are placeholders; copy the real value from `inventory.json`.
+- `source_temporal_mode` is mandatory: `oracle_native_local` for Oracle
+  `DATE`/`TIMESTAMP`, or `iso8601_text` for offset-bearing ISO-8601 strings.
+- Keys must be finite numeric values. Text/UUID keys are rejected because an
+  Oracle and PostgreSQL collation cannot safely drive the same merge order.
+- UUID values in the example are placeholders; copy the real value from `inventory.jsonl`.
 
 ## Step 3 — run one stable audit
 
@@ -110,9 +115,9 @@ flowchart TD
   A[--as-of with offset] --> B[parse one instant]
   B --> C[Oracle: saved SELECT]
   B --> D[PostgreSQL: target table]
-  C --> E[eligible rows: source date < as_of]
-  D --> F[eligible rows: target date < as_of]
-  E --> G[ordered composite-key merge]
+  C --> E[one complete key/date stream]
+  D --> F[one complete key/date stream]
+  E --> G[ordered numeric composite-key merge]
   F --> G
   G --> H[report counts + up to --limit examples]
 ```
@@ -147,16 +152,16 @@ flowchart LR
 - `target_only`: row exists in target, not KN integration result.
 - `date_changed_mismatch`: same key; different eligible `DATE_CHANGED`.
 - `post_cutoff_volatile`: counterpart exists only with a value at/after cutoff. Excluded from normal deltas and from default export, so a recent change is not misreported as a historical absence.
-- Null `DATE_CHANGED`, null eligible key, duplicate key, unsafe SQL, mismatched key types, or metadata mismatch: table failure with detail in the report.
+- Null dates/keys, duplicate or unordered keys, nonnumeric keys, unsafe SQL, malformed temporal values, or metadata mismatch: table failure with detail in the report.
 
 ## Optional full evidence export
 
 ```mermaid
 flowchart TD
   A[--export] --> B{category count <= 1000?}
-  B -- yes --> C[spool exact first-pass full payload]
-  B -- no --> D[record count + samples; discard spool]
-  E[--allow-large-export] --> F[permit unlimited spool]
+  B -- yes --> C[bounded per-delta-key rereads]
+  B -- no --> D[record count + samples; no payload read]
+  E[--allow-large-export] --> F[permit unlimited key retention/rereads]
   C --> G[source and target JSONL files]
   F --> G
 ```
@@ -175,11 +180,12 @@ Example:
 - Default cap: 1,000 rows **per category**.
 - `--limit 20` affects samples only, never counts or full-export cap.
 - `--allow-large-export` is an explicit override; it can create large local files.
-- Export rows come from the first comparison pass, not a later reread.
+- Export rows are fetched only after exact counts, in a later per-key reread;
+  the artifact records that reread time and no global snapshot is claimed.
 - `source_only`: full integration projection.
 - `target_only`: full target row.
 - timestamp mismatch: separate source and target full-row files.
-- Over-cap non-overridden exports are skipped safely after retaining only cap + 1 temporary payload rows.
+- Over-cap non-overridden exports are skipped after retaining only cap + 1 key/date payloads, never full rows.
 
 ## Files produced per run
 
@@ -220,4 +226,4 @@ python3 -m venv .venv
 .venv/bin/python -m pytest -q
 ```
 
-Current unit suite: eight tests; database access is not required for it.
+Current unit suite uses fakes; database access is not required for it.
