@@ -6,6 +6,38 @@ If KN enforces Oracle Native Network Encryption/Data Integrity, install Oracle I
 
 Pass a staging table name and a file containing the integration `SELECT`. The query must select all insertable destination columns, use destination-compatible aliases, include a non-null unique membership key, and return no duplicate keys. `--id-field` is required and must name a source/staging field such as `jn_pe_parc_pk`; it cannot be LIFT's generated `id`. For every execution, the utility deletes staging keys absent from KN, then inserts KN keys absent from staging; matching keys are compared and may be updated unless `--ignore-change-field` is used.
 
+## Incremental insert/update-only (`--only-new`)
+
+The normal mode is a complete reconciliation: it scans KN membership and deletes staging rows absent from KN. `--only-new` is the cheaper incremental alternative. It fetches only KN rows whose source watermark is at or after the persisted high-water timestamp, inserts missing keys, updates KN-newer matching rows, and **never deletes** staging rows.
+
+`--only-new --apply` requires `--resumable`, `--source-page-key`, and an explicit `--source-watermark-field`. The watermark must be a native Oracle-comparable timestamp alias, not the ISO text `date_change` field used for PostgreSQL comparison. The included SQL examples expose `kn_delta_date_change` for that purpose. The source page key breaks timestamp ties, so the checkpoint cursor is `(source watermark, native key...)`.
+
+On the first run, the completed watermark is the literal `MAX(date_change)` already in staging; an empty table imports all source rows. The lower timestamp bound is inclusive, so reruns replay equal-timestamp rows safely instead of missing ties. At the start of each invocation the loader freezes the greatest source `(watermark, native key...)` tuple and will not read past it. The completed watermark advances only after that window completes. `--restart` discards an incomplete window but retains the completed watermark.
+
+Example (there are no deletes in this mode):
+
+```sh
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_dst_pripis_podatki_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_dst_pripis_podatki_h_kn.sql \
+  --id-field dst_pripis_podatki_pk \
+  --source-page-key kn_page_id \
+  --source-watermark-field kn_delta_date_change \
+  --change-field DATE_CHANGE \
+  --trust-unique-non-null \
+  --only-new --resumable --apply --auto-page-size
+
+.venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
+  --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
+  --id-field parc_pripis_podatki_pk \
+  --source-page-key kn_page_id \
+  --source-watermark-field kn_delta_date_change \
+  --change-field DATE_CHANGE \
+  --trust-unique-non-null \
+  --only-new --resumable --apply --auto-page-size
+```
+
+Use a periodic normal full reconciliation as well: `--only-new` cannot discover KN deletions, source corrections with an unchanged/backdated `DATE_CHANGE`, or data outside its watermark contract.
+
 The destination-managed LIFT fields `id`, `created_at`, `created_by`, `updated_at`, and `updated_by` are intentionally omitted from the KN query. PostgreSQL generates `id` and timestamps/defaults on insert. By default, matching keys are compared using `DATE_CHANGE`: KN-newer rows are updated, equal rows are left unchanged, and staging-newer rows abort the complete run before any write. Use `--ignore-change-field` for integrations that should use only key membership: delete staging keys absent from KN and insert KN keys absent from staging, while leaving matching keys unchanged.
 
 ### Oracle timezone workaround

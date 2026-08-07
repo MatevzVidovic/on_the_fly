@@ -1,5 +1,7 @@
 from datetime import date, datetime, timezone
 from decimal import Decimal
+import hashlib
+import json
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
@@ -50,6 +52,27 @@ def test_trust_constraint_assertion_uses_its_own_checkpoint() -> None:
     trusted = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), True)
 
     assert standard != trusted
+
+
+def test_only_new_checkpoint_and_auto_profile_are_isolated_from_full_sync() -> None:
+    full = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",))
+    delta = sync.delta_fingerprint_args("SELECT 1", "public", "target", "source_id", "date_change", ("kn_page_id",), "kn_delta_date_change", False)
+    full_profile = sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "data", False)
+    delta_profile = sync.only_new_auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",))
+
+    assert full != delta
+    assert full_profile != delta_profile
+
+
+def test_full_checkpoint_and_profile_hashes_remain_legacy_compatible() -> None:
+    legacy_checkpoint_payload = {"format": 3, "query": "SELECT 1", "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "ignore_change_field": False, "source_page_key": ("kn_page_id",), "trust_unique_non_null": False}
+    legacy_profile_payload = {"query": "SELECT 1", "schema": "public", "table": "target", "id_field": "source_id", "source_page_key": ("kn_page_id",), "category": "data", "ignore_change_field": False}
+    expected_checkpoint = hashlib.sha256(json.dumps(legacy_checkpoint_payload, sort_keys=True).encode()).hexdigest()
+    expected_profile = hashlib.sha256(json.dumps(legacy_profile_payload, sort_keys=True).encode()).hexdigest()
+
+    assert sync.STATE_FORMAT == 3
+    assert sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",)) == expected_checkpoint
+    assert sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "data", False) == expected_profile
 
 
 def test_auto_page_size_retries_first_timeout_at_one_third_without_hidden_retries(monkeypatch, tmp_path: Path) -> None:
@@ -136,6 +159,57 @@ def test_composite_source_keyset_predicate_uses_native_key_order() -> None:
 
     assert "id_pe_parc > :last_key_0" in predicate
     assert "id_pe_parc = :last_key_0 AND jn_rev_num > :last_key_1" in predicate
+
+
+def test_incremental_delta_predicates_have_inclusive_lower_and_bounded_tuple() -> None:
+    upper = sync.tuple_predicate(("kn_delta_date_change", "kn_page_id"), "<=", "upper")
+    assert "kn_delta_date_change < :upper_0" in upper
+    assert "kn_delta_date_change = :upper_0 AND kn_page_id <= :upper_1" in upper
+    predicate = sync.tuple_predicate(("kn_delta_date_change", "kn_page_id"), ">", "after")
+    assert "kn_delta_date_change > :after_0" in predicate
+    assert "kn_delta_date_change = :after_0 AND kn_page_id > :after_1" in predicate
+    three_part_upper = sync.tuple_predicate(("a", "b", "c"), "<=", "upper")
+    assert "a < :upper_0" in three_part_upper
+    assert "a = :upper_0 AND b < :upper_1" in three_part_upper
+    assert "a = :upper_0 AND b = :upper_1 AND c <= :upper_2" in three_part_upper
+
+
+def test_incremental_source_page_strips_watermark_and_page_aliases(monkeypatch) -> None:
+    def page(*_args, **_kwargs):
+        return ["synthetic_pk", "date_change", "kn_page_id", "kn_delta_date_change"], [
+            ("row-1", "2025-01-01T00:00:00", "oracle-1", datetime(2025, 1, 1))
+        ]
+
+    monkeypatch.setattr(sync, "oracle_delta_page", page)
+    rows, cursors, next_cursor = sync.source_delta_full_page(
+        object(), "SELECT 1", "synthetic_pk", ["synthetic_pk", "date_change"],
+        "kn_delta_date_change", ("kn_page_id",), None,
+        (datetime(2025, 1, 1), "oracle-1"), None, 100,
+    )
+
+    assert rows == {"row-1": ("row-1", "2025-01-01T00:00:00")}
+    assert cursors == {"row-1": (datetime(2025, 1, 1), "oracle-1")}
+    assert next_cursor == (datetime(2025, 1, 1), "oracle-1")
+
+
+def test_incremental_dry_projection_uses_only_key_change_watermark_and_page_key(monkeypatch) -> None:
+    seen: list[str] = []
+
+    def page(_db, _query, _watermark, _page_key, projection, *_args, **_kwargs):
+        seen.append(projection)
+        return ["synthetic_pk", "date_change", "kn_delta_date_change", "kn_page_id"], [
+            ("row-1", "2025-01-01", datetime(2025, 1, 1), "oracle-1")
+        ]
+
+    monkeypatch.setattr(sync, "oracle_delta_page", page)
+    changes, cursor = sync.source_delta_change_page(
+        object(), "SELECT 1", "synthetic_pk", "date_change", "kn_delta_date_change",
+        ("kn_page_id",), None, (datetime(2025, 1, 1), "oracle-1"), None, 100,
+    )
+
+    assert seen == ["synthetic_pk, date_change, kn_delta_date_change, kn_page_id"]
+    assert changes == {"row-1": "2025-01-01"}
+    assert cursor == (datetime(2025, 1, 1), "oracle-1")
 
 
 def test_source_page_key_requires_distinct_identifiers() -> None:
