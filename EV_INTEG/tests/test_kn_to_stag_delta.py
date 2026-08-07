@@ -2,6 +2,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 import importlib.util
 from pathlib import Path
+from types import SimpleNamespace
 from uuid import UUID
 
 
@@ -49,6 +50,76 @@ def test_trust_constraint_assertion_uses_its_own_checkpoint() -> None:
     trusted = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), True)
 
     assert standard != trusted
+
+
+def test_auto_page_size_retries_first_timeout_at_one_third_without_hidden_retries(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "AUTO_PAGE_SIZE_DIR", tmp_path / "auto_sizes")
+    args = SimpleNamespace(auto_page_size=True, page_size=90)
+    state: dict[str, object] = {}
+    seen: list[tuple[int, bool]] = []
+
+    def operation(size: int, retry_transient: bool) -> str:
+        seen.append((size, retry_transient))
+        if size == 90:
+            raise RuntimeError("query timeout")
+        return "ok"
+
+    result, used, _successful, _wall = sync.adaptive_source_page(args, state, "profile", "public", "target", "apply", "data", operation)
+
+    assert (result, used, seen, state["effective_page_sizes"]) == ("ok", 30, [(90, False), (30, False)], {"data": 30})
+    # Only the page checkpoint caller persists a successful candidate.
+    assert sync.learned_page_size("profile") is None
+    sync.remember_page_size("profile", used, "public", "target")
+    assert sync.learned_page_size("profile") == 30
+
+
+def test_auto_page_size_does_not_shrink_network_failure(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "AUTO_PAGE_SIZE_DIR", tmp_path / "auto_sizes")
+    args = SimpleNamespace(auto_page_size=True, page_size=90)
+    seen: list[tuple[int, bool]] = []
+
+    def operation(size: int, retry_transient: bool) -> str:
+        seen.append((size, retry_transient))
+        if not retry_transient:
+            raise RuntimeError("network connection lost")
+        return "ok"
+
+    result, used, _successful, _wall = sync.adaptive_source_page(args, {}, "profile", "public", "target", "apply", "data", operation)
+    assert (result, used, seen) == ("ok", 90, [(90, False), (90, True)])
+
+
+def test_oracle_connection_timeouts_are_not_size_relevant() -> None:
+    assert not sync.is_size_relevant_failure(RuntimeError("ORA-12170: TNS:Connect timeout occurred"))
+    assert not sync.is_size_relevant_failure(RuntimeError("connection timeout through SSH tunnel"))
+
+
+def test_bad_auto_profile_falls_back_without_blocking(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "AUTO_PAGE_SIZE_DIR", tmp_path)
+    path = sync.auto_page_size_path("bad")
+    path.write_text("not JSON", encoding="utf-8")
+    assert sync.learned_page_size("bad") is None
+
+
+def test_key_and_data_auto_profiles_are_independent(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "AUTO_PAGE_SIZE_DIR", tmp_path)
+    key_profile = sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "keys", False)
+    data_profile = sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "data", False)
+    sync.remember_page_size(key_profile, 1_000, "public", "target")
+    sync.remember_page_size(data_profile, 333, "public", "target")
+    assert key_profile != data_profile
+    assert (sync.learned_page_size(key_profile), sync.learned_page_size(data_profile)) == (1_000, 333)
+
+
+def test_timing_tracks_phase_specific_pages_and_detects_sustained_slowdown() -> None:
+    state: dict[str, object] = {"source_key_count": 1_000, "applied_rows": 100}
+    assert sync.phase_page_number(state, "apply") == 1
+    assert sync.phase_page_number(state, "preflight") == 1
+    for _ in range(2):
+        _rate, _eta, slow = sync.record_page_timing(state, "apply", 100, 100, 1.0, 1.0)
+        assert slow is None
+    for _ in range(3):
+        _rate, _eta, slow = sync.record_page_timing(state, "apply", 100, 100, 3.0, 3.0)
+    assert slow is not None
 
 
 def test_insert_statement_generates_lift_owned_id_and_timestamps() -> None:

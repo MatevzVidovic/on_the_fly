@@ -136,7 +136,7 @@ def test_diff_data_rejects_a_short_final_page_before_the_expected_kn_count():
     assert reason == "KN scan count 1 != COUNT(*) 2"
 
 
-def test_podatki_column_reference_is_rejected_but_pripis_table_is_allowed(monkeypatch):
+def test_podatki_is_rejected_only_for_split_enota_integrations(monkeypatch):
     class Oracle:
         def cursor(self):
             class C:
@@ -146,9 +146,10 @@ def test_podatki_column_reference_is_rejected_but_pripis_table_is_allowed(monkey
                 def execute(self, *_args): pass
             return C()
     spec = {"kn_table": "DST_PRIPIS_PODATKI", "pk": "dst_pripis_podatki_pk", "source_page_keys": ["dst_pripis_podatki_pk"], "requires_jn_status": False}
-    _, _, ok = check.validate_sql(Oracle(), "SELECT x FROM EV.DST_PRIPIS_PODATKI", spec)
+    _, _, ok = check.validate_sql(Oracle(), "SELECT j.PODATKI FROM EV.DST_PRIPIS_PODATKI j", spec)
     assert not any("PODATKI" in message for message in ok)
-    _, _, bad = check.validate_sql(Oracle(), "SELECT j.PODATKI AS another_name FROM EV.DST_PRIPIS_PODATKI j", spec)
+    split_spec = {**spec, "forbid_podatki": True}
+    _, _, bad = check.validate_sql(Oracle(), "SELECT j.PODATKI AS another_name FROM EV.DST_PRIPIS_PODATKI j", split_spec)
     assert any("PODATKI" in message for message in bad)
 
 

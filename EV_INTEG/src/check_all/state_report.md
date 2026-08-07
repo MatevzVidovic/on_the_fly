@@ -8,9 +8,9 @@
 | ev_parc_del_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_parc_enota_h_2025_danes | FAIL | NOT_CHECKED | NOT_CHECKED | NOT_CHECKED | **FAIL** |
 | ev_parcela_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
-| ev_pe_dst_h | FAIL | FAIL | FAIL | FAIL | **FAIL** |
-| ev_pe_parc_h | PASS | CACHED | PASS | FAIL | **FAIL** |
-| ev_posebna_enota_h | FAIL | FAIL | FAIL | FAIL | **FAIL** |
+| ev_pe_dst_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
+| ev_pe_parc_h | PASS | PASS | PASS | FAIL | **FAIL** |
+| ev_posebna_enota_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_prostor_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
 | ev_stavba_h | PASS | FAIL | PASS | FAIL | **FAIL** |
 | ev_parc_pripis_podatki_h | PASS | FAIL | FAIL | FAIL | **FAIL** |
@@ -39,13 +39,13 @@ Help: https://docs.oracle.com/error-help/db/ora-00904/
 - integration=c469d91a-ae56-11f0-84be-169cd02558fe; connection='KN ORACLE'; titles=['EV H - Parcela']; counts KN/target=26483635/26016639; target MAX(date_change)=2025-05-10T09:56:01.000000 != integration last_changed_datetime=2025-05-10T09:56:55.000000
 ### ev_pe_dst_h
 
-- references forbidden PODATKI column; integration=f5519202-ae65-11f0-adb7-169cd02558fe; connection='KN ORACLE'; titles=['EV H - PE DST']; counts KN/target=209301/195225; target MAX(date_change)=2025-05-09T00:30:01.000000 != integration last_changed_datetime=2025-05-09T00:30:21.000000
+- integration=f5519202-ae65-11f0-adb7-169cd02558fe; connection='KN ORACLE'; titles=['EV H - PE DST']; counts KN/target=209301/195225; target MAX(date_change)=2025-05-09T00:30:01.000000 != integration last_changed_datetime=2025-05-09T00:30:21.000000
 ### ev_pe_parc_h
 
 - integration=26856cbc-ae67-11f0-8b08-169cd02558fe; connection='KN ORACLE'; titles=['EV H - PE parc']; counts KN/target=191788/191788; 2 KN rows are newer than high-water mark
 ### ev_posebna_enota_h
 
-- references forbidden PODATKI column; integration=a75bfb06-ae69-11f0-941e-169cd02558fe; connection='KN ORACLE'; titles=['EV H - Posebna enota']; counts KN/target=44970/35768; target MAX(date_change)=2025-05-09T00:30:01.000000 != integration last_changed_datetime=2025-05-09T00:30:00.000000
+- integration=a75bfb06-ae69-11f0-941e-169cd02558fe; connection='KN ORACLE'; titles=['EV H - Posebna enota']; counts KN/target=44970/35768; target MAX(date_change)=2025-05-09T00:30:01.000000 != integration last_changed_datetime=2025-05-09T00:30:00.000000
 ### ev_prostor_h
 
 - integration=3d6e03ec-ae6e-11f0-bc34-169cd02558fe; connection='KN ORACLE'; titles=['EV H - Prostor']; counts KN/target=4645880/4551070; target MAX(date_change)=2025-05-10T09:56:01.000000 != integration last_changed_datetime=2025-05-10T09:57:41.000000

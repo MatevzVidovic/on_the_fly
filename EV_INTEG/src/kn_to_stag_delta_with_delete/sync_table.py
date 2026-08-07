@@ -34,6 +34,12 @@ LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at",
 PAGE_ONLY_PREFIX = "kn_page_"
 STATE_FORMAT = 3
 _SIGINT_COUNT = 0
+AUTO_PAGE_SIZE_DIR = HERE / ".auto_page_sizes"
+AUTO_PAGE_SIZE_DIVISOR = 3
+# Three consecutive full pages that each take at least twice the earlier
+# median time per row are very unlikely to be normal end-of-result behaviour.
+SLOW_PAGE_WINDOW = 3
+SLOW_PAGE_FACTOR = 2.0
 
 
 def install_sigint_handler() -> None:
@@ -138,6 +144,154 @@ def atomic_json_write(path: Path, value: dict[str, Any]) -> None:
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
+
+
+def read_json_object(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+    try:
+        with path.open(encoding="utf-8") as handle:
+            value = json.load(handle)
+    except (OSError, json.JSONDecodeError) as error:
+        raise RuntimeError(f"JSON settings file is unreadable: {path}") from error
+    if not isinstance(value, dict):
+        raise RuntimeError(f"JSON settings file is invalid: {path}")
+    return value
+
+
+def auto_page_size_profile_key(query: str, schema: str, table: str, id_field: str, page_key: tuple[str, ...], category: str, ignore_change_field: bool) -> str:
+    """Stable identity for the Oracle result shape whose page size is learned."""
+    payload = json.dumps(
+        {"query": query, "schema": schema, "table": table, "id_field": id_field, "source_page_key": page_key, "category": category, "ignore_change_field": ignore_change_field},
+        sort_keys=True,
+    )
+    return hashlib.sha256(payload.encode()).hexdigest()
+
+
+def auto_page_size_path(profile_key: str) -> Path:
+    return AUTO_PAGE_SIZE_DIR / f"{profile_key}.json"
+
+
+def learned_page_size(profile_key: str) -> int | None:
+    try:
+        value = read_json_object(auto_page_size_path(profile_key)).get("page_size")
+    except RuntimeError as error:
+        print(f"warning: ignoring unreadable auto page-size profile: {error}", file=sys.stderr, flush=True)
+        return None
+    return value if isinstance(value, int) and not isinstance(value, bool) and value > 0 else None
+
+
+def remember_page_size(profile_key: str, page_size: int, schema: str, table: str) -> None:
+    try:
+        atomic_json_write(auto_page_size_path(profile_key), {
+            "page_size": page_size,
+            "schema": schema,
+            "table": table,
+            "updated_at": datetime.now().astimezone().isoformat(),
+        })
+    except OSError as error:
+        print(f"warning: could not save optional auto page-size profile: {error}", file=sys.stderr, flush=True)
+
+
+def format_duration(seconds: float | None) -> str:
+    if seconds is None:
+        return "unknown"
+    seconds = max(0, round(seconds))
+    hours, remainder = divmod(seconds, 3600)
+    minutes, seconds = divmod(remainder, 60)
+    return f"{hours:d}:{minutes:02d}:{seconds:02d}" if hours else f"{minutes:d}:{seconds:02d}"
+
+
+def record_page_timing(state: dict[str, Any], phase: str, page_rows: int, page_size: int, wall_elapsed: float, successful_elapsed: float) -> tuple[float, str | None, str | None]:
+    """Store bounded timing history and return a conservative phase ETA."""
+    metrics = state.setdefault("timing", {})
+    phase_metrics = metrics.setdefault(phase, {"elapsed_seconds": 0.0, "rows": 0, "full_page_seconds_per_row": []})
+    phase_metrics["elapsed_seconds"] = float(phase_metrics.get("elapsed_seconds", 0.0)) + wall_elapsed
+    phase_metrics["rows"] = int(phase_metrics.get("rows", 0)) + page_rows
+    history = list(phase_metrics.get("full_page_seconds_per_row", []))
+    slow_reason: str | None = None
+    if page_rows == page_size and page_rows:
+        sample = successful_elapsed / page_rows
+        history.append(sample)
+        # Keep enough older measurements for a meaningful baseline without
+        # making checkpoint files grow with a large integration.
+        history = history[-12:]
+        if len(history) >= SLOW_PAGE_WINDOW + 2:
+            recent = history[-SLOW_PAGE_WINDOW:]
+            baseline = sorted(history[:-SLOW_PAGE_WINDOW])[len(history[:-SLOW_PAGE_WINDOW]) // 2]
+            if baseline > 0 and all(value >= baseline * SLOW_PAGE_FACTOR for value in recent):
+                slow_reason = (
+                    f"three full {phase} pages are at least {SLOW_PAGE_FACTOR:g}x slower per row "
+                    f"than the earlier median"
+                )
+    phase_metrics["full_page_seconds_per_row"] = history
+    total = state.get("source_key_count") if phase in {"apply", "verify"} else None
+    if not isinstance(total, int) or total <= page_rows:
+        aggregate_elapsed = float(phase_metrics["elapsed_seconds"])
+        aggregate_rows = int(phase_metrics["rows"])
+        return (aggregate_rows / aggregate_elapsed if aggregate_elapsed else float("inf")), None, slow_reason
+    aggregate_elapsed = float(phase_metrics["elapsed_seconds"])
+    aggregate_rows = int(phase_metrics["rows"])
+    rate = aggregate_rows / aggregate_elapsed if aggregate_elapsed else float("inf")
+    done = int(state.get({"apply": "applied_rows", "verify": "verified_rows"}[phase], 0)) if phase in {"apply", "verify"} else 0
+    eta = (total - done) / rate if rate else None
+    return rate, (f"ETA {format_duration(eta)}" if eta is not None else None), slow_reason
+
+
+def phase_page_number(state: dict[str, Any], phase: str) -> int:
+    counts = state.setdefault("phase_pages", {})
+    counts[phase] = int(counts.get(phase, 0)) + 1
+    return counts[phase]
+
+
+def is_size_relevant_failure(error: Exception) -> bool:
+    """Failures for which fewer fetched rows can realistically help."""
+    text = str(error).lower()
+    return any(marker in text for marker in (
+        "fetch timeout", "read timeout", "query timeout", "ora-04030", "ora-04031",
+        "out of memory", "memory allocation", "dpi-1015", "array size", "fetch buffer",
+    ))
+
+
+def adaptive_source_page(args: argparse.Namespace, state: dict[str, Any], profile_key: str, schema: str, table: str, phase: str, category: str, operation: Any) -> tuple[Any, int, float, float]:
+    """Read one Oracle page, with at most three 3x size reductions in auto mode."""
+    sizes = state.setdefault("effective_page_sizes", {})
+    page_size = int(sizes.get(category, args.page_size)) if args.auto_page_size else args.page_size
+    reductions = 0
+    logical_started = time.perf_counter()
+    while True:
+        started = time.perf_counter()
+        try:
+            # Auto sizing must observe the first candidate failure itself.
+            return operation(page_size, not args.auto_page_size), page_size, time.perf_counter() - started, time.perf_counter() - logical_started
+        except Exception as error:
+            if not args.auto_page_size:
+                raise
+            if not is_size_relevant_failure(error):
+                # Network/lost-contact failures are unrelated to row count;
+                # retain ordinary transient retry rather than shrinking.
+                try:
+                    retried_started = time.perf_counter()
+                    result = operation(page_size, True)
+                    return result, page_size, time.perf_counter() - retried_started, time.perf_counter() - logical_started
+                except Exception as retry_error:
+                    error = retry_error
+                    if not is_size_relevant_failure(error):
+                        raise error
+            if page_size <= 1 or reductions >= 3:
+                raise
+            smaller = max(1, page_size // AUTO_PAGE_SIZE_DIVISOR)
+            if smaller == page_size:
+                raise
+            print(
+                f"{phase} page read failed at page size {page_size}: {error}; "
+                f"retrying the same cursor at {smaller}",
+                file=sys.stderr,
+                flush=True,
+            )
+            page_size = smaller
+            sizes[category] = page_size
+            reductions += 1
 
 
 def read_checkpoint(path: Path) -> dict[str, Any] | None:
@@ -584,7 +738,7 @@ def composite_keyset_predicate(page_key: tuple[str, ...], has_cursor: bool) -> s
     return " WHERE (" + " OR ".join(f"({branch})" for branch in branches) + ")"
 
 
-def oracle_page(oracledb: Any, query: str, page_key: tuple[str, ...], projection: str, after_key: tuple[Any, ...] | None, page_size: int) -> tuple[list[str], list[tuple[Any, ...]]]:
+def oracle_page(oracledb: Any, query: str, page_key: tuple[str, ...], projection: str, after_key: tuple[Any, ...] | None, page_size: int, retry_transient: bool = True) -> tuple[list[str], list[tuple[Any, ...]]]:
     """Fetch a deterministic keyset page from the integration SELECT."""
     def operation() -> tuple[list[str], list[tuple[Any, ...]]]:
         with oracledb.connect(**oracle_settings(oracledb)) as connection:
@@ -597,13 +751,13 @@ def oracle_page(oracledb: Any, query: str, page_key: tuple[str, ...], projection
                 cursor.execute(paged, binds)
                 names = [description[0].lower() for description in cursor.description]
                 return names, [tuple(scalar(value) for value in row) for row in cursor.fetchall()]
-    return retry(operation)
+    return retry(operation) if retry_transient else operation()
 
 
-def source_change_page(oracledb: Any, query: str, id_field: str, change_field: str | None, page_key: tuple[str, ...], after_key: tuple[Any, ...] | None, page_size: int) -> tuple[dict[Any, Any], dict[Any, tuple[Any, ...]], tuple[Any, ...] | None]:
+def source_change_page(oracledb: Any, query: str, id_field: str, change_field: str | None, page_key: tuple[str, ...], after_key: tuple[Any, ...] | None, page_size: int, retry_transient: bool = True) -> tuple[dict[Any, Any], dict[Any, tuple[Any, ...]], tuple[Any, ...] | None]:
     selected = list(dict.fromkeys([id_field, *(() if change_field is None else (change_field,)), *page_key]))
     projection = ", ".join(selected)
-    names, rows = oracle_page(oracledb, query, page_key, projection, after_key, page_size)
+    names, rows = oracle_page(oracledb, query, page_key, projection, after_key, page_size, retry_transient)
     expected = selected
     if names != expected:
         raise RuntimeError(f"integration SQL key projection did not match expected columns: {expected}; got {names}")
@@ -657,8 +811,8 @@ def require_source_invariants(oracledb: Any, query: str, id_field: str, page_key
     retry(operation)
 
 
-def source_full_page(oracledb: Any, query: str, id_field: str, source_columns: list[str], page_key: tuple[str, ...], after_key: tuple[Any, ...] | None, page_size: int) -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]], tuple[Any, ...] | None]:
-    names, rows = oracle_page(oracledb, query, page_key, "source_rows.*", after_key, page_size)
+def source_full_page(oracledb: Any, query: str, id_field: str, source_columns: list[str], page_key: tuple[str, ...], after_key: tuple[Any, ...] | None, page_size: int, retry_transient: bool = True) -> tuple[dict[Any, tuple[Any, ...]], dict[Any, tuple[Any, ...]], tuple[Any, ...] | None]:
+    names, rows = oracle_page(oracledb, query, page_key, "source_rows.*", after_key, page_size, retry_transient)
     validate_source_output(names, source_columns, page_key)
     positions = [names.index(column) for column in source_columns]
     page_positions = [names.index(field) for field in page_key]
@@ -713,6 +867,8 @@ def save_state(path: Path, state: dict[str, Any], *, phase: str, cursor: Any, pa
 
 def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
     fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.trust_unique_non_null)
+    key_profile_key = auto_page_size_profile_key(query, schema, table, id_field, page_key, "keys", args.ignore_change_field)
+    data_profile_key = auto_page_size_profile_key(query, schema, table, id_field, page_key, "data", args.ignore_change_field)
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
     if not args.apply:
         raise RuntimeError("--resumable is only available with --apply; dry-run is already read-only")
@@ -740,14 +896,45 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             raise RuntimeError(f"integration/staging table must contain {change_field}, or use --ignore-change-field")
         if not state:
             require_source_invariants(oracledb, query, id_field, page_key, source_columns)
+            learned_key_size = learned_page_size(key_profile_key) if args.auto_page_size else None
+            learned_data_size = learned_page_size(data_profile_key) if args.auto_page_size else None
             state = {
                 "format": STATE_FORMAT, "fingerprint": fingerprint, "schema": schema, "table": table,
                 "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key),
                 "ignore_change_field": args.ignore_change_field, "trust_unique_non_null": args.trust_unique_non_null,
+                "auto_page_size": args.auto_page_size,
                 "phase": "preflight", "source_cursor": None,
                 "verify_cursor": None, "delete_cursor": None, "pages": 0, "rows": 0, "status": "running",
                 "preflight_rows": 0, "applied_rows": 0, "verified_rows": 0, "delete_scanned": 0, "deleted": 0,
+                "phase_pages": {"preflight": 0, "apply": 0, "verify": 0, "delete": 0},
+                "timing": {},
             }
+            if args.auto_page_size:
+                state["effective_page_sizes"] = {
+                    "keys": min(learned_key_size or args.page_size, args.page_size),
+                    "data": min(learned_data_size or args.page_size, args.page_size),
+                }
+            atomic_json_write(checkpoint, state)
+            if learned_key_size or learned_data_size:
+                print(f"auto page size: using learned key/data sizes {state['effective_page_sizes']['keys']}/{state['effective_page_sizes']['data']} for {schema}.{table}")
+        elif args.auto_page_size or state.get("auto_page_size"):
+            # A learned size is deliberately kept outside the restartable
+            # checkpoint, then copied in once for a new logical run.
+            args.auto_page_size = True
+            state["auto_page_size"] = True
+            old_size = state.pop("effective_page_size", None)
+            sizes = state.setdefault("effective_page_sizes", {})
+            sizes["keys"] = min(int(sizes.get("keys", old_size or learned_page_size(key_profile_key) or args.page_size)), args.page_size)
+            sizes["data"] = min(int(sizes.get("data", old_size or learned_page_size(data_profile_key) or args.page_size)), args.page_size)
+        state.setdefault("phase_pages", {"preflight": 0, "apply": 0, "verify": 0, "delete": 0})
+        state.setdefault("timing", {})
+        if state.get("status") == "paused_performance_degraded":
+            # An explicit rerun acknowledges the warning.  Do not immediately
+            # trip again on the same historical samples.
+            state["status"] = "running"
+            for phase_metrics in state["timing"].values():
+                if isinstance(phase_metrics, dict):
+                    phase_metrics["full_page_seconds_per_row"] = []
             atomic_json_write(checkpoint, state)
         keys = key_database(key_path)
         try:
@@ -775,7 +962,11 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     print("stopped at --max-pages; rerun with --resumable --apply to continue")
                     return 0
                 if phase == "preflight":
-                    kn_changes, page_cursors, next_cursor = source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, args.page_size)
+                    (kn_changes, page_cursors, next_cursor), used_page_size, successful_fetch_elapsed, logical_fetch_elapsed = adaptive_source_page(
+                        args, state, key_profile_key, schema, table, phase, "keys",
+                        lambda size, retry_transient: source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, size, retry_transient),
+                    )
+                    page_started = time.perf_counter()
                     if not kn_changes:
                         phase, cursor = "apply", None
                         state.update(key_index_complete=True, source_key_count=key_count(keys))
@@ -794,14 +985,28 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     page_count += 1
                     rows += len(kn_changes)
                     state["preflight_rows"] = int(state.get("preflight_rows", 0)) + len(kn_changes)
+                    phase_page = phase_page_number(state, phase)
+                    processing_elapsed = time.perf_counter() - page_started
+                    rate, eta, slow_reason = record_page_timing(state, phase, len(kn_changes), used_page_size, logical_fetch_elapsed + processing_elapsed, successful_fetch_elapsed + processing_elapsed)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
+                    if args.auto_page_size:
+                        remember_page_size(key_profile_key, used_page_size, schema, table)
                     print(
-                        f"preflight committed page {page_count} "
-                        f"({len(kn_changes)} keys; total {state['preflight_rows']})"
+                        f"preflight committed page {phase_page} ({len(kn_changes)} keys; total {state['preflight_rows']}; "
+                        f"page size {used_page_size}; {rate:,.0f} keys/s; elapsed {format_duration(state['timing'][phase]['elapsed_seconds'])})"
                     )
+                    if slow_reason:
+                        state["status"] = "paused_performance_degraded"
+                        atomic_json_write(checkpoint, state)
+                        print(f"stopped safely after checkpoint: {slow_reason}", file=sys.stderr)
+                        return 3
                     continue
                 if phase == "apply":
-                    source, page_cursors, next_cursor = source_full_page(oracledb, query, id_field, source_columns, page_key, cursor, args.page_size)
+                    (source, page_cursors, next_cursor), used_page_size, successful_fetch_elapsed, logical_fetch_elapsed = adaptive_source_page(
+                        args, state, data_profile_key, schema, table, phase, "data",
+                        lambda size, retry_transient: source_full_page(oracledb, query, id_field, source_columns, page_key, cursor, size, retry_transient),
+                    )
+                    page_started = time.perf_counter()
                     if not source:
                         phase, cursor = "verify", None
                         state["verified_rows"] = 0
@@ -830,14 +1035,29 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     page_count += 1
                     rows += len(source)
                     state["applied_rows"] = int(state.get("applied_rows", 0)) + len(source)
+                    phase_page = phase_page_number(state, phase)
+                    processing_elapsed = time.perf_counter() - page_started
+                    rate, eta, slow_reason = record_page_timing(state, phase, len(source), used_page_size, logical_fetch_elapsed + processing_elapsed, successful_fetch_elapsed + processing_elapsed)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
+                    if args.auto_page_size:
+                        remember_page_size(data_profile_key, used_page_size, schema, table)
                     print(
-                        f"apply committed page {page_count} "
-                        f"({len(source)} rows; total {state['applied_rows']})"
+                        f"apply committed page {phase_page} ({len(source)} rows; total {state['applied_rows']}; "
+                        f"page size {used_page_size}; {rate:,.0f} rows/s; elapsed {format_duration(state['timing'][phase]['elapsed_seconds'])}"
+                        f"{'; ' + eta if eta else ''})"
                     )
+                    if slow_reason:
+                        state["status"] = "paused_performance_degraded"
+                        atomic_json_write(checkpoint, state)
+                        print(f"stopped safely after checkpoint: {slow_reason}", file=sys.stderr)
+                        return 3
                     continue
                 if phase == "verify":
-                    kn_changes, page_cursors, next_cursor = source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, args.page_size)
+                    (kn_changes, page_cursors, next_cursor), used_page_size, successful_fetch_elapsed, logical_fetch_elapsed = adaptive_source_page(
+                        args, state, key_profile_key, schema, table, phase, "keys",
+                        lambda size, retry_transient: source_change_page(oracledb, query, id_field, None if args.ignore_change_field else change_field, page_key, cursor, size, retry_transient),
+                    )
+                    page_started = time.perf_counter()
                     if not kn_changes:
                         if int(state.get("verified_rows", 0)) != key_count(keys):
                             state.update(phase="verification_failed", status="source_changed")
@@ -854,12 +1074,28 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     page_count += 1
                     rows += len(kn_changes)
                     state["verified_rows"] = int(state.get("verified_rows", 0)) + len(kn_changes)
+                    phase_page = phase_page_number(state, phase)
+                    processing_elapsed = time.perf_counter() - page_started
+                    rate, eta, slow_reason = record_page_timing(state, phase, len(kn_changes), used_page_size, logical_fetch_elapsed + processing_elapsed, successful_fetch_elapsed + processing_elapsed)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
-                    print(f"verify committed page {page_count} ({len(kn_changes)} rows; total {state['verified_rows']})")
+                    if args.auto_page_size:
+                        remember_page_size(key_profile_key, used_page_size, schema, table)
+                    print(
+                        f"verify committed page {phase_page} ({len(kn_changes)} rows; total {state['verified_rows']}; "
+                        f"page size {used_page_size}; {rate:,.0f} rows/s; elapsed {format_duration(state['timing'][phase]['elapsed_seconds'])}"
+                        f"{'; ' + eta if eta else ''})"
+                    )
+                    if slow_reason:
+                        state["status"] = "paused_performance_degraded"
+                        atomic_json_write(checkpoint, state)
+                        print(f"stopped safely after checkpoint: {slow_reason}", file=sys.stderr)
+                        return 3
                     continue
                 if phase == "delete":
+                    page_started = time.perf_counter()
+                    used_page_size = args.page_size
                     with psycopg.connect(**pg_settings()) as connection:
-                        identifiers = staging_key_page(connection, schema, table, id_field, cursor, args.page_size)
+                        identifiers = staging_key_page(connection, schema, table, id_field, cursor, used_page_size)
                         if not identifiers:
                             state.update(phase="complete", status="complete", completed_at=datetime.now().astimezone().isoformat())
                             atomic_json_write(checkpoint, state)
@@ -882,8 +1118,19 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
                     rows += len(identifiers)
                     state["delete_scanned"] = int(state.get("delete_scanned", 0)) + len(identifiers)
                     state["deleted"] = int(state.get("deleted", 0)) + len(delete_ids)
+                    phase_page = phase_page_number(state, phase)
+                    elapsed = time.perf_counter() - page_started
+                    rate, _eta, slow_reason = record_page_timing(state, phase, len(identifiers), used_page_size, elapsed, elapsed)
                     save_state(checkpoint, state, phase=phase, cursor=cursor, page_count=page_count, rows=rows)
-                    print(f"delete committed page {page_count} ({len(delete_ids)} deleted; scanned {len(identifiers)})")
+                    print(
+                        f"delete committed page {phase_page} ({len(delete_ids)} deleted; scanned {len(identifiers)}; "
+                        f"page size {used_page_size}; {rate:,.0f} rows/s; elapsed {format_duration(state['timing'][phase]['elapsed_seconds'])})"
+                    )
+                    if slow_reason:
+                        state["status"] = "paused_performance_degraded"
+                        atomic_json_write(checkpoint, state)
+                        print(f"stopped safely after checkpoint: {slow_reason}", file=sys.stderr)
+                        return 3
                     continue
                 raise RuntimeError(f"unknown resumable checkpoint phase: {phase}")
         finally:
@@ -908,17 +1155,24 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--restart", action="store_true", help="remove only this integration's resumable checkpoint and key index")
     parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
     parser.add_argument("--batch-size", type=int, default=1_000)
-    parser.add_argument("--page-size", type=int, default=1_000, help="rows per resumable page (default: 1000)")
+    parser.add_argument("--page-size", type=int, default=50_000, help="initial rows per resumable page (default: 50000)")
+    parser.add_argument("--page-size-cap", type=int, default=50_000, help="maximum rows per resumable page, including learned auto sizes (default: 50000)")
+    parser.add_argument("--auto-page-size", action="store_true", help="on retryable Oracle page-read failure, reduce page size by 3x and persist the successful size for this integration")
     parser.add_argument("--max-pages", type=int, help="stop cleanly after this many resumable pages")
     args = parser.parse_args()
-    if args.preview_limit < 0 or args.batch_size <= 0 or args.page_size <= 0:
-        parser.error("--preview-limit must be non-negative and --batch-size/--page-size must be positive")
+    if args.preview_limit < 0 or args.batch_size <= 0 or args.page_size <= 0 or args.page_size_cap <= 0:
+        parser.error("--preview-limit must be non-negative and --batch-size/--page-size/--page-size-cap must be positive")
+    # Store the effective value in one place so fixed-size delete pages and
+    # learned auto sizes never exceed the operator's explicit cap.
+    args.page_size = min(args.page_size, args.page_size_cap)
     if (args.status or args.restart) and not args.resumable:
         parser.error("--status and --restart require --resumable")
     if args.resumable and not args.source_page_key:
         parser.error("--resumable requires --source-page-key")
     if args.trust_unique_non_null and not args.resumable:
         parser.error("--trust-unique-non-null requires --resumable")
+    if args.auto_page_size and not args.resumable:
+        parser.error("--auto-page-size requires --resumable")
     return args
 
 

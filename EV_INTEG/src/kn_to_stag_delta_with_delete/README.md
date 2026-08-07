@@ -53,7 +53,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
-  --resumable --apply --page-size 20000
+  --resumable --apply --page-size 20000 --auto-page-size
 
 .venv/bin/python src/kn_to_stag_delta_with_delete/sync_table.py ev_parc_pripis_podatki_h \
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_parc_pripis_podatki_h_kn.sql \
@@ -61,7 +61,7 @@ Dry-run fetches only the key and comparison field from KN (and the same two fiel
   --source-page-key kn_page_id \
   --change-field DATE_CHANGE \
   --trust-unique-non-null \
-  --resumable --apply --page-size 20000
+  --resumable --apply --page-size 20000 --auto-page-size
 ```
 
 ## Dry-run: use only key membership
@@ -91,12 +91,14 @@ Add `--resumable` to use keyset pages and a locally persisted checkpoint. Each i
   --integration-sql ./src/kn_to_stag_delta_with_delete/ev_pe_parc_h.sql \
   --id-field jn_pe_parc_pk --change-field DATE_CHANGE \
   --source-page-key id_pe_parc,jn_rev_num \
-  --resumable --apply
+  --resumable --apply --auto-page-size
 ```
 
 `--source-page-key` is required for resumable runs. It is the native KN key (one or more integration-query aliases) in the same order as an all-ascending KN index; it controls Oracle paging only. `--id-field` remains the destination membership key. A paging field that is not a staging column must be selected with a `kn_page_` alias, for example `j."ID" AS kn_page_id`; those fields are never inserted or updated in PostgreSQL. For `ev_pe_parc_h`, use `id_pe_parc,jn_rev_num`; for the two direct-ID examples, use `kn_page_id`.
 
-Before writing, resumable mode validates that both the KN membership ID and the complete native page tuple are non-null and unique. By default, the staging membership column must have a non-partial unique index and a `NOT NULL` constraint. If those constraints are not present but you know the existing staging data is already unique and non-null, add `--trust-unique-non-null` to bypass only that metadata check. This is an operator assertion: duplicate or null staging keys can invalidate resumable update/delete behavior. The loader stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. Use `--page-size 1000` to tune page size and `--max-pages N` to stop cleanly for testing.
+Before writing, resumable mode validates that both the KN membership ID and the complete native page tuple are non-null and unique. By default, the staging membership column must have a non-partial unique index and a `NOT NULL` constraint. If those constraints are not present but you know the existing staging data is already unique and non-null, add `--trust-unique-non-null` to bypass only that metadata check. This is an operator assertion: duplicate or null staging keys can invalidate resumable update/delete behavior. The loader stores typed ID/page-key values and (when enabled) `DATE_CHANGE` in a fingerprinted local state directory. After inserts and updates, it fully re-scans KN and verifies that the same IDs, page tuples, and change values are still present before it starts deleting staging-only rows. A changed source leaves the run in a terminal `source_changed` state; use `--restart` to begin again. The default initial page size and cap are both `50000`; use `--page-size N` to choose a smaller/larger starting size and `--page-size-cap N` to enforce a maximum for every resumable page, including learned auto sizes. Use `--max-pages N` to stop cleanly for testing.
+
+Add `--auto-page-size` to make size-relevant Oracle page-read failures (fetch/query timeout, array/resource, or memory pressure) retry the same checkpoint cursor at one-third of the previous size. Connection, SSH-tunnel, network, and lost-contact failures keep the same size and use ordinary transient retry. The learned size is saved in `src/kn_to_stag_delta_with_delete/.auto_page_sizes/`, keyed by the table and integration query, and is reused by future matching auto-sized runs, including after `--restart`. You may add the flag to an already-checkpointed run without discarding its progress. The loader prints separate preflight/apply/verify/delete page numbers, page size, throughput, and phase elapsed time. Once preflight establishes the source total, apply and verify also print a simple ETA. As a conservative protection against sustained slowdown, it safely pauses after checkpointing when three full pages are each at least twice as slow per row as the earlier median; rerun the identical command to continue after investigating.
 
 ```sh
 # Inspect progress without database credentials.
