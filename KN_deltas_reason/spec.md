@@ -14,6 +14,15 @@ We will identify what rows are the deltas. Then if the 2 delta sets (extra in ea
 look at EV_INTEG to see how kn connection works and other conections work and all that
 
 
+We have to perform the checks with the integration sql select
+BUT
+We need to do comparisons with sth like DATE_CHANGED < some_timestamp_we_choose
+Because the data can be changing all the time on KN and we need a stable delta check.
+
+Also, when we get the deltas and export them and such, we should have that export have a datetime attached to it, so we know both when we ran that and what we chose as that condition for the where.
+
+Also, we should have a --limit flag for how many of the deltas we actually take as examples. By default it should be 20.
+
 
 
 
