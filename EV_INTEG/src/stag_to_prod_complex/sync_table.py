@@ -69,7 +69,7 @@ def unique_index(conn: Any, schema: str, table: str, key: str) -> bool:
     sql = """SELECT 1 FROM pg_index i JOIN pg_class t ON t.oid=i.indrelid JOIN pg_namespace n ON n.oid=t.relnamespace JOIN pg_class idx ON idx.oid=i.indexrelid
       WHERE n.nspname=%s AND t.relname=%s AND i.indisunique AND i.indpred IS NULL
       AND i.indisvalid AND i.indisready AND idx.relam = (SELECT oid FROM pg_am WHERE amname='btree')
-      AND (SELECT array_agg(a.attname ORDER BY x.ord) FROM unnest(i.indkey) WITH ORDINALITY x(attnum,ord) JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=x.attnum WHERE x.ord <= i.indnkeyatts) = ARRAY[%s] LIMIT 1"""
+      AND (SELECT array_agg(a.attname ORDER BY x.ord) FROM unnest(i.indkey) WITH ORDINALITY x(attnum,ord) JOIN pg_attribute a ON a.attrelid=t.oid AND a.attnum=x.attnum WHERE x.ord <= i.indnkeyatts) = ARRAY[%s]::name[] LIMIT 1"""
     with conn.cursor() as c: c.execute(sql,(schema,table,key)); return c.fetchone() is not None
 
 def schema_signature(conn: Any, schema: str, table: str, copied: list[str]) -> list[tuple[str,str,str|None]]:
@@ -352,6 +352,9 @@ def main()->int:
                 if not db.execute("SELECT 1 FROM meta WHERE key='manifest_done'").fetchone():
                     # A single stable staging snapshot is the contract for the
                     # persisted manifest; SQLite checkpoints are independent.
+                    # schema_signature() performed catalog reads, so close its
+                    # implicit transaction before SET TRANSACTION below.
+                    stag.commit()
                     with stag.transaction():
                         with stag.cursor() as c: c.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
                         stream_manifest(stag,db,schema,table,cols,key,changed,a.progress_every)

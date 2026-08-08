@@ -59,6 +59,7 @@ def test_unique_index_catalog_query_uses_index_relation_btree_and_key_attributes
     assert "x.ord <= i.indnkeyatts" in cursor.sql
     assert "indkey[" not in cursor.sql
     assert "i.indam" not in cursor.sql
+    assert "ARRAY[%s]::name[]" in cursor.sql
 
 
 def test_preflight_membership_does_not_compare_cross_database_text_order(monkeypatch, tmp_path) -> None:
