@@ -4,6 +4,7 @@ import hashlib
 import json
 import importlib.util
 from pathlib import Path
+import sys
 from types import SimpleNamespace
 from uuid import UUID
 
@@ -47,11 +48,12 @@ def test_resumable_state_paths_are_isolated_per_integration() -> None:
     assert second[0].parent.name == "b" * 64
 
 
-def test_trust_constraint_assertion_uses_its_own_checkpoint() -> None:
+def test_constraint_overrides_use_distinct_checkpoints() -> None:
     standard = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",))
-    trusted = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), True)
+    nullable = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), True, False)
+    non_unique = sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",), False, True)
 
-    assert standard != trusted
+    assert len({standard, nullable, non_unique}) == 3
 
 
 def test_only_new_checkpoint_and_auto_profile_are_isolated_from_full_sync() -> None:
@@ -64,13 +66,13 @@ def test_only_new_checkpoint_and_auto_profile_are_isolated_from_full_sync() -> N
     assert full_profile != delta_profile
 
 
-def test_full_checkpoint_and_profile_hashes_remain_legacy_compatible() -> None:
-    legacy_checkpoint_payload = {"format": 3, "query": "SELECT 1", "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "ignore_change_field": False, "source_page_key": ("kn_page_id",), "trust_unique_non_null": False}
+def test_full_checkpoint_hash_uses_split_constraint_policy() -> None:
+    checkpoint_payload = {"format": 4, "query": "SELECT 1", "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "ignore_change_field": False, "source_page_key": ("kn_page_id",), "ignore_not_null_constraint": False, "ignore_unique_constraint": False}
     legacy_profile_payload = {"query": "SELECT 1", "schema": "public", "table": "target", "id_field": "source_id", "source_page_key": ("kn_page_id",), "category": "data", "ignore_change_field": False}
-    expected_checkpoint = hashlib.sha256(json.dumps(legacy_checkpoint_payload, sort_keys=True).encode()).hexdigest()
+    expected_checkpoint = hashlib.sha256(json.dumps(checkpoint_payload, sort_keys=True).encode()).hexdigest()
     expected_profile = hashlib.sha256(json.dumps(legacy_profile_payload, sort_keys=True).encode()).hexdigest()
 
-    assert sync.STATE_FORMAT == 3
+    assert sync.STATE_FORMAT == 4
     assert sync.sync_fingerprint("SELECT 1", "public", "target", "source_id", "date_change", False, ("kn_page_id",)) == expected_checkpoint
     assert sync.auto_page_size_profile_key("SELECT 1", "public", "target", "source_id", ("kn_page_id",), "data", False) == expected_profile
 
@@ -608,3 +610,143 @@ def test_require_unique_key_rejects_nullable_key() -> None:
     else:
         raise AssertionError("nullable resumable key must be rejected")
     assert "i.indpred IS NULL" in connection.cursor_instance.statements[0]
+
+
+def test_require_unique_key_overrides_are_independent() -> None:
+    class Cursor:
+        def __init__(self, responses):
+            self.responses = iter(responses)
+            self.statements: list[str] = []
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *_args):
+            return False
+
+        def execute(self, statement, _parameters):
+            self.statements.append(statement)
+
+        def fetchone(self):
+            return next(self.responses)
+
+    class Connection:
+        def __init__(self, responses):
+            self.cursor_instance = Cursor(responses)
+
+        def cursor(self):
+            return self.cursor_instance
+
+    # Nullable is allowed only by the null override; the unique query still runs.
+    sync.require_unique_key(Connection([(1,), ("YES",)]), "public", "target", "source_id", ignore_not_null_constraint=True)
+    # Missing unique is allowed only by the unique override; NOT NULL still runs.
+    sync.require_unique_key(Connection([("NO",)]), "public", "target", "source_id", ignore_unique_constraint=True)
+    try:
+        sync.require_unique_key(Connection([None]), "public", "target", "source_id", ignore_not_null_constraint=True)
+    except RuntimeError as error:
+        assert "unique key" in str(error)
+    else:
+        raise AssertionError("null override must not bypass uniqueness")
+    try:
+        sync.require_unique_key(Connection([(1,), ("YES",)]), "public", "target", "source_id", ignore_unique_constraint=True)
+    except RuntimeError as error:
+        assert "NOT NULL" in str(error)
+    else:
+        raise AssertionError("unique override must not bypass NOT NULL")
+
+
+def test_constraint_override_argument_validation(monkeypatch) -> None:
+    base = ["sync_table.py", "target", "--integration-sql", "query.sql", "--id-field", "source_id", "--resumable", "--source-page-key", "source_id"]
+    monkeypatch.setattr(sys, "argv", [*base, "--ignore-not-null-constraint"])
+    assert sync.parse_args().ignore_not_null_constraint is True
+    monkeypatch.setattr(sys, "argv", [*base, "--only-new", "--ignore-not-null-constraint"])
+    try:
+        sync.parse_args()
+    except SystemExit as error:
+        assert error.code == 2
+    else:
+        raise AssertionError("only-new must reject the null-constraint override")
+    monkeypatch.setattr(sys, "argv", [*base, "--trust-unique-non-null"])
+    try:
+        sync.parse_args()
+    except SystemExit as error:
+        assert error.code == 2
+    else:
+        raise AssertionError("removed combined override must not be accepted")
+
+
+def test_legacy_state_discovery_is_exact_to_query_and_finds_policy_variants(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "HERE", tmp_path)
+    query = "SELECT source_id, date_change FROM source"
+    common = {"format": 3, "query": query, "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "ignore_change_field": False, "source_page_key": ("source_id",)}
+    for trusted in (False, True):
+        payload = {**common, "trust_unique_non_null": trusted}
+        fingerprint = sync.fingerprint_payload(payload)
+        checkpoint, _key, _lock = sync.resumable_paths(fingerprint)
+        checkpoint.parent.mkdir(parents=True)
+        sync.atomic_json_write(checkpoint, {**payload, "fingerprint": fingerprint, "phase": "apply"})
+    unrelated = {**common, "query": "SELECT source_id, date_change FROM other", "trust_unique_non_null": False}
+    unrelated_fingerprint = sync.fingerprint_payload(unrelated)
+    unrelated_checkpoint, _key, _lock = sync.resumable_paths(unrelated_fingerprint)
+    unrelated_checkpoint.parent.mkdir(parents=True)
+    sync.atomic_json_write(unrelated_checkpoint, {**unrelated, "fingerprint": unrelated_fingerprint, "phase": "apply"})
+
+    matches = sync.legacy_full_states(query, "public", "target", "source_id", "date_change", False, ("source_id",))
+
+    assert {state["trust_unique_non_null"] for _path, state in matches} == {False, True}
+    assert unrelated_checkpoint not in {path for path, _state in matches}
+
+
+def test_only_new_related_state_discovery_is_exact_and_includes_other_policy(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "HERE", tmp_path)
+    query = "SELECT source_id, date_change FROM source"
+    for ignore_unique in (False, True):
+        fingerprint = sync.delta_fingerprint_args(query, "public", "target", "source_id", "date_change", ("source_id",), ignore_unique)
+        checkpoint, _key, _lock = sync.resumable_paths(fingerprint)
+        checkpoint.parent.mkdir(parents=True)
+        sync.atomic_json_write(checkpoint, {"format": sync.ONLY_NEW_STATE_FORMAT, "fingerprint": fingerprint, "mode": "only_new", "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "source_page_key": ["source_id"], "ignore_unique_constraint": ignore_unique, "phase": "delta", "completed_watermark": None})
+    unrelated_fingerprint = sync.delta_fingerprint_args("SELECT source_id, date_change FROM other", "public", "target", "source_id", "date_change", ("source_id",), False)
+    unrelated_checkpoint, _key, _lock = sync.resumable_paths(unrelated_fingerprint)
+    unrelated_checkpoint.parent.mkdir(parents=True)
+    sync.atomic_json_write(unrelated_checkpoint, {"format": sync.ONLY_NEW_STATE_FORMAT, "fingerprint": unrelated_fingerprint, "mode": "only_new", "phase": "delta"})
+
+    matches = sync.related_only_new_states(query, "public", "target", "source_id", "date_change", ("source_id",))
+
+    assert {state["ignore_unique_constraint"] for _path, state in matches} == {False, True}
+    assert unrelated_checkpoint not in {path for path, _state in matches}
+
+
+def test_full_related_state_discovery_includes_current_policy_variants(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "HERE", tmp_path)
+    query = "SELECT source_id, date_change FROM source"
+    for ignore_not_null in (False, True):
+        fingerprint = sync.sync_fingerprint(query, "public", "target", "source_id", "date_change", False, ("source_id",), ignore_not_null, False)
+        checkpoint, _key, _lock = sync.resumable_paths(fingerprint)
+        checkpoint.parent.mkdir(parents=True)
+        sync.atomic_json_write(checkpoint, {"format": sync.STATE_FORMAT, "fingerprint": fingerprint, "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "source_page_key": ["source_id"], "phase": "apply"})
+
+    matches = sync.related_full_states(query, "public", "target", "source_id", "date_change", False, ("source_id",))
+
+    assert len(matches) == 2
+
+
+def test_only_new_v1_state_is_ambiguous_and_not_related_to_current_sql(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setattr(sync, "HERE", tmp_path)
+    query = "SELECT source_id, date_change FROM source"
+    payload = {"format": 1, "mode": "only_new", "schema": "public", "table": "target", "id_field": "source_id", "change_field": "date_change", "source_page_key": ["source_id"], "trust_unique_non_null": True}
+    fingerprint = sync.fingerprint_payload(payload)
+    checkpoint, _key, _lock = sync.resumable_paths(fingerprint)
+    checkpoint.parent.mkdir(parents=True)
+    sync.atomic_json_write(checkpoint, {**payload, "fingerprint": fingerprint, "phase": "delta"})
+    unrelated = {**payload, "table": "other_target"}
+    unrelated_fingerprint = sync.fingerprint_payload(unrelated)
+    unrelated_checkpoint, _key, _lock = sync.resumable_paths(unrelated_fingerprint)
+    unrelated_checkpoint.parent.mkdir(parents=True)
+    sync.atomic_json_write(unrelated_checkpoint, {**unrelated, "fingerprint": unrelated_fingerprint, "phase": "delta"})
+
+    ambiguous = sync.ambiguous_v1_only_new_states("public", "target", "source_id", "date_change", ("source_id",))
+    related = sync.related_only_new_states(query, "public", "target", "source_id", "date_change", ("source_id",))
+
+    assert checkpoint in {path for path, _state in ambiguous}
+    assert unrelated_checkpoint not in {path for path, _state in ambiguous}
+    assert checkpoint not in {path for path, _state in related}

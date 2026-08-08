@@ -8,6 +8,35 @@ class FakeClob:
         return "long metadata"
 
 
+class RecordingCursor:
+    description = [("value",)]
+
+    def __init__(self, statements):
+        self.statements = statements
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_):
+        return False
+
+    def execute(self, statement, parameters):
+        self.statements.append((statement, parameters))
+        if ":owner" in statement or ":table" in statement:
+            raise AssertionError("Oracle keyword used as a bind variable")
+
+    def __iter__(self):
+        return iter(())
+
+
+class RecordingConnection:
+    def __init__(self):
+        self.statements = []
+
+    def cursor(self):
+        return RecordingCursor(self.statements)
+
+
 class InspectJnStatusTests(unittest.TestCase):
     def test_identifier_is_normalised_and_injection_is_rejected(self):
         self.assertEqual(inspector.oracle_identifier("ev", "owner"), "EV")
@@ -37,6 +66,20 @@ class InspectJnStatusTests(unittest.TestCase):
             }
         )
         self.assertEqual([row["trigger_name"] for row in result["rows"]], ["A"])
+
+    def test_report_uses_safe_bind_names_for_owner_and_table(self):
+        connection = RecordingConnection()
+        report = inspector.collect_report(connection, "EV", "JN_PARC_ENOTA")
+
+        self.assertTrue(all(section["status"] == "ok" for section in report["sections"].values()))
+        bound_statements = [item for item in connection.statements if item[1]]
+        self.assertTrue(bound_statements)
+        for statement, parameters in bound_statements:
+            self.assertNotIn(":owner", statement)
+            self.assertNotIn(":table", statement)
+            self.assertNotIn("owner", parameters)
+            self.assertNotIn("table", parameters)
+            self.assertEqual(parameters, {"p_owner": "EV", "p_table": "JN_PARC_ENOTA"})
 
 
 if __name__ == "__main__":

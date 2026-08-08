@@ -2,8 +2,8 @@
 
 Read-only verification for the EV historical LIFT integrations.  It checks the
 selected LIFT database metadata, compares PK and `date_change` against the KN
-query, validates the stored high-water mark, and proves that the query has no
-rows newer than that mark.  It never runs or changes a LIFT integration.
+query, validates the stored high-water mark, and checks LIFT's inclusive delta
+date bounds. It never runs or changes a LIFT integration.
 
 Copy `.env.example` to `.env` and fill in KN, staging, and production credentials.
 
@@ -26,5 +26,8 @@ Metadata, high-water and zero-transfer checks always run live. `--refresh-data`
 forces both expensive checks. A non-zero exit code means at least one selected
 table failed.
 
-The final `zero newer rows` result is the precondition for manually running the
-LIFT integration: that LIFT run should transfer zero records.
+`LIFT now` simulates LIFT's delta predicate at one timestamp captured when the
+checker starts: `date_change >= minDate AND date_change <= integrationStart`.
+`Zero newer rows` is intentionally stricter and has no upper bound. It is the
+precondition for manually running LIFT after the checker completes: a passing
+result means that later LIFT run should transfer zero records.

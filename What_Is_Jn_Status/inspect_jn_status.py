@@ -100,7 +100,8 @@ def matching_triggers(section: dict[str, Any]) -> dict[str, Any]:
 def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
     target = {"owner": owner, "table": table, "column": "JN_STATUS"}
     quoted_target = f'"{owner}"."{table}"'
-    binds = {"owner": owner, "table": table}
+    # OWNER and TABLE are Oracle keywords, so do not use them as bind names.
+    binds = {"p_owner": owner, "p_table": table}
 
     report: dict[str, Any] = {
         "generated_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -112,7 +113,7 @@ def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
 
     sections["table_ddl"] = collect_section(
         connection,
-        "SELECT DBMS_METADATA.GET_DDL('TABLE', :table, :owner) AS ddl FROM dual",
+        "SELECT DBMS_METADATA.GET_DDL('TABLE', :p_table, :p_owner) AS ddl FROM dual",
         binds,
     )
     sections["column_definition"] = collect_section(
@@ -121,7 +122,7 @@ def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
         SELECT owner, table_name, column_name, data_type, data_length,
                data_precision, data_scale, nullable, data_default
         FROM all_tab_columns
-        WHERE owner = :owner AND table_name = :table AND column_name = 'JN_STATUS'
+        WHERE owner = :p_owner AND table_name = :p_table AND column_name = 'JN_STATUS'
         """,
         binds,
     )
@@ -130,7 +131,7 @@ def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
         """
         SELECT owner, table_name, column_name, comments
         FROM all_col_comments
-        WHERE owner = :owner AND table_name = :table AND column_name = 'JN_STATUS'
+        WHERE owner = :p_owner AND table_name = :p_table AND column_name = 'JN_STATUS'
         """,
         binds,
     )
@@ -144,8 +145,8 @@ def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
           ON cc.owner = c.owner
          AND cc.constraint_name = c.constraint_name
          AND cc.table_name = c.table_name
-        WHERE c.owner = :owner
-          AND c.table_name = :table
+        WHERE c.owner = :p_owner
+          AND c.table_name = :p_table
           AND cc.column_name = 'JN_STATUS'
         ORDER BY c.constraint_name, cc.position
         """,
@@ -166,7 +167,7 @@ def collect_report(connection: Any, owner: str, table: str) -> dict[str, Any]:
         SELECT owner, trigger_name, table_name, triggering_event, trigger_type,
                status, trigger_body
         FROM all_triggers
-        WHERE table_owner = :owner AND table_name = :table
+        WHERE table_owner = :p_owner AND table_name = :p_table
         ORDER BY trigger_name
         """,
         binds,

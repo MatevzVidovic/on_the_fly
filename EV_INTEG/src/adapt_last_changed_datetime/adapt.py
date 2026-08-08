@@ -8,6 +8,7 @@ import json
 import os
 import re
 import sys
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -75,7 +76,16 @@ def parse_args() -> argparse.Namespace:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true", help="show the proposed metadata update (default)")
     mode.add_argument("--apply", action="store_true", help="apply the metadata update")
-    return parser.parse_args()
+    parser.add_argument(
+        "--last-sync-start-year",
+        type=int,
+        metavar="YEAR",
+        help="also set last_sync_start to midnight on 1 January of YEAR",
+    )
+    args = parser.parse_args()
+    if args.last_sync_start_year is not None and not 1 <= args.last_sync_start_year <= 9999:
+        parser.error("--last-sync-start-year must be between 1 and 9999")
+    return args
 
 
 def main() -> int:
@@ -101,6 +111,8 @@ def main() -> int:
         with psycopg.connect(**pg_settings("fmp")) as metadata_connection:
             metadata_columns = columns(metadata_connection, "attribute_table_integrations")
             required_metadata = {"id", "attribute_table_id", "last_changed_datetime"}
+            if args.last_sync_start_year is not None:
+                required_metadata.add("last_sync_start")
             missing_metadata = required_metadata - metadata_columns
             if missing_metadata:
                 raise RuntimeError(f"public.attribute_table_integrations is missing: {', '.join(sorted(missing_metadata))}")
@@ -112,14 +124,23 @@ def main() -> int:
                 if len(attribute_rows) != 1:
                     raise RuntimeError(f"expected exactly one public.attribute_tables row for {table!r}; found {len(attribute_rows)}")
                 attribute_table_id, attribute_table_name = attribute_rows[0]
+                integration_fields = ["id", "attribute_table_id", "last_changed_datetime"]
+                if args.last_sync_start_year is not None:
+                    integration_fields.append("last_sync_start")
                 cursor.execute(
-                    f'SELECT id, attribute_table_id, last_changed_datetime FROM {relation("attribute_table_integrations")} WHERE attribute_table_id = %s',
+                    f'SELECT {", ".join(integration_fields)} FROM {relation("attribute_table_integrations")} WHERE attribute_table_id = %s',
                     (attribute_table_id,),
                 )
                 integration_rows = cursor.fetchall()
                 if len(integration_rows) != 1:
                     raise RuntimeError(f"expected exactly one integration for attribute_table_id={attribute_table_id!r}; found {len(integration_rows)}")
-                integration_id, integration_attribute_table_id, current_last_changed = integration_rows[0]
+                integration_id, integration_attribute_table_id, current_last_changed, *optional_current_last_sync_start = integration_rows[0]
+
+            proposed_last_sync_start = (
+                datetime(args.last_sync_start_year, 1, 1)
+                if args.last_sync_start_year is not None
+                else None
+            )
 
             preview = {
                 "mode": "apply" if args.apply else "dry-run",
@@ -131,6 +152,14 @@ def main() -> int:
                     "attribute_table_id": integration_attribute_table_id,
                     "current_last_changed_datetime": current_last_changed,
                     "proposed_last_changed_datetime": max_date_change,
+                    **(
+                        {
+                            "current_last_sync_start": optional_current_last_sync_start[0],
+                            "proposed_last_sync_start": proposed_last_sync_start,
+                        }
+                        if args.last_sync_start_year is not None
+                        else {}
+                    ),
                 },
             }
             print(json.dumps(preview, default=str, ensure_ascii=False, indent=2))
@@ -138,13 +167,20 @@ def main() -> int:
                 return 0
             with metadata_connection.transaction():
                 with metadata_connection.cursor() as cursor:
+                    assignments = ["last_changed_datetime = %s"]
+                    values: list[Any] = [max_date_change]
+                    if proposed_last_sync_start is not None:
+                        assignments.append("last_sync_start = %s")
+                        values.append(proposed_last_sync_start)
+                    values.append(integration_id)
                     cursor.execute(
-                        f'UPDATE {relation("attribute_table_integrations")} SET last_changed_datetime = %s WHERE id = %s',
-                        (max_date_change, integration_id),
+                        f'UPDATE {relation("attribute_table_integrations")} SET {", ".join(assignments)} WHERE id = %s',
+                        values,
                     )
                     if cursor.rowcount != 1:
                         raise RuntimeError("integration row changed unexpectedly; transaction rolled back")
-            print("applied: last_changed_datetime updated")
+            changed = "last_changed_datetime and last_sync_start" if proposed_last_sync_start is not None else "last_changed_datetime"
+            print(f"applied: {changed} updated")
             return 0
     except Exception as error:
         print(f"error: {error}", file=sys.stderr)

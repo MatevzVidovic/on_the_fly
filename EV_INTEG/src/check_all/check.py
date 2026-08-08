@@ -17,7 +17,7 @@ from typing import Any, Iterable
 HERE = Path(__file__).resolve().parent
 MANIFEST_PATH = HERE / "tables.json"
 CACHE_PATH = HERE / ".state" / "data_correct.json"
-CACHE_VERSION = 1
+CACHE_VERSION = 2
 SCHEMA = "public"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 # Do not ask python-oracledb to describe or fetch a TIMESTAMP WITH TIME ZONE.
@@ -163,7 +163,7 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
     ats = column_names(connection, "attribute_tables") or {"id", "name"}
     ais = column_names(connection, "attribute_table_integrations") or {
         "id", "attribute_table_id", "last_changed_datetime", "last_sync_start", "url",
-        "attribute_table_sql_connection_id",
+        "attribute_table_sql_connection_id", "is_full_sync", "use_changed_datetime_for_delta",
     }
     acs = column_names(connection, "attribute_table_sql_connections") or {"id", "name"}
     table_name = pick(ats, ("name", "table_name"), "attribute table name column")
@@ -183,8 +183,13 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         # ``(attribute_id)`` was just a UUID value, causing psycopg to call
         # ``len()`` on it while processing query parameters.
         attribute_id_parameter = (attribute_id,)
+        config_missing = [name for name in ("is_full_sync", "use_changed_datetime_for_delta") if name not in ais]
+        full_sync = f"i.{quote('is_full_sync')}" if "is_full_sync" in ais else "NULL AS is_full_sync"
+        use_changed = (f"i.{quote('use_changed_datetime_for_delta')}"
+                       if "use_changed_datetime_for_delta" in ais else "NULL AS use_changed_datetime_for_delta")
         cur.execute(
-            f"SELECT i.id, i.last_changed_datetime, i.last_sync_start, i.{quote(sql_col)}, c.{quote(connection_name)} "
+            f"SELECT i.id, i.last_changed_datetime, i.last_sync_start, {full_sync}, {use_changed}, "
+            f"i.{quote(sql_col)}, c.{quote(connection_name)} "
             f"FROM {relation('attribute_table_integrations')} i "
             f"LEFT JOIN {relation('attribute_table_sql_connections')} c ON c.id=i.{quote(connection_fk)} "
             "WHERE i.attribute_table_id=%s", attribute_id_parameter)
@@ -196,9 +201,9 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         if len(integrations) != 1:
             raise RuntimeError(
                 f"expected exactly one integration total for {table!r}; found "
-                f"{len(integrations)} (connections: {[r[3] for r in integrations]!r})"
+                f"{len(integrations)} (connections: {[r[6] for r in integrations]!r})"
             )
-        integration_id, highwater, last_sync_start, source_sql, conn_name = integrations[0]
+        integration_id, highwater, last_sync_start, is_full_sync, use_changed_datetime, source_sql, conn_name = integrations[0]
         translations: list[Any] = []
         try:
             trans = column_names(connection, "attribute_table_translations")
@@ -208,7 +213,8 @@ def metadata(connection: Any, table: str) -> dict[str, Any]:
         except RuntimeError:
             raise
     return {"attribute_id": attribute_id, "integration_id": integration_id, "highwater": highwater, "last_sync_start": last_sync_start,
-            "sql": source_sql, "connection_name": conn_name, "titles": translations}
+            "is_full_sync": is_full_sync, "use_changed_datetime_for_delta": use_changed_datetime,
+            "configuration_errors": config_missing, "sql": source_sql, "connection_name": conn_name, "titles": translations}
 
 
 def oracle_timestamp_text(expression: str, alias: str) -> str:
@@ -345,6 +351,32 @@ def normalize(value: Any) -> str | None:
     return str(value)
 
 
+def optional_bool(value: Any) -> bool | None:
+    """Return a PostgreSQL boolean, accepting drivers that return 0/1/text."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, int) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str):
+        parsed = value.strip().lower()
+        if parsed in {"true", "t", "1"}:
+            return True
+        if parsed in {"false", "f", "0"}:
+            return False
+    return None
+
+
+def integration_start_time() -> datetime:
+    """Return the one Ljubljana wall-clock upper bound for this checker run.
+
+    LIFT stores ``timestamp`` values and the KN queries are compared as
+    Ljubljana wall-clock timestamps, so deliberately pass a naïve value to
+    Oracle rather than an instant with an offset.
+    """
+    from zoneinfo import ZoneInfo
+    return datetime.now(ZoneInfo("Europe/Ljubljana")).replace(tzinfo=None)
+
+
 def cache_read() -> dict[str, Any]:
     if not CACHE_PATH.exists():
         return {"version": CACHE_VERSION, "entries": {}}
@@ -378,6 +410,18 @@ def heartbeat(message: str) -> None:
 def oracle_count(oracle: Any, sql: str) -> int:
     with oracle.cursor() as cur:
         cur.execute(f"SELECT COUNT(*) FROM ({sql}) q")
+        return int(cur.fetchone()[0])
+
+
+def oracle_distinct_pk_count(oracle: Any, sql: str, source_pk: str) -> int:
+    """Prove the KN result has one non-null destination PK per source row.
+
+    Paged checks alone only see duplicate keys within one page.  This bounded
+    aggregate makes equal source/target counts meaningful: once every source
+    key is unique, successful page lookups prove exact PK membership too.
+    """
+    with oracle.cursor() as cur:
+        cur.execute(f"SELECT COUNT(DISTINCT {quote(source_pk)}) FROM ({sql}) q")
         return int(cur.fetchone()[0])
 
 
@@ -455,17 +499,50 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
             )
 
 
-def highwater_and_delta(pg: Any, oracle: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], highwater: Any) -> tuple[bool, str, int]:
+def highwater_and_delta(
+    pg: Any,
+    oracle: Any,
+    sql: str,
+    spec: dict[str, Any],
+    source_output: dict[str, str],
+    highwater: Any,
+    last_sync_start: Any,
+    is_full_sync: bool | None,
+    use_changed_datetime_for_delta: bool | None,
+    check_started_at: datetime | None = None,
+) -> tuple[bool, str, bool, str, int, bool, str, int]:
+    """Check high-water equality, the current LIFT filter, and a safe gate.
+
+    The first candidate count exactly models LIFT at ``check_started_at``.
+    The second deliberately has no upper bound: it is the conservative proof
+    needed before manually running LIFT after this checker has completed.
+    """
+    check_started_at = check_started_at or integration_start_time()
     with pg.cursor() as cur:
         cur.execute(f"SELECT MAX({quote('date_change')}) FROM {relation(spec['table'])}")
         maximum = cur.fetchone()[0]
-    if normalize(maximum) != normalize(highwater):
-        return False, f"target MAX(date_change)={normalize(maximum)} != integration last_changed_datetime={normalize(highwater)}", -1
-    if highwater is None:
+    highwater_ok = normalize(maximum) == normalize(highwater)
+    highwater_detail = (
+        "ok" if highwater_ok else
+        f"target MAX(date_change)={normalize(maximum)} != integration last_changed_datetime={normalize(highwater)}"
+    )
+    if is_full_sync is None or use_changed_datetime_for_delta is None:
+        detail = "cannot determine LIFT delta filter: integration configuration is unavailable"
+        return highwater_ok, highwater_detail, False, detail, -1, False, detail, -1
+
+    # LIFT ignores both dates for a first/full run.  Checking COUNT(*) rather
+    # than only non-null date_change mirrors that behaviour exactly.
+    if last_sync_start is None or is_full_sync:
         with oracle.cursor() as cur:
-            cur.execute(f"SELECT COUNT(*) FROM ({sql}) q WHERE {quote(source_output['date_change'])} IS NOT NULL")
-            delta = int(cur.fetchone()[0])
-            return delta == 0, ("ok (both target and KN are empty)" if delta == 0 else "empty high-water mark but KN has date_change values"), delta
+            cur.execute(f"SELECT COUNT(*) FROM ({sql}) q")
+            candidates = int(cur.fetchone()[0])
+        reason = "last_sync_start is NULL" if last_sync_start is None else "is_full_sync is true"
+        detail = (
+            f"ok ({reason}; source is empty)" if candidates == 0 else
+            f"{candidates} KN rows would transfer because {reason}"
+        )
+        return highwater_ok, highwater_detail, candidates == 0, detail, candidates, candidates == 0, detail, candidates
+
     with oracle.cursor() as cur:
         # LIFT stores a naïve PostgreSQL timestamp; KN's FROM_TZ output is a
         # TSTZ. Cast to TIMESTAMP so this uses the same Ljubljana wall-clock
@@ -475,20 +552,39 @@ def highwater_and_delta(pg: Any, oracle: Any, sql: str, spec: dict[str, Any], so
             source_date = f"CAST(TO_TIMESTAMP_TZ({source_date}, '{DOCUMENTED_ISO_TZ_FORMAT}') AS TIMESTAMP)"
         else:
             source_date = f"CAST({source_date} AS TIMESTAMP)"
-        cur.execute(f"SELECT COUNT(*) FROM ({sql}) q WHERE {source_date} > :highwater", {"highwater": highwater})
-        delta = int(cur.fetchone()[0])
-    return delta == 0, ("ok" if delta == 0 else f"{delta} KN rows are newer than high-water mark"), delta
+        minimum = highwater if use_changed_datetime_for_delta and highwater is not None else last_sync_start
+        bound_name = "last_changed_datetime" if use_changed_datetime_for_delta and highwater is not None else "last_sync_start"
+        cur.execute(
+            f"SELECT COUNT(*) FROM ({sql}) q WHERE {source_date} >= :minimum "
+            f"AND {source_date} <= :integration_start",
+            {"minimum": minimum, "integration_start": check_started_at},
+        )
+        current_candidates = int(cur.fetchone()[0])
+        cur.execute(f"SELECT COUNT(*) FROM ({sql}) q WHERE {source_date} >= :minimum", {"minimum": minimum})
+        future_candidates = int(cur.fetchone()[0])
+    current_detail = (
+        f"ok (LIFT at {normalize(check_started_at)} uses {bound_name} through its integration start)"
+        if current_candidates == 0 else
+        f"{current_candidates} KN rows match LIFT's {bound_name} inclusive lower bound through integration start {normalize(check_started_at)}"
+    )
+    future_detail = (
+        f"ok (no KN rows at or after {bound_name}; conservative manual-run gate)"
+        if future_candidates == 0 else
+        f"{future_candidates} KN rows are at or after {bound_name}; a later manual LIFT run could transfer them"
+    )
+    return (highwater_ok, highwater_detail, current_candidates == 0, current_detail, current_candidates,
+            future_candidates == 0, future_detail, future_candidates)
 
 
 def markdown(results: list[dict[str, Any]], environment: str) -> str:
-    lines = [f"# EV integration state check ({environment})", "", "| Table | Metadata | Last sync start | Data | High-water | Zero newer rows | Result |", "|---|---|---|---|---|---|---|"]
+    lines = [f"# EV integration state check ({environment})", "", "| Table | Metadata | Last sync start | Delta config | Data | High-water | LIFT now | Zero newer rows | Result |", "|---|---|---|---|---|---|---|---|---|"]
     for item in results:
-        lines.append("| {table} | {metadata} | {sync_start} | {data} | {water} | {delta} | **{result}** |".format(
-            table=item["table"], metadata=item["metadata"], sync_start=item["sync_start"], data=item["data"], water=item["highwater"], delta=item["delta"], result=item["result"]))
+        lines.append("| {table} | {metadata} | {sync_start} | {config} | {data} | {water} | {lift_now} | {delta} | **{result}** |".format(
+            table=item["table"], metadata=item["metadata"], sync_start=item["sync_start"], config=item["delta_config"], data=item["data"], water=item["highwater"], lift_now=item["lift_now"], delta=item["delta"], result=item["result"]))
     lines += ["", "## Details", ""]
     for item in results:
         lines += [f"### {item['table']}", "", f"- {item['detail']}"]
-    lines += ["", "A passing `Zero newer rows` result is the precondition for manually running LIFT; that LIFT run should transfer zero records.", ""]
+    lines += ["", "`LIFT now` simulates the inclusive lower and upper date bounds at this check's start. A passing `Zero newer rows` result is deliberately stricter: it has no upper bound, so it is the precondition for manually running LIFT later with zero records transferred.", ""]
     return "\n".join(lines)
 
 
@@ -497,9 +593,10 @@ def write_report(path: Path, results: list[dict[str, Any]], environment: str) ->
     path.write_text(markdown(results, environment), encoding="utf-8")
 
 
-def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str) -> dict[str, Any]:
+def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str, check_started_at: datetime | None = None) -> dict[str, Any]:
     table = target_table(spec, environment); local = {**spec, "table": table}
-    result = {"table": table, "metadata": "FAIL", "sync_start": "NOT_CHECKED", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
+    check_started_at = check_started_at or integration_start_time()
+    result = {"table": table, "metadata": "FAIL", "sync_start": "NOT_CHECKED", "delta_config": "NOT_CHECKED", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "lift_now": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
     try:
         heartbeat(f"[{table}] heartbeat: resolving LIFT metadata and validating KN SQL")
         info = metadata(metadata_pg, table)
@@ -507,6 +604,18 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         sql, output, failures = validate_sql(oracle, info["sql"], local)
         if title_bad: failures.append(f"titles must all start with EV H; got {info['titles']!r}")
         if str(info["connection_name"] or "").upper() != "KN ORACLE": failures.append("integration connection is not KN ORACLE")
+        config_errors = list(info.get("configuration_errors", []))
+        full_sync = optional_bool(info.get("is_full_sync"))
+        use_changed = optional_bool(info.get("use_changed_datetime_for_delta"))
+        if config_errors:
+            failures.append("integration configuration column(s) unavailable: " + ", ".join(config_errors))
+        if full_sync is None:
+            failures.append("is_full_sync must be a non-null boolean")
+        elif full_sync:
+            failures.append("is_full_sync must be false; this checker requires a delta integration")
+        if use_changed is None:
+            failures.append("use_changed_datetime_for_delta must be a non-null boolean")
+        result["delta_config"] = "PASS" if not config_errors and full_sync is False and use_changed is not None else "FAIL"
         if info["last_sync_start"] is None:
             failures.append("last_sync_start is NULL; LIFT would run a full integration and ignore the delta high-water mark")
             result["sync_start"] = "FAIL"
@@ -542,20 +651,38 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         if entry.get("last_check_passed") and not refresh:
             if data_ok: result["data"] = "CACHED"
         elif data_ok:
-            same, reason = diff_data(oracle, target_pg, sql, local, data_output, page_size, kn_count)
-            if not same:
-                result["data"] = "FAIL"; result["detail"] = reason or "PK/date diff failed"; entry.pop("last_check_passed", None); data_ok = False
+            heartbeat(f"[{table}] heartbeat: proving KN source PK uniqueness")
+            distinct_pk_count = oracle_distinct_pk_count(oracle, sql, data_output[spec["pk"].lower()])
+            if distinct_pk_count != kn_count:
+                result["data"] = "FAIL"
+                result["detail"] = f"KN query has null or duplicate PK globally: COUNT(DISTINCT PK)={distinct_pk_count}, COUNT(*)={kn_count}"
+                entry.pop("last_check_passed", None)
+                data_ok = False
             else:
-                entry["last_check_passed"] = True; result["data"] = "PASS"
+                same, reason = diff_data(oracle, target_pg, sql, local, data_output, page_size, kn_count)
+                if not same:
+                    result["data"] = "FAIL"; result["detail"] = reason or "PK/date diff failed"; entry.pop("last_check_passed", None); data_ok = False
+                else:
+                    entry["last_check_passed"] = True; result["data"] = "PASS"
         cache["entries"][identity] = entry
         heartbeat(f"[{table}] heartbeat: checking target high-water mark and KN zero-transfer condition")
-        ok, detail, delta = highwater_and_delta(target_pg, oracle, sql, local, data_output, info["highwater"])
-        result["highwater"] = "FAIL" if delta == -1 else "PASS"
-        result["delta"] = "PASS" if ok else "FAIL"
+        highwater_ok, highwater_detail, lift_now_ok, lift_now_detail, _current_candidates, delta_ok, delta_detail, _future_candidates = highwater_and_delta(
+            target_pg, oracle, sql, local, data_output, info["highwater"], info["last_sync_start"], full_sync, use_changed, check_started_at,
+        )
+        result["highwater"] = "PASS" if highwater_ok else "FAIL"
+        result["lift_now"] = "PASS" if lift_now_ok else "FAIL"
+        result["delta"] = "PASS" if delta_ok else "FAIL"
         metadata_detail = "; ".join(failures)
-        result["detail"] = ((metadata_detail + "; " if metadata_detail else "") + f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
-                            f"titles={info['titles']!r}; last_sync_start={normalize(info['last_sync_start'])}; counts KN/target={kn_count}/{target_count}; {detail}")
-        result["result"] = "PASS" if result["metadata"] == "PASS" and ok and data_ok else "FAIL"
+        detail_parts = [part for part in (metadata_detail, result["detail"]) if part]
+        detail_parts.append(
+            f"integration={info['integration_id']}; connection={info['connection_name']!r}; "
+            f"titles={info['titles']!r}; last_sync_start={normalize(info['last_sync_start'])}; "
+            f"is_full_sync={full_sync}; use_changed_datetime_for_delta={use_changed}; "
+            f"integration_start_time={normalize(check_started_at)}; counts KN/target={kn_count}/{target_count}; "
+            f"{highwater_detail}; {lift_now_detail}; {delta_detail}"
+        )
+        result["detail"] = "; ".join(detail_parts)
+        result["result"] = "PASS" if result["metadata"] == "PASS" and highwater_ok and lift_now_ok and delta_ok and data_ok else "FAIL"
         return result
     except Exception as error:
         result["detail"] = str(error); return result
@@ -587,10 +714,12 @@ def main() -> int:
             psycopg.connect(**pg_settings(args.environment, metadata=True)) as metadata_pg,
         ):
             initialise_sessions(oracle, target_pg, metadata_pg)
+            check_started_at = integration_start_time()
+            heartbeat(f"integration-start timestamp fixed at {normalize(check_started_at)} (Europe/Ljubljana wall clock)")
             results = []
             for index, spec in enumerate(selected, start=1):
                 heartbeat(f"[{index}/{len(selected)}] starting {target_table(spec, args.environment)}")
-                results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash))
+                results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash, check_started_at))
                 cache_write(cache)
                 write_report(args.report, results, args.environment)
                 heartbeat(f"[{index}/{len(selected)}] checkpoint saved: cache and partial report written")

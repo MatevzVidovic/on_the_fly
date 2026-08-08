@@ -32,13 +32,13 @@ HERE = Path(__file__).resolve().parent
 IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
 # These columns are owned by LIFT/PostgreSQL, not supplied by the KN SELECT.
 LIFT_SYSTEM_COLUMNS = frozenset({"id", "created_at", "created_by", "updated_at", "updated_by"})
-STATE_FORMAT = 3  # Full-reconciliation checkpoint format: do not change.
+STATE_FORMAT = 4  # Constraint-override settings are part of checkpoint identity.
 # Incremental state v1 required loader-only SELECT aliases.  Do not reuse it:
 # v2 builds its watermark solely from the selected DATE_CHANGE column.
 # v4 persists the complete, already-selected source row alongside each frozen
 # key.  This avoids repeatedly executing an arbitrary integration SELECT with
 # a thousand ``OR`` predicates during the payload phase.
-ONLY_NEW_STATE_FORMAT = 4
+ONLY_NEW_STATE_FORMAT = 5
 ONLY_NEW_TIMESTAMP_BIND_CAPABILITY = "explicit_timestamp_v1"
 # This becomes an unquoted Oracle column alias in an internal wrapper query.
 # Oracle identifiers must start with a letter, so do not use a leading
@@ -426,9 +426,16 @@ def target_columns(connection: Any, schema: str, table: str, id_field: str) -> t
     return source_columns, destination_columns
 
 
-def require_unique_key(connection: Any, schema: str, table: str, id_field: str, trust_unique_non_null: bool = False, require_not_null: bool = True) -> None:
-    if trust_unique_non_null:
-        return
+def require_unique_key(
+    connection: Any,
+    schema: str,
+    table: str,
+    id_field: str,
+    ignore_unique_constraint: bool = False,
+    require_not_null: bool = True,
+    ignore_not_null_constraint: bool = False,
+) -> None:
+    """Validate the independent destination-key contracts needed by resumable sync."""
     query = """
         SELECT 1
         FROM pg_index i
@@ -440,10 +447,11 @@ def require_unique_key(connection: Any, schema: str, table: str, id_field: str, 
           AND i.indnkeyatts = 1 AND a.attname = %s
     """
     with connection.cursor() as cursor:
-        cursor.execute(query, (schema, table, id_field))
-        if cursor.fetchone() is None:
-            raise RuntimeError(f"staging table {schema}.{table} needs a non-partial single-column unique key on {id_field}")
-        if not require_not_null:
+        if not ignore_unique_constraint:
+            cursor.execute(query, (schema, table, id_field))
+            if cursor.fetchone() is None:
+                raise RuntimeError(f"staging table {schema}.{table} needs a non-partial single-column unique key on {id_field}")
+        if not require_not_null or ignore_not_null_constraint:
             return
         cursor.execute(
             "SELECT is_nullable FROM information_schema.columns WHERE table_schema = %s AND table_name = %s AND column_name = %s",
@@ -759,8 +767,8 @@ def resumable_paths(fingerprint: str) -> tuple[Path, Path, Path]:
     return state_dir / "checkpoint.json", state_dir / "source_keys.sqlite3", state_dir / "loader.lock"
 
 
-def sync_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...], trust_unique_non_null: bool = False) -> str:
-    payload = json.dumps({"format": STATE_FORMAT, "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": ignore_change_field, "source_page_key": page_key, "trust_unique_non_null": trust_unique_non_null}, sort_keys=True)
+def sync_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...], ignore_not_null_constraint: bool = False, ignore_unique_constraint: bool = False) -> str:
+    payload = json.dumps({"format": STATE_FORMAT, "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": ignore_change_field, "source_page_key": page_key, "ignore_not_null_constraint": ignore_not_null_constraint, "ignore_unique_constraint": ignore_unique_constraint}, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
@@ -1202,27 +1210,87 @@ def staging_max_change(connection: Any, schema: str, table: str, change_field: s
         return cursor.fetchone()[0]
 
 
-def delta_fingerprint_args(query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], trust_unique_non_null: bool) -> str:
-    payload = json.dumps({"format": ONLY_NEW_STATE_FORMAT, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": page_key, "watermark": "date_change_iso_ljubljana_v1", "trust_unique_non_null": trust_unique_non_null}, sort_keys=True)
+def delta_fingerprint_args(query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], ignore_unique_constraint: bool) -> str:
+    payload = json.dumps({"format": ONLY_NEW_STATE_FORMAT, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": page_key, "watermark": "date_change_iso_ljubljana_v1", "ignore_unique_constraint": ignore_unique_constraint}, sort_keys=True)
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def legacy_only_new_fingerprint(query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], trust_unique_non_null: bool) -> str:
-    """Locate v2 windows only to retain their already-completed watermark."""
-    payload = json.dumps({"format": 2, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": page_key, "watermark": "date_change_iso_ljubljana_v1", "trust_unique_non_null": trust_unique_non_null}, sort_keys=True)
-    return hashlib.sha256(payload.encode()).hexdigest()
+def fingerprint_payload(payload: dict[str, Any]) -> str:
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()
 
 
-def prior_only_new_state(schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...]) -> tuple[Path, dict[str, Any]] | None:
-    """Find an old-format state even if its SQL changed for native timestamps."""
+def states_for_fingerprints(fingerprints: set[str]) -> list[tuple[Path, dict[str, Any]]]:
+    """Read only exact, derived checkpoint directories; never scan by table name."""
+    matches: list[tuple[Path, dict[str, Any]]] = []
+    for fingerprint in fingerprints:
+        checkpoint, _key_path, _lock_path = resumable_paths(fingerprint)
+        state = read_checkpoint(checkpoint)
+        if state and state.get("fingerprint") == fingerprint:
+            matches.append((checkpoint, state))
+    return matches
+
+
+def legacy_full_states(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...]) -> list[tuple[Path, dict[str, Any]]]:
+    """Find only v3 combined-policy states for this exact SQL integration."""
+    fingerprints = {
+        fingerprint_payload({"format": 3, "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "ignore_change_field": ignore_change_field, "source_page_key": page_key, "trust_unique_non_null": trusted})
+        for trusted in (False, True)
+    }
+    return [(path, state) for path, state in states_for_fingerprints(fingerprints) if state.get("format") == 3 and state.get("mode") != "only_new"]
+
+
+def related_full_states(query: str, schema: str, table: str, id_field: str, change_field: str, ignore_change_field: bool, page_key: tuple[str, ...]) -> list[tuple[Path, dict[str, Any]]]:
+    """Find every old or current constraint-policy variant for exact full-sync SQL."""
+    legacy = legacy_full_states(query, schema, table, id_field, change_field, ignore_change_field, page_key)
+    current_fingerprints = {
+        sync_fingerprint(query, schema, table, id_field, change_field, ignore_change_field, page_key, ignore_not_null, ignore_unique)
+        for ignore_not_null in (False, True)
+        for ignore_unique in (False, True)
+    }
+    current = [(path, state) for path, state in states_for_fingerprints(current_fingerprints) if state.get("format") == STATE_FORMAT and state.get("mode") != "only_new"]
+    return [*legacy, *current]
+
+
+def related_only_new_states(query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...]) -> list[tuple[Path, dict[str, Any]]]:
+    """Find prior and current policy variants for this exact incremental SQL."""
+    fingerprints: set[str] = set()
+    for format_version in (2, 3, 4):
+        for trusted in (False, True):
+            fingerprints.add(fingerprint_payload({"format": format_version, "mode": "only_new", "query": query, "schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": page_key, "watermark": "date_change_iso_ljubljana_v1", "trust_unique_non_null": trusted}))
+    for ignore_unique in (False, True):
+        fingerprints.add(delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, ignore_unique))
+    return [(path, state) for path, state in states_for_fingerprints(fingerprints) if state.get("mode") == "only_new"]
+
+
+def ambiguous_v1_only_new_states(schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...]) -> list[tuple[Path, dict[str, Any]]]:
+    """Find v1 states that cannot be tied to current SQL safely.
+
+    v1 did not persist the integration SQL (and local instances may also lack
+    its old watermark alias), so we must never reuse its HWM or remove it
+    automatically.  An active candidate blocks a new run for manual review.
+    """
+    matches: list[tuple[Path, dict[str, Any]]] = []
     root = HERE / ".state"
-    if not root.exists():
-        return None
-    for candidate in root.glob("*/checkpoint.json"):
-        state = read_checkpoint(candidate)
-        if state.get("mode") == "only_new" and state.get("format") != ONLY_NEW_STATE_FORMAT and all(state.get(field) == value for field, value in {"schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key)}.items()):
-            return candidate, state
-    return None
+    if root.exists():
+        for candidate in root.glob("*/checkpoint.json"):
+            state = read_checkpoint(candidate)
+            expected = {"schema": schema, "table": table, "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key)}
+            if state.get("format") == 1 and state.get("mode") == "only_new" and all(state.get(field) == value for field, value in expected.items()):
+                matches.append((candidate, state))
+    return matches
+
+
+def greatest_completed_watermark(states: list[tuple[Path, dict[str, Any]]]) -> Any:
+    values = [decode_value(state["completed_watermark"]) for _path, state in states if state.get("completed_watermark") is not None]
+    return max(values) if values else None
+
+
+def remove_state_files(checkpoint: Path) -> None:
+    """Remove one checkpoint and its SQLite source-key store, if present."""
+    key_path = checkpoint.with_name("source_keys.sqlite3")
+    for path in (checkpoint, key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
+        if path.exists():
+            path.unlink()
 
 
 def only_new_auto_page_size_profile_key(query: str, schema: str, table: str, id_field: str, page_key: tuple[str, ...]) -> str:
@@ -1230,14 +1298,14 @@ def only_new_auto_page_size_profile_key(query: str, schema: str, table: str, id_
     return hashlib.sha256(payload.encode()).hexdigest()
 
 
-def initialise_only_new_state(checkpoint: Path, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], fingerprint: str, trust_unique_non_null: bool, args: argparse.Namespace, completed_watermark: Any) -> dict[str, Any]:
+def initialise_only_new_state(checkpoint: Path, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], fingerprint: str, ignore_unique_constraint: bool, args: argparse.Namespace, completed_watermark: Any) -> dict[str, Any]:
     profile = only_new_auto_page_size_profile_key(query, schema, table, id_field, page_key)
     state: dict[str, Any] = {
         "format": ONLY_NEW_STATE_FORMAT, "fingerprint": fingerprint, "mode": "only_new",
         "schema": schema, "table": table, "id_field": id_field, "change_field": change_field,
         "source_page_key": list(page_key), "watermark": "date_change_iso_ljubljana_v1",
         "timestamp_bind_capability": ONLY_NEW_TIMESTAMP_BIND_CAPABILITY,
-        "trust_unique_non_null": trust_unique_non_null, "auto_page_size": args.auto_page_size,
+        "ignore_unique_constraint": ignore_unique_constraint, "auto_page_size": args.auto_page_size,
         "phase": "complete", "status": "complete", "completed_watermark": None if completed_watermark is None else encode_value(completed_watermark),
         "window_lower": None, "window_upper": None, "delta_cursor": None, "pages": 0, "rows": 0, "delta_rows": 0,
         "inserted": 0, "updated": 0, "unchanged": 0, "phase_pages": {"delta": 0}, "timing": {},
@@ -1248,11 +1316,11 @@ def initialise_only_new_state(checkpoint: Path, query: str, schema: str, table: 
     return state
 
 
-def only_new_settings_match(state: dict[str, Any], schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], trust_unique_non_null: bool) -> bool:
+def only_new_settings_match(state: dict[str, Any], schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], ignore_unique_constraint: bool) -> bool:
     return all(state.get(field) == value for field, value in {
         "mode": "only_new", "schema": schema, "table": table, "id_field": id_field,
         "change_field": change_field, "source_page_key": list(page_key),
-        "watermark": "date_change_iso_ljubljana_v1", "trust_unique_non_null": trust_unique_non_null,
+        "watermark": "date_change_iso_ljubljana_v1", "ignore_unique_constraint": ignore_unique_constraint,
     }.items())
 
 
@@ -1268,7 +1336,12 @@ def require_only_new_timestamp_bind_capability(state: dict[str, Any] | None) -> 
 
 def run_only_new_legacy(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
     """Resumable insert/update-only delta.  It intentionally has no delete phase."""
-    fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
+    if any(candidate.get("phase") != "complete" for _path, candidate in ambiguous_v1_only_new_states(schema, table, id_field, change_field, page_key)):
+        raise RuntimeError(
+            "an active v1 only-new checkpoint matches this table/key but cannot be tied to the current SQL; "
+            "review and remove it manually before starting a new run"
+        )
+    fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)
     data_profile = only_new_auto_page_size_profile_key(query, schema, table, id_field, page_key)
     checkpoint, _key_path, lock_path = resumable_paths(fingerprint)
     watermark_field = ONLY_NEW_WATERMARK
@@ -1277,7 +1350,7 @@ def run_only_new_legacy(args: argparse.Namespace, query: str, schema: str, table
         # Dry run never writes state.  If an invocation is in progress, inspect
         # precisely its remaining frozen window rather than opening a new one.
         dry_state = read_checkpoint(checkpoint)
-        if dry_state and (dry_state.get("format") != ONLY_NEW_STATE_FORMAT or dry_state.get("fingerprint") != fingerprint or not only_new_settings_match(dry_state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
+        if dry_state and (dry_state.get("format") != ONLY_NEW_STATE_FORMAT or dry_state.get("fingerprint") != fingerprint or not only_new_settings_match(dry_state, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)):
             raise RuntimeError("checkpoint belongs to different incremental settings; use --restart after review")
         require_only_new_timestamp_bind_capability(dry_state)
         with psycopg.connect(**pg_settings()) as connection:
@@ -1325,27 +1398,27 @@ def run_only_new_legacy(args: argparse.Namespace, query: str, schema: str, table
         return 0
     with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table) as heartbeat:
         state = read_checkpoint(checkpoint)
-        if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
+        if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)):
             raise RuntimeError("checkpoint belongs to different incremental settings; use --restart after review")
         require_only_new_timestamp_bind_capability(state)
         if state and state.get("phase") == "conflict":
             raise RuntimeError("only-new sync is in terminal conflict state; resolve staging rows and use --restart (completed watermark is retained)")
         with psycopg.connect(**pg_settings()) as connection:
             source_columns, destination_columns = target_columns(connection, schema, table, id_field)
-            require_unique_key(connection, schema, table, id_field, args.trust_unique_non_null, require_not_null=False)
+            require_unique_key(connection, schema, table, id_field, ignore_unique_constraint=args.ignore_unique_constraint, require_not_null=False)
             if change_field not in source_columns:
                 raise RuntimeError(f"integration/staging table must contain {change_field}")
             staging_hwm = staging_max_change(connection, schema, table, change_field)
         require_only_new_source_shape(oracledb, query, source_columns, page_key)
         if not state:
-            prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
+            prior = related_only_new_states(query, schema, table, id_field, change_field, page_key)
             if prior:
-                _legacy_checkpoint, legacy = prior
-                if legacy.get("phase") != "complete":
+                if any(legacy.get("phase") != "complete" for _legacy_checkpoint, legacy in prior):
                     raise RuntimeError("an older active only-new checkpoint exists; use --restart first to discard its active window while retaining its completed watermark")
-                if legacy.get("completed_watermark") is not None:
-                    staging_hwm = decode_value(legacy["completed_watermark"])
-            state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.trust_unique_non_null, args, staging_hwm)
+                completed = greatest_completed_watermark(prior)
+                if completed is not None:
+                    staging_hwm = completed
+            state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.ignore_unique_constraint, args, staging_hwm)
         elif args.auto_page_size or state.get("auto_page_size"):
             args.auto_page_size = True
             state["auto_page_size"] = True
@@ -1503,17 +1576,29 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
     if not args.apply:
         # The normal dry-run is intentionally read-only; retain its detailed comparison output.
         return run_only_new_legacy(args, query, schema, table, id_field, change_field, page_key, oracledb, psycopg)
-    fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
+    fingerprint = delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
     profile = only_new_auto_page_size_profile_key(query, schema, table, id_field, page_key)
     delta_query = only_new_query(query, change_field)
     with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table) as heartbeat:
         state = read_checkpoint(checkpoint)
-        if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)):
+        ambiguous_v1 = ambiguous_v1_only_new_states(schema, table, id_field, change_field, page_key)
+        if any(candidate.get("phase") != "complete" for _path, candidate in ambiguous_v1):
+            raise RuntimeError(
+                "an active v1 only-new checkpoint matches this table/key but cannot be tied to the current SQL; "
+                "review and remove it manually before starting a new run"
+            )
+        if state and (state.get("format") != ONLY_NEW_STATE_FORMAT or state.get("fingerprint") != fingerprint or not only_new_settings_match(state, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)):
             raise RuntimeError("active only-new checkpoint uses an older incompatible format; run the identical command with --restart (completed watermark is retained)")
+        other_policy_states = [(path, candidate) for path, candidate in related_only_new_states(query, schema, table, id_field, change_field, page_key) if path != checkpoint]
+        if any(candidate.get("phase") != "complete" for _path, candidate in other_policy_states):
+            raise RuntimeError(
+                "an active only-new checkpoint exists for the same SQL with a different constraint policy; "
+                "run the identical command with --restart to discard its active window"
+            )
         with psycopg.connect(**pg_settings()) as pg:
             source_columns, destination_columns = target_columns(pg, schema, table, id_field)
-            require_unique_key(pg, schema, table, id_field, args.trust_unique_non_null, require_not_null=False)
+            require_unique_key(pg, schema, table, id_field, ignore_unique_constraint=args.ignore_unique_constraint, require_not_null=False)
             if change_field not in source_columns:
                 raise RuntimeError(f"integration/staging table must contain {change_field}")
             staging_hwm = staging_max_change(pg, schema, table, change_field)
@@ -1523,18 +1608,18 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
             # either require the slow OR-of-keys query again or silently change
             # its frozen snapshot, so require the explicit restart operator
             # action.  A completed prior state contributes its durable HWM.
-            prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
+            prior = related_only_new_states(query, schema, table, id_field, change_field, page_key)
             if prior:
-                _old_checkpoint, old_state = prior
-                if old_state.get("phase") != "complete":
+                if any(old_state.get("phase") != "complete" for _old_checkpoint, old_state in prior):
                     raise RuntimeError(
                         "an older active only-new checkpoint has no stored payload; "
                         "run the identical command with --restart to discard its active window "
                         "while retaining its completed watermark"
                     )
-                if old_state.get("completed_watermark") is not None:
-                    staging_hwm = decode_value(old_state["completed_watermark"])
-            state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.trust_unique_non_null, args, staging_hwm)
+                completed = greatest_completed_watermark(prior)
+                if completed is not None:
+                    staging_hwm = completed
+            state = initialise_only_new_state(checkpoint, query, schema, table, id_field, change_field, page_key, fingerprint, args.ignore_unique_constraint, args, staging_hwm)
         elif args.auto_page_size or state.get("auto_page_size"):
             args.auto_page_size = True
             state["auto_page_size"] = True
@@ -1716,7 +1801,7 @@ def run_only_new(args: argparse.Namespace, query: str, schema: str, table: str, 
 
 
 def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str, id_field: str, change_field: str, page_key: tuple[str, ...], oracledb: Any, psycopg: Any) -> int:
-    fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.trust_unique_non_null)
+    fingerprint = sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.ignore_not_null_constraint, args.ignore_unique_constraint)
     key_profile_key = auto_page_size_profile_key(query, schema, table, id_field, page_key, "keys", args.ignore_change_field)
     data_profile_key = auto_page_size_profile_key(query, schema, table, id_field, page_key, "data", args.ignore_change_field)
     checkpoint, key_path, lock_path = resumable_paths(fingerprint)
@@ -1724,13 +1809,20 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
         raise RuntimeError("--resumable is only available with --apply; dry-run is already read-only")
     with file_lock(lock_path), staging_advisory_lock(psycopg, schema, table) as heartbeat:
         state = read_checkpoint(checkpoint)
+        other_policy_states = [(path, candidate) for path, candidate in related_full_states(query, schema, table, id_field, change_field, args.ignore_change_field, page_key) if path != checkpoint]
+        if any(candidate.get("phase") != "complete" for _path, candidate in other_policy_states):
+            raise RuntimeError(
+                "an active resumable checkpoint exists for the same SQL with a different constraint policy; "
+                "run the identical command with --restart to discard it"
+            )
         if state and (state.get("fingerprint") != fingerprint or state.get("format") != STATE_FORMAT):
             raise RuntimeError("checkpoint belongs to a different table, SQL, or sync options; use --restart after review")
         if state:
             expected = {
                 "schema": schema, "table": table, "id_field": id_field, "change_field": change_field,
                 "ignore_change_field": args.ignore_change_field, "source_page_key": list(page_key),
-                "trust_unique_non_null": args.trust_unique_non_null,
+                "ignore_not_null_constraint": args.ignore_not_null_constraint,
+                "ignore_unique_constraint": args.ignore_unique_constraint,
             }
             if any(state.get(name) != value for name, value in expected.items()):
                 raise RuntimeError("checkpoint settings are inconsistent; use --restart")
@@ -1741,7 +1833,7 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             raise RuntimeError(f"resumable sync is in terminal state {state.get('status', state['phase'])}; resolve the cause and use --restart")
         with psycopg.connect(**pg_settings()) as connection:
             source_columns, destination_columns = target_columns(connection, schema, table, id_field)
-            require_unique_key(connection, schema, table, id_field, args.trust_unique_non_null)
+            require_unique_key(connection, schema, table, id_field, ignore_unique_constraint=args.ignore_unique_constraint, ignore_not_null_constraint=args.ignore_not_null_constraint)
         if not args.ignore_change_field and change_field not in source_columns:
             raise RuntimeError(f"integration/staging table must contain {change_field}, or use --ignore-change-field")
         if not state:
@@ -1751,7 +1843,9 @@ def run_resumable(args: argparse.Namespace, query: str, schema: str, table: str,
             state = {
                 "format": STATE_FORMAT, "fingerprint": fingerprint, "schema": schema, "table": table,
                 "id_field": id_field, "change_field": change_field, "source_page_key": list(page_key),
-                "ignore_change_field": args.ignore_change_field, "trust_unique_non_null": args.trust_unique_non_null,
+                "ignore_change_field": args.ignore_change_field,
+                "ignore_not_null_constraint": args.ignore_not_null_constraint,
+                "ignore_unique_constraint": args.ignore_unique_constraint,
                 "auto_page_size": args.auto_page_size,
                 "phase": "preflight", "source_cursor": None,
                 "verify_cursor": None, "delete_cursor": None, "pages": 0, "rows": 0, "status": "running",
@@ -2001,7 +2095,8 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--only-new", action="store_true", help="incremental insert/update-only mode, bounded by a persisted source change watermark; never deletes")
     parser.add_argument("--resumable", action="store_true", help="use local checkpointing and page-by-page commits (requires --apply)")
     parser.add_argument("--source-page-key", help="comma-separated stored integration columns, in native KN index order; required with --resumable")
-    parser.add_argument("--trust-unique-non-null", action="store_true", help="skip staging UNIQUE/NOT NULL metadata checks in resumable mode; use only when the data is known to satisfy both")
+    parser.add_argument("--ignore-not-null-constraint", action="store_true", help="skip only the staging membership-key NOT NULL metadata check for normal resumable reconciliation")
+    parser.add_argument("--ignore-unique-constraint", action="store_true", help="skip only the staging membership-key UNIQUE metadata check in resumable mode")
     parser.add_argument("--status", action="store_true", help="show the resumable checkpoint and exit")
     parser.add_argument("--restart", action="store_true", help="remove only this integration's resumable checkpoint and key index")
     parser.add_argument("--preview-limit", type=int, default=5, help="maximum example rows shown for each action (default: 5)")
@@ -2020,12 +2115,14 @@ def parse_args() -> argparse.Namespace:
         parser.error("--status and --restart require --resumable")
     if args.resumable and not args.source_page_key:
         parser.error("--resumable requires --source-page-key")
-    if args.trust_unique_non_null and not args.resumable:
-        parser.error("--trust-unique-non-null requires --resumable")
+    if (args.ignore_not_null_constraint or args.ignore_unique_constraint) and not args.resumable:
+        parser.error("--ignore-not-null-constraint and --ignore-unique-constraint require --resumable")
     if args.auto_page_size and not args.resumable:
         parser.error("--auto-page-size requires --resumable")
     if args.only_new and args.ignore_change_field:
         parser.error("--only-new cannot be combined with --ignore-change-field")
+    if args.only_new and args.ignore_not_null_constraint:
+        parser.error("--ignore-not-null-constraint is not applicable to --only-new; only-new does not require staging NOT NULL")
     if args.only_new and not args.source_page_key:
         parser.error("--only-new requires --source-page-key")
     if args.only_new and args.apply and not args.resumable:
@@ -2047,37 +2144,43 @@ def main() -> int:
         schema = valid_identifier(args.schema or os.environ.get("STAG_SCHEMA", "public"), "schema")
         query = read_select(args.integration_sql)
         if args.resumable and (args.status or args.restart):
-            fingerprint = (delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.trust_unique_non_null)
-                           if args.only_new else sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.trust_unique_non_null))
+            fingerprint = (delta_fingerprint_args(query, schema, table, id_field, change_field, page_key, args.ignore_unique_constraint)
+                           if args.only_new else sync_fingerprint(query, schema, table, id_field, change_field, args.ignore_change_field, page_key, args.ignore_not_null_constraint, args.ignore_unique_constraint))
             checkpoint, key_path, lock_path = resumable_paths(fingerprint)
             if args.status:
                 print(json.dumps(read_checkpoint(checkpoint) or {"status": "not started"}, indent=2, default=str))
                 return 0
-            with file_lock(lock_path):
+            # Restart may mutate checkpoints belonging to another constraint
+            # policy for the same target.  Serialize it with every normal run
+            # through the table-wide advisory lock, not just this fingerprint's
+            # local lock.
+            _oracledb, restart_psycopg = require_drivers()
+            with file_lock(lock_path), staging_advisory_lock(restart_psycopg, schema, table):
                 if args.only_new:
                     state = read_checkpoint(checkpoint)
-                    if not state:
-                        prior = prior_only_new_state(schema, table, id_field, change_field, page_key)
-                        if prior:
-                            old_checkpoint, old_state = prior
-                            old_state.update(phase="complete", status="complete", window_lower=None, window_upper=None, delta_cursor=None, materialize_cursor=None, payload_position=0)
-                            atomic_json_write(old_checkpoint, old_state)
-                            print("discarded the old-format active only-new window; the completed watermark was kept")
-                            return 0
-                    if state and state.get("phase") != "complete":
-                        state.update(phase="complete", status="complete", window_lower=None, window_upper=None, delta_cursor=None,
-                                     pages=0, rows=0, delta_rows=0, inserted=0, updated=0, unchanged=0,
-                                     phase_pages={"delta": 0}, timing={})
-                        atomic_json_write(checkpoint, state)
-                        for path in (key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
-                            if path.exists():
-                                path.unlink()
-                    print("discarded the active only-new window; the completed watermark was kept")
+                    related = related_only_new_states(query, schema, table, id_field, change_field, page_key)
+                    ambiguous_v1 = ambiguous_v1_only_new_states(schema, table, id_field, change_field, page_key)
+                    if state and all(path != checkpoint for path, _candidate in related):
+                        related.append((checkpoint, state))
+                    for related_checkpoint, related_state in related:
+                        if related_state.get("phase") != "complete":
+                            related_state.update(phase="complete", status="complete", window_lower=None, window_upper=None, delta_cursor=None,
+                                                 materialize_cursor=None, payload_position=0, pages=0, rows=0, delta_rows=0,
+                                                 inserted=0, updated=0, unchanged=0, phase_pages={"delta": 0}, timing={})
+                            atomic_json_write(related_checkpoint, related_state)
+                            key_database_path = related_checkpoint.with_name("source_keys.sqlite3")
+                            for path in (key_database_path, Path(f"{key_database_path}-wal"), Path(f"{key_database_path}-shm")):
+                                if path.exists():
+                                    path.unlink()
+                    print(f"discarded active only-new windows for {len(related)} matching constraint-policy checkpoint(s); completed watermarks were kept")
+                    if ambiguous_v1:
+                        print(f"left {len(ambiguous_v1)} ambiguous v1 only-new checkpoint(s) untouched; review/remove them manually")
                 else:
-                    for path in (checkpoint, key_path, Path(f"{key_path}-wal"), Path(f"{key_path}-shm")):
-                        if path.exists():
-                            path.unlink()
-                    print("removed this integration's resumable checkpoint and source-key index")
+                    related = [(path, state) for path, state in related_full_states(query, schema, table, id_field, change_field, args.ignore_change_field, page_key) if path != checkpoint]
+                    for old_checkpoint, _old_state in related:
+                        remove_state_files(old_checkpoint)
+                    remove_state_files(checkpoint)
+                    print(f"removed this integration's resumable checkpoint and {len(related)} matching old combined-policy checkpoint(s)")
             return 0
         oracledb, psycopg = require_drivers()
         enable_oracle_thick_mode(oracledb)
