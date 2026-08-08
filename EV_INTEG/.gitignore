@@ -7,3 +7,4 @@ __pycache__/
 .pytest_cache/
 src/**/.state/
 src/**/.auto_page_sizes/
+src/kn_tables_uk_check/kn_tables_uk_report.md

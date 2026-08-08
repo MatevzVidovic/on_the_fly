@@ -83,14 +83,18 @@ def verify_tables(stag: Any, prod: Any, schema: str, table: str, id_field: str, 
         raise RuntimeError(f"both {schema}.{table} tables must have the key field {id_field}")
     if change_field not in stag_columns or change_field not in prod_columns:
         raise RuntimeError(f"both {schema}.{table} tables must have the change field {change_field}")
-    if stag_columns != prod_columns:
+    # Staging and production can have the same fields in a different physical
+    # order.  All copy statements name columns explicitly, so order is safe.
+    if set(stag_columns) != set(prod_columns):
         only_stag = sorted(set(stag_columns) - set(prod_columns))
         only_prod = sorted(set(prod_columns) - set(stag_columns))
         raise RuntimeError(
             f"table columns differ for {schema}.{table}; only in staging: {only_stag or '-'}; "
             f"only in production: {only_prod or '-'}"
         )
-    return prod_columns
+    # Keep source reads in staging order; destination INSERT/UPDATE statements
+    # explicitly name this same column sequence.
+    return stag_columns
 
 
 def id_changes(connection: Any, schema: str, table: str, id_field: str, change_field: str) -> dict[Any, Any]:
