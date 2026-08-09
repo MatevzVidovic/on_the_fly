@@ -137,12 +137,78 @@ def test_lift_init_apply_refuses_concurrent_metadata_drift() -> None:
         LIFT_INIT.apply_metadata_update(Cursor(), "integration", "maximum", "before", None, None)
 
 
+def test_lift_init_lock_loss_prevents_metadata_mutation() -> None:
+    events = []
+    class Writer:
+        def ensure_held(self): events.append("ensure"); raise RuntimeError("lock lost")
+        def begin_page_mutation(self, _metadata): events.append("begin")
+        def end_page_mutation(self): events.append("end")
+    class Metadata:
+        def commit(self): events.append("commit")
+        def transaction(self): raise AssertionError("must not open write transaction after lock loss")
+        def cursor(self): raise AssertionError("must not update after lock loss")
+
+    with pytest.raises(RuntimeError, match="lock lost"):
+        LIFT_INIT.guarded_metadata_update(Writer(), Metadata(), "id", "max", "old", None, None)
+    assert events == ["commit", "ensure"]
+
+
+def test_lift_init_keeps_staging_session_lock_across_fmp_transaction() -> None:
+    events = []
+    class Cursor:
+        rowcount = 1
+        def __enter__(self): events.append("cursor-enter"); return self
+        def __exit__(self, *_): events.append("cursor-exit")
+        def execute(self, *_): events.append("update")
+    class Transaction:
+        def __enter__(self): events.append("transaction-enter")
+        def __exit__(self, *_): events.append("transaction-exit")
+    class Metadata:
+        def commit(self): events.append("commit")
+        def transaction(self): return Transaction()
+        def cursor(self): return Cursor()
+    class Writer:
+        def ensure_held(self): events.append("ensure")
+        def begin_page_mutation(self, metadata): pytest.fail("must not hand a staging-database lock to fmp")
+        def end_page_mutation(self): pytest.fail("must not release the staging mutex during metadata update")
+    metadata = Metadata()
+    LIFT_INIT.guarded_metadata_update(Writer(), metadata, "id", "max", "old", None, None)
+    assert events == [
+        "commit", "ensure", "transaction-enter", "ensure",
+        "cursor-enter", "update", "cursor-exit", "transaction-exit", "ensure",
+    ]
+
+
 def test_lift_init_loads_only_its_canonical_env(monkeypatch: pytest.MonkeyPatch) -> None:
     calls = []
     monkeypatch.setitem(sys.modules, "dotenv", SimpleNamespace(load_dotenv=lambda path, override=False: calls.append((Path(path), override))))
     LIFT_INIT.load_environment()
     assert calls[0] == (LIFT_INIT.HERE / ".env", False)
     assert len(calls) == 1
+
+
+def test_lift_init_apply_uses_the_shared_table_writer_lock(monkeypatch: pytest.MonkeyPatch) -> None:
+    captured = {}
+
+    class Context:
+        def __init__(self, path, connect, database, schema, table):
+            captured.update(path=path, connect=connect, database=database, schema=schema, table=table)
+
+    monkeypatch.setattr(LIFT_INIT, "WriterRunContext", Context)
+    monkeypatch.setenv("STAG_DATABASE", "staging_data")
+    monkeypatch.setattr(LIFT_INIT, "pg_settings", lambda database: {"dbname": database})
+    driver = SimpleNamespace(connect=lambda **settings: settings)
+    spec = SimpleNamespace(target_table="ev_dst_pripis_podatki_h")
+
+    context = LIFT_INIT.writer_context(driver, spec, apply=True)
+    assert isinstance(context, Context)
+    assert captured["database"] == "staging_data"
+    assert captured["schema"] == "public"
+    assert captured["table"] == "ev_dst_pripis_podatki_h"
+    assert captured["connect"]() == {"dbname": "staging_data"}
+
+    with LIFT_INIT.writer_context(driver, spec, apply=False):
+        pass
 
 
 def test_checker_parser_preserves_environment_report_and_page_size_contract() -> None:

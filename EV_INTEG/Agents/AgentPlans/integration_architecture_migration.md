@@ -28,17 +28,17 @@ The engine provides a page runner with one stable contract:
 - One SIGINT completes and checkpoints the current page; a second rolls it back and stops. A reconnect discards the uncommitted result and retries the same cursor.
 - `PageSizer` is one optional core feature, not separate implementations per script. Fixed size is the default; `--auto-page-size` uses the configured bounded search. SQLite page boundaries are not used unless direct keyset pagination is measured to be insufficient.
 
-### One SQLite use
+### One SQLite mechanism
 
-`RunStore` is SQLite only for a durable source-key/change generation: full change-conflict preflight and explicit purge. It stores the spec/SQL fingerprint, generation ID, source tuple, membership key, and optional change value; it is usable only after successful EOF and an atomic complete marker.
+`RunStore` is SQLite only for durable source generations: full change-conflict preflight and a frozen only-new payload window. It stores the spec/SQL fingerprint, source tuple, membership key, and optional payload/change value; it is usable only after successful EOF and an atomic complete marker.
 
 ## Adapters
 
 ### KN to staging
 
 - **Full:** direct Oracle keyset payload pages using `source_page_keys`; idempotent upsert to staging. For change-aware tables, first materialize the source key/change generation and compare it with staging: source newer updates, equal is a no-op, target newer aborts before writes. This is best-effort against concurrent Oracle changes.
-- **Only new:** persist one completed composite watermark `(date_change, source_page_keys...)`; freeze an upper tuple at run start; use lower-exclusive/upper-inclusive tuple predicates; advance only after the destination page commits. `date_change` must be non-null and deterministic.
-- **Purge:** explicit `--purge-non-existant` only. It uses a complete source generation with non-null unique membership keys and a null-safe anti-join. An interrupted, failed, null-key, duplicate-key, or incomplete generation can never purge. It is explicitly best-effort against concurrent Oracle changes.
+- **Only new:** persist one completed composite watermark `(date_change, source_page_keys...)`; freeze an upper tuple, stream the lower-exclusive/upper-inclusive ordered payload window into a complete SQLite generation, then apply local transactional pages. It trusts the catalogued non-null source contract rather than repeating a full-table NULL scan, while strictly rejecting NULL cursor components in every selected row. Full sync/checking provides the global proof. Advance the watermark only after every destination page commits.
+- **Deletion:** not implemented. Live Oracle membership and payload reads do not share a consistent snapshot, so a purge cannot currently be made safe.
 
 ### Staging to production
 

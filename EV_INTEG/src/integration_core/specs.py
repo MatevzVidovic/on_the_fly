@@ -31,7 +31,6 @@ class TableSpec:
     oracle_index: str | None = None
     oracle_index_columns: tuple[str, ...] | None = None
     version: int = 1
-    insert_policy: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "name", _identifier(self.name, "table spec name"))
@@ -61,8 +60,6 @@ class TableSpec:
             object.__setattr__(self, "oracle_index_columns", columns)
         if self.version < 1:
             raise ValueError("table spec version must be positive")
-        if self.insert_policy is not None and self.insert_policy not in {"default", "copy-managed"}:
-            raise ValueError("insert_policy must be 'default', 'copy-managed', or None")
 
     @property
     def target_relation(self) -> str:

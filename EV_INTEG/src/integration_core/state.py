@@ -200,7 +200,10 @@ def atomic_json_write(path: Path, value: Mapping[str, Any]) -> None:
     descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
     try:
         with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
-            json.dump(value, handle, indent=2, sort_keys=True, default=str, allow_nan=False)
+            # Checkpoint values have already passed the explicit typed codec.
+            # Never add a permissive string fallback here: it would make a
+            # future unsupported cursor/metadata type appear resumable.
+            json.dump(value, handle, indent=2, sort_keys=True, allow_nan=False)
             handle.write("\n")
             handle.flush()
             os.fsync(handle.fileno())

@@ -81,124 +81,112 @@ class PageRunner(Generic[Row]):
         return self._run(fresh, context)
 
     def _run(self, fresh: bool, context: Any) -> PageRunResult:
-            ensure_held = getattr(context, "ensure_held", None)
-            begin_page_mutation = getattr(context, "begin_page_mutation", None)
-            end_page_mutation = getattr(context, "end_page_mutation", None)
-            if not callable(ensure_held) or not callable(begin_page_mutation) or not callable(end_page_mutation):
-                raise RuntimeError("run_context must provide writer advisory-lock liveness and page-handoff methods")
-            checkpoint = read_checkpoint(self.path, self.identity, fresh=fresh)
-            if self.prepare_checkpoint is not None:
-                prepared = self.prepare_checkpoint(checkpoint)
-                if prepared is None:
-                    return PageRunResult(checkpoint, True)
-                if prepared.identity != self.identity:
-                    raise RuntimeError("prepared checkpoint has a different run identity")
-                if prepared != checkpoint:
-                    checkpoint = prepared
-                    save_checkpoint(self.path, checkpoint)
-            if checkpoint.completed:
-                return PageRunResult(checkpoint, False)
-            if self.interrupts.stop_requested:
+        ensure_held = getattr(context, "ensure_held", None)
+        begin_page_mutation = getattr(context, "begin_page_mutation", None)
+        end_page_mutation = getattr(context, "end_page_mutation", None)
+        if not callable(ensure_held) or not callable(begin_page_mutation) or not callable(end_page_mutation):
+            raise RuntimeError("run_context must provide writer advisory-lock liveness and page-handoff methods")
+        checkpoint = read_checkpoint(self.path, self.identity, fresh=fresh)
+        if self.prepare_checkpoint is not None:
+            prepared = self.prepare_checkpoint(checkpoint)
+            if prepared is None:
                 return PageRunResult(checkpoint, True)
-            reconnect_attempts = 0
-            while True:
-                try:
-                    # A graceful SIGINT applies only to the page that was
-                    # active when it arrived.  Never begin a later fetch.
-                    if self.interrupts.stop_requested:
-                        return PageRunResult(checkpoint, True)
-                    ensure_held()
-                    page = self.fetch_page(checkpoint.cursor)
-                    if page is None:
-                        # Final source fetch can be long-running too.  Never
-                        # publish a completed checkpoint after the run lock
-                        # session has been lost.
-                        ensure_held()
-                        checkpoint = Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, checkpoint.metadata)
-                        if self.complete_checkpoint is not None:
-                            checkpoint = self.complete_checkpoint(checkpoint)
-                            if checkpoint.identity != self.identity or not checkpoint.completed:
-                                raise RuntimeError("completion checkpoint must retain identity and be completed")
-                        save_checkpoint(self.path, checkpoint)
-                        return PageRunResult(checkpoint, False)
-                    if not page.rows:
-                        raise RuntimeError("a non-final page must contain rows")
-                    if len(page.next_cursor) != len(self.identity.source_page_keys):
-                        raise RuntimeError("page cursor does not match declared source_page_keys")
-                    if checkpoint.cursor is not None and page.next_cursor <= checkpoint.cursor:
-                        raise RuntimeError("page cursor did not advance")
-                    # Any error here rolls back.  An error after the context
-                    # exits but before save_checkpoint intentionally causes an
-                    # idempotent replay from the unchanged checkpoint cursor.
-                    # Fetches can be long-running; prove the dedicated lock
-                    # session is still alive immediately before mutation.
-                    ensure_held()
-                    handoff_started = False
-                    try:
-                        with self.transaction() as destination_connection:
-                            begin_page_mutation(destination_connection)
-                            handoff_started = True
-                            self.write_page(page.rows)
-                    finally:
-                        # The xact lock is released by the transaction context
-                        # before the dedicated session lock is restored. If
-                        # restoration loses to another writer, refuse to
-                        # checkpoint this committed (idempotent) page.
-                        if handoff_started:
-                            end_page_mutation()
-                    # Size evidence is valid only after the destination
-                    # transaction committed.  Fetch success alone says
-                    # nothing about capacity for the complete page operation.
-                    if self.on_page_committed is not None:
-                        self.on_page_committed(page)
-                    checkpoint = Checkpoint(
-                        self.identity, page.next_cursor, checkpoint.pages + 1, checkpoint.rows + len(page.rows), False, checkpoint.metadata
-                    )
-                    save_checkpoint(self.path, checkpoint)
-                except Exception as error:
-                    # A first SIGINT can make an Oracle driver surface a break
-                    # exception from fetch/write.  It is a graceful stop, not
-                    # a connection failure: the active transaction has rolled
-                    # back and the previous checkpoint remains authoritative.
-                    if isinstance(error, LockUnavailable):
-                        raise
-                    if self.interrupts.stop_requested:
-                        return PageRunResult(checkpoint, True)
-                    # Capacity failure is retried from the unchanged
-                    # checkpoint cursor with an adapter-selected smaller page.
-                    # It applies equally to source fetch and destination work.
-                    if self.on_page_size_error is not None and self.on_page_size_error(error):
-                        continue
-                    if self.reconnect is None or self.is_reconnectable is None or not self.is_reconnectable(error):
-                        raise
-                    while True:
-                        if reconnect_attempts >= self.max_reconnect_attempts:
-                            raise error
-                        delay = min(
-                            self.reconnect_max_delay_seconds,
-                            self.reconnect_initial_delay_seconds * (2 ** reconnect_attempts),
-                        )
-                        reconnect_attempts += 1
-                        if self.interrupts.stop_requested:
-                            return PageRunResult(checkpoint, True)
-                        self.sleep(delay)
-                        if self.interrupts.stop_requested:
-                            return PageRunResult(checkpoint, True)
-                        try:
-                            self.reconnect()
-                            if self.interrupts.stop_requested:
-                                return PageRunResult(checkpoint, True)
-                            break
-                        except Exception as reconnect_error:
-                            if self.interrupts.stop_requested:
-                                return PageRunResult(checkpoint, True)
-                            if not self.is_reconnectable(reconnect_error):
-                                raise
-                            error = reconnect_error
-                    # Refetch; never reuse a possibly partial/stale page.
-                    continue
-                # A committed page proves the connection is usable again, so
-                # subsequent transient failures receive the full retry budget.
-                reconnect_attempts = 0
+            if prepared.identity != self.identity:
+                raise RuntimeError("prepared checkpoint has a different run identity")
+            if prepared != checkpoint:
+                checkpoint = prepared
+                save_checkpoint(self.path, checkpoint)
+        if checkpoint.completed:
+            return PageRunResult(checkpoint, False)
+        if self.interrupts.stop_requested:
+            return PageRunResult(checkpoint, True)
+        reconnect_attempts = 0
+        while True:
+            try:
+                # A graceful SIGINT applies only to the page that was active
+                # when it arrived. Never begin a later fetch.
                 if self.interrupts.stop_requested:
                     return PageRunResult(checkpoint, True)
+                ensure_held()
+                page = self.fetch_page(checkpoint.cursor)
+                if page is None:
+                    # Final source fetch can be long-running too. Never publish
+                    # completion after losing the run-lock session.
+                    ensure_held()
+                    checkpoint = Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, checkpoint.metadata)
+                    if self.complete_checkpoint is not None:
+                        checkpoint = self.complete_checkpoint(checkpoint)
+                        if checkpoint.identity != self.identity or not checkpoint.completed:
+                            raise RuntimeError("completion checkpoint must retain identity and be completed")
+                    save_checkpoint(self.path, checkpoint)
+                    return PageRunResult(checkpoint, False)
+                if not page.rows:
+                    raise RuntimeError("a non-final page must contain rows")
+                if len(page.next_cursor) != len(self.identity.source_page_keys):
+                    raise RuntimeError("page cursor does not match declared source_page_keys")
+                if checkpoint.cursor is not None and page.next_cursor <= checkpoint.cursor:
+                    raise RuntimeError("page cursor did not advance")
+                # Any error here rolls back. An error after commit but before
+                # checkpoint intentionally causes an idempotent replay.
+                ensure_held()
+                handoff_started = False
+                try:
+                    with self.transaction() as destination_connection:
+                        begin_page_mutation(destination_connection)
+                        handoff_started = True
+                        self.write_page(page.rows)
+                finally:
+                    # Restore the dedicated session lock after transaction end.
+                    # Losing the handoff race refuses the checkpoint.
+                    if handoff_started:
+                        end_page_mutation()
+                # Size evidence is valid only after the whole page commits.
+                if self.on_page_committed is not None:
+                    self.on_page_committed(page)
+                checkpoint = Checkpoint(
+                    self.identity, page.next_cursor, checkpoint.pages + 1,
+                    checkpoint.rows + len(page.rows), False, checkpoint.metadata,
+                )
+                save_checkpoint(self.path, checkpoint)
+            except Exception as error:
+                # A driver's first-SIGINT break error is a graceful stop; the
+                # active transaction rolled back and the checkpoint is intact.
+                if isinstance(error, LockUnavailable):
+                    raise
+                if self.interrupts.stop_requested:
+                    return PageRunResult(checkpoint, True)
+                if self.on_page_size_error is not None and self.on_page_size_error(error):
+                    continue
+                if self.reconnect is None or self.is_reconnectable is None or not self.is_reconnectable(error):
+                    raise
+                while True:
+                    if reconnect_attempts >= self.max_reconnect_attempts:
+                        raise error
+                    delay = min(
+                        self.reconnect_max_delay_seconds,
+                        self.reconnect_initial_delay_seconds * (2 ** reconnect_attempts),
+                    )
+                    reconnect_attempts += 1
+                    if self.interrupts.stop_requested:
+                        return PageRunResult(checkpoint, True)
+                    self.sleep(delay)
+                    if self.interrupts.stop_requested:
+                        return PageRunResult(checkpoint, True)
+                    try:
+                        self.reconnect()
+                        if self.interrupts.stop_requested:
+                            return PageRunResult(checkpoint, True)
+                        break
+                    except Exception as reconnect_error:
+                        if self.interrupts.stop_requested:
+                            return PageRunResult(checkpoint, True)
+                        if not self.is_reconnectable(reconnect_error):
+                            raise
+                        error = reconnect_error
+                # Refetch; never reuse a possibly partial/stale page.
+                continue
+            # A committed page proves the connection is usable again, so
+            # subsequent transient failures receive the full retry budget.
+            reconnect_attempts = 0
+            if self.interrupts.stop_requested:
+                return PageRunResult(checkpoint, True)

@@ -60,8 +60,6 @@ def test_specs_normalize_safe_identifiers_and_keep_checker_rules_separate() -> N
     with pytest.raises(ValueError):
         TableSpec("x", Path("q"), "public", "t", "id", ("bad-key",))
     with pytest.raises(ValueError):
-        TableSpec("x", Path("q.sql"), "public", "t", "id", ("id",), insert_policy="anything")
-    with pytest.raises(ValueError):
         CheckSpec("bad-name")
     with pytest.raises(TypeError):
         CheckSpec()  # type: ignore[call-arg]

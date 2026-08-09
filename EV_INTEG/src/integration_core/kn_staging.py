@@ -12,6 +12,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
 import re
+from time import monotonic
 from typing import Any
 
 from .managed import InsertPolicy
@@ -82,60 +83,67 @@ def keyset_projection_query(source_sql: str, projection: tuple[str, ...], page_k
     return query.replace("SELECT *", f"SELECT {aliases}", 1), binds
 
 
-def delta_query(
-    source_sql: str,
-    change_field: str,
-    page_keys: tuple[str, ...],
-    lower: tuple[Any, ...] | None,
-    upper: tuple[Any, ...],
-) -> tuple[str, dict[str, Any]]:
-    """Build lower-exclusive / upper-inclusive composite watermark paging."""
-    fields = (_identifier(change_field), *( _identifier(field) for field in page_keys))
-    if len(upper) != len(fields):
-        raise ValueError("upper watermark does not match change/page keys")
-    clauses = [lexicographic_predicate(fields, "<=", "upper")]
-    binds = {f"upper_{index}": value for index, value in enumerate(upper)}
-    if lower is not None:
-        if len(lower) != len(fields):
-            raise ValueError("lower watermark does not match change/page keys")
-        clauses.append(lexicographic_predicate(fields, ">", "after"))
-        binds.update({f"after_{index}": value for index, value in enumerate(lower)})
-    return (
-        f"SELECT * FROM ({source_sql}) source_rows WHERE {' AND '.join(clauses)} "
-        f"ORDER BY {', '.join(fields)} FETCH NEXT :page_size ROWS ONLY",
-        binds,
-    )
-
-
 def upper_watermark_query(source_sql: str, change_field: str, page_keys: tuple[str, ...]) -> str:
     fields = (_identifier(change_field), *( _identifier(field) for field in page_keys))
-    return f"SELECT {', '.join(fields)} FROM ({source_sql}) source_rows ORDER BY {', '.join(field + ' DESC' for field in fields)} FETCH FIRST 1 ROW ONLY"
+    return f"SELECT {', '.join(fields)} FROM ({source_sql}) source_rows ORDER BY {', '.join(field + ' DESC NULLS LAST' for field in fields)} FETCH FIRST 1 ROW ONLY"
+
+
+def delta_materialization_query(
+    source_sql: str, change_field: str,
+    lower: tuple[Any, ...] | None, upper: tuple[Any, ...],
+    page_keys: tuple[str, ...],
+) -> tuple[str, dict[str, Any]]:
+    """One ordered, payload-bearing query for a frozen timestamp window.
+
+    The lower timestamp is inclusive so a resumed materialization can see and
+    validate the exact boundary tuple again.  Composite lower/upper filtering
+    happens in Python while rows stream into the durable local generation.
+    """
+    change = _identifier(change_field)
+    fields = (change, *(_identifier(field) for field in page_keys))
+    binds: dict[str, Any] = {"upper_change": upper[0]}
+    clauses = [f"{change} <= :upper_change"]
+    if lower is not None:
+        clauses.append(f"{change} >= :lower_change")
+        binds["lower_change"] = lower[0]
+    return (
+        f"SELECT * FROM ({source_sql}) source_rows WHERE {' AND '.join(clauses)} "
+        f"ORDER BY {', '.join(field + ' ASC NULLS FIRST' for field in fields)}",
+        binds,
+    )
 
 
 def source_columns(connection: Any, source_sql: str) -> tuple[str, ...]:
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT * FROM ({source_sql}) source_rows WHERE 1 = 0")
-        return tuple(_identifier(column[0]) for column in cursor.description)
+        columns = tuple(_identifier(column[0]) for column in cursor.description)
+    duplicates = sorted({column for column in columns if columns.count(column) > 1})
+    if duplicates:
+        raise RuntimeError(f"integration SQL has duplicate selected aliases: {', '.join(duplicates)}")
+    return columns
 
 
-def validate_source_shape(connection: Any, source_sql: str, spec: TableSpec, *, require_change: bool) -> None:
-    """Cheap structural validation for normal transfer runs."""
-    columns = set(source_columns(connection, source_sql))
+def validate_selected_columns(columns: tuple[str, ...], spec: TableSpec, *, require_change: bool) -> None:
+    """Validate one already-described source result against its paging facts."""
+    selected = set(columns)
     required = {spec.membership_key, *spec.source_page_keys}
     if require_change and spec.date_change:
         required.add(spec.date_change)
-    missing = sorted(required - columns)
+    missing = sorted(required - selected)
     if missing:
         raise RuntimeError(f"integration SQL is missing required selected aliases: {', '.join(missing)}")
 
-def prove_source_membership(connection: Any, source_sql: str, spec: TableSpec, *, include_change: bool) -> None:
-    """Prove that source identities can safely drive a resumable run.
 
-    ``--only-new`` pages by ``(date_change, *source_page_keys)``.  A unique,
-    non-null native page tuple is deliberately a stronger requirement: it
-    makes that composite cursor deterministic as well as making ordinary full
-    keyset paging safe.
-    """
+def validate_source_shape(connection: Any, source_sql: str, spec: TableSpec, *, require_change: bool) -> None:
+    """Cheap structural validation for command previews and preflight."""
+    validate_selected_columns(source_columns(connection, source_sql), spec, require_change=require_change)
+
+
+def prove_source_membership(
+    connection: Any, source_sql: str, spec: TableSpec, *,
+    include_change: bool,
+) -> None:
+    """Globally prove identities used by full-sync paging and preflight."""
     page_fields = tuple(dict.fromkeys(spec.source_page_keys))
     fields = tuple(dict.fromkeys((spec.membership_key, *page_fields, *((spec.date_change,) if include_change and spec.date_change else ()))))
     null_checks = [
@@ -163,6 +171,10 @@ def prove_source_membership(connection: Any, source_sql: str, spec: TableSpec, *
         raise RuntimeError(f"KN integration result has null {spec.date_change} values")
     if total != distinct_membership:
         raise RuntimeError("KN integration result has duplicate membership keys")
+    # Full paging is *always* ordered by the native page tuple.  Prove that
+    # tuple independently of date_change: two rows with the same native tuple
+    # but different change timestamps would otherwise pass a composite proof
+    # and make full keyset paging silently skip one of them.
     tuple_query = (
         f"SELECT COUNT(*) FROM (SELECT {', '.join(spec.source_page_keys)} "
         f"FROM ({source_sql}) source_rows GROUP BY {', '.join(spec.source_page_keys)})"
@@ -246,23 +258,35 @@ def target_changes(connection: Any, spec: TableSpec, identifiers: list[Any]) -> 
         return {row[0]: row[1] for row in cursor.fetchall()}
 
 
-def materialize_source_membership(connection: Any, source_sql: str, spec: TableSpec, page_size: int, store: RunStore, *, fresh: bool, interrupts: Any | None = None, include_change: bool = False, prove: bool = True) -> tuple[Any, bool]:
+def materialize_source_membership(
+    connection: Any, source_sql: str, spec: TableSpec, page_size: int,
+    store: RunStore, *, fresh: bool, interrupts: Any | None = None,
+    include_change: bool = False, prove: bool = True,
+    page_sizer: PageSizer | None = None,
+    progress: Callable[[dict[str, Any]], None] | None = None,
+) -> tuple[Any, bool]:
     """Build/reuse one durable source generation for full preflight/purge."""
     database = store.open(fresh=fresh)
     handed_to_caller = False
     try:
+        # Re-prove on every invocation, including a durable-generation or
+        # payload resume. The SQLite cursor records data, not an enduring fact
+        # about a live Oracle result, and older state may predate this proof.
+        if prove:
+            prove_source_membership(connection, source_sql, spec, include_change=include_change)
         if store.complete(database):
             handed_to_caller = True
             return database, False
         projection = tuple(dict.fromkeys((spec.membership_key, *((spec.date_change,) if include_change and spec.date_change else ()), *spec.source_page_keys)))
         after = store.cursor(database)
         if after is None:
-            if prove:
-                prove_source_membership(connection, source_sql, spec, include_change=include_change)
             store.begin(database)
+        started = monotonic()
+        pages = 0
+        rows_done = 0
         while True:
             query, binds = keyset_projection_query(source_sql, projection, spec.source_page_keys, after)
-            binds["page_size"] = page_size
+            binds["page_size"] = page_sizer.current if page_sizer is not None else page_size
             try:
                 with connection.cursor() as cursor:
                     cursor.execute(query, binds)
@@ -276,6 +300,9 @@ def materialize_source_membership(connection: Any, source_sql: str, spec: TableS
                 if interrupts is not None and interrupts.stop_requested:
                     handed_to_caller = True
                     return database, True
+                if page_sizer is not None and page_sizer.adaptive and is_size_related_error(error):
+                    page_sizer.failed_for_size()
+                    continue
                 raise
             if not rows:
                 store.mark_complete(database)
@@ -287,6 +314,18 @@ def materialize_source_membership(connection: Any, source_sql: str, spec: TableS
                 generation_rows.append((values[spec.membership_key], values[spec.date_change] if include_change and spec.date_change else None))
             last = dict(zip(names, rows[-1], strict=True))
             store.append_page(database, generation_rows, tuple(last[key] for key in spec.source_page_keys))
+            if page_sizer is not None:
+                page_sizer.succeeded()
+            pages += 1
+            rows_done += len(rows)
+            if progress is not None:
+                elapsed = max(monotonic() - started, 1e-9)
+                progress({
+                    "phase": "preflight", "page": pages,
+                    "page_rows": len(rows), "rows": rows_done,
+                    "elapsed_seconds": elapsed, "rate": rows_done / elapsed,
+                    "eta_seconds": None,
+                })
             if interrupts is not None and interrupts.stop_requested:
                 handed_to_caller = True
                 return database, True
@@ -310,18 +349,121 @@ def assert_target_not_newer(connection: Any, spec: TableSpec, generation: Any, *
     return False
 
 
-def materialize_source_changes(*args: Any, **kwargs: Any) -> tuple[Any, bool]:
-    """Compatibility helper for checker/research tests; no destructive proof."""
-    kwargs["prove"] = False
-    kwargs["include_change"] = True
-    return materialize_source_membership(*args, **kwargs)
+def materialize_delta_payload(
+    connection: Any, source_sql: str, spec: TableSpec, store: RunStore,
+    lower: tuple[Any, ...] | None, upper: tuple[Any, ...], page_size: int,
+    *, interrupts: Any | None = None, page_sizer: PageSizer | None = None,
+    progress: Callable[[dict[str, Any]], None] | None = None,
+) -> tuple[Any, bool]:
+    """Freeze the exact only-new payload locally before any target write.
+
+    Validation is proportional to the delta window: ordered rows prove a
+    strict composite cursor as they are read, and SQLite's UNIQUE keys prove
+    membership uniqueness.  No full-result aggregate or global NULL scan is
+    needed for each incremental run.
+    """
+    if spec.date_change is None:
+        raise RuntimeError("only-new needs a date_change column")
+    database = store.open()
+    handed_to_caller = False
+    try:
+        bounds = store.delta_bounds(database)
+        if bounds != (lower, upper):
+            store.begin_delta(database, lower, upper)
+        elif store.delta_complete(database):
+            handed_to_caller = True
+            return database, False
+
+        started = monotonic()
+        pages = rows_done = 0
+        while True:
+            persisted_after = store.delta_cursor(database)
+            query_lower = persisted_after if persisted_after is not None else lower
+            query, binds = delta_materialization_query(
+                source_sql, spec.date_change, query_lower, upper, spec.source_page_keys,
+            )
+            size = page_sizer.current if page_sizer is not None else page_size
+            saw_persisted_boundary = persisted_after is None
+            try:
+                with connection.cursor() as cursor:
+                    cursor.arraysize = size
+                    cursor.execute(query, binds)
+                    names = tuple(_identifier(column[0]) for column in cursor.description)
+                    while True:
+                        raw_rows = cursor.fetchmany(size)
+                        if not raw_rows:
+                            break
+                        batch: list[tuple[Any, tuple[Any, ...], dict[str, Any]]] = []
+                        for raw in raw_rows:
+                            row = dict(zip(names, raw, strict=True))
+                            composite = (row[spec.date_change], *(row[key] for key in spec.source_page_keys))
+                            if any(value is None for value in composite):
+                                raise RuntimeError("only-new source has a NULL cursor component")
+                            if persisted_after is not None and composite == persisted_after:
+                                if saw_persisted_boundary:
+                                    raise RuntimeError("only-new source cursor is duplicate or not strictly ordered")
+                                saw_persisted_boundary = True
+                                continue
+                            if query_lower is not None and composite <= query_lower:
+                                continue
+                            if composite > upper:
+                                continue
+                            batch.append((row[spec.membership_key], composite, row))
+                        store.append_delta_page(database, batch)
+                        if page_sizer is not None:
+                            page_sizer.succeeded()
+                            size = page_sizer.current
+                            cursor.arraysize = size
+                        pages += 1
+                        rows_done += len(batch)
+                        if progress is not None:
+                            elapsed = max(monotonic() - started, 1e-9)
+                            progress({
+                                "phase": "only-new-materialize", "page": pages,
+                                "page_rows": len(batch), "rows": rows_done,
+                                "elapsed_seconds": elapsed, "rate": rows_done / elapsed,
+                                "eta_seconds": None,
+                            })
+                        if interrupts is not None and interrupts.stop_requested:
+                            handed_to_caller = True
+                            return database, True
+                # The boundary row may be deleted after its payload was
+                # durably stored. Its absence does not invalidate later rows;
+                # filtering remains lower-exclusive from that stored cursor.
+                store.mark_delta_complete(database)
+                handed_to_caller = True
+                return database, False
+            except BaseException as error:
+                if isinstance(error, KeyboardInterrupt):
+                    raise
+                if interrupts is not None and interrupts.stop_requested:
+                    handed_to_caller = True
+                    return database, True
+                if page_sizer is not None and page_sizer.adaptive and is_size_related_error(error):
+                    page_sizer.failed_for_size()
+                    continue
+                raise
+    finally:
+        if not handed_to_caller:
+            database.close()
 
 
 def upsert_sql(spec: TableSpec, source: tuple[str, ...], destination: tuple[str, ...], policy: InsertPolicy = InsertPolicy()) -> str:
-    selected = tuple(column for column in source if column in destination)
-    if spec.membership_key not in selected:
+    source_set, destination_set = set(source), set(destination)
+    duplicates = sorted({column for column in source if source.count(column) > 1})
+    if duplicates:
+        raise RuntimeError(f"integration SQL has duplicate selected aliases: {', '.join(duplicates)}")
+    expected_source = destination_set if policy.copy_managed_fields else destination_set - policy.managed.all_fields
+    missing = sorted(expected_source - source_set)
+    extra = sorted(source_set - expected_source)
+    if missing or extra:
+        raise RuntimeError(
+            f"integration SQL columns do not match {spec.target_relation}; "
+            f"missing: {missing or '-'}; extra: {extra or '-'}"
+        )
+    if spec.membership_key not in source_set:
         raise RuntimeError("integration SQL membership key is not insertable into staging")
-    insertable = policy.insert_columns(selected)
+    insertable = policy.insert_columns(source)
     generated = {key: value for key, value in policy.generated_insert_values().items() if key in destination}
     columns = (*generated, *insertable)
     values = (*generated.values(), *(f"%({column})s" for column in insertable))
@@ -362,6 +504,35 @@ def checked_upsert(cursor: Any, statement: str, rows: tuple[Mapping[str, Any], .
         )
 
 
+def _write_source_rows(
+    connection: Any, spec: TableSpec, statement: str,
+    rows: tuple[Mapping[str, Any], ...], *, newer_error: str,
+) -> None:
+    """Select versions once, reject target-newer rows, then upsert changes."""
+    rows_to_write = rows
+    if spec.date_change is not None:
+        existing = target_changes(
+            connection, spec, [row[spec.membership_key] for row in rows],
+        )
+        newer = [
+            row[spec.membership_key]
+            for row in rows
+            if row[spec.membership_key] in existing
+            and existing[row[spec.membership_key]] is not None
+            and row[spec.date_change] < existing[row[spec.membership_key]]
+        ]
+        if newer:
+            raise RuntimeError(newer_error.format(change=spec.date_change, key=newer[0]))
+        rows_to_write = tuple(
+            row for row in rows
+            if row[spec.membership_key] not in existing
+            or existing[row[spec.membership_key]] is None
+            or row[spec.date_change] > existing[row[spec.membership_key]]
+        )
+    with connection.cursor() as cursor:
+        checked_upsert(cursor, statement, rows_to_write)
+
+
 @dataclass(slots=True)
 class KnStagingRun:
     """Small composition layer around :class:`PageRunner` for one table."""
@@ -379,6 +550,7 @@ class KnStagingRun:
     reconnect: Callable[[], None] | None = None
     is_reconnectable: Callable[[Exception], bool] | None = None
     page_sizer: PageSizer | None = None
+    progress: Callable[[dict[str, Any]], None] | None = None
 
     def _shrink_page_for(self, error: Exception) -> bool:
         if self.page_sizer is None or not self.page_sizer.adaptive or not is_size_related_error(error):
@@ -403,6 +575,24 @@ class KnStagingRun:
 
     def run_full(self, *, fresh: bool = False, context: Any | None = None) -> Any:
         statement: str | None = None
+        payload_started = monotonic()
+        payload_pages = 0
+        payload_rows = 0
+
+        def page_committed(page: Page[Mapping[str, Any]]) -> None:
+            nonlocal payload_pages, payload_rows
+            if self.page_sizer is not None:
+                self.page_sizer.succeeded()
+            payload_pages += 1
+            payload_rows += len(page.rows)
+            if self.progress is not None:
+                elapsed = max(monotonic() - payload_started, 1e-9)
+                self.progress({
+                    "phase": "payload", "page": payload_pages,
+                    "page_rows": len(page.rows), "rows": payload_rows,
+                    "elapsed_seconds": elapsed, "rate": payload_rows / elapsed,
+                    "eta_seconds": None,
+                })
 
         def fetch(after: tuple[Any, ...] | None) -> Page[Mapping[str, Any]] | None:
             def query_builder(size: int) -> tuple[str, dict[str, Any]]:
@@ -412,16 +602,11 @@ class KnStagingRun:
             return self._source_page(after, query_builder, self.spec.source_page_keys)
 
         def write(rows: tuple[Mapping[str, Any], ...]) -> None:
-            rows_to_write = rows
-            if self.spec.date_change is not None:
-                existing = target_changes(self.destination_connection, self.spec, [row[self.spec.membership_key] for row in rows])
-                newer = [row[self.spec.membership_key] for row in rows if row[self.spec.membership_key] in existing and existing[row[self.spec.membership_key]] is not None and row[self.spec.date_change] < existing[row[self.spec.membership_key]]]
-                if newer:
-                    raise RuntimeError(f"staging has newer {self.spec.date_change} for source key {newer[0]!r}; full sync refuses to overwrite it")
-                rows_to_write = tuple(row for row in rows if row[self.spec.membership_key] not in existing or existing[row[self.spec.membership_key]] is None or row[self.spec.date_change] > existing[row[self.spec.membership_key]])
-            with self.destination_connection.cursor() as cursor:
-                assert statement is not None
-                checked_upsert(cursor, statement, rows_to_write)
+            assert statement is not None
+            _write_source_rows(
+                self.destination_connection, self.spec, statement, rows,
+                newer_error="staging has newer {change} for source key {key!r}; full sync refuses to overwrite it",
+            )
 
         @contextmanager
         def transaction() -> Iterable[Any]:
@@ -433,6 +618,9 @@ class KnStagingRun:
         def prepare(checkpoint: Checkpoint) -> Checkpoint:
             nonlocal statement
             source = source_columns(self.source_connection, self.source_sql)
+            validate_selected_columns(
+                source, self.spec, require_change=self.spec.date_change is not None,
+            )
             destination = target_columns(self.destination_connection, self.spec)
             validate_target_membership_index(self.destination_connection, self.spec)
             statement = upsert_sql(self.spec, source, destination, self.policy)
@@ -440,6 +628,7 @@ class KnStagingRun:
                 self.source_connection, self.source_sql, self.spec, self.page_size, store,
                 fresh=fresh or (checkpoint.completed and not store.has_active_incomplete_generation()),
                 interrupts=self.interrupts, include_change=self.spec.date_change is not None,
+                page_sizer=self.page_sizer, progress=self.progress,
             )
             if stopped:
                 if generation is not None:
@@ -458,22 +647,37 @@ class KnStagingRun:
                 return Checkpoint(self.identity)
             return checkpoint
 
-        return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=(lambda _page: self.page_sizer.succeeded()) if self.page_sizer is not None else None, on_page_size_error=(lambda error: self._shrink_page_for(error))).run(fresh=fresh, context=context)
+        return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=page_committed, on_page_size_error=(lambda error: self._shrink_page_for(error))).run(fresh=fresh, context=context)
 
     def run_only_new(self, *, fresh: bool = False) -> Any:
-        """Apply one frozen composite-watermark window idempotently.
-
-        A completed checkpoint's cursor is the completed composite watermark.
-        An incomplete checkpoint contains a frozen ``window_upper`` metadata
-        value.  This makes retries use exactly the same source window.
-        """
+        """Materialize one frozen delta window, then apply it locally."""
         if self.spec.date_change is None:
             raise RuntimeError("only-new needs a date_change column")
         if self.spec.date_change in self.spec.source_page_keys:
             raise RuntimeError("only-new date_change must not also be a source_page_key")
         statement: str | None = None
+        payload_started = monotonic()
+        payload_pages = 0
+        payload_rows = 0
 
-        window: dict[str, tuple[Any, ...] | None] = {"upper": None}
+        def page_committed(page: Page[Mapping[str, Any]]) -> None:
+            nonlocal payload_pages, payload_rows
+            if self.page_sizer is not None:
+                self.page_sizer.succeeded()
+            payload_pages += 1
+            payload_rows += len(page.rows)
+            if self.progress is not None:
+                elapsed = max(monotonic() - payload_started, 1e-9)
+                self.progress({
+                    "phase": "payload", "page": payload_pages,
+                    "page_rows": len(page.rows), "rows": payload_rows,
+                    "elapsed_seconds": elapsed, "rate": payload_rows / elapsed,
+                    "eta_seconds": None,
+                })
+
+        window: dict[str, tuple[Any, ...] | None] = {"lower": None, "upper": None}
+        generation: dict[str, Any] = {"database": None}
+        store = self._generation_store(self.identity)
 
         def prewrite(operation: Callable[[], Any]) -> Any:
             """Run only-new setup with an explicit safe failure boundary.
@@ -498,57 +702,97 @@ class KnStagingRun:
             nonlocal statement
             source = prewrite(lambda: source_columns(self.source_connection, self.source_sql))
             destination = prewrite(lambda: target_columns(self.destination_connection, self.spec))
-            prewrite(lambda: validate_source_shape(self.source_connection, self.source_sql, self.spec, require_change=True))
+            validate_selected_columns(source, self.spec, require_change=True)
             prewrite(lambda: validate_target_membership_index(self.destination_connection, self.spec))
             statement = upsert_sql(self.spec, source, destination, self.policy)
             self.destination_connection.commit()
             metadata = dict(checkpoint.metadata or {})
             stored = metadata.get("window_upper")
-            if not checkpoint.completed and stored is not None:
+            lower: tuple[Any, ...] | None
+            upper: tuple[Any, ...] | None
+            freeze_new_upper = False
+            if not checkpoint.completed and metadata:
                 if not isinstance(stored, tuple) or len(stored) != len(self.identity.source_page_keys):
                     raise RuntimeError("only-new checkpoint has an invalid frozen upper watermark")
-                window["upper"] = stored
-                return checkpoint
-            if checkpoint.cursor is None:
-                raise RuntimeError(
-                    "--only-new needs a completed composite watermark; this version cannot safely bootstrap one "
-                    "from legacy full-sync state. Run a full sync, then initialise a reviewed "
-                    "(date_change, source page-key) watermark before using --only-new."
-                )
-            # This happens before looking up/persisting a new upper watermark.
-            # NULLS LAST cannot make a nullable or duplicate cursor correct:
-            # it would only hide rows from a later keyset page.
-            prewrite(lambda: prove_source_membership(self.source_connection, self.source_sql, self.spec, include_change=True))
-            upper = prewrite(lambda: freeze_upper_watermark(self.source_connection, self.source_sql, self.spec))
+                upper = stored
+                if "window_lower" in metadata:
+                    declared_lower = metadata["window_lower"]
+                    if declared_lower is not None and (
+                        not isinstance(declared_lower, tuple)
+                        or len(declared_lower) != len(self.identity.source_page_keys)
+                    ):
+                        raise RuntimeError("only-new checkpoint has an invalid frozen lower watermark")
+                    lower = declared_lower
+                elif metadata.get("initialized_only_new_bootstrap") is True and checkpoint.cursor is None:
+                    lower = None
+                else:
+                    raise RuntimeError("only-new checkpoint is missing its frozen lower watermark")
+            else:
+                if not checkpoint.completed and checkpoint.cursor is not None:
+                    raise RuntimeError("only-new checkpoint is missing its frozen window metadata")
+                if checkpoint.cursor is None:
+                    raise RuntimeError(
+                        "--only-new needs a completed composite watermark; this version cannot safely bootstrap one "
+                        "from legacy full-sync state. Run a full sync, then initialise a reviewed "
+                        "(date_change, source page-key) watermark before using --only-new."
+                    )
+                lower = checkpoint.cursor
+                # A crash may have persisted part of a newly frozen generation
+                # before PageRunner published its window metadata. Reuse those
+                # durable bounds instead of silently opening a different window.
+                probe = store.open()
+                try:
+                    bounds = store.delta_bounds(probe)
+                finally:
+                    probe.close()
+                if bounds is not None and bounds[0] == lower and not checkpoint.metadata:
+                    upper = bounds[1]
+                else:
+                    upper = None
+                    freeze_new_upper = True
+            if freeze_new_upper:
+                upper = prewrite(lambda: freeze_upper_watermark(
+                    self.source_connection, self.source_sql, self.spec,
+                ))
             if upper is None:
                 window["upper"] = None
                 return Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, None)
-            if checkpoint.cursor is not None and upper <= checkpoint.cursor:
+            if lower is not None and upper <= lower:
                 window["upper"] = upper
                 return Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, None)
-            window["upper"] = upper
-            lower = checkpoint.cursor
-            return Checkpoint(self.identity, lower, 0 if checkpoint.completed else checkpoint.pages, 0 if checkpoint.completed else checkpoint.rows, False, {"window_upper": upper})
+            database, stopped = prewrite(lambda: materialize_delta_payload(
+                self.source_connection, self.source_sql, self.spec, store,
+                lower, upper, self.page_size, interrupts=self.interrupts,
+                page_sizer=self.page_sizer, progress=self.progress,
+            ))
+            generation["database"] = database
+            if stopped:
+                database.close()
+                generation["database"] = None
+                return None
+            window["lower"], window["upper"] = lower, upper
+            apply_cursor = checkpoint.cursor if not checkpoint.completed else lower
+            return Checkpoint(
+                self.identity, apply_cursor,
+                0 if checkpoint.completed else checkpoint.pages,
+                0 if checkpoint.completed else checkpoint.rows,
+                False, {"window_lower": lower, "window_upper": upper},
+            )
 
         def fetch(after: tuple[Any, ...] | None) -> Page[Mapping[str, Any]] | None:
-            upper = window["upper"]
-            if upper is None:
+            database = generation["database"]
+            if database is None:
                 return None
-            def query_builder(size: int) -> tuple[str, dict[str, Any]]:
-                page_query, page_binds = delta_query(self.source_sql, self.spec.date_change or "", self.spec.source_page_keys, after, upper)
-                page_binds["page_size"] = size
-                return page_query, page_binds
-            return self._source_page(after, query_builder, (self.spec.date_change, *self.spec.source_page_keys))
+            size = self.page_sizer.current if self.page_sizer is not None else self.page_size
+            rows, next_cursor = RunStore.delta_page(database, after, size)
+            return None if not rows else Page(rows, next_cursor or ())
 
         def write(rows: tuple[Mapping[str, Any], ...]) -> None:
-            existing = target_changes(self.destination_connection, self.spec, [row[self.spec.membership_key] for row in rows])
-            newer = [row[self.spec.membership_key] for row in rows if row[self.spec.membership_key] in existing and existing[row[self.spec.membership_key]] is not None and row[self.spec.date_change] < existing[row[self.spec.membership_key]]]
-            if newer:
-                raise RuntimeError(f"staging has newer {self.spec.date_change} for source key {newer[0]!r}; only-new refuses to overwrite it")
-            rows = tuple(row for row in rows if row[self.spec.membership_key] not in existing or existing[row[self.spec.membership_key]] is None or row[self.spec.date_change] > existing[row[self.spec.membership_key]])
-            with self.destination_connection.cursor() as cursor:
-                assert statement is not None
-                checked_upsert(cursor, statement, rows)
+            assert statement is not None
+            _write_source_rows(
+                self.destination_connection, self.spec, statement, rows,
+                newer_error="staging has newer {change} for source key {key!r}; only-new refuses to overwrite it",
+            )
 
         @contextmanager
         def transaction() -> Iterable[Any]:
@@ -565,7 +809,12 @@ class KnStagingRun:
                 return checkpoint
             return Checkpoint(self.identity, upper, checkpoint.pages, checkpoint.rows, True, None)
 
-        return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=(lambda _page: self.page_sizer.succeeded()) if self.page_sizer is not None else None, on_page_size_error=(lambda error: self._shrink_page_for(error)), complete_checkpoint=complete).run(fresh=fresh)
+        try:
+            return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=page_committed, on_page_size_error=(lambda error: self._shrink_page_for(error)), complete_checkpoint=complete).run(fresh=fresh)
+        finally:
+            database = generation["database"]
+            if database is not None:
+                database.close()
 
 
 def freeze_upper_watermark(connection: Any, source_sql: str, spec: TableSpec) -> tuple[Any, ...] | None:
@@ -574,4 +823,10 @@ def freeze_upper_watermark(connection: Any, source_sql: str, spec: TableSpec) ->
     with connection.cursor() as cursor:
         cursor.execute(upper_watermark_query(source_sql, spec.date_change, spec.source_page_keys))
         row = cursor.fetchone()
-    return tuple(row) if row is not None else None
+    if row is None:
+        return None
+    fields = (spec.date_change, *spec.source_page_keys)
+    missing = ", ".join(field for field, value in zip(fields, row, strict=True) if value is None)
+    if missing:
+        raise RuntimeError(f"only-new source has NULL cursor component(s): {missing}")
+    return tuple(row)

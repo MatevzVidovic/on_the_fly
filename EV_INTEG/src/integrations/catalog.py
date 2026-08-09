@@ -22,7 +22,6 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from integration_core import CheckSpec, TableSpec
-from .ev_pe_parc import SPEC as EV_PE_PARC_SPEC
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -60,7 +59,7 @@ _DECLARED_ENTRIES = {
     "ev_parc_enota_h_2025_danes": _entry("ev_parc_enota", "ev_parc_enota_h_2025_danes", "jn_parcela_enota_pk", ("id_parc_enota", "jn_rev_num"), "JN_PARC_ENOTA", "JN_PARC_ENOTA_PK_JNF_IX", "ev_parc_enota_h_2025_danes_kn.sql", from_2025=True, forbid_columns=("podatki",)),
     "ev_parcela_h": _entry("ev_parcela", "ev_parcela_h", "jn_parcela_pk", ("pc_mid", "jn_rev_num"), "JN_PARCELA", "JN_PARCELA_PK_JNF_IX", "ev_parcela_h_kn.sql"),
     "ev_pe_dst_h": _entry("ev_pe_dst", "ev_pe_dst_h", "jn_pe_dst_pk", ("id_pe_dst", "jn_rev_num"), "JN_PE_DST", "JN_PE_DST_PK_JNF_IX", "ev_pe_dst_h_kn.sql"),
-    "ev_pe_parc_h": CatalogEntry(EV_PE_PARC_SPEC, CheckSpec(source_table="JN_PE_PARC", requires_jn_status=True), False),
+    "ev_pe_parc_h": _entry("ev_pe_parc", "ev_pe_parc_h", "jn_pe_parc_pk", ("id_pe_parc", "jn_rev_num"), "JN_PE_PARC", "JN_PE_PARC_PK_JNF_IX", "ev_pe_parc_h.sql"),
     "ev_posebna_enota_h": _entry("ev_posebna_enota", "ev_posebna_enota_h", "jn_posebna_enota_pk", ("id_pe", "jn_rev_num"), "JN_POSEBNA_ENOTA", "JN_POSEBNA_ENOTA_PK_JNF_IX", "ev_posebna_enota_h_kn.sql"),
     "ev_prostor_h": _entry("ev_prostor", "ev_prostor_h", "jn_prostor_pk", ("pro_id", "jn_rev_num"), "JN_PROSTOR", "JN_PROSTOR_PK_JNF_IX", "ev_prostor_h_kn.sql"),
     "ev_stavba_h": _entry("ev_stavba", "ev_stavba_h", "jn_sta_pk", ("sta_sid", "jn_rev_num"), "JN_STAVBA", "JN_STAVBA_PK_JNF_IX", "ev_stavba_h_kn.sql"),
