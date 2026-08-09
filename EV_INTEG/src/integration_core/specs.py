@@ -27,6 +27,9 @@ class TableSpec:
     membership_key: str
     source_page_keys: tuple[str, ...]
     date_change: str | None = None
+    oracle_owner: str | None = None
+    oracle_index: str | None = None
+    oracle_index_columns: tuple[str, ...] | None = None
     version: int = 1
     insert_policy: str | None = None
 
@@ -44,6 +47,18 @@ class TableSpec:
         object.__setattr__(self, "source_page_keys", keys)
         if self.date_change is not None:
             object.__setattr__(self, "date_change", _identifier(self.date_change, "date_change"))
+        if (self.oracle_owner is None) != (self.oracle_index is None):
+            raise ValueError("oracle_owner and oracle_index must be supplied together")
+        if self.oracle_owner is not None:
+            object.__setattr__(self, "oracle_owner", _identifier(self.oracle_owner, "oracle owner"))
+            object.__setattr__(self, "oracle_index", _identifier(self.oracle_index or "", "oracle index"))
+        if self.oracle_index_columns is not None:
+            if self.oracle_index is None:
+                raise ValueError("oracle_index_columns requires oracle_index")
+            columns = tuple(_identifier(column, "oracle index column") for column in self.oracle_index_columns)
+            if not columns:
+                raise ValueError("oracle_index_columns must not be empty")
+            object.__setattr__(self, "oracle_index_columns", columns)
         if self.version < 1:
             raise ValueError("table spec version must be positive")
         if self.insert_policy is not None and self.insert_policy not in {"default", "copy-managed"}:
@@ -58,12 +73,19 @@ class TableSpec:
 class CheckSpec:
     """Checker-only options; transfer behavior must not depend on these."""
 
-    compare_columns: tuple[str, ...] = field(default_factory=tuple)
-    compare_change_field: bool = True
-    cache_counts: bool = True
+    source_table: str
+    requires_jn_status: bool = False
+    from_2025: bool = False
+    forbid_columns: tuple[str, ...] = field(default_factory=tuple)
+    lift_title_prefix: str = "EV H"
 
     def __post_init__(self) -> None:
-        columns = tuple(_identifier(column, "check column") for column in self.compare_columns)
-        if len(set(columns)) != len(columns):
-            raise ValueError("compare_columns must be distinct")
-        object.__setattr__(self, "compare_columns", columns)
+        object.__setattr__(self, "source_table", _identifier(self.source_table, "checker source table"))
+        if not isinstance(self.requires_jn_status, bool) or not isinstance(self.from_2025, bool):
+            raise ValueError("checker boolean options must be bool")
+        forbidden = tuple(_identifier(column, "forbidden check column") for column in self.forbid_columns)
+        if len(set(forbidden)) != len(forbidden):
+            raise ValueError("forbid_columns must be distinct")
+        object.__setattr__(self, "forbid_columns", forbidden)
+        if not isinstance(self.lift_title_prefix, str) or not self.lift_title_prefix:
+            raise ValueError("lift_title_prefix must be a non-empty string")

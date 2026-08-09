@@ -12,9 +12,6 @@ SELECT
     j."POSPLOSENA_VREDNOST" AS posplosena_vrednost,
     j."ID_MODEL_VER" AS id_model_ver,
     j."JN_REV_NUM" AS jn_rev_num,
-    ROW_NUMBER() OVER (
-        ORDER BY rf.CREATED, j."ID_PARC_ENOTA", j."JN_REV_NUM"
-    ) AS rn,
     CAST(TRIM(j."JN_STATUS") AS VARCHAR2(1)) AS jn_status,
     TO_CHAR(FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
             'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,

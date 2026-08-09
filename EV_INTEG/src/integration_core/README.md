@@ -3,7 +3,9 @@
 The small shared runtime for transfer commands. Database adapters own SQL and
 row conversion; this package owns operational contracts.
 
-- `TableSpec` and `CheckSpec`: small, explicit per-table facts.
+- `TableSpec` contains transfer facts only; adjacent required `CheckSpec`
+  contains checker-only SQL/name rules. The shared `integrations.catalog` is
+  the canonical declaration source for active tools.
 - `RunIdentity` / `Checkpoint`: versioned JSON state, fingerprinted by
   destination, SQL, paging tuple, mode, and semantic options.
 - `PageRunner`: commits the destination page before checkpointing it; a crash

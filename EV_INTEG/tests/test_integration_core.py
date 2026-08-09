@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from contextlib import contextmanager, nullcontext
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from decimal import Decimal
 from pathlib import Path
@@ -12,7 +12,7 @@ import pytest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from integration_core.errors import is_size_related_error
-from integration_core.locks import LockUnavailable, LocalStateLock, PostgresWriterLock, WriterRunContext, advisory_key
+from integration_core.locks import LockUnavailable, LocalStateLock, PostgresWriterLock, WriterLockLost, WriterRunContext, advisory_key
 from integration_core.managed import DEFAULT_CREATED_BY, InsertPolicy
 from integration_core.page_size import PageSizer
 from integration_core.runner import Page, PageRunner
@@ -29,23 +29,54 @@ def identity(sql: str = "SELECT id FROM ev.example") -> RunIdentity:
 
 
 def run_context():
-    return nullcontext()
+    return TestRunContext()
+
+
+class TestRunContext:
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *_: object) -> None:
+        return None
+
+    def ensure_held(self) -> None:
+        return None
+
+    def begin_page_mutation(self, _destination_connection: object) -> None:
+        return None
+
+    def end_page_mutation(self) -> None:
+        return None
 
 
 def test_specs_normalize_safe_identifiers_and_keep_checker_rules_separate() -> None:
     table = TableSpec("example", Path("query.sql"), "PUBLIC", "Target", "Source_Id", ("Source_Id", "REV"), "Date_Change")
-    checks = CheckSpec(("Date_Change", "value"))
+    checks = CheckSpec("JN_EXAMPLE")
 
     assert table.target_relation == "public.target"
     assert table.source_page_keys == ("source_id", "rev")
     assert table.date_change == "date_change"
-    assert checks.compare_columns == ("date_change", "value")
+    assert checks.source_table == "jn_example"
     with pytest.raises(ValueError):
         TableSpec("x", Path("q"), "public", "t", "id", ("bad-key",))
     with pytest.raises(ValueError):
         TableSpec("x", Path("q.sql"), "public", "t", "id", ("id",), insert_policy="anything")
     with pytest.raises(ValueError):
-        CheckSpec(("id", "ID"))
+        CheckSpec("bad-name")
+    with pytest.raises(TypeError):
+        CheckSpec()  # type: ignore[call-arg]
+
+
+def test_check_spec_holds_checker_only_source_rules() -> None:
+    checks = CheckSpec(
+        source_table="JN_EXAMPLE",
+        requires_jn_status=True,
+        from_2025=True,
+        forbid_columns=("PODATKI",),
+    )
+    assert checks.source_table == "jn_example"
+    assert checks.requires_jn_status and checks.from_2025
+    assert checks.forbid_columns == ("podatki",)
 
 
 def test_default_managed_insert_policy_supplies_required_values_and_preserves_creation_on_update() -> None:
@@ -99,6 +130,13 @@ def test_checkpoint_cursor_codec_losslessly_round_trips_native_scalar_types(tmp_
     assert read_checkpoint(path, rich_identity).cursor == cursor
     with pytest.raises(CheckpointFormatError, match="finite"):
         save_checkpoint(path, Checkpoint(identity(), (float("nan"),), 1, 1))
+
+
+def test_checkpoint_metadata_losslessly_persists_a_frozen_composite_window(tmp_path: Path) -> None:
+    path = tmp_path / "checkpoint.json"
+    upper = (datetime(2026, 1, 2, tzinfo=timezone.utc), Decimal("7"))
+    save_checkpoint(path, Checkpoint(identity(), None, metadata={"window_upper": upper}))
+    assert read_checkpoint(path, identity()).metadata == {"window_upper": upper}
 
 
 def test_identity_changes_for_every_semantic_resume_input() -> None:
@@ -198,6 +236,28 @@ def test_page_runner_honours_graceful_stop_after_one_committed_page(tmp_path: Pa
     assert log.events == ["begin", "commit"]
 
 
+def test_page_runner_prepares_a_frozen_window_under_the_writer_context(tmp_path: Path) -> None:
+    log = TransactionLog()
+    prepared: list[bool] = []
+
+    def prepare(checkpoint: Checkpoint) -> Checkpoint:
+        prepared.append(True)
+        return Checkpoint(checkpoint.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, checkpoint.completed, {"window_upper": (2,)})
+
+    runner = PageRunner(tmp_path / "state.json", identity(), lambda _cursor: None, lambda _rows: None, log.transaction, run_context, prepare_checkpoint=prepare)
+    result = runner.run()
+    assert prepared == [True]
+    assert result.checkpoint.completed
+    assert result.checkpoint.metadata == {"window_upper": (2,)}
+
+
+def test_page_runner_stops_cleanly_when_locked_preflight_requests_interrupt(tmp_path: Path) -> None:
+    runner = PageRunner(tmp_path / "state.json", identity(), lambda _cursor: (_ for _ in ()).throw(AssertionError("no payload fetch")), lambda _rows: None, TransactionLog().transaction, run_context, prepare_checkpoint=lambda _checkpoint: None)
+    result = runner.run()
+    assert result.stopped_by_signal
+    assert not result.checkpoint.completed
+
+
 def test_local_lock_is_non_blocking_and_released(tmp_path: Path) -> None:
     path = tmp_path / "loader.lock"
     with LocalStateLock(path):
@@ -218,7 +278,7 @@ class FakeCursor:
     def __exit__(self, *_: object) -> None:
         return None
 
-    def execute(self, sql: str, params: tuple[int, ...]) -> None:
+    def execute(self, sql: str, params: tuple[int, ...] | None = None) -> None:
         self.connection.queries.append((sql, params))
 
     def fetchone(self) -> tuple[bool]:
@@ -250,12 +310,42 @@ def test_postgres_lock_uses_deterministic_session_lock_and_unlocks() -> None:
             pass
 
 
+def test_postgres_lock_liveness_probe_does_not_reacquire() -> None:
+    connection = FakeConnection()
+    with PostgresWriterLock(connection, "fmp_data_gurs", "public", "target") as lock:
+        lock.ensure_held()
+    assert [sql for sql, _params in connection.queries].count("SELECT pg_try_advisory_lock(%s)") == 1
+    assert "SELECT 1" in [sql for sql, _params in connection.queries]
+
+
 def test_writer_context_takes_local_then_dedicated_autocommit_postgres_lock(tmp_path: Path) -> None:
     connection = FakeConnection()
     with WriterRunContext(tmp_path / "loader.lock", lambda: connection, "fmp", "public", "target") as context:
         assert context.connection is connection
         assert connection.autocommit is True
     assert connection.closed is True
+
+
+def test_page_runner_does_not_mutate_when_same_key_transaction_handoff_is_denied(tmp_path: Path) -> None:
+    lock_connection, destination = FakeConnection(True), FakeConnection(False)
+    writes, log = [], TransactionLog()
+
+    @contextmanager
+    def destination_transaction():
+        with log.transaction():
+            yield destination
+
+    context = WriterRunContext(tmp_path / "loader.lock", lambda: lock_connection, "fmp", "public", "target")
+    runner = PageRunner(
+        tmp_path / "state.json", identity(), lambda _cursor: Page((1,), (1,)), lambda rows: writes.extend(rows),
+        destination_transaction, lambda: context,
+    )
+    with pytest.raises(LockUnavailable, match="transaction advisory"):
+        runner.run()
+    assert writes == []
+    assert log.events == ["begin", "rollback"]
+    # The session lock was restored after the denied xact-lock handoff.
+    assert [sql for sql, _params in lock_connection.queries].count("SELECT pg_try_advisory_lock(%s)") == 2
 
 
 def test_page_sizer_grows_then_refines_after_failure_without_persistence() -> None:
@@ -296,6 +386,80 @@ def test_page_sizer_automatically_restarts_after_a_later_stable_failure() -> Non
     sizer.succeeded()  # 100
     sizer.succeeded()  # 100, stable
     assert sizer.failed_for_size() == 50
+
+
+def test_capacity_error_from_destination_retries_same_cursor_and_only_credits_after_commit(tmp_path: Path) -> None:
+    log, seen, credits, shrinks = TransactionLog(), [], [], []
+    attempts = 0
+    sizer = PageSizer(max_page_size=100, initial_page_size=40)
+
+    @contextmanager
+    def destination_transaction():
+        log.events.append("begin")
+        try:
+            yield object()
+        except Exception:
+            log.events.append("rollback")
+            raise
+        else:
+            log.events.append("commit")
+
+    def write(_rows):
+        nonlocal attempts
+        attempts += 1
+        if attempts == 1:
+            class PgCapacityError(Exception):
+                sqlstate = "54000"
+            error = PgCapacityError("capacity")
+            raise error
+
+    class Context:
+        def ensure_held(self): return None
+        def begin_page_mutation(self, _connection): return None
+        def end_page_mutation(self): return None
+
+    def shrink(error: Exception) -> bool:
+        shrinks.append(error)
+        if getattr(error, "sqlstate", None) != "54000":
+            return False
+        sizer.failed_for_size()
+        return True
+
+    runner = PageRunner(
+        tmp_path / "state.json", identity(),
+        lambda cursor: seen.append((cursor, sizer.current)) or (Page(("row",), (1,)) if len(seen) < 3 else None),
+        write, destination_transaction, lambda: Context(),
+        on_page_committed=lambda _page: credits.append(sizer.succeeded()),
+        on_page_size_error=shrink,
+    )
+    result = runner.run(context=Context())
+    assert result.checkpoint.completed
+    assert seen[:2] == [(None, 40), (None, 20)]
+    assert len(shrinks) == 1
+    assert credits == [30]
+    assert log.events[:3] == ["begin", "rollback", "begin"]
+
+
+def test_non_size_destination_error_does_not_shrink_or_refetch(tmp_path: Path) -> None:
+    class Context:
+        def ensure_held(self): return None
+        def begin_page_mutation(self, _connection): return None
+        def end_page_mutation(self): return None
+
+    @contextmanager
+    def transaction():
+        yield object()
+
+    calls, shrinks = [], []
+    runner = PageRunner(
+        tmp_path / "state.json", identity(), lambda cursor: calls.append(cursor) or Page(("row",), (1,)),
+        lambda _rows: (_ for _ in ()).throw(ValueError("bad data")), transaction, lambda: Context(),
+        on_page_size_error=lambda error: shrinks.append(error) or False,
+    )
+    with pytest.raises(ValueError, match="bad data"):
+        runner.run(context=Context())
+    assert calls == [None]
+    assert len(shrinks) == 1
 
 
 def test_page_runner_reconnects_and_refetches_the_unchanged_cursor(tmp_path: Path) -> None:
@@ -375,6 +539,55 @@ def test_first_interrupt_break_error_stops_at_prior_checkpoint_without_reconnect
     assert result.stopped_by_signal and result.checkpoint.cursor is None
     assert reconnects == []
     assert not (tmp_path / "state.json").exists()
+
+
+def test_page_runner_stops_before_next_mutation_if_writer_lock_session_is_lost(tmp_path: Path) -> None:
+    class LosingContext(TestRunContext):
+        def __init__(self) -> None:
+            self.probes = 0
+
+        def ensure_held(self) -> None:
+            self.probes += 1
+            # Page one: before fetch + before write.  The next pre-fetch probe
+            # must stop the run before it reads/writes page two.
+            if self.probes >= 3:
+                raise WriterLockLost("simulated dedicated session loss")
+
+    context, log, fetched = LosingContext(), TransactionLog(), []
+
+    def fetch(cursor: tuple[int, ...] | None):
+        fetched.append(cursor)
+        return Page((1,), (1,)) if cursor is None else Page((2,), (2,))
+
+    runner = PageRunner(tmp_path / "state.json", identity(), fetch, lambda rows: log.rows.extend(rows), log.transaction, lambda: context)
+    with pytest.raises(WriterLockLost, match="simulated"):
+        runner.run()
+    assert fetched == [None]
+    assert log.rows == [1]
+    assert read_checkpoint(tmp_path / "state.json", identity()).cursor == (1,)
+
+
+def test_page_runner_does_not_mark_complete_if_lock_is_lost_during_final_fetch(tmp_path: Path) -> None:
+    class FinalFetchLossContext(TestRunContext):
+        def __init__(self) -> None:
+            self.lost = False
+
+        def ensure_held(self) -> None:
+            if self.lost:
+                raise WriterLockLost("simulated loss during final fetch")
+
+    path, context = tmp_path / "state.json", FinalFetchLossContext()
+    prior = Checkpoint(identity(), (1,), 1, 1, False)
+    save_checkpoint(path, prior)
+
+    def final_fetch(_cursor: tuple[int, ...] | None):
+        context.lost = True
+        return None
+
+    runner = PageRunner(path, identity(), final_fetch, lambda _rows: None, TransactionLog().transaction, lambda: context)
+    with pytest.raises(WriterLockLost, match="final fetch"):
+        runner.run()
+    assert read_checkpoint(path, identity()) == prior
 
 
 def test_second_interrupt_during_write_rolls_back_without_checkpoint(tmp_path: Path) -> None:

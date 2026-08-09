@@ -1,281 +1,145 @@
 #!/usr/bin/env python3
-"""Resumable full copy from a staging PostgreSQL table to production."""
+"""Resumable, idempotent staging → production PostgreSQL copy."""
 
 from __future__ import annotations
 
 import argparse
-import hashlib
-import json
 import os
-import re
-import shutil
-import sqlite3
 import sys
 from pathlib import Path
 from typing import Any
 
 
 HERE = Path(__file__).resolve().parent
-STATE_ROOT = HERE / ".state"
-IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
+SRC = HERE.parent
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from integration_core import InterruptController, PageSizer, RunIdentity, StagingProductionRun, WriterRunContext, read_checkpoint
+from integration_core.staging_production import copyable_columns, ensure_id_not_null, ensure_non_null_id, ensure_uuid_id, identifier, relation, usable_id_index
 
 
-def identifier(value: str, label: str) -> str:
-    if not IDENTIFIER.fullmatch(value):
-        raise ValueError(f"{label} must be a plain PostgreSQL identifier")
-    return value
+STATE_ROOT = HERE / ".state" / "core"
 
 
-def quote(value: str) -> str:
-    return f'"{value}"'
+def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("table", help="production/staging table name without schema")
+    parser.add_argument("--schema", default="public")
+    parser.add_argument("--page-key", default="id", help="compatibility alias; only UUID id is supported")
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("--dry-run", action="store_true", help="validate/count only (default)")
+    mode.add_argument("--apply", action="store_true")
+    mode.add_argument("--status", action="store_true")
+    parser.add_argument("--page-size", type=int, default=50_000)
+    parser.add_argument("--auto-page-size", action="store_true")
+    parser.add_argument("--initial-page-size", type=int)
+    parser.add_argument("--max-page-size", type=int)
+    parser.add_argument("--constant-page-size", type=int)
+    parser.add_argument("--truncate", action="store_true", help="truncate production, reset checkpoint, then copy")
+    parser.add_argument("--fresh", action="store_true", help="discard this completed/partial checkpoint and rescan staging")
+    args = parser.parse_args(argv)
+    if args.page_size <= 0:
+        parser.error("--page-size must be positive")
+    if args.initial_page_size is not None and args.initial_page_size <= 0: parser.error("--initial-page-size must be positive")
+    if args.max_page_size is not None and args.max_page_size <= 0: parser.error("--max-page-size must be positive")
+    if args.constant_page_size is not None and args.constant_page_size <= 0: parser.error("--constant-page-size must be positive")
+    if args.constant_page_size is not None and (args.auto_page_size or args.initial_page_size is not None or args.max_page_size is not None): parser.error("--constant-page-size cannot be combined with adaptive-size options")
+    if (args.initial_page_size is not None or args.max_page_size is not None) and not args.auto_page_size: parser.error("--initial-page-size/--max-page-size require --auto-page-size")
+    if args.page_key.lower() != "id":
+        parser.error("staging-to-production copy always pages on UUID id")
+    if args.truncate and not args.apply:
+        parser.error("--truncate requires --apply")
+    if args.fresh and not args.apply:
+        parser.error("--fresh requires --apply")
+    return args
 
 
-def relation(schema: str, table: str) -> str:
-    return f"{quote(schema)}.{quote(table)}"
+args_parse = parse_args  # compatibility for callers that imported the old CLI helper
 
 
 def load_environment() -> None:
-    try:
-        from dotenv import load_dotenv
-    except ImportError as error:
-        raise RuntimeError("install requirements into .venv before running this script") from error
+    from dotenv import load_dotenv
     load_dotenv(HERE / ".env", override=False)
 
 
-def settings(prefix: str) -> dict[str, str | int]:
+def settings(prefix: str) -> dict[str, Any]:
     required = [f"{prefix}_{field}" for field in ("USER", "PASSWORD", "HOST", "PORT")]
     missing = [field for field in required if not os.environ.get(field)]
     if missing:
-        raise RuntimeError(f"missing PostgreSQL environment variables: {', '.join(missing)}")
+        raise RuntimeError("missing PostgreSQL environment variables: " + ", ".join(missing))
     return {
-        "user": os.environ[f"{prefix}_USER"],
-        "password": os.environ[f"{prefix}_PASSWORD"],
-        "host": os.environ[f"{prefix}_HOST"],
-        "port": int(os.environ[f"{prefix}_PORT"]),
+        "user": os.environ[f"{prefix}_USER"], "password": os.environ[f"{prefix}_PASSWORD"],
+        "host": os.environ[f"{prefix}_HOST"], "port": int(os.environ[f"{prefix}_PORT"]),
         "dbname": os.environ.get(f"{prefix}_DATABASE", "fmp_data_gurs"),
     }
 
 
-def connection_identity(prefix: str) -> str:
+def connection_name(prefix: str) -> str:
     config = settings(prefix)
     return f"{config['host']}:{config['port']}/{config['dbname']}"
 
 
-def state_path(schema: str, table: str, page_key: str) -> Path:
-    raw = json.dumps(["simple-copy-v1", connection_identity("STAG"), connection_identity("PROD"), schema, table, page_key])
-    return STATE_ROOT / hashlib.sha256(raw.encode()).hexdigest() / "state.sqlite"
-
-
-def open_state(path: Path) -> sqlite3.Connection:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    state = sqlite3.connect(path)
-    state.execute("PRAGMA journal_mode=WAL")
-    state.execute("PRAGMA synchronous=FULL")
-    state.execute("CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)")
-    return state
-
-
-def get_meta(state: sqlite3.Connection, key: str) -> str | None:
-    row = state.execute("SELECT value FROM meta WHERE key = ?", (key,)).fetchone()
-    return row[0] if row else None
-
-
-def set_meta(state: sqlite3.Connection, key: str, value: str) -> None:
-    state.execute("INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)", (key, value))
-    state.commit()
-
-
-def table_columns(connection: Any, schema: str, table: str) -> list[str]:
-    with connection.cursor() as cursor:
-        cursor.execute(
-            """
-            SELECT column_name
-            FROM information_schema.columns
-            WHERE table_schema = %s AND table_name = %s
-              AND is_generated = 'NEVER'
-              AND identity_generation IS DISTINCT FROM 'ALWAYS'
-            ORDER BY ordinal_position
-            """,
-            (schema, table),
-        )
-        return [row[0] for row in cursor.fetchall()]
-
-
-def verify_columns(staging: Any, production: Any, schema: str, table: str, page_key: str) -> list[str]:
-    staging_columns = table_columns(staging, schema, table)
-    production_columns = table_columns(production, schema, table)
-    if not staging_columns or not production_columns:
-        raise RuntimeError(f"table {schema}.{table} was not found or has no copyable columns in both databases")
-    if set(staging_columns) != set(production_columns):
-        raise RuntimeError(
-            f"table columns differ for {schema}.{table}; "
-            f"only in staging: {sorted(set(staging_columns) - set(production_columns)) or '-'}; "
-            f"only in production: {sorted(set(production_columns) - set(staging_columns)) or '-'}"
-        )
-    if page_key not in staging_columns:
-        raise RuntimeError(f"both tables must contain page key {page_key}")
-    return staging_columns
-
-
-def has_unique_btree_index(connection: Any, schema: str, table: str, key: str) -> bool:
-    sql = """
-        SELECT 1
-        FROM pg_index i
-        JOIN pg_class table_rel ON table_rel.oid = i.indrelid
-        JOIN pg_namespace namespace ON namespace.oid = table_rel.relnamespace
-        JOIN pg_class index_rel ON index_rel.oid = i.indexrelid
-        WHERE namespace.nspname = %s
-          AND table_rel.relname = %s
-          AND i.indisunique
-          AND i.indisvalid
-          AND i.indisready
-          AND i.indpred IS NULL
-          AND index_rel.relam = (SELECT oid FROM pg_am WHERE amname = 'btree')
-          AND (
-              SELECT array_agg(attribute.attname ORDER BY indexed.ord)
-              FROM unnest(i.indkey) WITH ORDINALITY indexed(attnum, ord)
-              JOIN pg_attribute attribute
-                ON attribute.attrelid = table_rel.oid AND attribute.attnum = indexed.attnum
-              WHERE indexed.ord <= i.indnkeyatts
-          ) = ARRAY[%s]::name[]
-        LIMIT 1
-    """
-    with connection.cursor() as cursor:
-        cursor.execute(sql, (schema, table, key))
-        return cursor.fetchone() is not None
-
-
-def ensure_non_null_key(connection: Any, schema: str, table: str, key: str) -> None:
-    with connection.cursor() as cursor:
-        cursor.execute(f"SELECT 1 FROM {relation(schema, table)} WHERE {quote(key)} IS NULL LIMIT 1")
-        if cursor.fetchone():
-            raise RuntimeError(f"{schema}.{table} contains NULL {key} values; resumable keyset paging is unsafe")
+def checkpoint_path(schema: str, table: str) -> Path:
+    return STATE_ROOT / schema / table / "copy.json"
 
 
 def count_rows(connection: Any, schema: str, table: str) -> int:
     with connection.cursor() as cursor:
         cursor.execute(f"SELECT count(*) FROM {relation(schema, table)}")
-        return cursor.fetchone()[0]
+        return int(cursor.fetchone()[0])
 
 
-def fetch_page(staging: Any, schema: str, table: str, columns: list[str], key: str, last_key: str | None, page_size: int) -> list[tuple[Any, ...]]:
-    projection = ", ".join(quote(column) for column in columns)
-    where = ""
-    values: list[Any] = [page_size]
-    if last_key is not None:
-        where = f"WHERE {quote(key)} > %s"
-        values = [last_key, page_size]
-    with staging.cursor() as cursor:
-        cursor.execute(
-            f"SELECT {projection} FROM {relation(schema, table)} {where} ORDER BY {quote(key)} LIMIT %s",
-            values,
-        )
-        return cursor.fetchall()
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    load_environment()
+    import psycopg
 
-
-def copy_page(production: Any, schema: str, table: str, columns: list[str], key: str, rows: list[tuple[Any, ...]]) -> int:
-    target = relation(schema, table)
-    column_list = ", ".join(quote(column) for column in columns)
-    temp = '"_stag_to_prod_page"'
-    with production.transaction():
-        with production.cursor() as cursor:
-            cursor.execute(f"CREATE TEMP TABLE {temp} ON COMMIT DROP AS SELECT {column_list} FROM {target} WHERE false")
-            with cursor.copy(f"COPY {temp} ({column_list}) FROM STDIN") as copy:
-                for row in rows:
-                    copy.write_row(row)
-            cursor.execute(
-                f"INSERT INTO {target} ({column_list}) "
-                f"SELECT {column_list} FROM {temp} "
-                f"ON CONFLICT ({quote(key)}) DO NOTHING"
+    schema, table = identifier(args.schema, "schema"), identifier(args.table, "table")
+    path = checkpoint_path(schema, table)
+    with psycopg.connect(**settings("STAG")) as staging, psycopg.connect(**settings("PROD")) as production:
+        columns = copyable_columns(staging, production, schema, table)
+        if not usable_id_index(staging, schema, table) or not usable_id_index(production, schema, table):
+            raise RuntimeError("both tables require a valid non-partial single-column UNIQUE btree index on id")
+        ensure_uuid_id(staging, schema, table)
+        ensure_uuid_id(production, schema, table)
+        ensure_id_not_null(staging, schema, table)
+        ensure_id_not_null(production, schema, table)
+        ensure_non_null_id(staging, schema, table)
+        identity = RunIdentity("prod", connection_name("PROD"), schema, table, 1, "staging-production-copy-v1", "upsert", ("id",), {"staging": connection_name("STAG"), "columns": columns})
+        if args.status:
+            print(read_checkpoint(path, identity).as_json() if path.exists() else {"status": "not started"})
+            return 0
+        staging_count, production_count = count_rows(staging, schema, table), count_rows(production, schema, table)
+        print({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "page_key": "id", "staging_rows": staging_count, "production_rows": production_count, "copyable_columns": len(columns), "page_size": args.page_size})
+        if not args.apply:
+            return 0
+        staging.commit()
+        production.commit()
+        production.autocommit = True
+        with InterruptController(lambda message: print(message, file=sys.stderr, flush=True)) as interrupts:
+            maximum = args.max_page_size or max(args.page_size, args.constant_page_size or 0)
+            page_sizer = PageSizer(max_page_size=maximum, initial_page_size=args.initial_page_size if args.auto_page_size else None, constant_page_size=args.constant_page_size) if args.auto_page_size or args.constant_page_size is not None else None
+            run = StagingProductionRun(
+                schema, table, staging, production, columns, args.page_size, path, identity,
+                lambda: WriterRunContext(path.with_suffix(".lock"), lambda: psycopg.connect(**settings("PROD")), identity.database, schema, table),
+                interrupts=interrupts, page_sizer=page_sizer,
             )
-            return cursor.rowcount
 
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("table", help="table name without schema")
-    parser.add_argument("--schema", help="defaults to SYNC_SCHEMA or public")
-    parser.add_argument("--page-key", default="id", help="unique, non-null key used for paging (default: id)")
-    mode = parser.add_mutually_exclusive_group()
-    mode.add_argument("--dry-run", action="store_true", help="validate and print counts only (default)")
-    mode.add_argument("--apply", action="store_true", help="truncate once and copy/resume pages")
-    parser.add_argument("--page-size", type=int, default=50_000)
-    parser.add_argument("--restart", action="store_true", help="discard copy state, truncate production, and restart")
-    args = parser.parse_args()
-    if args.page_size <= 0:
-        parser.error("--page-size must be positive")
-    if args.restart and not args.apply:
-        parser.error("--restart requires --apply")
-    return args
-
-
-def main() -> int:
-    args = parse_args()
-    state: sqlite3.Connection | None = None
-    try:
-        load_environment()
-        try:
-            import psycopg
-        except ImportError as error:
-            raise RuntimeError("install requirements into .venv before running this script") from error
-
-        schema = identifier(args.schema or os.environ.get("SYNC_SCHEMA", "public"), "schema")
-        table = identifier(args.table, "table")
-        page_key = identifier(args.page_key, "page key")
-        path = state_path(schema, table, page_key)
-
-        with psycopg.connect(**settings("STAG")) as staging, psycopg.connect(**settings("PROD")) as production:
-            columns = verify_columns(staging, production, schema, table, page_key)
-            if not has_unique_btree_index(staging, schema, table, page_key) or not has_unique_btree_index(production, schema, table, page_key):
-                raise RuntimeError(f"both tables require a valid non-partial single-column unique B-tree index on {page_key}")
-            ensure_non_null_key(staging, schema, table, page_key)
-            staging_count = count_rows(staging, schema, table)
-            production_count = count_rows(production, schema, table)
-            print(json.dumps({"mode": "apply" if args.apply else "dry-run", "schema": schema, "table": table, "page_key": page_key, "staging_rows": staging_count, "production_rows": production_count, "page_size": args.page_size}))
-            if not args.apply:
-                return 0
-
-            staging.commit()
-            production.commit()
-            if args.restart and path.parent.exists():
-                shutil.rmtree(path.parent)
-            state = open_state(path)
-            phase = get_meta(state, "phase")
-            if phase == "completed":
-                raise RuntimeError("copy already completed; use --restart to replace production again")
-            if phase is None:
-                # Commit the destructive reset before page commits. A crash here
-                # is safe: a rerun with phase unset truncates again.
-                with production.transaction():
-                    with production.cursor() as cursor:
-                        cursor.execute(f"TRUNCATE TABLE {relation(schema, table)}")
-                set_meta(state, "phase", "copying")
-
-            key_index = columns.index(page_key)
-            last_key = get_meta(state, "last_key")
-            copied = int(get_meta(state, "copied_rows") or "0")
-            page = int(get_meta(state, "page") or "0")
-            while True:
-                rows = fetch_page(staging, schema, table, columns, page_key, last_key, args.page_size)
-                if not rows:
-                    set_meta(state, "phase", "completed")
-                    print(f"applied: completed {copied} source rows in {page} pages")
-                    return 0
-                inserted = copy_page(production, schema, table, columns, page_key, rows)
-                last_key = str(rows[-1][key_index])
-                copied += len(rows)
-                page += 1
-                set_meta(state, "last_key", last_key)
-                set_meta(state, "copied_rows", str(copied))
-                set_meta(state, "page", str(page))
-                print(f"committed page {page} ({len(rows)} source rows; {inserted} inserted; total {copied})", flush=True)
-    except (RuntimeError, ValueError, KeyboardInterrupt) as error:
-        print(f"error: {error}", file=sys.stderr)
-        return 2
-    finally:
-        if state is not None:
-            state.close()
+            # One invocation reads one stable staging snapshot.  We do not
+            # transparently reconnect this source session: that would silently
+            # replace its snapshot and could skip rows behind the checkpoint.
+            with staging.transaction():
+                with staging.cursor() as cursor:
+                    cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
+                result = run.run(fresh=args.fresh, truncate=args.truncate)
+            print({"table": table, "pages": result.checkpoint.pages, "rows": result.checkpoint.rows, "completed": result.checkpoint.completed, "stopped": result.stopped_by_signal})
+    return 0
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    try:
+        raise SystemExit(main())
+    except (RuntimeError, ValueError) as error:
+        print(f"error: {error}", file=sys.stderr)
+        raise SystemExit(2)

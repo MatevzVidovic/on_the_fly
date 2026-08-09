@@ -12,6 +12,7 @@ from .page_size import PageSizer
 from .runner import Page, PageRunResult, PageRunner
 from .signals import InterruptController
 from .specs import CheckSpec, TableSpec
+from .staging_production import StagingProductionRun
 from .state import Checkpoint, CheckpointFormatError, CheckpointMismatch, RunIdentity, atomic_json_write, read_checkpoint
 
 __all__ = [
@@ -33,6 +34,7 @@ __all__ = [
     "PostgresWriterLock",
     "RunIdentity",
     "TableSpec",
+    "StagingProductionRun",
     "WriterRunContext",
     "atomic_json_write",
     "is_size_related_error",

@@ -89,10 +89,11 @@ def test_validate_sql_uses_safe_zero_row_projection_for_tstz(monkeypatch):
     assert 'TO_CHAR(CAST(q."DATE_CHANGE" AS TIMESTAMP)' in statements[0]
 
 
-def test_manifest_contains_only_split_2025_targets():
-    manifest = __import__("json").loads((MODULE_PATH.parent / "tables.json").read_text())
-    names = {item["key"] for item in manifest["tables"] if item.get("from_2025")}
-    assert names == {"ev_del_stavbe_enota_h_2025_danes", "ev_parc_enota_h_2025_danes"}
+def test_catalog_hash_uses_shared_table_and_check_specs():
+    from integrations.catalog import ENTRIES
+    assert check.catalog_hash(ENTRIES)
+    split = [key for key, entry in ENTRIES.items() if entry.checks.from_2025]
+    assert split == ["ev_del_stavbe_enota_h_2025_danes", "ev_parc_enota_h_2025_danes"]
 
 
 def test_markdown_includes_all_required_columns():
@@ -112,6 +113,56 @@ def test_markdown_includes_all_required_columns():
     assert "## Column explanations" in output
     assert "informational delta preview does not affect" in output
     assert "ev_x_h" in output
+
+
+def test_report_write_is_atomic_and_not_selected_rows_are_explicit(tmp_path):
+    from integrations.catalog import ENTRIES
+    result = check.pending_result(ENTRIES["ev_pe_parc_h"], "prod", selected=False)
+    assert result["result"] == "NOT_SELECTED"
+    path = tmp_path / "report.md"
+    check.write_report(path, [result], "prod")
+    assert path.exists() and "NOT_SELECTED" in path.read_text()
+    assert not list(tmp_path.glob(".report.md.*"))
+
+
+def test_initial_results_preseeds_the_full_catalog_for_partial_reports():
+    from integrations.catalog import ENTRIES
+    results, positions = check.initial_results(ENTRIES, "staging", ("ev_pe_parc_h",))
+    assert len(results) == len(ENTRIES)
+    assert results[positions["ev_pe_parc_h"]]["result"] == "NOT_CHECKED"
+    assert results[positions["ev_dst_pripis_podatki_h"]]["result"] == "NOT_SELECTED"
+
+
+def test_typed_table_spec_custom_change_alias_is_used_for_checker_queries():
+    from integration_core import CheckSpec, TableSpec
+    from integrations.catalog import CatalogEntry
+    view = check.CheckView(CatalogEntry(
+        TableSpec("custom", Path("custom.sql"), "public", "custom_h", "custom_pk", ("native",), "changed_on"),
+        CheckSpec("EXAMPLE"),
+    ))
+    assert view.date_change == "changed_on"
+    class Cursor:
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, statement, _params=None): self.statement = statement
+        def fetchone(self): return (datetime(2025, 1, 1),)
+    class Connection:
+        cursor_instance = Cursor()
+        def cursor(self): return self.cursor_instance
+    pg = Connection()
+    check.highwater_and_delta(pg, Connection(), "SELECT 1", view, {"changed_on": "CHANGED_ON"}, datetime(2025, 1, 1), datetime(2024, 1, 1), None, None)
+    assert 'MAX("changed_on")' in pg.cursor_instance.statement
+
+    class Oracle:
+        def cursor(self):
+            class C:
+                description = [("CUSTOM_PK",), ("CHANGED_ON",), ("VALID_FROM",), ("VALID_TO",), ("NATIVE",)]
+                def __enter__(self): return self
+                def __exit__(self, *_args): return False
+                def execute(self, *_args): return None
+            return C()
+    _, _, failures = check.validate_sql(Oracle(), "SELECT x FROM EV.EXAMPLE", view)
+    assert not any("changed_on" in failure for failure in failures)
 
 
 class _Cursor:
@@ -158,39 +209,39 @@ def test_diff_data_rejects_a_short_final_page_before_the_expected_kn_count():
 
 
 def test_page_sizer_grows_to_its_maximum_then_becomes_stable():
-    sizer = check.PageSizer(10, 80)
-    assert sizer.succeeded() and sizer.current == 20
-    assert sizer.succeeded() and sizer.current == 40
-    assert sizer.succeeded() and sizer.current == 80
-    assert sizer.succeeded() and sizer.stable and sizer.current == 80
+    sizer = check.PageSizer(max_page_size=80, initial_page_size=10)
+    assert sizer.succeeded() == 20
+    assert sizer.succeeded() == 40
+    assert sizer.succeeded() == 80
+    assert sizer.succeeded() == 80 and sizer.stable
 
 
 def test_page_sizer_initial_failure_searches_down_then_refines_three_times():
-    sizer = check.PageSizer(80, 320)
-    sizer.failed()
+    sizer = check.PageSizer(max_page_size=320, initial_page_size=80)
+    sizer.failed_for_size()
     assert sizer.phase == "shrinking" and sizer.current == 40
-    assert not sizer.succeeded() and sizer.phase == "refining" and sizer.current == 60
-    sizer.failed()
+    assert sizer.succeeded() == 60 and sizer.phase == "refining"
+    sizer.failed_for_size()
     assert sizer.current == 50
-    assert not sizer.succeeded() and sizer.current == 55
-    sizer.failed()
+    assert sizer.succeeded() == 55
+    sizer.failed_for_size()
     assert sizer.stable and sizer.current == 50
 
 
 def test_page_sizer_later_stable_failure_discards_old_bound_and_searches_down():
-    sizer = check.PageSizer(20, 20)
-    assert sizer.succeeded() and sizer.stable
-    sizer.failed()
+    sizer = check.PageSizer(max_page_size=20, initial_page_size=20)
+    assert sizer.succeeded() == 20 and sizer.stable
+    sizer.failed_for_size()
     assert sizer.phase == "shrinking" and sizer.current == 10
-    sizer.failed()
+    sizer.failed_for_size()
     assert sizer.phase == "shrinking" and sizer.current == 5
 
 
 def test_constant_page_sizer_never_adapts():
-    sizer = check.PageSizer(10, 100, constant=37)
-    assert sizer.current == 37 and sizer.succeeded()
+    sizer = check.PageSizer(max_page_size=100, constant_page_size=37)
+    assert sizer.current == 37 and sizer.succeeded() == 37
     try:
-        sizer.failed()
+        sizer.failed_for_size()
     except RuntimeError as error:
         assert "constant page size 37" in str(error)
     else:
@@ -212,7 +263,9 @@ def test_diff_data_retries_the_same_keyset_cursor_while_calibrating():
     class Oracle:
         def __init__(self):
             row = [("A", datetime(2025, 1, 1), 1)]
-            self.responses = [RuntimeError("ORA-04030: out of process memory"), row, row, row]
+            class OracleCapacityError(Exception):
+                code = 4030
+            self.responses = [OracleCapacityError("ORA-04030: out of process memory"), row]
             self.params = []
         def cursor(self): return OracleCursor(self)
 
@@ -221,7 +274,7 @@ def test_diff_data_retries_the_same_keyset_cursor_while_calibrating():
     spec = {"pk": "synthetic_pk", "table": "target", "source_page_keys": ["native_id"]}
     output = {"synthetic_pk": "SYNTHETIC_PK", "date_change": "DATE_CHANGE", "native_id": "NATIVE_ID"}
     assert check.diff_data(oracle, pg, "SELECT 1", spec, output, 4, 1, 4) == (True, None)
-    assert [params["limit"] for params in oracle.params] == [4, 2, 3, 3]
+    assert [params["limit"] for params in oracle.params] == [4, 2]
     assert all("after_0" not in params for params in oracle.params)
 
 
@@ -273,8 +326,9 @@ def test_inclusive_lift_preview_is_informational_when_no_rows_are_strictly_newer
 
 
 def test_only_size_related_oracle_failures_trigger_page_shrink():
-    assert check.size_relevant_oracle_failure(RuntimeError("ORA-04030: out of process memory"))
-    assert not check.size_relevant_oracle_failure(RuntimeError("DPY-6005: cannot connect to database"))
+    class OracleCapacityError(Exception): code = 4030
+    assert check.is_size_related_error(OracleCapacityError())
+    assert not check.is_size_related_error(RuntimeError("DPY-6005: cannot connect to database"))
 
 
 def test_podatki_is_rejected_only_for_split_enota_integrations(monkeypatch):
@@ -494,6 +548,16 @@ def test_null_last_sync_start_is_a_metadata_failure_but_keeps_independent_checks
     assert result["integration_metadata"] == "FAIL"
     assert result["data"] == "PASS" and result["highwater"] == "PASS"
     assert "last_sync_start is NULL" in result["detail"]
+    assert calls == ["count", "pg-count", "distinct-pk", "diff", "water"]
+
+
+def test_false_changed_datetime_switch_is_a_metadata_failure(monkeypatch):
+    calls = _install_check_one_mocks(monkeypatch)
+    original_metadata = check.metadata
+    monkeypatch.setattr(check, "metadata", lambda *args: {**original_metadata(*args), "use_changed_datetime_for_delta": False})
+    result = check.check_one(None, None, None, _comparison_spec(), "staging", {"entries": {}}, False, 10, "manifest")
+    assert result["integration_metadata"] == "FAIL"
+    assert "must be true" in result["detail"]
     assert calls == ["count", "pg-count", "distinct-pk", "diff", "water"]
 
 

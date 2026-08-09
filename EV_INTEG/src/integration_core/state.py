@@ -89,6 +89,7 @@ class Checkpoint:
     pages: int = 0
     rows: int = 0
     completed: bool = False
+    metadata: Mapping[str, Any] | None = None
 
     def as_json(self) -> dict[str, Any]:
         return {
@@ -98,6 +99,7 @@ class Checkpoint:
             "pages": self.pages,
             "rows": self.rows,
             "completed": self.completed,
+            "metadata": _encode_metadata(dict(self.metadata or {})),
         }
 
 
@@ -148,6 +150,28 @@ def _decode_cursor_value(value: Any) -> Any:
     raise CheckpointFormatError("checkpoint cursor contains an unsupported typed value")
 
 
+def _encode_metadata(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        if not all(isinstance(key, str) for key in value):
+            raise CheckpointFormatError("checkpoint metadata keys must be strings")
+        return {key: _encode_metadata(item) for key, item in value.items()}
+    if isinstance(value, (tuple, list)):
+        return [_encode_metadata(item) for item in value]
+    return _encode_cursor_value(value)
+
+
+def _decode_metadata(value: Any) -> Any:
+    if isinstance(value, list):
+        return tuple(_decode_metadata(item) for item in value)
+    if isinstance(value, dict):
+        if set(value) == {"$type", "value"}:
+            return _decode_cursor_value(value)
+        if not all(isinstance(key, str) for key in value):
+            raise CheckpointFormatError("checkpoint metadata keys must be strings")
+        return {key: _decode_metadata(item) for key, item in value.items()}
+    return _decode_cursor_value(value)
+
+
 def _fresh_checkpoint(path: Path, identity: RunIdentity) -> Checkpoint:
     checkpoint = Checkpoint(identity=identity)
     # ``--fresh`` must replace stale state before source work begins.  If the
@@ -187,7 +211,7 @@ def read_checkpoint(path: Path, identity: RunIdentity, *, fresh: bool = False) -
         raw = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as error:
         raise RuntimeError(f"checkpoint is unreadable: {path}") from error
-    expected_keys = {"fingerprint", "identity", "cursor", "pages", "rows", "completed"}
+    expected_keys = {"fingerprint", "identity", "cursor", "pages", "rows", "completed", "metadata"}
     if not isinstance(raw, dict) or set(raw) != expected_keys:
         raise CheckpointFormatError(f"checkpoint has an invalid format: {path}")
     if raw.get("fingerprint") != identity.fingerprint or raw.get("identity") != identity.payload():
@@ -202,10 +226,16 @@ def read_checkpoint(path: Path, identity: RunIdentity, *, fresh: bool = False) -
             raise
     pages, rows = raw.get("pages", 0), raw.get("rows", 0)
     completed = raw.get("completed")
+    metadata = raw.get("metadata")
     if (not isinstance(pages, int) or isinstance(pages, bool) or not isinstance(rows, int) or isinstance(rows, bool)
-            or pages < 0 or rows < 0 or not isinstance(completed, bool)):
+            or pages < 0 or rows < 0 or not isinstance(completed, bool) or not isinstance(metadata, dict)):
         raise CheckpointFormatError(f"checkpoint counters are invalid: {path}")
-    return Checkpoint(identity, tuple(cursor) if cursor is not None else None, pages, rows, completed)
+    try:
+        metadata = _decode_metadata(metadata)
+        _canonical(_encode_metadata(metadata))
+    except (CheckpointFormatError, TypeError, ValueError) as error:
+        raise CheckpointFormatError(f"checkpoint metadata is invalid: {path}") from error
+    return Checkpoint(identity, tuple(cursor) if cursor is not None else None, pages, rows, completed, metadata or None)
 
 
 def save_checkpoint(path: Path, checkpoint: Checkpoint) -> None:

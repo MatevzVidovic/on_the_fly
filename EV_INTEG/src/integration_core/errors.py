@@ -13,7 +13,9 @@ _POSTGRES_SIZE_SQLSTATES = frozenset({"53100", "53200", "53400", "54000"})
 
 
 def _oracle_code(error: BaseException) -> int | None:
-    for value in (getattr(error, "code", None), getattr(getattr(error, "args", (None,))[0], "code", None)):
+    args = getattr(error, "args", ())
+    first_arg = args[0] if args else None
+    for value in (getattr(error, "code", None), getattr(first_arg, "code", None)):
         if isinstance(value, int):
             return value
     return None
@@ -28,7 +30,7 @@ def _sqlstate(error: BaseException) -> str | None:
 
 
 def is_size_related_error(error: BaseException) -> bool:
-    """True only for documented capacity/timeout classes safe to shrink.
+    """True only for documented capacity/resource classes safe to shrink.
 
     Oracle: ORA-01652, ORA-30036, ORA-04030 and ORA-01555.
     PostgreSQL: disk/memory/config/program limits.  Query cancellation

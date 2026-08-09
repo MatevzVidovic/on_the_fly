@@ -34,6 +34,31 @@ class PageSizer:
     def page_size(self) -> int:
         return self.current
 
+    @property
+    def adaptive(self) -> bool:
+        return self.constant is None
+
+    @property
+    def stable(self) -> bool:
+        return self.constant is not None or self._stable
+
+    @property
+    def phase(self) -> str:
+        """Small diagnostic view; adapters never branch on this value."""
+        if self.constant is not None:
+            return "constant"
+        if self._stable:
+            return "stable"
+        if self._working is None:
+            return "shrinking" if self._failing is not None else "growing"
+        return "refining" if self._failing is not None else "growing"
+
+    def description(self) -> str:
+        bounds = ""
+        if self._working is not None or self._failing is not None:
+            bounds = f"; working/failing bounds {self._working}/{self._failing}"
+        return f"{self.phase} page size {self.current}{bounds}"
+
     def _next_refinement_or_stable(self) -> int:
         assert self._working is not None and self._failing is not None
         if self._bisections >= 3 or self._working + 1 >= self._failing:
@@ -65,7 +90,7 @@ class PageSizer:
 
     def failed_for_size(self) -> int:
         if self.constant is not None:
-            raise RuntimeError("constant page size failed")
+            raise RuntimeError(f"constant page size {self.current} failed")
         if self._stable:
             # A later failure discards all old evidence and immediately begins
             # the same conservative downwards bracket search.
@@ -89,7 +114,7 @@ class PageSizer:
 
     def restart_after_later_failure(self) -> int:
         if self.constant is not None:
-            raise RuntimeError("constant page size failed")
+            raise RuntimeError(f"constant page size {self.current} failed")
         failed = self.current
         self._working = None
         self._failing = failed

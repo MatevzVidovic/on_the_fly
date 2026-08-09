@@ -5,6 +5,9 @@ target-table presence and PK uniqueness, integration SQL/metadata/name,
 PK and `date_change` against KN, and the stored high-water mark. It never runs
 or changes a LIFT integration.
 
+The checker derives its active table list and checker-only rules directly from
+the shared `integrations.catalog` (`TableSpec` plus `CheckSpec`).
+
 Copy `.env.example` to `.env` and fill in KN, staging, and production credentials.
 
 For each environment the checker uses two PostgreSQL databases on the same

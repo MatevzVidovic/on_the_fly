@@ -16,7 +16,12 @@ from pathlib import Path
 from typing import Any, Iterable
 
 HERE = Path(__file__).resolve().parent
-MANIFEST_PATH = HERE / "tables.json"
+SRC = HERE.parent
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from integrations.catalog import CatalogEntry, ENTRIES
+from integration_core import PageSizer, is_size_related_error
 CACHE_PATH = HERE / ".state" / "data_correct.json"
 REPORTS_DIR = HERE / "reports"
 CACHE_VERSION = 2
@@ -64,16 +69,55 @@ def uncomment(sql: str) -> str:
     return re.sub(r"/\*.*?\*/|--[^\n]*", " ", sql, flags=re.S | re.M)
 
 
-def target_table(spec: dict[str, Any], environment: str) -> str:
+def target_table(spec: CatalogEntry | dict[str, Any], environment: str) -> str:
+    """Compatibility coercion for old unit-level helpers; main uses CheckTarget."""
+    if isinstance(spec, CatalogEntry):
+        return spec.spec.target_table
     return spec["staging_table" if environment == "staging" else "prod_table"]
+
+
+class CheckView:
+    """Typed checker projection of one catalog entry; no manifest involved."""
+
+    def __init__(self, entry: CatalogEntry) -> None:
+        self.table = entry.spec.target_table
+        self.pk = entry.spec.membership_key
+        self.source_page_keys = entry.spec.source_page_keys
+        if entry.spec.date_change is None:
+            raise ValueError(f"{entry.spec.target_relation} has no checker date-change field")
+        self.date_change = entry.spec.date_change
+        self.kn_table = entry.checks.source_table
+        self.requires_jn_status = entry.checks.requires_jn_status
+        self.from_2025 = entry.checks.from_2025
+        self.forbid_podatki = "podatki" in entry.checks.forbid_columns
+        self.lift_title_prefix = entry.checks.lift_title_prefix
+
+
+def field(spec: CheckView | dict[str, Any], name: str) -> Any:
+    return getattr(spec, name) if isinstance(spec, CheckView) else spec[name]
+
+
+def option(spec: CheckView | dict[str, Any], name: str, default: Any = False) -> Any:
+    return getattr(spec, name, default) if isinstance(spec, CheckView) else spec.get(name, default)
+
+
+def date_field(spec: CheckView | dict[str, Any]) -> str:
+    return str(option(spec, "date_change", "date_change"))
 
 
 def sql_hash(value: str) -> str:
     return hashlib.sha256(" ".join(value.split()).encode()).hexdigest()
 
 
-def manifest_hash(manifest: dict[str, Any]) -> str:
-    return hashlib.sha256(json.dumps(manifest, sort_keys=True).encode()).hexdigest()
+def catalog_hash(entries: dict[str, CatalogEntry]) -> str:
+    """Stable cache boundary for typed catalog facts relevant to checking."""
+    value = [
+        (key, entry.spec.target_table, entry.spec.membership_key, entry.spec.source_page_keys,
+         entry.spec.date_change, entry.checks.source_table, entry.checks.requires_jn_status,
+         entry.checks.from_2025, entry.checks.forbid_columns, entry.checks.lift_title_prefix)
+        for key, entry in entries.items()
+    ]
+    return hashlib.sha256(repr(value).encode()).hexdigest()
 
 
 def load_env() -> None:
@@ -248,7 +292,7 @@ def documented_text_temporal_aliases(sql: str, aliases: Iterable[str]) -> set[st
     return matched
 
 
-def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: set[str] | None = None) -> str:
+def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: set[str] | None = None, temporal_aliases: set[str] | None = None) -> str:
     """Describe required integration aliases without exposing TSTZ to the driver.
 
     Oracle resolves every quoted reference in this zero-row projection, so a
@@ -256,7 +300,7 @@ def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: se
     error.  The temporal aliases are converted inside Oracle before the
     driver receives their metadata.
     """
-    temporal = {"date_change", "valid_from", "valid_to"}
+    temporal = temporal_aliases or {"date_change", "valid_from", "valid_to"}
     text_temporal_aliases = text_temporal_aliases or set()
     projections = []
     # A single-column native page key is often the destination PK.  Project
@@ -270,23 +314,24 @@ def safe_validation_sql(sql: str, required: list[str], text_temporal_aliases: se
     return f"SELECT {', '.join(projections)} FROM ({sql}) q WHERE 1 = 0"
 
 
-def describe_output_aliases(oracle: Any, sql: str, aliases: list[str], temporal_aliases: set[str]) -> tuple[dict[str, str], str | None]:
+def describe_output_aliases(oracle: Any, sql: str, aliases: list[str], text_temporal_aliases: set[str], temporal_aliases: set[str] | None = None) -> tuple[dict[str, str], str | None]:
     """Safely prove that a specific set of integration output aliases exists."""
     try:
         with oracle.cursor() as cur:
-            cur.execute(safe_validation_sql(sql, aliases, temporal_aliases))
+            cur.execute(safe_validation_sql(sql, aliases, text_temporal_aliases, temporal_aliases))
             return ({str(column[0]).lower(): str(column[0]) for column in cur.description}, None)
     except Exception as error:
         return {}, str(error)
 
 
-def data_output_aliases(oracle: Any, sql: str, spec: dict[str, Any], output: dict[str, str]) -> tuple[dict[str, str] | None, str | None]:
+def data_output_aliases(oracle: Any, sql: str, spec: CheckView | dict[str, Any], output: dict[str, str]) -> tuple[dict[str, str] | None, str | None]:
     """Return the aliases needed for comparison, independently of full spec checks."""
-    required = list(dict.fromkeys([spec["pk"], "date_change", *spec["source_page_keys"]]))
+    change = date_field(spec)
+    required = list(dict.fromkeys([field(spec, "pk"), change, *field(spec, "source_page_keys")]))
     if all(name.lower() in output for name in required):
         return ({name.lower(): output[name.lower()] for name in required}, None)
-    temporal = documented_text_temporal_aliases(sql, {"date_change"})
-    verified, error = describe_output_aliases(oracle, sql, required, temporal)
+    temporal = documented_text_temporal_aliases(sql, {change})
+    verified, error = describe_output_aliases(oracle, sql, required, temporal, {change})
     if error:
         return None, f"cannot validate data-critical output aliases: {error}"
     missing = [name for name in required if name.lower() not in verified]
@@ -295,35 +340,36 @@ def data_output_aliases(oracle: Any, sql: str, spec: dict[str, Any], output: dic
     return verified, None
 
 
-def validate_sql(oracle: Any, sql: str, spec: dict[str, Any]) -> tuple[str, dict[str, str], list[str]]:
+def validate_sql(oracle: Any, sql: str, spec: CheckView | dict[str, Any]) -> tuple[str, dict[str, str], list[str]]:
     sql = clean_sql(str(sql or ""))
     lower = uncomment(sql).lower()
     failures: list[str] = []
-    if not re.search(rf"\b\"?ev\"?\s*\.\s*\"?{re.escape(spec['kn_table'].lower())}\"?\b", lower):
-        failures.append(f"does not reference EV.{spec['kn_table']}")
-    if spec.get("requires_jn_status") and not re.search(r"jn_status\"?\s*(?:!=|<>)\s*'x'", lower):
+    if not re.search(rf"\b\"?ev\"?\s*\.\s*\"?{re.escape(field(spec, 'kn_table').lower())}\"?\b", lower):
+        failures.append(f"does not reference EV.{field(spec, 'kn_table')}")
+    if option(spec, "requires_jn_status") and not re.search(r"jn_status\"?\s*(?:!=|<>)\s*'x'", lower):
         failures.append("does not exclude JN_STATUS = 'X'")
-    if spec.get("requires_jn_status") and not re.search(r"\b(revision|rev_num)\b", lower):
+    if option(spec, "requires_jn_status") and not re.search(r"\b(revision|rev_num)\b", lower):
         failures.append("does not contain revision history join")
-    if spec.get("from_2025") and not re.search(r"rf\s*\.\s*\"?created\"?\s*>=\s*timestamp\s*'2025-01-01\s+00:00:00'", lower):
+    if option(spec, "from_2025") and not re.search(r"rf\s*\.\s*\"?created\"?\s*>=\s*timestamp\s*'2025-01-01\s+00:00:00'", lower):
         failures.append("does not contain required rf.created >= TIMESTAMP '2025-01-01 00:00:00' filter")
-    if spec.get("forbid_podatki"):
+    if option(spec, "forbid_podatki"):
         # Match an actual column token, not strings such as
         # DST_PRIPIS_PODATKI or dst_pripis_podatki_pk.  Only the two split
         # ENOTA integrations are required to omit this payload attribute.
         if re.search(r"(?:\.\s*|\b)(?:\"podatki\"|podatki)\b", lower):
             failures.append("references forbidden PODATKI column")
-    required = [spec["pk"], "date_change", "valid_from", "valid_to", *spec["source_page_keys"]]
-    if spec.get("requires_jn_status"):
+    change = date_field(spec)
+    required = [field(spec, "pk"), change, "valid_from", "valid_to", *field(spec, "source_page_keys")]
+    if option(spec, "requires_jn_status"):
         required.append("jn_status")
-    text_temporal_aliases = documented_text_temporal_aliases(sql, {"date_change", "valid_from", "valid_to"})
-    output, error = describe_output_aliases(oracle, sql, required, text_temporal_aliases)
+    text_temporal_aliases = documented_text_temporal_aliases(sql, {change, "valid_from", "valid_to"})
+    output, error = describe_output_aliases(oracle, sql, required, text_temporal_aliases, {change, "valid_from", "valid_to"})
     if error:
         failures.append(f"cannot validate required integration output aliases: {error}")
     for name in required:
         if name.lower() not in output:
             failures.append(f"missing output alias {name}")
-    if spec.get("forbid_podatki") and "podatki" in output:
+    if option(spec, "forbid_podatki") and "podatki" in output:
         failures.append("forbidden output alias podatki")
     return sql, output, failures
 
@@ -402,17 +448,6 @@ def cache_write(value: dict[str, Any]) -> None:
         os.replace(temporary, CACHE_PATH)
     finally:
         if os.path.exists(temporary): os.unlink(temporary)
-
-
-def size_relevant_oracle_failure(error: Exception) -> bool:
-    text = str(error).lower()
-    # Transport failures do not indicate that a smaller result page helps.
-    if any(token in text for token in ("connection", "network", "lost contact", "dpy-6005", "ora-125", "ssh")):
-        return False
-    return any(token in text for token in (
-        "timeout", "timed out", "out of memory", "memory", "array", "buffer", "resource",
-        "ora-04030", "ora-04031", "ora-01000",
-    ))
 
 
 def format_duration(seconds: float) -> str:
@@ -500,131 +535,39 @@ def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], a
     return f"SELECT {columns} FROM ({sql}) q{where} ORDER BY {', '.join(map(quote, page_keys))} FETCH NEXT :limit ROWS ONLY"
 
 
-class PageSizer:
-    """Find a safe page size without moving the source keyset cursor."""
-
-    def __init__(self, initial: int, maximum: int, constant: int | None = None):
-        self.maximum = maximum
-        self.constant = constant
-        self.current = constant if constant is not None else initial
-        self.phase = "constant" if constant is not None else "growing"
-        self.lower: int | None = None
-        self.upper: int | None = None
-        self.bisections = 0
-
-    @property
-    def adaptive(self) -> bool:
-        return self.constant is None
-
-    @property
-    def stable(self) -> bool:
-        return self.phase in {"constant", "stable"}
-
-    def _begin_refinement(self) -> None:
-        self.phase = "refining"
-        self.bisections = 0
-        self._next_bisection()
-
-    def _next_bisection(self) -> None:
-        assert self.lower is not None and self.upper is not None
-        if self.bisections >= 3 or self.upper - self.lower <= 1:
-            self.current = self.lower
-            self.phase = "stable"
-        else:
-            self.current = (self.lower + self.upper) // 2
-
-    def succeeded(self) -> bool:
-        """Record a successful fetch; return whether its rows may be processed."""
-        if self.phase in {"constant", "stable"}:
-            return True
-        if self.phase == "growing":
-            self.lower = self.current
-            if self.current >= self.maximum:
-                self.phase = "stable"
-            else:
-                self.current = min(self.maximum, self.current * 2)
-            return True
-        if self.phase == "shrinking":
-            self.lower = self.current
-            self._begin_refinement()
-            return False
-        assert self.phase == "refining"
-        self.lower = self.current
-        self.bisections += 1
-        self._next_bisection()
-        return False
-
-    def failed(self) -> None:
-        """Record a size failure and select a smaller/reﬁnement probe."""
-        if self.phase == "constant":
-            raise RuntimeError(f"constant page size {self.current} failed")
-        if self.phase == "stable":
-            # A previously working size is no longer trustworthy.  Treat it
-            # as failed and re-discover a safe lower bound below it.
-            self.lower = None
-            self.upper = self.current
-            self.phase = "shrinking"
-            self.current = max(1, self.current // 2)
-            return
-        if self.phase == "growing":
-            self.upper = self.current
-            if self.lower is None:
-                self.phase = "shrinking"
-                self.current = max(1, self.current // 2)
-            else:
-                self._begin_refinement()
-            return
-        if self.phase == "shrinking":
-            # A lower failure invalidates all former larger successes.
-            self.lower = None
-            self.upper = self.current
-            if self.current == 1:
-                raise RuntimeError("page size 1 failed; no safe page size exists")
-            self.current = max(1, self.current // 2)
-            return
-        assert self.phase == "refining"
-        self.upper = self.current
-        self.bisections += 1
-        self._next_bisection()
-
-    def description(self) -> str:
-        bounds = ""
-        if self.lower is not None or self.upper is not None:
-            bounds = f"; working/failing bounds {self.lower}/{self.upper}"
-        return f"{self.phase} page size {self.current}{bounds}"
-
-
-def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], initial_page_size: int, expected_count: int, max_page_size: int | None = None, constant_page_size: int | None = None) -> tuple[bool, str | None]:
-    pk = spec["pk"].lower(); after: tuple[Any, ...] | None = None; seen = 0
-    source_keys = [source_output[key.lower()] for key in spec["source_page_keys"]]
-    date_is_text = "date_change" in documented_text_temporal_aliases(sql, {"date_change"})
+def diff_data(oracle: Any, pg: Any, sql: str, spec: CheckView | dict[str, Any], source_output: dict[str, str], initial_page_size: int, expected_count: int, max_page_size: int | None = None, constant_page_size: int | None = None) -> tuple[bool, str | None]:
+    pk = str(field(spec, "pk")).lower(); after: tuple[Any, ...] | None = None; seen = 0
+    change = date_field(spec)
+    source_keys = [source_output[key.lower()] for key in field(spec, "source_page_keys")]
+    date_is_text = change in documented_text_temporal_aliases(sql, {change})
     max_page_size = max_page_size or initial_page_size
-    sizer = PageSizer(initial_page_size, max_page_size, constant_page_size)
+    sizer = PageSizer(max_page_size=max_page_size, initial_page_size=initial_page_size, constant_page_size=constant_page_size)
     page = 0; started = time.monotonic(); full_page_seconds: list[float] = []
     while True:
         page += 1
         while True:
             current_size = sizer.current
-            heartbeat(f"[{spec['table']}] heartbeat: fetching KN data-diff page {page} (checked {seen}/{expected_count} rows; {sizer.description()})")
+            heartbeat(f"[{field(spec, 'table')}] heartbeat: fetching KN data-diff page {page} (checked {seen}/{expected_count} rows; {sizer.description()})")
             page_started = time.monotonic()
             try:
                 with oracle.cursor() as cur:
                     params = {"limit": current_size}
                     if after is not None: params.update({f"after_{index}": value for index, value in enumerate(after)})
-                    cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after, date_is_text=date_is_text), params)
+                    cur.execute(page_sql(sql, source_output[pk], source_output[change], source_keys, after, date_is_text=date_is_text), params)
                     rows = cur.fetchall()
                 page_seconds = time.monotonic() - page_started
             except Exception as error:
-                if not sizer.adaptive or not size_relevant_oracle_failure(error):
+                if not sizer.adaptive or not is_size_related_error(error):
                     raise
-                sizer.failed()
-                heartbeat(f"[{spec['table']}] KN page read failed at {current_size}: {error}; retrying the same cursor with {sizer.description()}")
+                sizer.failed_for_size()
+                heartbeat(f"[{field(spec, 'table')}] KN page read failed at {current_size}: {error}; retrying the same cursor with {sizer.description()}")
                 continue
-            if sizer.succeeded():
-                break
-            heartbeat(f"[{spec['table']}] successful sizing probe at {current_size}; next probe uses {sizer.description()} on the same cursor")
+            # A successful fetch is a real check page, not a throw-away probe:
+            # advance the cursor only after its rows have been compared below.
+            sizer.succeeded()
+            break
         if not rows:
-            heartbeat(f"[{spec['table']}] data-diff fetch complete ({seen}/{expected_count} rows)")
+            heartbeat(f"[{field(spec, 'table')}] data-diff fetch complete ({seen}/{expected_count} rows)")
             return (seen == expected_count, None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}")
         keys = [row[0] for row in rows]
         tuples = [tuple(row[2:]) for row in rows]
@@ -633,7 +576,7 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
         if any(any(value is None for value in item) for item in tuples) or len(set(tuples)) != len(tuples):
             return False, "KN query has null or duplicate native page tuple"
         with pg.cursor() as cur:
-            cur.execute(f"SELECT {quote(pk)}, {quote('date_change')} FROM {relation(spec['table'])} WHERE {quote(pk)} = ANY(%s)", (keys,))
+            cur.execute(f"SELECT {quote(pk)}, {quote(change)} FROM {relation(field(spec, 'table'))} WHERE {quote(pk)} = ANY(%s)", (keys,))
             target_rows = cur.fetchall(); target: dict[str, str | None] = {}
             for row in target_rows:
                 key = str(row[0])
@@ -646,15 +589,15 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
             if actual is None and str(key) not in target:
                 return False, f"missing target PK {key!r}"
             if expected is None or actual is None:
-                return False, f"null date_change for PK {key!r}"
+                return False, f"null {change} for PK {key!r}"
             if expected != actual:
-                return False, f"date_change mismatch for PK {key!r}: KN={expected}, target={actual}"
+                return False, f"{change} mismatch for PK {key!r}: KN={expected}, target={actual}"
         seen += len(rows); after = tuples[-1]
         elapsed = time.monotonic() - started
         rate = len(rows) / page_seconds if page_seconds else 0
         remaining = max(0, expected_count - seen)
         eta = format_duration((remaining / rate) if rate else 0)
-        heartbeat(f"[{spec['table']}] checked data-diff page {page} ({len(rows)} rows; total {seen}/{expected_count}; page size {current_size}; {rate:,.0f} rows/s; elapsed {format_duration(elapsed)}; ETA {eta})")
+        heartbeat(f"[{field(spec, 'table')}] checked data-diff page {page} ({len(rows)} rows; total {seen}/{expected_count}; page size {current_size}; {rate:,.0f} rows/s; elapsed {format_duration(elapsed)}; ETA {eta})")
         if len(rows) == current_size:
             full_page_seconds.append(page_seconds / len(rows))
             if len(full_page_seconds) >= 6:
@@ -672,7 +615,7 @@ def highwater_and_delta(
     pg: Any,
     oracle: Any,
     sql: str,
-    spec: dict[str, Any],
+    spec: CheckView | dict[str, Any],
     source_output: dict[str, str],
     highwater: Any,
     last_sync_start: Any,
@@ -682,13 +625,14 @@ def highwater_and_delta(
 ) -> tuple[bool, str, int | None, str, int | None, str]:
     """Check high-water equality, inclusive LIFT preview, and strict freshness."""
     check_started_at = check_started_at or integration_start_time()
+    change = date_field(spec)
     with pg.cursor() as cur:
-        cur.execute(f"SELECT MAX({quote('date_change')}) FROM {relation(spec['table'])}")
+        cur.execute(f"SELECT MAX({quote(change)}) FROM {relation(field(spec, 'table'))}")
         maximum = cur.fetchone()[0]
     highwater_ok = normalize(maximum) == normalize(highwater)
     highwater_detail = (
         "ok" if highwater_ok else
-        f"target MAX(date_change)={normalize(maximum)} != integration last_changed_datetime={normalize(highwater)}"
+        f"target MAX({change})={normalize(maximum)} != integration last_changed_datetime={normalize(highwater)}"
     )
     if is_full_sync is None or use_changed_datetime_for_delta is None:
         detail = "cannot determine LIFT delta filter: integration configuration is unavailable"
@@ -711,8 +655,8 @@ def highwater_and_delta(
         # LIFT stores a naïve PostgreSQL timestamp; KN's FROM_TZ output is a
         # TSTZ. Cast to TIMESTAMP so this uses the same Ljubljana wall-clock
         # contract as normalize()/the data comparison.
-        source_date = quote(source_output["date_change"])
-        if "date_change" in documented_text_temporal_aliases(sql, {"date_change"}):
+        source_date = quote(source_output[change])
+        if change in documented_text_temporal_aliases(sql, {change}):
             source_date = f"CAST(TO_TIMESTAMP_TZ({source_date}, '{DOCUMENTED_ISO_TZ_FORMAT}') AS TIMESTAMP)"
         else:
             source_date = f"CAST({source_date} AS TIMESTAMP)"
@@ -760,10 +704,10 @@ def markdown(results: list[dict[str, Any]], environment: str) -> str:
         "| Integration SQL correctness | Validates KN SQL structure, required output aliases, revision/date fields, required `JN_STATUS <> 'X'` filter, split-table date filter, and excluded `PODATKI` where applicable. |",
         "| Integration metadata correctness | Requires one integration using `KN ORACLE`, a non-null last sync start, `is_full_sync=false`, and `use_changed_datetime_for_delta=true`. |",
         "| LIFT name correctness | `PASS` when every LIFT translation title starts with `EV H`. |",
-        "| Data | KN and target row count, PK membership, and `date_change` match. `CACHED` means the matching PK/date scan from the unchanged query/manifest was reused. |",
-        "| High-water | Target `MAX(date_change)` equals LIFT `last_changed_datetime`. |",
+        "| Data | KN and target row count, PK membership, and the table's configured change field match. `CACHED` means the matching PK/change scan from the unchanged query/catalog was reused. |",
+        "| High-water | Target `MAX(configured change field)` equals LIFT `last_changed_datetime`. |",
         "| LIFT delta preview | Rows selected by LIFT's inclusive lower bound through the checker start. `INFO (N)` is expected boundary replay and does not fail the result. |",
-        "| Changes after high-water | KN rows with `date_change > last_changed_datetime`; any such rows fail the result. |",
+        "| Changes after high-water | KN rows with configured change field `> last_changed_datetime`; any such rows fail the result. |",
         "| Result | `PASS` only when every required check passes; the informational delta preview does not affect it. |",
         "",
     ]
@@ -772,7 +716,21 @@ def markdown(results: list[dict[str, Any]], environment: str) -> str:
 
 def write_report(path: Path, results: list[dict[str, Any]], environment: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(markdown(results, environment), encoding="utf-8")
+    descriptor, temporary = tempfile.mkstemp(prefix=f".{path.name}.", dir=path.parent)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write(markdown(results, environment))
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, path)
+        directory = os.open(path.parent, os.O_RDONLY)
+        try:
+            os.fsync(directory)
+        finally:
+            os.close(directory)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
 
 
 def finalise_result(result: dict[str, Any]) -> dict[str, Any]:
@@ -784,8 +742,34 @@ def finalise_result(result: dict[str, Any]) -> dict[str, Any]:
     return result
 
 
-def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, initial_page_size: int, mhash: str, check_started_at: datetime | None = None, *, max_page_size: int | None = None, constant_page_size: int | None = None) -> dict[str, Any]:
-    table = target_table(spec, environment); local = {**spec, "table": table}
+def pending_result(entry: CatalogEntry, environment: str, *, selected: bool) -> dict[str, Any]:
+    table = entry.spec.target_table
+    state = "NOT_CHECKED" if selected else "NOT_SELECTED"
+    return {
+        "table": table,
+        "table_presence": state, "unique_constraint": state,
+        "integration_sql": state, "integration_metadata": state,
+        "lift_name": state, "data": state, "highwater": state,
+        "lift_preview": state, "changes_after_highwater": state,
+        "result": state, "detail": (f"selected for {environment} check; not yet checked" if selected else f"not selected for {environment} check"),
+    }
+
+
+def initial_results(entries: dict[str, CatalogEntry], environment: str, selected_keys: Iterable[str]) -> tuple[list[dict[str, Any]], dict[str, int]]:
+    """Preseed a complete report, then replace selected table rows in place."""
+    selected = set(selected_keys)
+    return (
+        [pending_result(entry, environment, selected=key in selected) for key, entry in entries.items()],
+        {key: index for index, key in enumerate(entries)},
+    )
+
+
+def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: CatalogEntry | dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, initial_page_size: int, mhash: str, check_started_at: datetime | None = None, *, max_page_size: int | None = None, constant_page_size: int | None = None) -> dict[str, Any]:
+    if isinstance(spec, CatalogEntry):
+        table = spec.spec.target_table
+        local: CheckView | dict[str, Any] = CheckView(spec)
+    else:
+        table = target_table(spec, environment); local = {**spec, "table": table}
     check_started_at = check_started_at or integration_start_time()
     result = {
         "table": table, "table_presence": "FAIL", "unique_constraint": "NOT_CHECKED",
@@ -802,10 +786,10 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         if not present:
             detail_parts.append(f"target table {SCHEMA}.{table} does not exist")
         else:
-            unique = has_unique_pk_index(target_pg, table, spec["pk"])
+            unique = has_unique_pk_index(target_pg, table, field(local, "pk"))
             result["unique_constraint"] = "PASS" if unique else "FAIL"
             if not unique:
-                detail_parts.append(f"missing valid non-partial single-column unique index/constraint on {spec['pk']}")
+                detail_parts.append(f"missing valid non-partial single-column unique index/constraint on {field(local, 'pk')}")
 
         heartbeat(f"[{table}] heartbeat: resolving LIFT metadata and validating KN SQL")
         try:
@@ -819,10 +803,11 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
         sql, output, sql_failures = validate_sql(oracle, info["sql"], local)
         result["integration_sql"] = "PASS" if not sql_failures else "FAIL"
         detail_parts.extend(sql_failures)
-        title_bad = not info["titles"] or any(not str(title or "").startswith("EV H") for title in info["titles"])
+        title_prefix = str(option(local, "lift_title_prefix", "EV H"))
+        title_bad = not info["titles"] or any(not str(title or "").startswith(title_prefix) for title in info["titles"])
         result["lift_name"] = "FAIL" if title_bad else "PASS"
         if title_bad:
-            detail_parts.append(f"titles must all start with EV H; got {info['titles']!r}")
+            detail_parts.append(f"titles must all start with {title_prefix!r}; got {info['titles']!r}")
 
         metadata_failures: list[str] = []
         if str(info["connection_name"] or "").upper() != "KN ORACLE": metadata_failures.append("integration connection is not KN ORACLE")
@@ -837,6 +822,8 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
             metadata_failures.append("is_full_sync must be false; this checker requires a delta integration")
         if use_changed is None:
             metadata_failures.append("use_changed_datetime_for_delta must be a non-null boolean")
+        elif not use_changed:
+            metadata_failures.append("use_changed_datetime_for_delta must be true; this checker requires the date-change high-water delta")
         if info["last_sync_start"] is None:
             metadata_failures.append("last_sync_start is NULL; LIFT would run a full integration and ignore the delta high-water mark")
         result["integration_metadata"] = "PASS" if not metadata_failures else "FAIL"
@@ -853,8 +840,8 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
             return finalise_result(result)
         identity = hashlib.sha256(json.dumps({
             "env": environment, "table": table, "integration": str(info["integration_id"]),
-            "sql": sql_hash(sql), "manifest": mhash, "pk": spec["pk"],
-            "date_change": "date_change", "source_page_keys": spec["source_page_keys"],
+            "sql": sql_hash(sql), "manifest": mhash, "pk": field(local, "pk"),
+            "date_change": date_field(local), "source_page_keys": field(local, "source_page_keys"),
         }, sort_keys=True).encode()).hexdigest()
         entry = cache["entries"].get(identity, {})
         kn_count = entry.get("kn_count")
@@ -874,7 +861,7 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
             if data_ok: result["data"] = "CACHED"
         elif data_ok:
             heartbeat(f"[{table}] heartbeat: proving KN source PK uniqueness")
-            distinct_pk_count = oracle_distinct_pk_count(oracle, sql, data_output[spec["pk"].lower()])
+            distinct_pk_count = oracle_distinct_pk_count(oracle, sql, data_output[str(field(local, "pk")).lower()])
             if distinct_pk_count != kn_count:
                 result["data"] = "FAIL"
                 detail_parts.append(f"KN query has null or duplicate PK globally: COUNT(DISTINCT PK)={distinct_pk_count}, COUNT(*)={kn_count}")
@@ -942,13 +929,16 @@ def main() -> int:
     if initial_page_size < 1 or initial_page_size > args.max_page_size:
         raise SystemExit("error: --initial-page-size must be positive and no greater than --max-page-size")
     try:
-        manifest = json.loads(MANIFEST_PATH.read_text()); specs = manifest["tables"]
-        by_key = {item["key"]: item for item in specs}
+        by_key = ENTRIES
         unknown = set(args.tables) - set(by_key)
         if unknown: raise RuntimeError("unknown table key(s): " + ", ".join(sorted(unknown)))
-        selected = [by_key[key] for key in args.tables] if args.tables else specs
-        load_env(); oracle_driver, psycopg = drivers(); cache = cache_read(); mhash = manifest_hash(manifest)
+        selected_keys = args.tables or list(by_key)
+        selected = [by_key[key] for key in selected_keys]
         report_path = args.report or default_report_path(args.environment, datetime.now())
+        results, positions = initial_results(by_key, args.environment, selected_keys)
+        write_report(report_path, results, args.environment)
+        heartbeat(f"seed report written: {report_path}")
+        load_env(); oracle_driver, psycopg = drivers(); cache = cache_read(); mhash = catalog_hash(by_key)
         with (
             oracle_driver.connect(**oracle_settings(oracle_driver)) as oracle,
             psycopg.connect(**pg_settings(args.environment)) as target_pg,
@@ -957,15 +947,14 @@ def main() -> int:
             initialise_sessions(oracle, target_pg, metadata_pg)
             check_started_at = integration_start_time()
             heartbeat(f"integration-start timestamp fixed at {normalize(check_started_at)} (Europe/Ljubljana wall clock)")
-            results = []
-            for index, spec in enumerate(selected, start=1):
-                heartbeat(f"[{index}/{len(selected)}] starting {target_table(spec, args.environment)}")
-                results.append(check_one(
+            for index, (key, spec) in enumerate(zip(selected_keys, selected, strict=True), start=1):
+                heartbeat(f"[{index}/{len(selected)}] starting {spec.spec.target_table}")
+                results[positions[key]] = check_one(
                     target_pg, metadata_pg, oracle, spec, args.environment, cache,
                     args.refresh_data, initial_page_size, mhash, check_started_at,
                     max_page_size=args.max_page_size,
                     constant_page_size=args.constant_page_size,
-                ))
+                )
                 cache_write(cache)
                 write_report(report_path, results, args.environment)
                 heartbeat(f"[{index}/{len(selected)}] checkpoint saved: cache and partial report written")
@@ -973,7 +962,8 @@ def main() -> int:
         report = markdown(results, args.environment); write_report(report_path, results, args.environment)
         heartbeat(f"report written: {report_path}")
         print(report)
-        return 0 if all(item["result"] == "PASS" for item in results) else 1
+        selected_results = [results[positions[key]] for key in selected_keys]
+        return 0 if all(item["result"] == "PASS" for item in selected_results) else 1
     except Exception as error:
         print(f"error: {error}", file=sys.stderr); return 2
 

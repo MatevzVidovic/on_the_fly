@@ -58,7 +58,7 @@ The engine provides a page runner with one stable contract:
 2. **Core and pilot:** implement the run protocol and tests for replay, checkpoint failure, reconnect, lock contention, one/two-SIGINT, and state mismatch. Migrate one small table through a thin wrapper.
 3. **KN adapter:** migrate full and only-new, prove a large table and a composite-key table, then add guarded purge. Validate native key/index assumptions on every run.
 4. **Production adapter:** migrate staging→production UUID piping and restart-from-zero truncate; prove bounded memory and replay safety.
-5. **Tool consolidation and removal:** move research, constraints, LIFT initialization, and checks to the specs. After parity tests and one deprecation window, delete the old monolithic loader logic, `stag_to_prod_complex`, duplicate configuration, and compatibility shims.
+5. **Tool consolidation and removal:** move research, constraints, LIFT initialization, and checks to the specs. Delete old monolithic loader logic, `stag_to_prod_complex`, duplicate configuration, and duplicate discovery tools. Legacy command paths may remain only as tiny forwarding/retirement shims; they contain no loader behavior or state format.
 
 ## Acceptance gates
 
