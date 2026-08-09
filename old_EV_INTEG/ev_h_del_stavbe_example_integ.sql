@@ -1,0 +1,36 @@
+
+select to_char(j."DST_SID") || '-' || to_char(j."JN_REV_NUM") as jn_del_stavbe_pk,
+       j."DST_SID",
+       j."STA_SID",
+       j."STEV_DST",
+       j."STEV_STAN",
+       j."POVRSINA",
+       j."UPOR_POV",
+       j."HS_MID",
+       j."LETO_OBN_OKEN",
+       j."LETO_OBN_INST",
+       j."ST_NADSTROPJA",
+       j."ID_LEGA",
+       j."PROSTORNINA",
+       j."IMA_DVIGALO_DN",
+       j."VISINA_ETAZE",
+       j."ID_DR_DST",
+       j."JN_REV_NUM",
+       j."JN_REV_NUM_TO",
+       j."JN_REV_NUM_PREV",
+       j."DELEZ_DST_STAVBA",
+       j."ZPS_DST",
+       j."ID_MODEL",
+       j."CCSI_STAR",
+       j."IMA_KATAS_VPIS_DN",
+       j."EID",
+       j."HS_MID_CENX",
+       j."HS_MID_CENY",
+       CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
+    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, 
+    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
+    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+from EV.JN_DEL_STAVBE j
+         join EV.revision rf on (j.jn_rev_num = rf.rev_num)
+         left join Ev.revision rt on (j.jn_rev_num_to = rt.rev_num)
+where jn_status <> 'X'

@@ -1,0 +1,10 @@
+.venv/
+.env
+src/stag_to_prod/.env
+src/kn_to_stag_delta_with_delete/.env
+src/adapt_last_changed_datetime/.env
+__pycache__/
+.pytest_cache/
+src/**/.state/
+src/**/.auto_page_sizes/
+src/kn_tables_uk_check/kn_tables_uk_report.md
