@@ -33,7 +33,7 @@ Sistems/folders:
           Concern: matching counts do not prove a complete/current membership set, so a partial or changed source could delete valid rows.
           Proposal: purge only after complete materialization and source verification under the writer lock; require non-null unique source keys and use null-safe `NOT EXISTS` against the completed SQLite set.
 - lift_integ_init: for a table, set last_sync_start to 1 year ago from now, and setting last_changed_datetime to  what we compute as the max (high-water mark) of DATE_CHANGE on our table. This lets further LIFT integs do a correct delta integ.
-- stag-to-prod (just upsert the data from stag to prod in large pages. with --truncate, truncate first, but by default it is false..)
+- stag-to-prod (just idempotent upsert the data from stag to prod in large pages. with --truncate, truncate first, but by default it is false..)
 - integ_all which will do the integration for all the tables I am working on.
   --parallel for how many we run in parallel
   --test to check the preconditions to all of them. Table existance, unique
