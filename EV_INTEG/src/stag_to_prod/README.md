@@ -19,10 +19,11 @@ semantics (first Ctrl-C stops after a page; second rolls back the active page).
   --apply --page-size 50000
 ```
 
-Rerun an interrupted apply command to resume.  A completed ordinary command
-automatically starts a new full, idempotent copy epoch on its next invocation;
-use `--fresh --apply` to explicitly abandon a partial checkpoint and rescan
-from the beginning.  `--truncate --apply` is the one replacement operation:
+Rerun an interrupted apply command to restart safely from UUID zero. A
+PostgreSQL snapshot cannot survive a process crash, so resuming the old UUID
+cursor could miss changes to rows already copied; idempotent upserts make the
+restart correct. A completed ordinary command also starts a new full,
+idempotent copy epoch on its next invocation. `--truncate --apply` is the one replacement operation:
 it truncates production and resets/copies under one writer lock. `--page-key
 id` remains a compatibility option, but no other key is supported.
 

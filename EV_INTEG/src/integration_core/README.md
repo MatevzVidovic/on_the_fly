@@ -12,7 +12,8 @@ row conversion; this package owns operational contracts.
   between them retries that page and therefore requires adapter upserts to be
   idempotent.
 - `LocalStateLock` and `PostgresWriterLock`: non-blocking exclusive writer
-  locks held for a complete run.
+  locks. The between-pages session lock is handed to a transaction-scoped lock
+  for each write, so a page cannot commit without PostgreSQL protection.
 - `InterruptController`: one Ctrl-C finishes/checkpoints the page; two abort.
 - `PageSizer`: optional in-memory bounded adaptive sizing; it is never saved.
 

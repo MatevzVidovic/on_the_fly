@@ -38,8 +38,9 @@ same keyset cursor at half size, then three bisections select a stable safe
 size. Use `--constant-page-size N` for a fixed-size diagnostic run.
 
 Without `--report`, each run writes its partial and final report under
-`reports/` as `state_report_stag_YYYYMMDD_HHMMSS.md` or
-`state_report_prod_YYYYMMDD_HHMMSS.md`. Existing reports are retained.
+`reports/` as `state_report_stag_YYYYMMDD_HHMMSS_microseconds.md` or
+`state_report_prod_YYYYMMDD_HHMMSS_microseconds.md`. Existing reports are
+retained, including concurrent runs started in the same second.
 
 `LIFT delta preview` simulates LIFT's inclusive lower bound at one timestamp
 captured when the checker starts: `date_change >= minDate AND date_change <=

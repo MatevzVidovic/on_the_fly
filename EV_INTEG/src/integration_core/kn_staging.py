@@ -20,7 +20,7 @@ from .page_size import PageSizer
 from .runner import Page, PageRunner
 from .run_store import RunStore
 from .specs import TableSpec
-from .state import Checkpoint, RunIdentity, read_checkpoint
+from .state import Checkpoint, RunIdentity
 
 
 _IDENTIFIER = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
@@ -328,9 +328,38 @@ def upsert_sql(spec: TableSpec, source: tuple[str, ...], destination: tuple[str,
     updates = [f'"{column}" = EXCLUDED."{column}"' for column in policy.update_columns(insertable) if column != spec.membership_key]
     if "updated_at" in destination and not policy.copy_managed_fields:
         updates.append('"updated_at" = CURRENT_TIMESTAMP')
-    conflict = "DO NOTHING" if not updates else "DO UPDATE SET " + ", ".join(updates)
+    if not updates:
+        conflict = "DO NOTHING"
+    else:
+        conflict = "DO UPDATE SET " + ", ".join(updates)
+        # The Python preflight/comparison gives useful diagnostics and avoids
+        # unnecessary writes, but it cannot prevent a concurrent non-loader
+        # writer from advancing the row between SELECT and INSERT.  Keep the
+        # source-newer rule in the atomic conflict statement as the final
+        # safety boundary so a page can never regress target data.
+        if spec.date_change is not None and spec.date_change in insertable and spec.date_change in destination:
+            target = f'"{spec.target_table}"."{spec.date_change}"'
+            conflict += f' WHERE {target} IS NULL OR EXCLUDED."{spec.date_change}" > {target}'
     quoted_columns = ", ".join(f'"{column}"' for column in columns)
     return f"INSERT INTO {_quoted(spec.target_schema, spec.target_table)} ({quoted_columns}) VALUES ({', '.join(values)}) ON CONFLICT (\"{spec.membership_key}\") {conflict}"
+
+
+def checked_upsert(cursor: Any, statement: str, rows: tuple[Mapping[str, Any], ...]) -> None:
+    """Write a page, rejecting an atomic conditional-upsert no-op.
+
+    The date-change predicate in ``ON CONFLICT`` is the final concurrent
+    writer guard.  PostgreSQL reports rows skipped by that predicate through
+    ``rowcount``; treating that as success would checkpoint a page whose
+    source version was not applied.
+    """
+    if not rows:
+        return
+    cursor.executemany(statement, rows)
+    if cursor.rowcount != len(rows):
+        raise RuntimeError(
+            "staging changed concurrently during conditional date_change upsert; "
+            "page rolled back and was not checkpointed"
+        )
 
 
 @dataclass(slots=True)
@@ -372,44 +401,6 @@ class KnStagingRun:
     def _generation_store(self, identity: RunIdentity) -> RunStore:
         return RunStore(self.checkpoint_path.with_suffix(".generation.sqlite3"), identity.fingerprint)
 
-    def _purge_identity(self, generation_identity: RunIdentity, generation_id: str) -> RunIdentity:
-        return RunIdentity(
-            self.identity.environment, self.identity.database, self.spec.target_schema, self.spec.target_table,
-            self.spec.version, self.identity.sql_content, "purge", (self.spec.membership_key,),
-            {"generation_fingerprint": generation_identity.fingerprint, "generation_id": generation_id},
-        )
-
-    def _purge_path(self, generation_id: str) -> Any:
-        return self.checkpoint_path.with_name(f"purge-{generation_id}.json")
-
-    def run_full_and_purge(self, *, fresh: bool = False) -> tuple[Any, Any | None]:
-        """Run source collection, full upsert, and purge under one writer lock.
-
-        If the upsert completed but its matching purge was interrupted, only
-        purge resumes; a later completed invocation starts a new generation.
-        """
-        with self.run_context() as context:
-            store = self._generation_store(self.identity)
-            # A normal run must never overwrite a generation belonging to a
-            # different SQL/spec identity.  ``--fresh`` is the one explicit
-            # operator request that is allowed to replace that stale state.
-            current = store.open(fresh=fresh, reset_on_mismatch=fresh)
-            try:
-                complete = store.complete(current)
-                generation_id = RunStore.generation_id(current) if complete else None
-            finally:
-                current.close()
-            full_checkpoint = read_checkpoint(self.checkpoint_path, self.identity, fresh=fresh)
-            if complete and generation_id is not None and full_checkpoint.completed and not fresh:
-                purge_identity = self._purge_identity(self.identity, generation_id)
-                purge_checkpoint = read_checkpoint(self._purge_path(generation_id), purge_identity)
-                if not purge_checkpoint.completed:
-                    return full_checkpoint, self.run_purge_non_existent(generation_identity=self.identity, context=context)
-            full = self.run_full(fresh=fresh, context=context)
-            if full.stopped_by_signal:
-                return full, None
-            return full, self.run_purge_non_existent(generation_identity=self.identity, fresh=fresh, context=context)
-
     def run_full(self, *, fresh: bool = False, context: Any | None = None) -> Any:
         statement: str | None = None
 
@@ -430,7 +421,7 @@ class KnStagingRun:
                 rows_to_write = tuple(row for row in rows if row[self.spec.membership_key] not in existing or existing[row[self.spec.membership_key]] is None or row[self.spec.date_change] > existing[row[self.spec.membership_key]])
             with self.destination_connection.cursor() as cursor:
                 assert statement is not None
-                cursor.executemany(statement, rows_to_write)
+                checked_upsert(cursor, statement, rows_to_write)
 
         @contextmanager
         def transaction() -> Iterable[Any]:
@@ -478,6 +469,8 @@ class KnStagingRun:
         """
         if self.spec.date_change is None:
             raise RuntimeError("only-new needs a date_change column")
+        if self.spec.date_change in self.spec.source_page_keys:
+            raise RuntimeError("only-new date_change must not also be a source_page_key")
         statement: str | None = None
 
         window: dict[str, tuple[Any, ...] | None] = {"upper": None}
@@ -507,10 +500,6 @@ class KnStagingRun:
             destination = prewrite(lambda: target_columns(self.destination_connection, self.spec))
             prewrite(lambda: validate_source_shape(self.source_connection, self.source_sql, self.spec, require_change=True))
             prewrite(lambda: validate_target_membership_index(self.destination_connection, self.spec))
-            # This happens before looking up/persisting a new upper watermark.
-            # NULLS LAST cannot make a nullable or duplicate cursor correct:
-            # it would only hide rows from a later keyset page.
-            prewrite(lambda: prove_source_membership(self.source_connection, self.source_sql, self.spec, include_change=True))
             statement = upsert_sql(self.spec, source, destination, self.policy)
             self.destination_connection.commit()
             metadata = dict(checkpoint.metadata or {})
@@ -520,6 +509,16 @@ class KnStagingRun:
                     raise RuntimeError("only-new checkpoint has an invalid frozen upper watermark")
                 window["upper"] = stored
                 return checkpoint
+            if checkpoint.cursor is None:
+                raise RuntimeError(
+                    "--only-new needs a completed composite watermark; this version cannot safely bootstrap one "
+                    "from legacy full-sync state. Run a full sync, then initialise a reviewed "
+                    "(date_change, source page-key) watermark before using --only-new."
+                )
+            # This happens before looking up/persisting a new upper watermark.
+            # NULLS LAST cannot make a nullable or duplicate cursor correct:
+            # it would only hide rows from a later keyset page.
+            prewrite(lambda: prove_source_membership(self.source_connection, self.source_sql, self.spec, include_change=True))
             upper = prewrite(lambda: freeze_upper_watermark(self.source_connection, self.source_sql, self.spec))
             if upper is None:
                 window["upper"] = None
@@ -528,10 +527,7 @@ class KnStagingRun:
                 window["upper"] = upper
                 return Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, None)
             window["upper"] = upper
-            # A first only-new run deliberately begins at no lower watermark.
-            # It can replay existing staging rows, but cannot lose rows merely
-            # because target timestamp serialization differs from Oracle's.
-            lower = checkpoint.cursor if checkpoint.completed else checkpoint.cursor
+            lower = checkpoint.cursor
             return Checkpoint(self.identity, lower, 0 if checkpoint.completed else checkpoint.pages, 0 if checkpoint.completed else checkpoint.rows, False, {"window_upper": upper})
 
         def fetch(after: tuple[Any, ...] | None) -> Page[Mapping[str, Any]] | None:
@@ -552,73 +548,24 @@ class KnStagingRun:
             rows = tuple(row for row in rows if row[self.spec.membership_key] not in existing or existing[row[self.spec.membership_key]] is None or row[self.spec.date_change] > existing[row[self.spec.membership_key]])
             with self.destination_connection.cursor() as cursor:
                 assert statement is not None
-                cursor.executemany(statement, rows)
+                checked_upsert(cursor, statement, rows)
 
         @contextmanager
         def transaction() -> Iterable[Any]:
             with self.destination_connection.transaction():
                 yield self.destination_connection
 
-        return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=(lambda _page: self.page_sizer.succeeded()) if self.page_sizer is not None else None, on_page_size_error=(lambda error: self._shrink_page_for(error))).run(fresh=fresh)
+        def complete(checkpoint: Checkpoint) -> Checkpoint:
+            # Oracle is live: rows at the frozen upper bound can disappear
+            # after page fetches. Completion still advances to that bound, so
+            # a later window cannot skip unseen keys between the last fetched
+            # row and the persisted upper cursor.
+            upper = window["upper"]
+            if upper is None:
+                return checkpoint
+            return Checkpoint(self.identity, upper, checkpoint.pages, checkpoint.rows, True, None)
 
-    def run_purge_non_existent(self, *, generation_identity: RunIdentity, fresh: bool = False, context: Any | None = None) -> Any:
-        """Delete staging-only non-null membership keys from a complete source generation.
-
-        SQLite is never attached to PostgreSQL: each bounded staging key page
-        is checked against the complete durable generation, then only missing
-        keys are deleted inside the page transaction.  Null staging keys are
-        deliberately outside the keyset and are never deleted by this mode.
-        """
-        generation_store = self._generation_store(generation_identity)
-        source = generation_store.open(reset_on_mismatch=False)
-        try:
-            if not generation_store.complete(source):
-                raise RuntimeError("--purge-non-existant requires a complete EOF-marked source generation")
-            generation_id = RunStore.generation_id(source)
-        finally:
-            source.close()
-        destination = target_columns(self.destination_connection, self.spec)
-        validate_target_membership_index(self.destination_connection, self.spec)
-        self.destination_connection.commit()
-        purge_identity = self._purge_identity(generation_identity, generation_id)
-        purge_path = self._purge_path(generation_id)
-
-        def fetch(after: tuple[Any, ...] | None) -> Page[Any] | None:
-            condition, binds = "", ()
-            if after is not None:
-                condition, binds = f' AND "{self.spec.membership_key}" > %s', (after[0],)
-            with self.destination_connection.cursor() as cursor:
-                cursor.execute(
-                    f'SELECT "{self.spec.membership_key}" FROM {_quoted(self.spec.target_schema, self.spec.target_table)} '
-                    f'WHERE "{self.spec.membership_key}" IS NOT NULL{condition} ORDER BY "{self.spec.membership_key}" LIMIT %s',
-                    (*binds, self.page_size),
-                )
-                rows = tuple(row[0] for row in cursor.fetchall())
-            if not rows:
-                return None
-            return Page(rows, (rows[-1],))
-
-        def write(rows: tuple[Any, ...]) -> None:
-            generation = generation_store.open(reset_on_mismatch=False)
-            try:
-                source_keys = RunStore.contains(generation, list(rows))
-            finally:
-                generation.close()
-            missing = [key for key in rows if key not in source_keys]
-            if not missing:
-                return
-            with self.destination_connection.cursor() as cursor:
-                cursor.execute(
-                    f'DELETE FROM {_quoted(self.spec.target_schema, self.spec.target_table)} WHERE "{self.spec.membership_key}" = ANY(%s)',
-                    (missing,),
-                )
-
-        @contextmanager
-        def transaction() -> Iterable[Any]:
-            with self.destination_connection.transaction():
-                yield self.destination_connection
-
-        return PageRunner(purge_path, purge_identity, fetch, write, transaction, self.run_context, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts).run(fresh=fresh, context=context)
+        return PageRunner(self.checkpoint_path, self.identity, fetch, write, transaction, self.run_context, prepare_checkpoint=prepare, reconnect=self.reconnect, is_reconnectable=self.is_reconnectable, interrupts=self.interrupts, on_page_committed=(lambda _page: self.page_sizer.succeeded()) if self.page_sizer is not None else None, on_page_size_error=(lambda error: self._shrink_page_for(error)), complete_checkpoint=complete).run(fresh=fresh)
 
 
 def freeze_upper_watermark(connection: Any, source_sql: str, spec: TableSpec) -> tuple[Any, ...] | None:

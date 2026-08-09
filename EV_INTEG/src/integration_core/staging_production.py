@@ -187,15 +187,19 @@ class StagingProductionRun:
             on_page_size_error=self._shrink_page_for,
         )
         # Read/reset/truncate/copy deliberately share exactly one writer
-        # context.  A completed ordinary copy starts a new idempotent epoch;
-        # a partial one resumes from its checkpoint.
+        # context. A completed ordinary copy starts a new idempotent epoch.
+        # A new process cannot resume a cursor from an old PostgreSQL snapshot:
+        # rows already behind that cursor may have changed in staging. Start
+        # those interrupted invocations from UUID zero; idempotent upserts
+        # make this safe and converge on one new consistent snapshot.
         with self.run_context() as context:
             from .state import read_checkpoint
             # --truncate supersedes checkpoint identity: it is the explicit
             # destructive reset requested by the operator.
             reset = fresh or truncate
             if not reset:
-                reset = read_checkpoint(self.checkpoint_path, self.identity).completed
+                read_checkpoint(self.checkpoint_path, self.identity)  # reject a stale identity before reset
+                reset = True
             if truncate:
                 # If the process dies after TRUNCATE but before checkpoint
                 # reset, rerunning --truncate repeats the intentional reset.

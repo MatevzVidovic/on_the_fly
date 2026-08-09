@@ -50,6 +50,7 @@ class PageRunner(Generic[Row]):
         interrupts: InterruptController | None = None,
         on_page_committed: Callable[[Page[Row]], None] | None = None,
         on_page_size_error: Callable[[Exception], bool] | None = None,
+        complete_checkpoint: Callable[[Checkpoint], Checkpoint] | None = None,
     ) -> None:
         self.path, self.identity = checkpoint_path, identity
         self.fetch_page, self.write_page, self.transaction = fetch_page, write_page, transaction
@@ -69,6 +70,7 @@ class PageRunner(Generic[Row]):
         self.interrupts = interrupts or InterruptController()
         self.on_page_committed = on_page_committed
         self.on_page_size_error = on_page_size_error
+        self.complete_checkpoint = complete_checkpoint
 
     def run(self, *, fresh: bool = False, context: Any | None = None) -> PageRunResult:
         # The writer context intentionally encloses checkpoint loading: no
@@ -96,9 +98,15 @@ class PageRunner(Generic[Row]):
                     save_checkpoint(self.path, checkpoint)
             if checkpoint.completed:
                 return PageRunResult(checkpoint, False)
+            if self.interrupts.stop_requested:
+                return PageRunResult(checkpoint, True)
             reconnect_attempts = 0
             while True:
                 try:
+                    # A graceful SIGINT applies only to the page that was
+                    # active when it arrived.  Never begin a later fetch.
+                    if self.interrupts.stop_requested:
+                        return PageRunResult(checkpoint, True)
                     ensure_held()
                     page = self.fetch_page(checkpoint.cursor)
                     if page is None:
@@ -107,6 +115,10 @@ class PageRunner(Generic[Row]):
                         # session has been lost.
                         ensure_held()
                         checkpoint = Checkpoint(self.identity, checkpoint.cursor, checkpoint.pages, checkpoint.rows, True, checkpoint.metadata)
+                        if self.complete_checkpoint is not None:
+                            checkpoint = self.complete_checkpoint(checkpoint)
+                            if checkpoint.identity != self.identity or not checkpoint.completed:
+                                raise RuntimeError("completion checkpoint must retain identity and be completed")
                         save_checkpoint(self.path, checkpoint)
                         return PageRunResult(checkpoint, False)
                     if not page.rows:
@@ -129,7 +141,9 @@ class PageRunner(Generic[Row]):
                             self.write_page(page.rows)
                     finally:
                         # The xact lock is released by the transaction context
-                        # before the dedicated session lock is restored.
+                        # before the dedicated session lock is restored. If
+                        # restoration loses to another writer, refuse to
+                        # checkpoint this committed (idempotent) page.
                         if handoff_started:
                             end_page_mutation()
                     # Size evidence is valid only after the destination
@@ -165,9 +179,15 @@ class PageRunner(Generic[Row]):
                             self.reconnect_initial_delay_seconds * (2 ** reconnect_attempts),
                         )
                         reconnect_attempts += 1
+                        if self.interrupts.stop_requested:
+                            return PageRunResult(checkpoint, True)
                         self.sleep(delay)
+                        if self.interrupts.stop_requested:
+                            return PageRunResult(checkpoint, True)
                         try:
                             self.reconnect()
+                            if self.interrupts.stop_requested:
+                                return PageRunResult(checkpoint, True)
                             break
                         except Exception as reconnect_error:
                             if self.interrupts.stop_requested:

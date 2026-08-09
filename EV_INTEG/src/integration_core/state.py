@@ -91,6 +91,19 @@ class Checkpoint:
     completed: bool = False
     metadata: Mapping[str, Any] | None = None
 
+    def __post_init__(self) -> None:
+        if not isinstance(self.identity, RunIdentity):
+            raise TypeError("checkpoint identity must be a RunIdentity")
+        if self.cursor is not None and not isinstance(self.cursor, tuple):
+            raise TypeError("checkpoint cursor must be a tuple or None")
+        if (not isinstance(self.pages, int) or isinstance(self.pages, bool) or self.pages < 0
+                or not isinstance(self.rows, int) or isinstance(self.rows, bool) or self.rows < 0):
+            raise ValueError("checkpoint counters must be non-negative integers")
+        if not isinstance(self.completed, bool):
+            raise TypeError("checkpoint completed must be bool")
+        if self.metadata is not None and not isinstance(self.metadata, Mapping):
+            raise TypeError("checkpoint metadata must be a mapping or None")
+
     def as_json(self) -> dict[str, Any]:
         return {
             "fingerprint": self.identity.fingerprint,

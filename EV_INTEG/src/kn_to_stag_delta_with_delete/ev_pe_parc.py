@@ -18,8 +18,9 @@ SRC = HERE.parent
 if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
-from integration_core import InterruptController, PageSizer, RunIdentity, WriterRunContext, read_checkpoint
-from integration_core.kn_staging import KnStagingRun, freeze_upper_watermark, read_select, validate_oracle_index, validate_source_shape
+from integration_core import Checkpoint, InterruptController, PageSizer, RunIdentity, WriterRunContext, read_checkpoint
+from integration_core.kn_staging import KnStagingRun, freeze_upper_watermark, prove_source_membership, read_select, validate_oracle_index, validate_source_shape
+from integration_core.state import save_checkpoint
 from integrations.catalog import table_spec
 from integrations.ev_pe_parc import SPEC
 
@@ -33,9 +34,11 @@ def parse_args(fixed_table: str | None = None) -> argparse.Namespace:
     mode = parser.add_mutually_exclusive_group()
     mode.add_argument("--dry-run", action="store_true")
     mode.add_argument("--apply", action="store_true")
+    mode.add_argument("--initialize-only-new-watermark", action="store_true", help="write the reviewed initial only-new composite watermark; never transfers rows")
     parser.add_argument("--resumable", action="store_true")
     parser.add_argument("--only-new", action="store_true")
-    parser.add_argument("--purge-non-existant", action="store_true", help="after a full run, delete staging keys absent from the complete KN source generation")
+    parser.add_argument("--confirm-staging-already-current", action="store_true", help="required acknowledgement for --initialize-only-new-watermark")
+    parser.add_argument("--purge-non-existant", action="store_true", help="reserved: unavailable until purge has a source-consistent Oracle snapshot")
     parser.add_argument("--page-size", type=int, default=50_000)
     parser.add_argument("--auto-page-size", action="store_true", help="adapt source payload pages within the configured maximum")
     parser.add_argument("--initial-page-size", type=int, help="adaptive starting size (default: one quarter of max)")
@@ -65,12 +68,23 @@ def parse_args(fixed_table: str | None = None) -> argparse.Namespace:
         parser.error("--initial-page-size/--max-page-size require --auto-page-size")
     if args.only_new and not args.resumable:
         parser.error("--only-new requires --resumable")
-    if args.only_new and args.purge_non_existant:
-        parser.error("--purge-non-existant cannot be combined with --only-new")
-    if args.purge_non_existant and not args.apply:
-        parser.error("--purge-non-existant requires --resumable --apply; it has no dry-run/status variant")
-    if args.purge_non_existant and args.status:
-        parser.error("--purge-non-existant cannot be combined with --status")
+    if args.only_new and args.fresh:
+        parser.error("--only-new cannot use --fresh; initialise or preserve its reviewed composite watermark")
+    if args.initialize_only_new_watermark:
+        if args.only_new:
+            parser.error("--initialize-only-new-watermark already operates on only-new state; omit --only-new")
+        if not args.resumable:
+            parser.error("--initialize-only-new-watermark requires --resumable")
+        if not args.confirm_staging_already_current:
+            parser.error("--initialize-only-new-watermark requires --confirm-staging-already-current")
+        if args.fresh:
+            parser.error("--initialize-only-new-watermark cannot use --fresh")
+        if args.status:
+            parser.error("--initialize-only-new-watermark cannot be combined with --status")
+    elif args.confirm_staging_already_current:
+        parser.error("--confirm-staging-already-current is only valid with --initialize-only-new-watermark")
+    if args.purge_non_existant:
+        parser.error("--purge-non-existant is unavailable until source membership and payload use one Oracle snapshot")
     if args.apply and not args.resumable:
         parser.error("the core pilot requires --resumable --apply")
     args.spec = spec
@@ -152,9 +166,52 @@ def preview(kn: Any, query: str, spec: Any, only_new: bool) -> None:
     validate_source_shape(kn, query, spec, require_change=True)
     if only_new:
         upper = freeze_upper_watermark(kn, query, spec)
-        print({"mode": "dry-run", "table": spec.target_table, "only_new": True, "upper_watermark": upper})
+        print({"mode": "source-shape-preview", "table": spec.target_table, "only_new": True, "upper_watermark": upper})
     else:
-        print({"mode": "dry-run", "table": spec.target_table, "source_page_keys": spec.source_page_keys, "validated": True})
+        print({"mode": "source-shape-preview", "table": spec.target_table, "source_page_keys": spec.source_page_keys})
+
+
+def initialize_only_new_watermark(
+    kn: Any, query: str, spec: Any, path: Path, run_id: RunIdentity,
+    context_factory: Any, interrupts: InterruptController,
+) -> Checkpoint:
+    """Freeze and persist a bootstrap window for later only-new completion.
+
+    The acknowledgement belongs at the CLI boundary.  This function proves
+    the source tuple, reads its native upper tuple under writer locks, and
+    writes only an *incomplete* window checkpoint—never a staging payload
+    row. The caller must transfer that frozen window before it can become a
+    completed lower cursor.
+    """
+    with context_factory() as context:
+        context.ensure_held()
+        checkpoint = read_checkpoint(path, run_id)
+        if checkpoint.completed:
+            if checkpoint.metadata and checkpoint.metadata.get("initialized_only_new_bootstrap"):
+                return checkpoint
+            raise RuntimeError("only-new state already exists; refusing to replace its completed watermark")
+        if checkpoint.metadata:
+            if checkpoint.metadata.get("window_upper") is not None:
+                return checkpoint
+            raise RuntimeError("only-new checkpoint is incomplete; resume it or inspect/reset it before initialization")
+        if checkpoint.cursor is not None or checkpoint.pages or checkpoint.rows:
+            raise RuntimeError("only-new checkpoint is incomplete; resume it or inspect/reset it before initialization")
+        validate_source_shape(kn, query, spec, require_change=True)
+        if spec.oracle_owner is None or spec.oracle_index is None:
+            raise RuntimeError(f"{spec.target_table} is not runnable until its verified Oracle index metadata is catalogued")
+        validate_oracle_index(kn, spec.oracle_owner, spec.oracle_index, spec.oracle_index_columns or spec.source_page_keys)
+        prove_source_membership(kn, query, spec, include_change=True)
+        if interrupts.stop_requested:
+            return checkpoint
+        upper = freeze_upper_watermark(kn, query, spec)
+        if interrupts.stop_requested:
+            return checkpoint
+        if upper is None:
+            raise RuntimeError("cannot initialise --only-new from an empty source; no safe composite watermark exists")
+        initialized = Checkpoint(run_id, None, 0, 0, False, {"window_upper": upper, "initialized_only_new_bootstrap": True})
+        context.ensure_held()
+        save_checkpoint(path, initialized)
+        return initialized
 
 
 def main(fixed_table: str | None = None) -> int:
@@ -164,21 +221,24 @@ def main(fixed_table: str | None = None) -> int:
     oracledb, psycopg = drivers()
     enable_oracle_thick_mode(oracledb)
     query = read_select(spec.source_sql)
-    path = checkpoint_path(spec, "only_new" if args.only_new else "full")
+    only_new_state = args.only_new or args.initialize_only_new_watermark
+    path = checkpoint_path(spec, "only_new" if only_new_state else "full")
     if args.status:
-        print(read_checkpoint(path, identity(spec, query, "only-new" if args.only_new else "full", {"adapter": "kn-staging-v1"})).as_json() if path.exists() else {"status": "not started"})
+        print(read_checkpoint(path, identity(spec, query, "only-new" if only_new_state else "full", {"adapter": "kn-staging-v1"})).as_json() if path.exists() else {"status": "not started"})
         return 0
     with oracledb.connect(**oracle_settings(oracledb)) as kn:
-        if args.dry_run or not args.apply:
+        if args.dry_run or (not args.apply and not args.initialize_only_new_watermark):
             preview(kn, query, spec, args.only_new)
             return 0
-        validate_source_shape(kn, query, spec, require_change=True)
+        if not args.initialize_only_new_watermark:
+            validate_source_shape(kn, query, spec, require_change=True)
         # A wrapper can later provide an actual Oracle index name.  The pilot
         # has expression-derived membership and validates the selected native
         # tuple instead, so no unsafe guessed dictionary lookup is made.
         if spec.oracle_owner is None or spec.oracle_index is None:
             raise RuntimeError(f"{spec.target_table} is not runnable until its verified Oracle index metadata is catalogued")
-        validate_oracle_index(kn, spec.oracle_owner, spec.oracle_index, spec.oracle_index_columns or spec.source_page_keys)
+        if not args.initialize_only_new_watermark:
+            validate_oracle_index(kn, spec.oracle_owner, spec.oracle_index, spec.oracle_index_columns or spec.source_page_keys)
         with psycopg.connect(**pg_settings()) as staging, InterruptController(lambda message: print(message, file=sys.stderr, flush=True)) as interrupts:
             # Keep long source/preflight reads outside an implicit PostgreSQL
             # transaction.  Each PageRunner transaction remains explicit.
@@ -186,7 +246,7 @@ def main(fixed_table: str | None = None) -> int:
             # Page size changes are operational tuning, not a different data
             # contract, so a safe resumed window may use a new size.
             options = {"adapter": "kn-staging-v1"}
-            run_id = identity(spec, query, "only-new" if args.only_new else "full", options)
+            run_id = identity(spec, query, "only-new" if only_new_state else "full", options)
             context = lambda: WriterRunContext(path.with_suffix(".lock"), lambda: psycopg.connect(**pg_settings()), run_id.database, spec.target_schema, spec.target_table)
             maximum = args.max_page_size or max(args.page_size, args.constant_page_size or 0)
             page_sizer = None
@@ -208,16 +268,14 @@ def main(fixed_table: str | None = None) -> int:
             run.reconnect = reconnect
             run.is_reconnectable = reconnectable
             try:
-                if not args.only_new:
-                    if args.purge_non_existant:
-                        result, purge = run.run_full_and_purge(fresh=args.fresh)
-                        if result is None:
-                            print({"table": spec.target_table, "mode": "purge-preflight", "stopped": True})
-                            return 0
-                        print({"table": spec.target_table, "mode": "full", "pages": result.checkpoint.pages, "rows": result.checkpoint.rows, "stopped": result.stopped_by_signal})
-                        if purge is not None:
-                            print({"table": spec.target_table, "mode": "purge", "pages": purge.checkpoint.pages, "rows": purge.checkpoint.rows, "stopped": purge.stopped_by_signal})
+                if args.initialize_only_new_watermark:
+                    checkpoint = initialize_only_new_watermark(kn, query, spec, path, run_id, context, interrupts)
+                    if interrupts.stop_requested:
+                        print({"table": spec.target_table, "mode": "only-new-bootstrap", "stopped": True})
                         return 0
+                    print({"table": spec.target_table, "mode": "only-new-bootstrap", "frozen_upper": (checkpoint.metadata or {}).get("window_upper"), "next_step": "run --only-new --apply"})
+                    return 0
+                if not args.only_new:
                     result = run.run_full(fresh=args.fresh)
                     print({"table": spec.target_table, "mode": "full", "pages": result.checkpoint.pages, "rows": result.checkpoint.rows, "stopped": result.stopped_by_signal})
                     return 0

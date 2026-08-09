@@ -181,6 +181,19 @@ def test_completed_copy_automatically_starts_a_new_idempotent_epoch(tmp_path: Pa
     assert [row["id"] for row in production.writes] == [key, key]
 
 
+def test_interrupted_copy_restarts_from_zero_under_a_new_staging_snapshot(tmp_path: Path) -> None:
+    first, second = sorted((uuid.uuid4(), uuid.uuid4()))
+    path = tmp_path / "copy.json"
+    save_checkpoint(path, Checkpoint(identity(), (first,), 1, 1, False))
+    staging = Connection([(first, "c1", "u1", "new-v1"), (second, "c2", "u2", "v2")])
+    production = Connection()
+    run = StagingProductionRun("public", "target", staging, production, ("id", "created_at", "created_by", "value"), 10, path, identity(), Context)
+    result = run.run()
+    assert result.checkpoint.completed
+    # The changed row behind the old cursor is included rather than skipped.
+    assert [row["id"] for row in production.writes] == [first, second]
+
+
 def test_uuid_preflight_rejects_non_uuid_id() -> None:
     class Cursor:
         def __enter__(self): return self

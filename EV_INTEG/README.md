@@ -1,38 +1,37 @@
-# EV historical bootstrap POC
+# EV integration tools
 
-LIFT should first create, but not run, the three integrations in `src/full_ev_backfill/small_table_initial_examples/*/lift_integ.sql`. The matching Python loader then copies the complete historical non-`X` source set into the LIFT-created PostgreSQL table. Once the loader completes, run the LIFT integration from the checkpoint's recorded `fence` timestamp inclusively to reconcile changes made during bootstrap.
+Small, resumable tools for moving checked KN Oracle data to staging and then
+to production. The active table definitions live in
+[`src/integrations/catalog.py`](src/integrations/catalog.py); the adapters do
+not infer table keys or SQL from old loaders.
 
-## Setup
+## Safety model
+
+- One writer per database/schema/table: local state lock plus PostgreSQL
+  advisory lock. A page takes a transaction-scoped lock before it writes.
+- Every destination page commits before its checkpoint. A crash or a second
+  Ctrl-C can replay the last page; idempotent upserts make that safe.
+- KN-to-staging full sync is source-keyset paged and upserts only. `--only-new`
+  requires an existing reviewed composite watermark; it never guesses one.
+- Purge is deliberately unavailable until it can read membership and payload
+  from the same Oracle snapshot. Live scans must not delete a concurrently
+  created source row.
+- Staging-to-production copies in UUID order with upserts and never deletes.
+  A restarted process begins from UUID zero because an old PostgreSQL snapshot
+  cannot safely be resumed.
+
+## Main commands
+
+See the focused READMEs for exact environment variables and examples:
+
+- [`src/kn_to_stag_delta_with_delete/README.md`](src/kn_to_stag_delta_with_delete/README.md)
+- [`src/stag_to_prod/README.md`](src/stag_to_prod/README.md)
+- [`src/lift_integ_init/README.md`](src/lift_integ_init/README.md)
+- [`src/check_all/README.md`](src/check_all/README.md)
+
+Run the offline checks before using a live database:
 
 ```sh
-python3 -m venv .venv
-.venv/bin/python -m pip install -r requirements.txt
+.venv/bin/python -m pytest -q
+.venv/bin/python src/check_all/check.py --environment staging
 ```
-
-The loaders automatically load this repository's ignored `.env` file. They also accept already-exported process environment variables, which take precedence over `.env` values:
-
-```sh
-export ORACLE_USER='...'
-export ORACLE_PASSWORD='...'
-export ORACLE_HOST='oracle-host.example.com'
-export ORACLE_PORT='1521'
-export ORACLE_SERVICE='ORCLPDB1'
-export PG_USER='...'
-export PG_PASSWORD='...'
-export PG_HOST='localhost'
-export PG_PORT='5432'
-# Optional; defaults to fmp_data_gurs when omitted.
-export PG_DATABASE='...'
-```
-
-Do not place credentials in committed files. The target table must already exist, contain all columns selected by its LIFT SQL, and have a unique key on the synthetic `*_pk` column. Unqualified target names use the `public` schema.
-
-## Run
-
-```sh
-.venv/bin/python src/full_ev_backfill/small_table_initial_examples/jn_pe_dst/load.py --target-table ev_h_pe_dst
-.venv/bin/python src/full_ev_backfill/small_table_initial_examples/jn_pe_parc/load.py --target-table ev_h_pe_parc
-.venv/bin/python src/full_ev_backfill/small_table_initial_examples/jn_posebna_enota/load.py --target-table ev_h_posebna_enota
-```
-
-Use `--page-size 1000` to tune page size and `--max-pages N` for a controlled partial run. `--status` reports the local checkpoint. `--restart` removes only that table's local checkpoint; it never deletes destination rows. A resumed run replays at most the last committed page safely through the synthetic-key upsert.

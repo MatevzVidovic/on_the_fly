@@ -122,6 +122,17 @@ def test_checkpoint_is_strict_and_validates_cursor_arity(tmp_path: Path) -> None
         save_checkpoint(path, Checkpoint(identity(), ("a", "b"), 1, 1))
 
 
+def test_checkpoint_constructor_rejects_invalid_in_memory_state() -> None:
+    with pytest.raises(ValueError, match="counters"):
+        Checkpoint(identity(), pages=-1)
+    with pytest.raises(ValueError, match="counters"):
+        Checkpoint(identity(), rows=True)
+    with pytest.raises(TypeError, match="cursor"):
+        Checkpoint(identity(), cursor=[1])  # type: ignore[arg-type]
+    with pytest.raises(TypeError, match="metadata"):
+        Checkpoint(identity(), metadata=[])  # type: ignore[arg-type]
+
+
 def test_checkpoint_cursor_codec_losslessly_round_trips_native_scalar_types(tmp_path: Path) -> None:
     rich_identity = RunIdentity("stag", "db", "public", "target", 1, "select", "full", ("a", "b", "c", "d"), {})
     cursor = (Decimal("2.10"), UUID("00000000-0000-0000-0000-000000000001"), datetime(2026, 1, 2, tzinfo=timezone.utc), "key")
@@ -226,14 +237,14 @@ def test_one_interrupt_stops_after_checkpoint_and_second_interrupt_aborts() -> N
         controller.handle()
 
 
-def test_page_runner_honours_graceful_stop_after_one_committed_page(tmp_path: Path) -> None:
+def test_page_runner_does_not_start_a_page_when_graceful_stop_precedes_run(tmp_path: Path) -> None:
     log, controller = TransactionLog(), InterruptController()
     controller.handle()
     runner = PageRunner(tmp_path / "state.json", identity(), lambda _cursor: Page((1,), (1,)), lambda rows: log.rows.extend(rows), log.transaction, run_context, interrupts=controller)
     result = runner.run()
     assert result.stopped_by_signal
-    assert result.checkpoint.cursor == (1,)
-    assert log.events == ["begin", "commit"]
+    assert result.checkpoint.cursor is None
+    assert log.events == []
 
 
 def test_page_runner_prepares_a_frozen_window_under_the_writer_context(tmp_path: Path) -> None:
@@ -326,8 +337,8 @@ def test_writer_context_takes_local_then_dedicated_autocommit_postgres_lock(tmp_
     assert connection.closed is True
 
 
-def test_page_runner_does_not_mutate_when_same_key_transaction_handoff_is_denied(tmp_path: Path) -> None:
-    lock_connection, destination = FakeConnection(True), FakeConnection(False)
+def test_writer_lock_handoffs_to_transaction_lock_for_the_active_page(tmp_path: Path) -> None:
+    lock_connection, destination = FakeConnection(True), FakeConnection(True)
     writes, log = [], TransactionLog()
 
     @contextmanager
@@ -337,15 +348,39 @@ def test_page_runner_does_not_mutate_when_same_key_transaction_handoff_is_denied
 
     context = WriterRunContext(tmp_path / "loader.lock", lambda: lock_connection, "fmp", "public", "target")
     runner = PageRunner(
-        tmp_path / "state.json", identity(), lambda _cursor: Page((1,), (1,)), lambda rows: writes.extend(rows),
+        tmp_path / "state.json", identity(), lambda cursor: Page((1,), (1,)) if cursor is None else None, lambda rows: writes.extend(rows),
         destination_transaction, lambda: context,
+    )
+    result = runner.run()
+    assert result.checkpoint.completed
+    assert writes == [1]
+    assert log.events == ["begin", "commit"]
+    lock_sql = [sql for sql, _params in lock_connection.queries]
+    assert lock_sql.count("SELECT pg_try_advisory_lock(%s)") == 2
+    assert lock_sql.count("SELECT pg_advisory_unlock(%s)") == 2
+    assert any("advisory_xact_lock" in sql for sql, _params in destination.queries)
+
+
+def test_xact_handoff_denial_rolls_back_before_write_and_restores_session_lock(tmp_path: Path) -> None:
+    lock_connection, destination = FakeConnection(True), FakeConnection(False)
+    writes, log = [], TransactionLog()
+
+    @contextmanager
+    def transaction():
+        with log.transaction():
+            yield destination
+
+    context = WriterRunContext(tmp_path / "loader.lock", lambda: lock_connection, "fmp", "public", "target")
+    runner = PageRunner(
+        tmp_path / "state.json", identity(), lambda _cursor: Page((1,), (1,)),
+        lambda rows: writes.extend(rows), transaction, lambda: context,
     )
     with pytest.raises(LockUnavailable, match="transaction advisory"):
         runner.run()
     assert writes == []
     assert log.events == ["begin", "rollback"]
-    # The session lock was restored after the denied xact-lock handoff.
-    assert [sql for sql, _params in lock_connection.queries].count("SELECT pg_try_advisory_lock(%s)") == 2
+    assert not (tmp_path / "state.json").exists()
+    assert [sql for sql, _ in lock_connection.queries].count("SELECT pg_try_advisory_lock(%s)") == 2
 
 
 def test_page_sizer_grows_then_refines_after_failure_without_persistence() -> None:
@@ -548,8 +583,9 @@ def test_page_runner_stops_before_next_mutation_if_writer_lock_session_is_lost(t
 
         def ensure_held(self) -> None:
             self.probes += 1
-            # Page one: before fetch + before write.  The next pre-fetch probe
-            # must stop the run before it reads/writes page two.
+            # Page one: pre-fetch and pre-write; after its transaction, the
+            # session lock is restored. The next pre-fetch probe must stop the
+            # run before it reads/writes page two.
             if self.probes >= 3:
                 raise WriterLockLost("simulated dedicated session loss")
 
@@ -590,14 +626,32 @@ def test_page_runner_does_not_mark_complete_if_lock_is_lost_during_final_fetch(t
     assert read_checkpoint(path, identity()) == prior
 
 
+def test_page_runner_completion_hook_can_publish_a_frozen_empty_window_cursor(tmp_path: Path) -> None:
+    frozen = ("2026-01-01", 9)
+    run_id = RunIdentity("test", "db", "public", "target", 1, "sql", "only-new", ("date_change", "native_key"), {})
+    initial = Checkpoint(run_id, None, metadata={"window_upper": frozen})
+    save_checkpoint(tmp_path / "state.json", initial)
+
+    def complete(checkpoint: Checkpoint) -> Checkpoint:
+        return Checkpoint(run_id, frozen, checkpoint.pages, checkpoint.rows, True, None)
+
+    runner = PageRunner(tmp_path / "state.json", run_id, lambda _cursor: None, lambda _rows: None, TransactionLog().transaction, TestRunContext, complete_checkpoint=complete)
+    result = runner.run()
+    assert result.checkpoint.completed and result.checkpoint.cursor == frozen
+    assert read_checkpoint(tmp_path / "state.json", run_id) == result.checkpoint
+
+
 def test_second_interrupt_during_write_rolls_back_without_checkpoint(tmp_path: Path) -> None:
     log, controller = TransactionLog(), InterruptController()
-    controller.handle()  # graceful stop requested first
+
+    def active_fetch(_cursor: tuple[int, ...] | None) -> Page[int]:
+        controller.handle()  # graceful stop belongs to this now-active page
+        return Page((1,), (1,))
 
     def abort_current_page(_rows: tuple[int, ...]) -> None:
         controller.handle()  # immediate abort while the transaction is active
 
-    runner = PageRunner(tmp_path / "state.json", identity(), lambda _cursor: Page((1,), (1,)), abort_current_page, log.transaction, run_context, interrupts=controller)
+    runner = PageRunner(tmp_path / "state.json", identity(), active_fetch, abort_current_page, log.transaction, run_context, interrupts=controller)
     with pytest.raises(KeyboardInterrupt):
         runner.run()
     assert log.events == ["begin", "rollback"]

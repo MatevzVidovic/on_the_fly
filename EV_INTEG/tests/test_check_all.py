@@ -125,6 +125,25 @@ def test_report_write_is_atomic_and_not_selected_rows_are_explicit(tmp_path):
     assert not list(tmp_path.glob(".report.md.*"))
 
 
+def test_cache_treats_valid_non_object_json_as_corrupt_and_writes_atomically(tmp_path, monkeypatch):
+    path = tmp_path / "data_correct.json"
+    monkeypatch.setattr(check, "CACHE_PATH", path)
+    path.write_text("[]", encoding="utf-8")
+    assert check.cache_read() == {"version": check.CACHE_VERSION, "entries": {}}
+    value = {"version": check.CACHE_VERSION, "entries": {"x": {"kn_count": 1}}}
+    check.cache_write(value)
+    assert check.cache_read() == value
+    assert not list(tmp_path.glob(".data_correct.json.*"))
+
+
+def test_default_report_names_do_not_collide_within_one_second(monkeypatch, tmp_path):
+    monkeypatch.setattr(check, "REPORTS_DIR", tmp_path)
+    first = check.default_report_path("prod", datetime(2026, 8, 9, 10, 11, 12, 1))
+    second = check.default_report_path("prod", datetime(2026, 8, 9, 10, 11, 12, 2))
+    assert first != second
+    assert first.name.startswith("state_report_prod_20260809_101112_")
+
+
 def test_initial_results_preseeds_the_full_catalog_for_partial_reports():
     from integrations.catalog import ENTRIES
     results, positions = check.initial_results(ENTRIES, "staging", ("ev_pe_parc_h",))

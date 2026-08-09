@@ -21,7 +21,7 @@ if str(SRC) not in sys.path:
     sys.path.insert(0, str(SRC))
 
 from integrations.catalog import CatalogEntry, ENTRIES
-from integration_core import PageSizer, is_size_related_error
+from integration_core import PageSizer, atomic_json_write, is_size_related_error
 CACHE_PATH = HERE / ".state" / "data_correct.json"
 REPORTS_DIR = HERE / "reports"
 CACHE_VERSION = 2
@@ -430,7 +430,8 @@ def cache_read() -> dict[str, Any]:
         return {"version": CACHE_VERSION, "entries": {}}
     try:
         result = json.loads(CACHE_PATH.read_text())
-        if result.get("version") != CACHE_VERSION or not isinstance(result.get("entries"), dict):
+        if (not isinstance(result, dict) or result.get("version") != CACHE_VERSION
+                or not isinstance(result.get("entries"), dict)):
             raise ValueError
         return result
     except (OSError, ValueError, json.JSONDecodeError):
@@ -438,16 +439,7 @@ def cache_read() -> dict[str, Any]:
 
 
 def cache_write(value: dict[str, Any]) -> None:
-    CACHE_PATH.parent.mkdir(parents=True, exist_ok=True)
-    fd, temporary = tempfile.mkstemp(prefix=".data_correct.", dir=CACHE_PATH.parent)
-    try:
-        with os.fdopen(fd, "w", encoding="utf-8") as handle:
-            json.dump(value, handle, indent=2, sort_keys=True)
-            handle.write("\n")
-            handle.flush(); os.fsync(handle.fileno())
-        os.replace(temporary, CACHE_PATH)
-    finally:
-        if os.path.exists(temporary): os.unlink(temporary)
+    atomic_json_write(CACHE_PATH, value)
 
 
 def format_duration(seconds: float) -> str:
@@ -917,7 +909,9 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
 
 def default_report_path(environment: str, started_at: datetime) -> Path:
     label = "stag" if environment == "staging" else "prod"
-    timestamp = started_at.strftime("%Y%m%d_%H%M%S")
+    # Concurrent checks started within the same second must not silently
+    # replace each other's report.
+    timestamp = started_at.strftime("%Y%m%d_%H%M%S_%f")
     return REPORTS_DIR / f"state_report_{label}_{timestamp}.md"
 
 

@@ -79,7 +79,10 @@ class PostgresWriterLock(AbstractContextManager["PostgresWriterLock"]):
             return
         with self.connection.cursor() as cursor:
             cursor.execute("SELECT pg_advisory_unlock(%s)", (self.key,))
+            released = cursor.fetchone()[0]
         self._held = False
+        if not released:
+            raise WriterLockLost("PostgreSQL writer advisory lock was not held by its dedicated session")
 
     def __exit__(self, exc_type: object, *_: object) -> None:
         if self._held:
@@ -125,6 +128,7 @@ class WriterRunContext(AbstractContextManager["WriterRunContext"]):
         self._identity = (database, schema, table)
         self._connection: Any | None = None
         self._postgres: PostgresWriterLock | None = None
+        self._page_mutation_active = False
 
     @property
     def connection(self) -> Any:
@@ -171,13 +175,16 @@ class WriterRunContext(AbstractContextManager["WriterRunContext"]):
         self._postgres.ensure_held()
 
     def begin_page_mutation(self, destination_connection: Any) -> None:
-        """Handoff the same advisory key into the destination transaction.
+        """Atomically protect the active page with a transaction lock.
 
-        PostgreSQL advisory locks conflict across sessions, so a separate
-        session lock cannot coexist with ``pg_try_advisory_xact_lock(key)``.
-        Release the verified session lock immediately before taking the
-        transaction lock; a handoff race fails before the page write.
+        A session advisory lock protects the run between pages.  PostgreSQL
+        locks of the same key conflict across sessions, so page mutation uses
+        a fail-closed handoff: release the verified session lock, immediately
+        try the destination transaction lock, and write only if it succeeds.
+        A competing writer during that handoff causes an error before writes.
         """
+        if self._page_mutation_active:
+            raise RuntimeError("a page mutation is already active")
         self.ensure_held()
         assert self._postgres is not None
         self._postgres.release()
@@ -191,10 +198,16 @@ class WriterRunContext(AbstractContextManager["WriterRunContext"]):
         if not acquired:
             self._restore_session_lock()
             raise LockUnavailable("could not acquire page transaction advisory lock; no rows were written")
+        self._page_mutation_active = True
 
     def end_page_mutation(self) -> None:
-        """Reacquire the dedicated session lock after transaction end."""
-        self._restore_session_lock()
+        """Restore the between-pages session lock after transaction end."""
+        if not self._page_mutation_active:
+            raise RuntimeError("no page mutation is active")
+        try:
+            self._restore_session_lock()
+        finally:
+            self._page_mutation_active = False
 
     def _restore_session_lock(self) -> None:
         if self._postgres is None:

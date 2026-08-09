@@ -24,8 +24,6 @@ def load_module(name: str, relative_path: str):
 
 KN = load_module("stage0_kn_to_stag", "src/kn_to_stag_delta_with_delete/sync_table.py")
 COPY = load_module("stage0_stag_to_prod", "src/stag_to_prod/sync_table.py")
-COMPLEX_COPY = load_module("stage0_stag_to_prod_complex", "src/stag_to_prod_complex/sync_table.py")
-ADAPT = load_module("stage0_adapt_last_changed", "src/adapt_last_changed_datetime/adapt.py")
 LIFT_INIT = load_module("stage5_lift_integ_init", "src/lift_integ_init/init.py")
 CHECK = load_module("stage0_check_all", "src/check_all/check.py")
 
@@ -35,7 +33,6 @@ CHECK = load_module("stage0_check_all", "src/check_all/check.py")
     [
         ("src/kn_to_stag_delta_with_delete/sync_table.py", ("--resumable", "--only-new", "--fresh", "--auto-page-size")),
         ("src/stag_to_prod/sync_table.py", ("--page-key", "--page-size", "--truncate", "--apply", "--auto-page-size")),
-        ("src/adapt_last_changed_datetime/adapt.py", ("--last-sync-start-year", "--dry-run", "--apply")),
         ("src/lift_integ_init/init.py", ("--last-sync-start-year", "--dry-run", "--apply")),
         ("src/check_all/check.py", ("--environment", "--max-page-size", "--constant-page-size", "--report")),
     ],
@@ -98,21 +95,17 @@ def test_transfer_cli_adaptive_page_options_are_explicit_and_bounded(monkeypatch
         COPY.parse_args()
 
 
-def test_legacy_complex_copy_is_an_explicit_retirement_error() -> None:
-    assert COMPLEX_COPY.main([]) == 2
-
-
 def test_metadata_adapter_defaults_to_dry_run_and_validates_year(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(sys, "argv", ["adapt", "target"])
-    assert not ADAPT.parse_args().apply
+    monkeypatch.setattr(sys, "argv", ["init", "target"])
+    assert not LIFT_INIT.parse_args().apply
 
-    monkeypatch.setattr(sys, "argv", ["adapt", "target", "--last-sync-start-year", "0"])
+    monkeypatch.setattr(sys, "argv", ["init", "target", "--last-sync-start-year", "0"])
     with pytest.raises(SystemExit):
-        ADAPT.parse_args()
+        LIFT_INIT.parse_args()
 
 
 def test_metadata_adapter_resolves_its_date_field_from_the_shared_catalog() -> None:
-    spec = ADAPT.resolve_table_spec("ev_dst_pripis_podatki_h")
+    spec = LIFT_INIT.resolve_table_spec("ev_dst_pripis_podatki_h")
     assert spec.target_table == "ev_dst_pripis_podatki_h"
     assert spec.date_change == "date_change"
 
@@ -144,12 +137,12 @@ def test_lift_init_apply_refuses_concurrent_metadata_drift() -> None:
         LIFT_INIT.apply_metadata_update(Cursor(), "integration", "maximum", "before", None, None)
 
 
-def test_lift_init_loads_canonical_env_before_non_overriding_legacy_fallback(monkeypatch: pytest.MonkeyPatch) -> None:
+def test_lift_init_loads_only_its_canonical_env(monkeypatch: pytest.MonkeyPatch) -> None:
     calls = []
     monkeypatch.setitem(sys.modules, "dotenv", SimpleNamespace(load_dotenv=lambda path, override=False: calls.append((Path(path), override))))
     LIFT_INIT.load_environment()
     assert calls[0] == (LIFT_INIT.HERE / ".env", False)
-    assert calls[1] == (LIFT_INIT.HERE.parent / "adapt_last_changed_datetime" / ".env", False)
+    assert len(calls) == 1
 
 
 def test_checker_parser_preserves_environment_report_and_page_size_contract() -> None:

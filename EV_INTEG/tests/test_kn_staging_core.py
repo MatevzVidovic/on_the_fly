@@ -5,13 +5,14 @@ import inspect
 import re
 import sys
 import importlib.util
+from types import SimpleNamespace
 
 import pytest
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
 
 from integration_core import TableSpec
-from integration_core.kn_staging import KnStagingRun, assert_target_not_newer, delta_query, keyset_query, materialize_source_changes, prove_source_membership, read_select, upsert_sql, validate_target_membership_index
+from integration_core.kn_staging import KnStagingRun, assert_target_not_newer, checked_upsert, delta_query, keyset_query, materialize_source_changes, prove_source_membership, read_select, upsert_sql, validate_target_membership_index
 from integration_core.run_store import RunStore
 from integrations.catalog import ENTRIES, UNSUPPORTED_TABLES, table_spec
 from integration_core.state import Checkpoint, RunIdentity, save_checkpoint
@@ -52,6 +53,28 @@ def test_upsert_is_idempotent_and_does_not_overwrite_creation_fields() -> None:
     assert '"value" = EXCLUDED."value"' in statement
     assert '"created_at" = EXCLUDED."created_at"' not in statement
     assert '"created_by" = EXCLUDED."created_by"' not in statement
+    assert 'WHERE "pilot_target"."date_change" IS NULL OR EXCLUDED."date_change" > "pilot_target"."date_change"' in statement
+
+
+def test_upsert_without_change_field_has_no_version_guard() -> None:
+    no_change = TableSpec("pilot", Path("pilot.sql"), "public", "pilot_target", "business_key", ("native_a",))
+    statement = upsert_sql(no_change, ("business_key", "value"), ("id", "business_key", "value"))
+    assert 'ON CONFLICT ("business_key") DO UPDATE' in statement
+    assert " WHERE " not in statement
+
+
+def test_conditional_upsert_refuses_a_concurrent_version_noop() -> None:
+    class Cursor:
+        rowcount = 1
+        def executemany(self, _statement: str, _rows: object) -> None: return None
+
+    with pytest.raises(RuntimeError, match="concurrently"):
+        checked_upsert(Cursor(), "INSERT", ({"business_key": "a"}, {"business_key": "b"}))
+
+
+def test_full_and_only_new_use_the_checked_conditional_upsert_boundary() -> None:
+    assert "checked_upsert(cursor, statement, rows_to_write)" in inspect.getsource(KnStagingRun.run_full)
+    assert "checked_upsert(cursor, statement, rows)" in inspect.getsource(KnStagingRun.run_only_new)
 
 
 def test_select_reader_accepts_client_semicolon_and_rejects_multiple_statements(tmp_path: Path) -> None:
@@ -62,6 +85,13 @@ def test_select_reader_accepts_client_semicolon_and_rejects_multiple_statements(
     bad.write_text("SELECT id FROM EV.T; DELETE FROM EV.T", encoding="utf-8")
     with pytest.raises(ValueError, match="exactly one"):
         read_select(bad)
+
+
+def test_root_readme_uses_current_smoke_commands() -> None:
+    readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+    assert ".venv/bin/python -m pytest -q" in readme
+    assert "src/check_all/check.py --environment staging" in readme
+    assert "--environment stag\n" not in readme
 
 
 def test_pilot_cli_keeps_the_documented_table_key_and_native_page_tuple(monkeypatch: pytest.MonkeyPatch) -> None:
@@ -85,6 +115,179 @@ def test_catalogued_core_cli_derives_facts_and_rejects_only_new_purge(monkeypatc
     monkeypatch.setattr(sys, "argv", ["fixed.py", "--resumable", "--apply", "--id-field", "dst_pripis_podatki_pk"])
     with pytest.raises(SystemExit):
         wrapper.parse_args("ev_dst_pripis_podatki_h")
+
+
+def test_only_new_initialization_cli_requires_explicit_safe_intent(monkeypatch: pytest.MonkeyPatch) -> None:
+    base = ["core.py", "ev_parc_pripis_podatki_h", "--resumable", "--initialize-only-new-watermark"]
+    monkeypatch.setattr(sys, "argv", base)
+    with pytest.raises(SystemExit, match="2"):
+        wrapper.parse_args()
+    monkeypatch.setattr(sys, "argv", [*base, "--confirm-staging-already-current", "--only-new"])
+    with pytest.raises(SystemExit, match="2"):
+        wrapper.parse_args()
+    monkeypatch.setattr(sys, "argv", ["core.py", "ev_parc_pripis_podatki_h", "--resumable", "--only-new", "--fresh", "--apply"])
+    with pytest.raises(SystemExit, match="2"):
+        wrapper.parse_args()
+    monkeypatch.setattr(sys, "argv", [*base, "--confirm-staging-already-current"])
+    assert wrapper.parse_args().initialize_only_new_watermark
+
+
+def test_only_new_watermark_initialization_is_locked_auditable_and_idempotent(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    events: list[str] = []
+
+    class Context:
+        def __enter__(self): events.append("lock-enter"); return self
+        def __exit__(self, *_: object): events.append("lock-exit")
+        def ensure_held(self): events.append("lock-check")
+
+    class Interrupts:
+        stop_requested = False
+
+    init_spec = TableSpec("pilot", Path("pilot.sql"), "public", "pilot_target", "business_key", ("native_a", "native_b"), "date_change", "EV", "PILOT_PK", ("native_a", "native_b"))
+    run_id = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change", "native_a", "native_b"), {"adapter": "kn-staging-v1"})
+    path = tmp_path / "only-new.json"
+    monkeypatch.setattr(wrapper, "validate_source_shape", lambda *_args, **_kwargs: events.append("shape"))
+    monkeypatch.setattr(wrapper, "validate_oracle_index", lambda *_args, **_kwargs: events.append("index"))
+    monkeypatch.setattr(wrapper, "prove_source_membership", lambda *_args, **_kwargs: events.append("prove"))
+    monkeypatch.setattr(wrapper, "freeze_upper_watermark", lambda *_args: events.append("freeze") or ("2026-01-01", 7, 9))
+
+    initialized = wrapper.initialize_only_new_watermark(object(), "SELECT * FROM EV.PILOT", init_spec, path, run_id, Context, Interrupts())
+    assert not initialized.completed and initialized.cursor is None
+    assert initialized.metadata == {"window_upper": ("2026-01-01", 7, 9), "initialized_only_new_bootstrap": True}
+    assert events.index("lock-enter") < events.index("shape") < events.index("prove") < events.index("freeze")
+    assert wrapper.initialize_only_new_watermark(object(), "SELECT * FROM EV.PILOT", init_spec, path, run_id, Context, Interrupts()) == initialized
+
+
+def test_only_new_watermark_initialization_stops_without_writing_state(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    class Context:
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+        def ensure_held(self): return None
+
+    class Interrupts:
+        stop_requested = False
+
+    interrupts = Interrupts()
+    init_spec = TableSpec("pilot", Path("pilot.sql"), "public", "pilot_target", "business_key", ("native_a", "native_b"), "date_change", "EV", "PILOT_PK", ("native_a", "native_b"))
+    run_id = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change", "native_a", "native_b"), {"adapter": "kn-staging-v1"})
+    path = tmp_path / "only-new.json"
+    monkeypatch.setattr(wrapper, "validate_source_shape", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(wrapper, "validate_oracle_index", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(wrapper, "prove_source_membership", lambda *_args, **_kwargs: setattr(interrupts, "stop_requested", True))
+    monkeypatch.setattr(wrapper, "freeze_upper_watermark", lambda *_args: pytest.fail("must not freeze after SIGINT"))
+    checkpoint = wrapper.initialize_only_new_watermark(object(), "SELECT * FROM EV.PILOT", init_spec, path, run_id, Context, interrupts)
+    assert not checkpoint.completed and not path.exists()
+
+
+def test_initializer_cli_never_calls_only_new_payload_runner(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path, capsys: pytest.CaptureFixture[str],
+) -> None:
+    init_spec = TableSpec("pilot", Path("pilot.sql"), "public", "pilot_target", "business_key", ("native_a", "native_b"), "date_change", "EV", "PILOT_PK", ("native_a", "native_b"))
+    args = SimpleNamespace(
+        spec=init_spec, only_new=False, initialize_only_new_watermark=True,
+        dry_run=False, apply=False, status=False, page_size=10, max_page_size=None,
+        constant_page_size=None, auto_page_size=False, initial_page_size=None, fresh=False,
+    )
+
+    class Connection:
+        autocommit = False
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+
+    class Driver:
+        def connect(self, **_kwargs: object): return Connection()
+
+    class Interrupts:
+        stop_requested = False
+        def __init__(self, *_: object): return None
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+
+    class Run:
+        def __init__(self, source: object, destination: object, *_: object, **__: object) -> None:
+            self.source_connection, self.destination_connection = source, destination
+        def run_only_new(self): pytest.fail("initializer must not transfer payload rows")
+
+    monkeypatch.setattr(wrapper, "parse_args", lambda _fixed=None: args)
+    monkeypatch.setattr(wrapper, "load_environment", lambda: None)
+    monkeypatch.setattr(wrapper, "drivers", lambda: (Driver(), Driver()))
+    monkeypatch.setattr(wrapper, "enable_oracle_thick_mode", lambda _driver: None)
+    monkeypatch.setattr(wrapper, "read_select", lambda _path: "SELECT * FROM EV.PILOT")
+    monkeypatch.setattr(wrapper, "oracle_settings", lambda _driver: {})
+    monkeypatch.setattr(wrapper, "pg_settings", lambda: {})
+    monkeypatch.setattr(wrapper, "checkpoint_path", lambda *_: tmp_path / "only-new.json")
+    monkeypatch.setattr(wrapper, "InterruptController", Interrupts)
+    monkeypatch.setattr(wrapper, "KnStagingRun", Run)
+    monkeypatch.setattr(wrapper, "initialize_only_new_watermark", lambda *_args: Checkpoint(_args[4], None, metadata={"window_upper": ("2026-01-01", 1, 1)}))
+
+    assert wrapper.main() == 0
+    assert "next_step" in capsys.readouterr().out
+
+
+def test_frozen_only_new_completion_uses_upper_cursor_when_final_source_row_disappears(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    import integration_core.kn_staging as adapter
+
+    frozen_upper = ("2026-01-01", 9, 9)
+    identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change", "native_a", "native_b"), {})
+    initial = Checkpoint(identity, metadata={"window_upper": frozen_upper, "initialized_only_new_bootstrap": True})
+    seen: dict[str, object] = {}
+
+    class SourceCursor:
+        description = (("business_key",), ("date_change",), ("native_a",), ("native_b",), ("value",))
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+        def execute(self, _query: str, binds: dict[str, object]) -> None:
+            seen["upper"] = (binds["upper_0"], binds["upper_1"], binds["upper_2"])
+        # The row at the frozen upper tuple was deleted after the freeze.
+        # Completion must still advance to that persisted upper tuple.
+        def fetchall(self): return [("tie-a", "2026-01-01", 1, 1, "a")]
+
+    class DestinationCursor:
+        rowcount = 1
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+        def executemany(self, _statement: str, rows: tuple[object, ...]) -> None: seen["written"] = len(rows)
+
+    class Destination:
+        def cursor(self): return DestinationCursor()
+        def commit(self): return None
+        def transaction(self):
+            class Transaction:
+                def __enter__(_self): return self
+                def __exit__(_self, *_: object): return None
+            return Transaction()
+
+    class CapturingRunner:
+        def __init__(self, _path: object, _identity: object, fetch: object, write: object, _transaction: object, _context: object, *, prepare_checkpoint: object, complete_checkpoint: object, **_: object) -> None:
+            self.fetch, self.write, self.prepare, self.complete = fetch, write, prepare_checkpoint, complete_checkpoint
+        def run(self, **_: object):
+            prepared = self.prepare(initial)
+            assert prepared is initial and not prepared.completed
+            page = self.fetch(prepared.cursor)
+            assert page is not None
+            self.write(page.rows)
+            return PageRunResult(self.complete(Checkpoint(identity, page.next_cursor, 1, len(page.rows), True, prepared.metadata)), False)
+
+    run = KnStagingRun(spec(), type("Source", (), {"cursor": lambda self: SourceCursor()})(), Destination(), "SELECT * FROM EV.PILOT", 10, tmp_path / "only-new.json", identity, lambda: None)
+    monkeypatch.setattr(adapter, "PageRunner", CapturingRunner)
+    monkeypatch.setattr(adapter, "source_columns", lambda *_: ("business_key", "date_change", "native_a", "native_b", "value"))
+    monkeypatch.setattr(adapter, "target_columns", lambda *_: ("business_key", "date_change", "native_a", "native_b", "value"))
+    monkeypatch.setattr(adapter, "validate_source_shape", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(adapter, "validate_target_membership_index", lambda *_: None)
+    monkeypatch.setattr(adapter, "target_changes", lambda *_: {})
+    result = run.run_only_new()
+    assert seen == {"upper": frozen_upper, "written": 1}
+    assert result.checkpoint.completed and result.checkpoint.cursor == frozen_upper
+    # A source row committed after the freeze has a greater date_change and
+    # is therefore outside this frozen page but inside the next delta window.
+    next_query, next_binds = delta_query("SELECT * FROM EV.PILOT", "date_change", ("native_a", "native_b"), frozen_upper, ("2026-01-02", 1, 1))
+    assert "date_change > :after_0" in next_query and next_binds["after_0"] == frozen_upper[0]
 
 
 def test_catalog_exposes_only_runnable_tables_and_formally_rejects_missing_sql() -> None:
@@ -127,6 +330,16 @@ def test_every_active_sql_has_the_required_safe_contract(table: str, requires_st
     for key in spec.source_page_keys:
         assert key in lowered
     assert "row_number" not in lowered
+    # Keep python-oracledb away from Oracle timezone objects: validity values
+    # are portable ISO text, while the delta cursor remains a native TIMESTAMP.
+    assert re.search(r"to_char\s*\(\s*from_tz\(.+?\)\s*,\s*'yyyy-mm-dd\"t\"hh24:mi:ss\.ff tzh:tzm'\s*\)\s+as\s+valid_from", lowered, re.DOTALL)
+    assert re.search(
+        r"(?:to_char\s*\(\s*from_tz\(.+?\)\s*,\s*'yyyy-mm-dd\"t\"hh24:mi:ss\.ff tzh:tzm'\s*\)|"
+        r"cast\s*\(\s*null\s+as\s+varchar2\s*\(\s*\d+\s*\)\s*\))\s+as\s+valid_to",
+        lowered,
+        re.DOTALL,
+    )
+    assert re.search(r"cast\s*\(.+?\s+as\s+timestamp\s*\)\s+as\s+date_change", lowered, re.DOTALL)
 
 
 def test_tuple_predicates_use_strict_intermediate_components_for_inclusive_bounds() -> None:
@@ -183,7 +396,7 @@ def test_only_new_proves_source_before_freezing_or_publishing_window(
             self.prepare_checkpoint = prepare_checkpoint
         def run(self, **_: object):
             assert callable(self.prepare_checkpoint)
-            return self.prepare_checkpoint(Checkpoint(run.identity))
+            return self.prepare_checkpoint(Checkpoint(run.identity, ("2026-01-01", 1, 1), completed=True))
 
     run = KnStagingRun(spec(), object(), Destination(), "SELECT * FROM EV.PILOT", 10, tmp_path / "only-new.json", RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change", "native_a", "native_b"), {}), lambda: None)
     monkeypatch.setattr(adapter, "PageRunner", CapturingRunner)
@@ -195,6 +408,46 @@ def test_only_new_proves_source_before_freezing_or_publishing_window(
     monkeypatch.setattr(adapter, "freeze_upper_watermark", lambda *_: events.append("freeze") or None)
     run.run_only_new()
     assert events.index("prove") < events.index("freeze")
+
+
+def test_only_new_refuses_an_unbootstrapped_first_window_before_source_scan(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    import integration_core.kn_staging as adapter
+
+    class Destination:
+        def commit(self) -> None: return None
+
+    class CapturingRunner:
+        def __init__(self, *_: object, prepare_checkpoint: object, **__: object) -> None:
+            self.prepare_checkpoint = prepare_checkpoint
+        def run(self, **_: object):
+            return self.prepare_checkpoint(Checkpoint(run.identity))
+
+    run = KnStagingRun(spec(), object(), Destination(), "SELECT * FROM EV.PILOT", 10, tmp_path / "only-new.json", RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change", "native_a", "native_b"), {}), lambda: None)
+    monkeypatch.setattr(adapter, "PageRunner", CapturingRunner)
+    monkeypatch.setattr(adapter, "source_columns", lambda *_: ("business_key", "date_change", "native_a", "native_b", "value"))
+    monkeypatch.setattr(adapter, "target_columns", lambda *_: ("business_key", "date_change", "native_a", "native_b", "value"))
+    monkeypatch.setattr(adapter, "validate_source_shape", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(adapter, "validate_target_membership_index", lambda *_: None)
+    monkeypatch.setattr(adapter, "prove_source_membership", lambda *_args, **_kwargs: pytest.fail("must not scan source") )
+    with pytest.raises(RuntimeError, match="completed composite watermark"):
+        run.run_only_new()
+
+
+def test_only_new_rejects_duplicate_change_component_in_cursor(tmp_path: Path) -> None:
+    invalid = TableSpec(
+        "pilot", Path("pilot.sql"), "public", "pilot_target", "business_key",
+        ("date_change",), "date_change",
+    )
+    run = KnStagingRun(
+        invalid, object(), object(), "SELECT * FROM EV.PILOT", 10,
+        tmp_path / "only-new.json",
+        RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "only-new", ("date_change",), {}),
+        lambda: None,
+    )
+    with pytest.raises(RuntimeError, match="must not also"):
+        run.run_only_new()
 
 
 def test_only_new_transient_setup_failure_is_explicitly_safe_to_rerun(
@@ -320,6 +573,36 @@ def test_source_generation_checkpoints_each_page_and_resumes_after_graceful_inte
     second.close()
 
 
+def test_source_generation_rerun_continues_after_a_source_connection_failure(tmp_path: Path) -> None:
+    class Cursor:
+        description = (("business_key",), ("date_change",), ("native_a",), ("native_b",))
+        def __init__(self, oracle: object) -> None: self.oracle, self.rows = oracle, []
+        def __enter__(self): return self
+        def __exit__(self, *_: object): return None
+        def execute(self, _query: str, binds: dict[str, object]) -> None:
+            after = binds.get("after_0")
+            if after == 1 and self.oracle.fail:
+                raise ConnectionError("tunnel lost")
+            self.rows = [("one", 1, 1, 1)] if after is None else ([("two", 2, 2, 1)] if after == 1 else [])
+        def fetchall(self): return self.rows
+
+    class Oracle:
+        fail = True
+        def cursor(self): return Cursor(self)
+
+    oracle, store = Oracle(), RunStore(tmp_path / "source.sqlite3", "fingerprint")
+    with pytest.raises(ConnectionError, match="tunnel"):
+        materialize_source_changes(oracle, "SELECT * FROM EV.PILOT", spec(), 1, store, fresh=False)
+    partial = store.open()
+    assert RunStore.cursor(partial) == (1, 1)
+    partial.close()
+    oracle.fail = False
+    completed, stopped = materialize_source_changes(oracle, "SELECT * FROM EV.PILOT", spec(), 1, store, fresh=False)
+    assert not stopped and RunStore.complete(completed)
+    assert list(RunStore.batches(completed, 10)) == [[("one", 1), ("two", 2)]]
+    completed.close()
+
+
 def test_completed_main_checkpoint_does_not_reset_an_interrupted_new_generation(tmp_path: Path) -> None:
     class Cursor:
         description = (("business_key",), ("date_change",), ("native_a",), ("native_b",))
@@ -405,22 +688,6 @@ def test_pilot_reconnect_replaces_both_oracle_and_postgres_data_sessions() -> No
     assert run.destination_connection.autocommit is True
 
 
-def test_complete_generation_membership_lookup_is_null_safe_and_bounded(tmp_path: Path) -> None:
-    store = RunStore(tmp_path / "generation.sqlite3", "test")
-    database = store.open()
-    store.append(database, [("present", 1), ("also-present", 2)])
-    store.mark_complete(database)
-    assert RunStore.contains(database, ["present", "missing", None]) == {"present"}
-    database.close()
-
-
-def test_generation_membership_lookup_chunks_large_sqlite_in_lists(tmp_path: Path) -> None:
-    store = RunStore(tmp_path / "generation.sqlite3", "test")
-    database = store.open()
-    store.append(database, [(f"key-{number}", None) for number in range(1_100)])
-    store.mark_complete(database)
-    assert RunStore.contains(database, [f"key-{number}" for number in range(1_100)]) == {f"key-{number}" for number in range(1_100)}
-    database.close()
 
 
 def test_purge_generation_open_refuses_fingerprint_mismatch_without_reset(tmp_path: Path) -> None:
@@ -433,8 +700,9 @@ def test_purge_generation_open_refuses_fingerprint_mismatch_without_reset(tmp_pa
         RunStore(tmp_path / "generation.sqlite3", "other").open(reset_on_mismatch=False)
     unchanged = original.open(reset_on_mismatch=False)
     assert original.complete(unchanged)
-    assert RunStore.contains(unchanged, ["present"]) == {"present"}
+    assert list(RunStore.batches(unchanged, 10)) == [[("present", None)]]
     unchanged.close()
+
 
 
 def test_source_generation_rejects_null_membership_but_not_unused_change(tmp_path: Path) -> None:
@@ -444,192 +712,6 @@ def test_source_generation_rejects_null_membership_but_not_unused_change(tmp_pat
         store.append_page(database, [(None, 1)], ("cursor",))
     store.append_page(database, [("key", None)], ("cursor",))
     database.close()
-
-
-def test_purge_uses_a_complete_full_generation_and_separate_mode_checkpoint(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    import contextlib
-    import integration_core.kn_staging as adapter
-
-    full_identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "full", ("native_a", "native_b"), {})
-    full_store = RunStore(tmp_path / "full.generation.sqlite3", full_identity.fingerprint)
-    generation = full_store.open()
-    full_store.append(generation, [("present", 1)])
-    full_store.mark_complete(generation)
-    generation.close()
-    deleted: list[list[str]] = []
-
-    class Cursor:
-        def __init__(self) -> None: self.pages = 0; self.rows: list[tuple[str]] = []
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def execute(self, query: str, params: object = None) -> None:
-            if query.startswith("DELETE"):
-                assert isinstance(params, tuple)
-                deleted.append(params[0])
-            elif query.startswith("SELECT"):
-                self.rows = [("present",), ("missing",)] if self.pages == 0 else []
-                self.pages += 1
-        def fetchall(self): return self.rows
-
-    class Destination:
-        def __init__(self) -> None: self.cursor_instance = Cursor()
-        def cursor(self): return self.cursor_instance
-        @contextlib.contextmanager
-        def transaction(self): yield self
-        def commit(self) -> None: return None
-
-    class Context:
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def ensure_held(self) -> None: return None
-        def begin_page_mutation(self, _connection: object) -> None: return None
-        def end_page_mutation(self) -> None: return None
-
-    # The first source-key page is supplied by the fake cursor; keep target
-    # metadata outside this focused state/transaction test.
-    monkeypatch.setattr(adapter, "target_columns", lambda *_: ("business_key", "date_change"))
-    monkeypatch.setattr(adapter, "validate_target_membership_index", lambda *_: None)
-    run = KnStagingRun(spec(), object(), Destination(), "SELECT * FROM EV.PILOT", 2, tmp_path / "full.json", full_identity, Context)
-    result = run.run_purge_non_existent(generation_identity=full_identity)
-    assert result.checkpoint.completed
-    assert deleted == [["missing"]]
-    purge_reports = list(tmp_path.glob("purge-*.json"))
-    assert len(purge_reports) == 1
-    assert '"generation_id"' in purge_reports[0].read_text(encoding="utf-8")
-    assert not (tmp_path / "full.json").exists()
-
-
-def test_completed_generation_starts_a_new_purge_epoch_and_deletes_new_extras(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    import contextlib
-    import integration_core.kn_staging as adapter
-
-    class Cursor:
-        def __init__(self, destination: object) -> None: self.destination = destination; self.rows: list[tuple[str]] = []
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def execute(self, query: str, params: tuple[object, ...]) -> None:
-            if query.startswith("SELECT"):
-                after = params[0] if len(params) == 2 else None
-                self.rows = [(key,) for key in self.destination.keys if after is None or key > after]
-            elif query.startswith("DELETE"):
-                self.destination.deleted.extend(params[0])
-                self.destination.keys[:] = [key for key in self.destination.keys if key not in params[0]]
-        def fetchall(self): return self.rows
-
-    class Destination:
-        def __init__(self) -> None: self.keys = ["present", "stale-g1"]; self.deleted: list[str] = []
-        def cursor(self): return Cursor(self)
-        @contextlib.contextmanager
-        def transaction(self): yield self
-        def commit(self) -> None: return None
-
-    class Context:
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def ensure_held(self) -> None: return None
-        def begin_page_mutation(self, _connection: object) -> None: return None
-        def end_page_mutation(self) -> None: return None
-
-    identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "full", ("native_a", "native_b"), {})
-    destination = Destination()
-    run = KnStagingRun(spec(), object(), destination, "SELECT * FROM EV.PILOT", 100, tmp_path / "full.json", identity, Context)
-    generations = iter([[("present", None)], [("present", None), ("new", None)]])
-    full_calls = 0
-
-    def fake_full(self: KnStagingRun, *, fresh: bool = False, context: object = None) -> PageRunResult:
-        nonlocal full_calls
-        full_calls += 1
-        source = self._generation_store(self.identity)
-        database = source.open(fresh=True)
-        RunStore.begin(database)
-        RunStore.append_page(database, next(generations), ("cursor",))
-        RunStore.mark_complete(database)
-        database.close()
-        checkpoint = Checkpoint(self.identity, completed=True)
-        save_checkpoint(self.checkpoint_path, checkpoint)
-        if full_calls == 2:
-            destination.keys.append("stale-g2")
-        return PageRunResult(checkpoint, False)
-
-    monkeypatch.setattr(adapter, "target_columns", lambda *_: ("business_key", "date_change"))
-    monkeypatch.setattr(adapter, "validate_target_membership_index", lambda *_: None)
-    monkeypatch.setattr(KnStagingRun, "run_full", fake_full)
-    first, first_purge = run.run_full_and_purge()
-    second, second_purge = run.run_full_and_purge()
-    assert first_purge is not None and second_purge is not None
-    assert first.checkpoint.completed and second.checkpoint.completed
-    assert destination.deleted == ["stale-g1", "stale-g2"]
-    assert len(list(tmp_path.glob("purge-*.json"))) == 2
-
-
-def test_interrupted_purge_reuses_its_generation_without_rebuilding_full(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "sql", "full", ("native_a", "native_b"), {})
-    store = RunStore(tmp_path / "full.generation.sqlite3", identity.fingerprint)
-    database = store.open()
-    RunStore.append(database, [("present", None)])
-    RunStore.mark_complete(database)
-    generation_id = RunStore.generation_id(database)
-    database.close()
-    save_checkpoint(tmp_path / "full.json", Checkpoint(identity, completed=True))
-
-    class Context:
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def ensure_held(self) -> None: return None
-        def begin_page_mutation(self, _connection: object) -> None: return None
-        def end_page_mutation(self) -> None: return None
-
-    run = KnStagingRun(spec(), object(), object(), "SELECT * FROM EV.PILOT", 1, tmp_path / "full.json", identity, Context)
-    purge_identity = run._purge_identity(identity, generation_id)
-    save_checkpoint(run._purge_path(generation_id), Checkpoint(purge_identity, ("old",), 1, 1, False))
-    called: list[bool] = []
-    monkeypatch.setattr(KnStagingRun, "run_full", lambda *_args, **_kwargs: (_ for _ in ()).throw(AssertionError("must not rebuild full")))
-    monkeypatch.setattr(KnStagingRun, "run_purge_non_existent", lambda *_args, **_kwargs: (called.append(True) or PageRunResult(Checkpoint(purge_identity, completed=True), False)))
-    full, purge = run.run_full_and_purge()
-    assert full.completed and purge is not None and called == [True]
-
-
-def test_fresh_full_purge_replaces_stale_generation_but_normal_run_refuses_it(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    old_identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "old sql", "full", ("native_a", "native_b"), {})
-    stale = RunStore(tmp_path / "full.generation.sqlite3", old_identity.fingerprint)
-    database = stale.open()
-    RunStore.append(database, [("old", None)])
-    RunStore.mark_complete(database)
-    database.close()
-    identity = RunIdentity("stag", "db", "public", "pilot_target", 1, "new sql", "full", ("native_a", "native_b"), {})
-
-    class Context:
-        def __enter__(self): return self
-        def __exit__(self, *_: object) -> None: return None
-        def ensure_held(self) -> None: return None
-        def begin_page_mutation(self, _connection: object) -> None: return None
-        def end_page_mutation(self) -> None: return None
-
-    run = KnStagingRun(spec(), object(), object(), "SELECT * FROM EV.PILOT", 1, tmp_path / "full.json", identity, Context)
-    with pytest.raises(RuntimeError, match="fingerprint"):
-        run.run_full_and_purge()
-    unchanged = stale.open(reset_on_mismatch=False)
-    assert stale.complete(unchanged) and RunStore.contains(unchanged, ["old"]) == {"old"}
-    unchanged.close()
-
-    def fake_full(self: KnStagingRun, *, fresh: bool = False, context: object = None) -> PageRunResult:
-        source = self._generation_store(self.identity)
-        current = source.open()
-        RunStore.begin(current)
-        RunStore.append_page(current, [("new", None)], ("cursor",))
-        RunStore.mark_complete(current)
-        current.close()
-        checkpoint = Checkpoint(self.identity, completed=True)
-        save_checkpoint(self.checkpoint_path, checkpoint)
-        return PageRunResult(checkpoint, False)
-
-    monkeypatch.setattr(KnStagingRun, "run_full", fake_full)
-    monkeypatch.setattr(KnStagingRun, "run_purge_non_existent", lambda self, **_kwargs: PageRunResult(Checkpoint(self.identity, completed=True), False))
-    full, purge = run.run_full_and_purge(fresh=True)
-    assert full.checkpoint.completed and purge is not None
-    replaced = RunStore(tmp_path / "full.generation.sqlite3", identity.fingerprint).open(reset_on_mismatch=False)
-    assert RunStore.contains(replaced, ["new"]) == {"new"}
-    replaced.close()
 
 
 def test_pilot_finally_cleanup_closes_replaced_but_not_outer_owned_sessions() -> None:

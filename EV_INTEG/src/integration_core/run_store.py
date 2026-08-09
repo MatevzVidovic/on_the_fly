@@ -7,7 +7,6 @@ from decimal import Decimal
 import json
 from pathlib import Path
 import sqlite3
-from uuid import uuid4
 from typing import Any, Iterator
 
 
@@ -48,7 +47,7 @@ class RunStore:
         row = connection.execute("SELECT value FROM metadata WHERE key = 'fingerprint'").fetchone()
         if row is not None and row[0] != self.fingerprint and not reset_on_mismatch:
             connection.close()
-            raise RuntimeError("source generation fingerprint does not match this purge run")
+            raise RuntimeError("source generation fingerprint does not match this run")
         if fresh or row is None or row[0] != self.fingerprint:
             connection.execute("DELETE FROM source_generation")
             connection.execute("DELETE FROM metadata")
@@ -78,15 +77,7 @@ class RunStore:
     def begin(connection: sqlite3.Connection) -> None:
         connection.execute("DELETE FROM source_generation")
         connection.execute("DELETE FROM metadata WHERE key IN ('complete', 'source_cursor')")
-        connection.execute("INSERT OR REPLACE INTO metadata(key, value) VALUES ('generation_id', ?)", (uuid4().hex,))
         connection.commit()
-
-    @staticmethod
-    def generation_id(connection: sqlite3.Connection) -> str:
-        row = connection.execute("SELECT value FROM metadata WHERE key = 'generation_id'").fetchone()
-        if row is None or not row[0]:
-            raise RuntimeError("source generation is missing its generation id")
-        return str(row[0])
 
     @staticmethod
     def cursor(connection: sqlite3.Connection) -> tuple[Any, ...] | None:
@@ -101,7 +92,7 @@ class RunStore:
     @staticmethod
     def append_page(connection: sqlite3.Connection, rows: list[tuple[Any, Any]], next_cursor: tuple[Any, ...]) -> None:
         if any(identifier is None for identifier, _change in rows):
-            raise RuntimeError("source generation has null membership values; purge is unsafe")
+            raise RuntimeError("source generation has null membership values")
         try:
             connection.executemany(
                 "INSERT INTO source_generation(membership_json, change_json) VALUES (?, ?)",
@@ -118,7 +109,8 @@ class RunStore:
     @staticmethod
     def append(connection: sqlite3.Connection, rows: list[tuple[Any, Any]]) -> None:
         """Test/support helper for a complete one-page generation."""
-        if connection.execute("SELECT 1 FROM metadata WHERE key = 'generation_id'").fetchone() is None:
+        if (not RunStore.complete(connection) and RunStore.cursor(connection) is None
+                and connection.execute("SELECT 1 FROM source_generation LIMIT 1").fetchone() is None):
             RunStore.begin(connection)
         RunStore.append_page(connection, rows, ())
 
@@ -132,19 +124,3 @@ class RunStore:
         cursor = connection.execute("SELECT membership_json, change_json FROM source_generation ORDER BY membership_json")
         while rows := cursor.fetchmany(size):
             yield [(_decode(identifier), _decode(change)) for identifier, change in rows]
-
-    @staticmethod
-    def contains(connection: sqlite3.Connection, identifiers: list[Any]) -> set[Any]:
-        """Membership lookup used by bounded null-safe staging purge pages."""
-        if not identifiers:
-            return set()
-        found: set[Any] = set()
-        # Keep well below SQLite's usual 999-variable compile-time limit.
-        for start in range(0, len(identifiers), 900):
-            encoded = [_encode(identifier) for identifier in identifiers[start : start + 900]]
-            placeholders = ",".join("?" for _ in encoded)
-            rows = connection.execute(
-                f"SELECT membership_json FROM source_generation WHERE membership_json IN ({placeholders})", encoded
-            ).fetchall()
-            found.update(_decode(row[0]) for row in rows)
-        return found

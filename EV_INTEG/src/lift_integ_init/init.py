@@ -48,7 +48,6 @@ def load_environment() -> None:
     # Canonical configuration wins. The legacy location is read only as a
     # non-overriding migration fallback, so existing operators are not broken.
     load_dotenv(HERE / ".env", override=False)
-    load_dotenv(HERE.parent / "adapt_last_changed_datetime" / ".env", override=False)
 
 
 def pg_settings(database: str) -> dict[str, str | int]:
