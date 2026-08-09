@@ -17,6 +17,7 @@ from typing import Any, Iterable
 HERE = Path(__file__).resolve().parent
 MANIFEST_PATH = HERE / "tables.json"
 CACHE_PATH = HERE / ".state" / "data_correct.json"
+REPORTS_DIR = HERE / "reports"
 CACHE_VERSION = 2
 SCHEMA = "public"
 IDENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_$]*$")
@@ -694,8 +695,14 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--environment", choices=("staging", "prod"), default="staging")
     parser.add_argument("--page-size", type=int, default=5000)
     parser.add_argument("--refresh-data", action="store_true")
-    parser.add_argument("--report", type=Path, default=HERE / "state_report.md")
+    parser.add_argument("--report", type=Path, help="custom report path (default: timestamped file in reports/)")
     return parser.parse_args()
+
+
+def default_report_path(environment: str, started_at: datetime) -> Path:
+    label = "stag" if environment == "staging" else "prod"
+    timestamp = started_at.strftime("%Y%m%d_%H%M%S")
+    return REPORTS_DIR / f"state_report_{label}_{timestamp}.md"
 
 
 def main() -> int:
@@ -708,6 +715,7 @@ def main() -> int:
         if unknown: raise RuntimeError("unknown table key(s): " + ", ".join(sorted(unknown)))
         selected = [by_key[key] for key in args.tables] if args.tables else specs
         load_env(); oracle_driver, psycopg = drivers(); cache = cache_read(); mhash = manifest_hash(manifest)
+        report_path = args.report or default_report_path(args.environment, datetime.now())
         with (
             oracle_driver.connect(**oracle_settings(oracle_driver)) as oracle,
             psycopg.connect(**pg_settings(args.environment)) as target_pg,
@@ -721,10 +729,11 @@ def main() -> int:
                 heartbeat(f"[{index}/{len(selected)}] starting {target_table(spec, args.environment)}")
                 results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash, check_started_at))
                 cache_write(cache)
-                write_report(args.report, results, args.environment)
+                write_report(report_path, results, args.environment)
                 heartbeat(f"[{index}/{len(selected)}] checkpoint saved: cache and partial report written")
         cache_write(cache)
-        report = markdown(results, args.environment); write_report(args.report, results, args.environment)
+        report = markdown(results, args.environment); write_report(report_path, results, args.environment)
+        heartbeat(f"report written: {report_path}")
         print(report)
         return 0 if all(item["result"] == "PASS" for item in results) else 1
     except Exception as error:

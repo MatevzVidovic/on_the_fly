@@ -26,6 +26,10 @@ Metadata, high-water and zero-transfer checks always run live. `--refresh-data`
 forces both expensive checks. A non-zero exit code means at least one selected
 table failed.
 
+Without `--report`, each run writes its partial and final report under
+`reports/` as `state_report_stag_YYYYMMDD_HHMMSS.md` or
+`state_report_prod_YYYYMMDD_HHMMSS.md`. Existing reports are retained.
+
 `LIFT now` simulates LIFT's delta predicate at one timestamp captured when the
 checker starts: `date_change >= minDate AND date_change <= integrationStart`.
 `Zero newer rows` is intentionally stricter and has no upper bound. It is the
