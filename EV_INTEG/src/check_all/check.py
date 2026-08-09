@@ -9,6 +9,7 @@ import os
 import re
 import sys
 import tempfile
+import time
 from datetime import date, datetime
 from decimal import Decimal
 from pathlib import Path
@@ -17,6 +18,7 @@ from typing import Any, Iterable
 HERE = Path(__file__).resolve().parent
 MANIFEST_PATH = HERE / "tables.json"
 CACHE_PATH = HERE / ".state" / "data_correct.json"
+AUTO_PAGE_SIZE_DIR = HERE / ".auto_page_sizes"
 REPORTS_DIR = HERE / "reports"
 CACHE_VERSION = 2
 SCHEMA = "public"
@@ -403,6 +405,50 @@ def cache_write(value: dict[str, Any]) -> None:
         if os.path.exists(temporary): os.unlink(temporary)
 
 
+def atomic_json_write(path: Path, value: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix=f".{path.stem}.", dir=path.parent)
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            json.dump(value, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush(); os.fsync(handle.fileno())
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary): os.unlink(temporary)
+
+
+def auto_page_size_path(profile: str) -> Path:
+    return AUTO_PAGE_SIZE_DIR / f"{profile}.json"
+
+
+def learned_page_size(profile: str, cap: int) -> int | None:
+    try:
+        value = json.loads(auto_page_size_path(profile).read_text()).get("page_size")
+        return min(int(value), cap) if int(value) > 0 else None
+    except (OSError, ValueError, TypeError, json.JSONDecodeError):
+        return None
+
+
+def save_learned_page_size(profile: str, page_size: int) -> None:
+    atomic_json_write(auto_page_size_path(profile), {"page_size": page_size})
+
+
+def size_relevant_oracle_failure(error: Exception) -> bool:
+    text = str(error).lower()
+    # Transport failures do not indicate that a smaller result page helps.
+    if any(token in text for token in ("connection", "network", "lost contact", "dpy-6005", "ora-125", "ssh")):
+        return False
+    return any(token in text for token in (
+        "timeout", "timed out", "out of memory", "memory", "array", "buffer", "resource",
+        "ora-04030", "ora-04031", "ora-01000",
+    ))
+
+
+def format_duration(seconds: float) -> str:
+    return f"{int(seconds // 3600)}:{int(seconds % 3600 // 60):02d}:{int(seconds % 60):02d}"
+
+
 def heartbeat(message: str) -> None:
     """Emit immediately so long KN checks remain visibly alive."""
     print(message, flush=True)
@@ -452,19 +498,38 @@ def page_sql(sql: str, source_pk: str, source_date: str, page_keys: list[str], a
     return f"SELECT {columns} FROM ({sql}) q{where} ORDER BY {', '.join(map(quote, page_keys))} FETCH NEXT :limit ROWS ONLY"
 
 
-def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], page_size: int, expected_count: int) -> tuple[bool, str | None]:
+def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_output: dict[str, str], page_size: int, expected_count: int, page_size_cap: int | None = None, auto_page_size: bool = False, profile: str | None = None) -> tuple[bool, str | None]:
     pk = spec["pk"].lower(); after: tuple[Any, ...] | None = None; seen = 0
     source_keys = [source_output[key.lower()] for key in spec["source_page_keys"]]
     date_is_text = "date_change" in documented_text_temporal_aliases(sql, {"date_change"})
-    page = 0
+    page_size_cap = page_size_cap or page_size
+    profile = profile or "direct-diff-call"
+    current_size = min(page_size, page_size_cap)
+    if auto_page_size:
+        learned = learned_page_size(profile, page_size_cap)
+        if learned is not None:
+            current_size = learned
+            heartbeat(f"[{spec['table']}] auto page size: using learned {current_size}")
+    page = 0; started = time.monotonic(); full_page_seconds: list[float] = []
     while True:
         page += 1
-        heartbeat(f"[{spec['table']}] heartbeat: fetching KN data-diff page {page} (checked {seen}/{expected_count} rows)")
-        with oracle.cursor() as cur:
-            params = {"limit": page_size}
-            if after is not None: params.update({f"after_{index}": value for index, value in enumerate(after)})
-            cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after, date_is_text=date_is_text), params)
-            rows = cur.fetchall()
+        while True:
+            heartbeat(f"[{spec['table']}] heartbeat: fetching KN data-diff page {page} (checked {seen}/{expected_count} rows; page size {current_size})")
+            page_started = time.monotonic()
+            try:
+                with oracle.cursor() as cur:
+                    params = {"limit": current_size}
+                    if after is not None: params.update({f"after_{index}": value for index, value in enumerate(after)})
+                    cur.execute(page_sql(sql, source_output[pk], source_output["date_change"], source_keys, after, date_is_text=date_is_text), params)
+                    rows = cur.fetchall()
+                page_seconds = time.monotonic() - page_started
+                break
+            except Exception as error:
+                smaller = max(1, current_size // 3)
+                if not auto_page_size or smaller == current_size or not size_relevant_oracle_failure(error):
+                    raise
+                heartbeat(f"[{spec['table']}] KN page read failed at page size {current_size}: {error}; retrying same cursor at {smaller}")
+                current_size = smaller
         if not rows:
             heartbeat(f"[{spec['table']}] data-diff fetch complete ({seen}/{expected_count} rows)")
             return (seen == expected_count, None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}")
@@ -492,8 +557,20 @@ def diff_data(oracle: Any, pg: Any, sql: str, spec: dict[str, Any], source_outpu
             if expected != actual:
                 return False, f"date_change mismatch for PK {key!r}: KN={expected}, target={actual}"
         seen += len(rows); after = tuples[-1]
-        heartbeat(f"[{spec['table']}] checked data-diff page {page} ({len(rows)} rows; total {seen}/{expected_count})")
-        if len(rows) < page_size:
+        if auto_page_size:
+            save_learned_page_size(profile, current_size)
+        elapsed = time.monotonic() - started
+        rate = len(rows) / page_seconds if page_seconds else 0
+        remaining = max(0, expected_count - seen)
+        eta = format_duration((remaining / rate) if rate else 0)
+        heartbeat(f"[{spec['table']}] checked data-diff page {page} ({len(rows)} rows; total {seen}/{expected_count}; page size {current_size}; {rate:,.0f} rows/s; elapsed {format_duration(elapsed)}; ETA {eta})")
+        if len(rows) == current_size:
+            full_page_seconds.append(page_seconds / len(rows))
+            if len(full_page_seconds) >= 6:
+                baseline = sorted(full_page_seconds[:-3])[len(full_page_seconds[:-3]) // 2]
+                if baseline > 0 and all(value >= baseline * 2 for value in full_page_seconds[-3:]):
+                    return False, "stopped after three sustained 2x-per-row slowdowns; rerun after investigating"
+        if len(rows) < current_size:
             return (
                 seen == expected_count,
                 None if seen == expected_count else f"KN scan count {seen} != COUNT(*) {expected_count}",
@@ -594,7 +671,7 @@ def write_report(path: Path, results: list[dict[str, Any]], environment: str) ->
     path.write_text(markdown(results, environment), encoding="utf-8")
 
 
-def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str, check_started_at: datetime | None = None) -> dict[str, Any]:
+def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any], environment: str, cache: dict[str, Any], refresh: bool, page_size: int, mhash: str, check_started_at: datetime | None = None, *, page_size_cap: int | None = None, auto_page_size: bool = True) -> dict[str, Any]:
     table = target_table(spec, environment); local = {**spec, "table": table}
     check_started_at = check_started_at or integration_start_time()
     result = {"table": table, "metadata": "FAIL", "sync_start": "NOT_CHECKED", "delta_config": "NOT_CHECKED", "data": "NOT_CHECKED", "highwater": "NOT_CHECKED", "lift_now": "NOT_CHECKED", "delta": "NOT_CHECKED", "result": "FAIL", "detail": ""}
@@ -660,7 +737,10 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: dict[str, Any
                 entry.pop("last_check_passed", None)
                 data_ok = False
             else:
-                same, reason = diff_data(oracle, target_pg, sql, local, data_output, page_size, kn_count)
+                same, reason = diff_data(
+                    oracle, target_pg, sql, local, data_output, page_size, kn_count,
+                    page_size_cap, auto_page_size, identity,
+                )
                 if not same:
                     result["data"] = "FAIL"; result["detail"] = reason or "PK/date diff failed"; entry.pop("last_check_passed", None); data_ok = False
                 else:
@@ -693,7 +773,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("tables", nargs="*", help="manifest table key(s)")
     parser.add_argument("--environment", choices=("staging", "prod"), default="staging")
-    parser.add_argument("--page-size", type=int, default=5000)
+    parser.add_argument("--page-size", type=int, default=50_000, help="initial KN diff page size")
+    parser.add_argument("--page-size-cap", type=int, default=50_000, help="maximum KN diff page size")
+    auto_size = parser.add_mutually_exclusive_group()
+    auto_size.add_argument("--auto-page-size", dest="auto_page_size", action="store_true", help="adapt and persist KN diff page size (default)")
+    auto_size.add_argument("--no-auto-page-size", dest="auto_page_size", action="store_false", help="use a fixed --page-size")
+    parser.set_defaults(auto_page_size=True)
     parser.add_argument("--refresh-data", action="store_true")
     parser.add_argument("--report", type=Path, help="custom report path (default: timestamped file in reports/)")
     return parser.parse_args()
@@ -707,7 +792,7 @@ def default_report_path(environment: str, started_at: datetime) -> Path:
 
 def main() -> int:
     args = parse_args()
-    if args.page_size < 1: raise SystemExit("error: --page-size must be positive")
+    if args.page_size < 1 or args.page_size_cap < 1: raise SystemExit("error: --page-size and --page-size-cap must be positive")
     try:
         manifest = json.loads(MANIFEST_PATH.read_text()); specs = manifest["tables"]
         by_key = {item["key"]: item for item in specs}
@@ -727,7 +812,7 @@ def main() -> int:
             results = []
             for index, spec in enumerate(selected, start=1):
                 heartbeat(f"[{index}/{len(selected)}] starting {target_table(spec, args.environment)}")
-                results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash, check_started_at))
+                results.append(check_one(target_pg, metadata_pg, oracle, spec, args.environment, cache, args.refresh_data, args.page_size, mhash, check_started_at, page_size_cap=args.page_size_cap, auto_page_size=args.auto_page_size))
                 cache_write(cache)
                 write_report(report_path, results, args.environment)
                 heartbeat(f"[{index}/{len(selected)}] checkpoint saved: cache and partial report written")

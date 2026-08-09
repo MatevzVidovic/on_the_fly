@@ -147,6 +147,49 @@ def test_diff_data_rejects_a_short_final_page_before_the_expected_kn_count():
     assert reason == "KN scan count 1 != COUNT(*) 2"
 
 
+def test_auto_page_size_is_capped_and_persisted(monkeypatch, tmp_path):
+    monkeypatch.setattr(check, "AUTO_PAGE_SIZE_DIR", tmp_path)
+    check.save_learned_page_size("example", 20_000)
+    assert check.learned_page_size("example", 50_000) == 20_000
+    assert check.learned_page_size("example", 5_000) == 5_000
+
+
+def test_diff_data_retries_the_same_cursor_at_one_third_size(monkeypatch, tmp_path):
+    monkeypatch.setattr(check, "AUTO_PAGE_SIZE_DIR", tmp_path)
+
+    class OracleCursor:
+        def __init__(self, oracle):
+            self.oracle = oracle
+        def __enter__(self): return self
+        def __exit__(self, *_args): return False
+        def execute(self, _statement, _params=None):
+            response = self.oracle.responses.pop(0)
+            if isinstance(response, Exception):
+                raise response
+            self.rows = response
+        def fetchall(self): return self.rows
+
+    class Oracle:
+        def __init__(self):
+            self.responses = [
+                RuntimeError("ORA-04030: out of process memory"),
+                [("A", datetime(2025, 1, 1), 1)],
+                [],
+            ]
+        def cursor(self): return OracleCursor(self)
+
+    pg = _Connection([[("A", datetime(2025, 1, 1))]])
+    spec = {"pk": "synthetic_pk", "table": "target", "source_page_keys": ["native_id"]}
+    output = {"synthetic_pk": "SYNTHETIC_PK", "date_change": "DATE_CHANGE", "native_id": "NATIVE_ID"}
+    assert check.diff_data(Oracle(), pg, "SELECT 1", spec, output, 9, 1, 9, True, "example") == (True, None)
+    assert check.learned_page_size("example", 9) == 3
+
+
+def test_only_size_related_oracle_failures_trigger_page_shrink():
+    assert check.size_relevant_oracle_failure(RuntimeError("ORA-04030: out of process memory"))
+    assert not check.size_relevant_oracle_failure(RuntimeError("DPY-6005: cannot connect to database"))
+
+
 def test_podatki_is_rejected_only_for_split_enota_integrations(monkeypatch):
     class Oracle:
         def cursor(self):

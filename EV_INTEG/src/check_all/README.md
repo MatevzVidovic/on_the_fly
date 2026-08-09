@@ -15,7 +15,7 @@ metadata such as `attribute_tables` and its integration rows.
 ```sh
 .venv/bin/python src/check_all/check.py
 .venv/bin/python src/check_all/check.py --environment prod ev_pe_parc_h
-.venv/bin/python src/check_all/check.py --page-size 5000 --report /tmp/ev-check.md
+.venv/bin/python src/check_all/check.py --page-size 50000 --page-size-cap 50000 --report /tmp/ev-check.md
 .venv/bin/python src/check_all/check.py --refresh-data
 ```
 
@@ -25,6 +25,12 @@ only while the integration SQL, manifest and integration id are unchanged.
 Metadata, high-water and zero-transfer checks always run live. `--refresh-data`
 forces both expensive checks. A non-zero exit code means at least one selected
 table failed.
+
+KN data-diff pages start at 50,000 rows and automatically retry the same
+keyset cursor at one-third size after a size-related Oracle failure. The
+learned safe size is stored in `.auto_page_sizes/` for the matching environment
+and integration query. Use `--no-auto-page-size` for a fixed-size diagnostic
+run, or `--page-size-cap N` to limit automatic pages.
 
 Without `--report`, each run writes its partial and final report under
 `reports/` as `state_report_stag_YYYYMMDD_HHMMSS.md` or
