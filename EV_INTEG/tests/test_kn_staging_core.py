@@ -333,6 +333,8 @@ def test_catalog_exposes_only_runnable_tables_and_formally_rejects_missing_sql()
     assert table_spec("ev_stavba_h").source_page_keys == ("sta_sid", "jn_rev_num")
     assert table_spec("ev_dst_pripis_podatki_h").oracle_index_columns == ("id",)
     assert table_spec("ev_parc_pripis_podatki_h").oracle_index_columns == ("id",)
+    assert all(entry.spec.source_sql.name.endswith("_kn.sql") for entry in ENTRIES.values())
+    assert all(entry.lift_sql is not None and entry.lift_sql.name.endswith("_lift.sql") and entry.lift_sql.exists() for entry in ENTRIES.values())
 
 
 @pytest.mark.parametrize(("table", "requires_status", "from_2025"), (
@@ -372,6 +374,41 @@ def test_every_active_sql_has_the_required_safe_contract(table: str, requires_st
         re.DOTALL,
     )
     assert re.search(r"cast\s*\(.+?\s+as\s+timestamp\s*\)\s+as\s+date_change", lowered, re.DOTALL)
+
+
+@pytest.mark.parametrize(
+    ("table", "requires_status", "from_2025"),
+    (
+        ("ev_dst_pripis_podatki_h", False, False),
+        ("ev_del_stavbe_h", True, False),
+        ("ev_del_stavbe_enota_h_2025_danes", True, True),
+        ("ev_parc_del_h", True, False),
+        ("ev_parc_enota_h_2025_danes", True, True),
+        ("ev_parcela_h", True, False),
+        ("ev_pe_dst_h", True, False),
+        ("ev_pe_parc_h", True, False),
+        ("ev_posebna_enota_h", True, False),
+        ("ev_prostor_h", True, False),
+        ("ev_stavba_h", True, False),
+        ("ev_parc_pripis_podatki_h", False, False),
+    ),
+)
+def test_every_active_lift_sql_has_the_copy_paste_contract(table: str, requires_status: bool, from_2025: bool) -> None:
+    from integrations.catalog import ENTRIES
+
+    entry = ENTRIES[table]
+    assert entry.lift_sql is not None
+    source = entry.lift_sql.read_text(encoding="utf-8")
+    lowered = source.lower()
+    assert "to_char(from_tz" not in lowered
+    assert "from_tz(" in lowered
+    assert " as valid_from" in lowered and " as valid_to" in lowered and " as date_change" in lowered
+    assert table_spec(table).membership_key in lowered
+    for key in table_spec(table).source_page_keys:
+        assert key in lowered
+    status_filter = re.search(r'(?:[a-z_][a-z0-9_]*\.)?"?jn_status"?\s*<>\s*\'x\'', lowered) is not None
+    assert status_filter is requires_status
+    assert ("timestamp '2025-01-01 00:00:00'" in lowered) is from_2025
 
 
 def test_tuple_predicates_use_strict_intermediate_components_for_inclusive_bounds() -> None:

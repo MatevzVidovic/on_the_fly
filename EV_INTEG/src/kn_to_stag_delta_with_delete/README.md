@@ -23,6 +23,20 @@ fixed table entrypoint; all behavior remains in `sync_table.py`. Former
 monolithic-loader state and auto-page-size profiles are not used by the shared
 engine.
 
+## SQL files
+
+Every table has two separately versioned queries in this directory:
+
+- `ev_<table>_kn.sql` is used only by KN→staging. Its validity timestamps are
+  ISO text so python-oracledb never has to fetch Oracle timezone objects.
+- `ev_<table>_lift.sql` is the literal SQL to paste into LIFT. It uses the
+  native `FROM_TZ(..., 'Europe/Ljubljana')` timestamp values required by the
+  LIFT integration contract.
+
+Do not substitute one for the other. `check_all` compares LIFT's stored SQL
+byte-for-byte with the corresponding `*_lift.sql`, so the LIFT file is the
+copy/paste source of truth.
+
 Full change-aware runs retain a complete SQLite source generation because it
 is the durable proof used to compare *all* target change values before any
 payload write. This is required for the global “staging newer aborts before any write” guarantee;

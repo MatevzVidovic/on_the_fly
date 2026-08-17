@@ -8,6 +8,11 @@ or changes a LIFT integration.
 The checker derives its active table list and checker-only rules directly from
 the shared `integrations.catalog` (`TableSpec` plus `CheckSpec`).
 
+Each catalogued table also has a checked-in `*_lift.sql` file. The checker
+requires LIFT's stored query to match that file exactly: it is a direct
+verification that the canonical query was pasted into LIFT, not merely a
+structural-equivalence check.
+
 Copy `.env.example` to `.env` and fill in KN, staging, and production credentials.
 
 For each environment the checker uses two PostgreSQL databases on the same

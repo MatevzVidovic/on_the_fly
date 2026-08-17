@@ -13,6 +13,8 @@ not infer table keys or SQL from old loaders.
   Ctrl-C can replay the last page; idempotent upserts make that safe.
 - KN-to-staging full sync is source-keyset paged and upserts only. `--only-new`
   requires an existing reviewed composite watermark; it never guesses one.
+- Each active table owns `*_kn.sql` for KN→staging and `*_lift.sql` for LIFT.
+  The checker verifies that LIFT contains the latter exact query text.
 - Purge is deliberately unavailable until it can read membership and payload
   from the same Oracle snapshot. Live scans must not delete a concurrently
   created source row.

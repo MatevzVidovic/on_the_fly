@@ -17,8 +17,6 @@ CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
             'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_from,
     TO_CHAR(FROM_TZ(CAST(RT.CREATED AS TIMESTAMP), 'Europe/Ljubljana'),
             'YYYY-MM-DD"T"HH24:MI:SS.FF TZH:TZM') AS valid_to,
-    -- Page/watermark value stays a native Oracle TIMESTAMP.  The two display
-    -- validity values remain ISO text for the thin-driver timezone workaround.
     CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP) AS date_change
 from EV.JN_PE_PARC j
              join ev.revision rf on (j.jn_rev_num = rf.rev_num)

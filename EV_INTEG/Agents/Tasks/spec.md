@@ -11,7 +11,10 @@ old loaders or alternate designs.
 - **Catalog:** only entries in `integrations.catalog.ENTRIES` are executable.
   Historical tables without checked-in KN SQL and verified Oracle index order
   are formally unsupported, not guessed. Add them through the migration
-  checklist in the catalog module.
+  checklist in the catalog module. Every active entry has two explicit SQL
+  files: `*_kn.sql` for KN→staging and `*_lift.sql` as the exact text pasted
+  into LIFT; the checker requires the stored LIFT query to be byte-for-byte
+  equal to the latter.
 - **Cursor:** every active KN run declares a non-null unique native
   `source_page_keys` tuple in verified usable Oracle-index order. `--only-new`
   additionally requires non-null `date_change` and uses its composite frozen

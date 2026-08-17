@@ -93,6 +93,21 @@ class CheckView:
         self.lift_title_prefix = entry.checks.lift_title_prefix
 
 
+def canonical_lift_sql(entry: CatalogEntry) -> str:
+    """Return the literal SQL text the operator must paste into LIFT."""
+    if entry.lift_sql is None:
+        raise RuntimeError(f"{entry.spec.target_table} has no checked-in LIFT SQL")
+    try:
+        return entry.lift_sql.read_text(encoding="utf-8")
+    except OSError as error:
+        raise RuntimeError(f"cannot read checked-in LIFT SQL {entry.lift_sql}: {error}") from error
+
+
+def lift_sql_matches(entry: CatalogEntry, live_sql: Any) -> bool:
+    """Literal copy/paste verification; formatting differences are differences."""
+    return isinstance(live_sql, str) and live_sql == canonical_lift_sql(entry)
+
+
 def field(spec: CheckView | dict[str, Any], name: str) -> Any:
     return getattr(spec, name) if isinstance(spec, CheckView) else spec[name]
 
@@ -114,7 +129,8 @@ def catalog_hash(entries: dict[str, CatalogEntry]) -> str:
     value = [
         (key, entry.spec.target_table, entry.spec.membership_key, entry.spec.source_page_keys,
          entry.spec.date_change, entry.checks.source_table, entry.checks.requires_jn_status,
-         entry.checks.from_2025, entry.checks.forbid_columns, entry.checks.lift_title_prefix)
+         entry.checks.from_2025, entry.checks.forbid_columns, entry.checks.lift_title_prefix,
+         canonical_lift_sql(entry))
         for key, entry in entries.items()
     ]
     return hashlib.sha256(repr(value).encode()).hexdigest()
@@ -693,7 +709,7 @@ def markdown(results: list[dict[str, Any]], environment: str) -> str:
         "| Table | Target EV table checked in the selected environment. |",
         "| Table presence | `PASS` when the expected `public` target table exists. |",
         "| Unique constraint | `PASS` when the manifest PK has a valid, ready, non-partial single-column unique btree index or constraint. |",
-        "| Integration SQL correctness | Validates KN SQL structure, required output aliases, revision/date fields, required `JN_STATUS <> 'X'` filter, split-table date filter, and excluded `PODATKI` where applicable. |",
+        "| Integration SQL correctness | LIFT's stored query exactly equals the checked-in `*_lift.sql`, and has the required aliases, revision/date fields, `JN_STATUS <> 'X'` filter, split-table date filter, and excluded `PODATKI` where applicable. |",
         "| Integration metadata correctness | Requires one integration using `KN ORACLE`, a non-null last sync start, `is_full_sync=false`, and `use_changed_datetime_for_delta=true`. |",
         "| LIFT name correctness | `PASS` when every LIFT translation title starts with `EV H`. |",
         "| Data | KN and target row count, PK membership, and the table's configured change field match. `CACHED` means the matching PK/change scan from the unchanged query/catalog was reused. |",
@@ -793,6 +809,9 @@ def check_one(target_pg: Any, metadata_pg: Any, oracle: Any, spec: CatalogEntry 
             return finalise_result(result)
 
         sql, output, sql_failures = validate_sql(oracle, info["sql"], local)
+        if isinstance(spec, CatalogEntry):
+            if not lift_sql_matches(spec, info["sql"]):
+                sql_failures.insert(0, f"LIFT SQL does not exactly match {spec.lift_sql.name}")
         result["integration_sql"] = "PASS" if not sql_failures else "FAIL"
         detail_parts.extend(sql_failures)
         title_prefix = str(option(local, "lift_title_prefix", "EV H"))

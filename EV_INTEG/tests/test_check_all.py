@@ -96,6 +96,15 @@ def test_catalog_hash_uses_shared_table_and_check_specs():
     assert split == ["ev_del_stavbe_enota_h_2025_danes", "ev_parc_enota_h_2025_danes"]
 
 
+def test_lift_sql_match_is_literal_copy_paste_verification():
+    from integrations.catalog import ENTRIES
+    entry = ENTRIES["ev_del_stavbe_h"]
+    canonical = check.canonical_lift_sql(entry)
+    assert check.lift_sql_matches(entry, canonical)
+    assert not check.lift_sql_matches(entry, canonical + "\n")
+    assert not check.lift_sql_matches(entry, canonical.replace("SELECT", "select", 1))
+
+
 def test_markdown_includes_all_required_columns():
     output = check.markdown([{
         "table": "ev_x_h", "table_presence": "PASS", "unique_constraint": "PASS",

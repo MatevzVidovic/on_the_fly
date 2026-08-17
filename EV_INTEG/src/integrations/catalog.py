@@ -32,13 +32,17 @@ SQL = ROOT / "kn_to_stag_delta_with_delete"
 class CatalogEntry:
     spec: TableSpec
     checks: CheckSpec
+    # Exact SQL that must be pasted into the corresponding LIFT integration.
+    # TableSpec.source_sql remains the python-oracledb-safe KN→staging query.
+    lift_sql: Path | None = None
     pending_sql: bool = False
 
 
-def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], source_table: str, index: str | None, sql_name: str | None, index_columns: tuple[str, ...] | None = None, *, requires_jn_status: bool = True, from_2025: bool = False, forbid_columns: tuple[str, ...] = ()) -> CatalogEntry:
+def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], source_table: str, index: str | None, kn_sql_name: str | None, lift_sql_name: str | None, index_columns: tuple[str, ...] | None = None, *, requires_jn_status: bool = True, from_2025: bool = False, forbid_columns: tuple[str, ...] = ()) -> CatalogEntry:
     # A path is still a TableSpec fact when the integration SQL is pending;
     # live wrappers explicitly reject it rather than falling back to old code.
-    source = SQL / (sql_name or f"{name}.sql")
+    source = SQL / (kn_sql_name or f"{name}_kn.sql")
+    lift = SQL / (lift_sql_name or f"{name}_lift.sql")
     return CatalogEntry(
         TableSpec(name, source, "public", target, membership, page_keys, "date_change", "EV" if index else None, index, index_columns),
         CheckSpec(
@@ -47,23 +51,24 @@ def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], 
             from_2025=from_2025,
             forbid_columns=forbid_columns,
         ),
-        not source.exists() or index is None,
+        lift,
+        not source.exists() or not lift.exists() or index is None,
     )
 
 
 _DECLARED_ENTRIES = {
-    "ev_dst_pripis_podatki_h": _entry("ev_dst_pripis_podatki", "ev_dst_pripis_podatki_h", "dst_pripis_podatki_pk", ("dst_pripis_podatki_pk",), "DST_PRIPIS_PODATKI", "SYS_C00102666", "ev_dst_pripis_podatki_h_kn.sql", ("id",), requires_jn_status=False),
-    "ev_del_stavbe_h": _entry("ev_del_stavbe", "ev_del_stavbe_h", "jn_del_stavbe_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE", "JN_DEL_STAVBE_PK_JNF_IX", "ev_del_stavbe_h_kn.sql"),
-    "ev_del_stavbe_enota_h_2025_danes": _entry("ev_del_stavbe_enota", "ev_del_stavbe_enota_h_2025_danes", "jn_del_stavbe_enota_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE_ENOTA", "JN_DEL_STAVBE_ENOTA_PK_JNF_IX", "ev_del_stavbe_enota_h_2025_danes_kn.sql", from_2025=True, forbid_columns=("podatki",)),
-    "ev_parc_del_h": _entry("ev_parc_del", "ev_parc_del_h", "jn_parcela_del_pk", ("id_parc_del", "jn_rev_num"), "JN_PARC_DEL", "JN_PARC_DEL_PK_JNF_IX", "ev_parc_del_h_kn.sql"),
-    "ev_parc_enota_h_2025_danes": _entry("ev_parc_enota", "ev_parc_enota_h_2025_danes", "jn_parcela_enota_pk", ("id_parc_enota", "jn_rev_num"), "JN_PARC_ENOTA", "JN_PARC_ENOTA_PK_JNF_IX", "ev_parc_enota_h_2025_danes_kn.sql", from_2025=True, forbid_columns=("podatki",)),
-    "ev_parcela_h": _entry("ev_parcela", "ev_parcela_h", "jn_parcela_pk", ("pc_mid", "jn_rev_num"), "JN_PARCELA", "JN_PARCELA_PK_JNF_IX", "ev_parcela_h_kn.sql"),
-    "ev_pe_dst_h": _entry("ev_pe_dst", "ev_pe_dst_h", "jn_pe_dst_pk", ("id_pe_dst", "jn_rev_num"), "JN_PE_DST", "JN_PE_DST_PK_JNF_IX", "ev_pe_dst_h_kn.sql"),
-    "ev_pe_parc_h": _entry("ev_pe_parc", "ev_pe_parc_h", "jn_pe_parc_pk", ("id_pe_parc", "jn_rev_num"), "JN_PE_PARC", "JN_PE_PARC_PK_JNF_IX", "ev_pe_parc_h.sql"),
-    "ev_posebna_enota_h": _entry("ev_posebna_enota", "ev_posebna_enota_h", "jn_posebna_enota_pk", ("id_pe", "jn_rev_num"), "JN_POSEBNA_ENOTA", "JN_POSEBNA_ENOTA_PK_JNF_IX", "ev_posebna_enota_h_kn.sql"),
-    "ev_prostor_h": _entry("ev_prostor", "ev_prostor_h", "jn_prostor_pk", ("pro_id", "jn_rev_num"), "JN_PROSTOR", "JN_PROSTOR_PK_JNF_IX", "ev_prostor_h_kn.sql"),
-    "ev_stavba_h": _entry("ev_stavba", "ev_stavba_h", "jn_sta_pk", ("sta_sid", "jn_rev_num"), "JN_STAVBA", "JN_STAVBA_PK_JNF_IX", "ev_stavba_h_kn.sql"),
-    "ev_parc_pripis_podatki_h": _entry("ev_parc_pripis_podatki", "ev_parc_pripis_podatki_h", "parc_pripis_podatki_pk", ("parc_pripis_podatki_pk",), "PARC_PRIPIS_PODATKI", "SYS_C0034999", "ev_parc_pripis_podatki_h_kn.sql", ("id",), requires_jn_status=False),
+    "ev_dst_pripis_podatki_h": _entry("ev_dst_pripis_podatki", "ev_dst_pripis_podatki_h", "dst_pripis_podatki_pk", ("dst_pripis_podatki_pk",), "DST_PRIPIS_PODATKI", "SYS_C00102666", "ev_dst_pripis_podatki_h_kn.sql", "ev_dst_pripis_podatki_h_lift.sql", ("id",), requires_jn_status=False),
+    "ev_del_stavbe_h": _entry("ev_del_stavbe", "ev_del_stavbe_h", "jn_del_stavbe_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE", "JN_DEL_STAVBE_PK_JNF_IX", "ev_del_stavbe_h_kn.sql", "ev_del_stavbe_h_lift.sql"),
+    "ev_del_stavbe_enota_h_2025_danes": _entry("ev_del_stavbe_enota", "ev_del_stavbe_enota_h_2025_danes", "jn_del_stavbe_enota_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE_ENOTA", "JN_DEL_STAVBE_ENOTA_PK_JNF_IX", "ev_del_stavbe_enota_h_2025_danes_kn.sql", "ev_del_stavbe_enota_h_2025_danes_lift.sql", from_2025=True, forbid_columns=("podatki",)),
+    "ev_parc_del_h": _entry("ev_parc_del", "ev_parc_del_h", "jn_parcela_del_pk", ("id_parc_del", "jn_rev_num"), "JN_PARC_DEL", "JN_PARC_DEL_PK_JNF_IX", "ev_parc_del_h_kn.sql", "ev_parc_del_h_lift.sql"),
+    "ev_parc_enota_h_2025_danes": _entry("ev_parc_enota", "ev_parc_enota_h_2025_danes", "jn_parcela_enota_pk", ("id_parc_enota", "jn_rev_num"), "JN_PARC_ENOTA", "JN_PARC_ENOTA_PK_JNF_IX", "ev_parc_enota_h_2025_danes_kn.sql", "ev_parc_enota_h_2025_danes_lift.sql", from_2025=True, forbid_columns=("podatki",)),
+    "ev_parcela_h": _entry("ev_parcela", "ev_parcela_h", "jn_parcela_pk", ("pc_mid", "jn_rev_num"), "JN_PARCELA", "JN_PARCELA_PK_JNF_IX", "ev_parcela_h_kn.sql", "ev_parcela_h_lift.sql"),
+    "ev_pe_dst_h": _entry("ev_pe_dst", "ev_pe_dst_h", "jn_pe_dst_pk", ("id_pe_dst", "jn_rev_num"), "JN_PE_DST", "JN_PE_DST_PK_JNF_IX", "ev_pe_dst_h_kn.sql", "ev_pe_dst_h_lift.sql"),
+    "ev_pe_parc_h": _entry("ev_pe_parc", "ev_pe_parc_h", "jn_pe_parc_pk", ("id_pe_parc", "jn_rev_num"), "JN_PE_PARC", "JN_PE_PARC_PK_JNF_IX", "ev_pe_parc_h_kn.sql", "ev_pe_parc_h_lift.sql"),
+    "ev_posebna_enota_h": _entry("ev_posebna_enota", "ev_posebna_enota_h", "jn_posebna_enota_pk", ("id_pe", "jn_rev_num"), "JN_POSEBNA_ENOTA", "JN_POSEBNA_ENOTA_PK_JNF_IX", "ev_posebna_enota_h_kn.sql", "ev_posebna_enota_h_lift.sql"),
+    "ev_prostor_h": _entry("ev_prostor", "ev_prostor_h", "jn_prostor_pk", ("pro_id", "jn_rev_num"), "JN_PROSTOR", "JN_PROSTOR_PK_JNF_IX", "ev_prostor_h_kn.sql", "ev_prostor_h_lift.sql"),
+    "ev_stavba_h": _entry("ev_stavba", "ev_stavba_h", "jn_sta_pk", ("sta_sid", "jn_rev_num"), "JN_STAVBA", "JN_STAVBA_PK_JNF_IX", "ev_stavba_h_kn.sql", "ev_stavba_h_lift.sql"),
+    "ev_parc_pripis_podatki_h": _entry("ev_parc_pripis_podatki", "ev_parc_pripis_podatki_h", "parc_pripis_podatki_pk", ("parc_pripis_podatki_pk",), "PARC_PRIPIS_PODATKI", "SYS_C0034999", "ev_parc_pripis_podatki_h_kn.sql", "ev_parc_pripis_podatki_h_lift.sql", ("id",), requires_jn_status=False),
 }
 
 # Only these entries are executable and checked. Facts for the remaining
