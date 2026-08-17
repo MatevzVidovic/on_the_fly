@@ -62,8 +62,9 @@ def test_render_shows_actual_index_and_column_evidence() -> None:
     assert "unique=UNIQUE" in text and "nullable=N" in text and "num_rows=1" in text and "DDL" in text
 
 
-def test_constraint_sql_accepts_backlog_and_emits_btree_reuse_path(capsys) -> None:
+def test_constraint_sql_accepts_catalogue_entry_and_writes_btree_reuse_path(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(constraints, "OUTPUT_DIR", tmp_path)
     assert constraints.main(["ev_stavba_h"]) == 0
-    output = capsys.readouterr().out
+    output = (tmp_path / "ev_stavba_h.sql").read_text(encoding="utf-8")
     assert "am.amname='btree'" in output
     assert "UNIQUE USING INDEX" in output

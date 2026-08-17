@@ -6,3 +6,4 @@ __pycache__/
 .pytest_cache/
 src/**/.state/
 src/**/.auto_page_sizes/
+src/unique_constraint_sql/generated/
