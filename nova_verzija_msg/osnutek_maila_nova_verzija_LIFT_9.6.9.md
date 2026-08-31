@@ -4,7 +4,7 @@ Pozdravljeni,
 
 danes bomo na produkcijsko in testno okolje naložili novo verzijo LIFT-a 9.6.9.
 
-V verziji so vključeni popravki prijavljenih napak, optimizacije in dogovorjene nadgradnje za projekt ISAM ter splošne izboljšave LIFT-a. Manjši popravki so vodeni na Jiri.
+V verziji so vključeni popravki prijavljenih napak, optimizacije in dogovorjene nadgradnje za projekt ISAM ter splošne izboljšave LIFT-a.
 
 Opravljena razvojna dela (D – dorazvoj, B – napaka):
 
@@ -24,6 +24,7 @@ Večje nadgradnje:
 - Pravila za zaklepanje atributnih polj so prenovljena na princip dovoljenih polj (whitelist), kar omogoča jasnejše upravljanje urejanja podatkov.
 - Poročila se lahko obdelujejo tudi s procesorjem Quarto. Nadaljuje se tudi prenova oblikovalnika poročil, ki bo na voljo kot administrativno orodje.
 - Dodana je osnova za upravljanje geofence območij in pripadajočih pravic.
+- V orodju »Pomoč« je dostopna uporabniška dokumentacija, urejena po modulih in datotekah. Posamezno datoteko oziroma dokumentacijo posameznega modula je mogoče prenesti.
 
 V primeru nepravilnosti nas prosimo obvestite prek Jire, da jih lahko čim prej preverimo in odpravimo.
 
