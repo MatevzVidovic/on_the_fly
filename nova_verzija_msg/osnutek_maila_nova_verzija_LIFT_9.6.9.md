@@ -8,19 +8,35 @@ V verziji so vključeni popravki prijavljenih napak, optimizacije in dogovorjene
 
 Opravljena razvojna dela (D – dorazvoj, B – napaka):
 
-- MD – B – Odpravljene so napake pri rezanju območij, shranjevanju imena območja ter posodabljanju geometrije con in križne tabele »MD – Območja x Cone«.
-- MD – D – Izboljšana je hitrost kontrole faktorja obnove. Zavihek vrednostnih tabel je prestavljen v informacijski prikaz; v cone so dodani podatki fonda, posodobljena pa je tudi tabela novogradenj in pripadajoča migracija.
-- PEV – B – Odpravljene so napake pri izpisu informacij o obsegu, prikazu oznak na karti in v GIS pogledu ter pri funkcijah verzij modelov. Pri izračunu se v primeru podvojenih poslovnih podatkov uporabi ustrezen zapis, uporabnik pa je o tem obveščen.
+- MD – B – Odpravljena je napaka pri rezanju območij in dodajanju zapisa v križno tabelo `md_geo_obmxcone`.
+- MD – B – Odpravljena je napaka pri shranjevanju imena območja.
+- MD – B – Odpravljena je napaka pri posodabljanju geometrije cone po spremembi križne tabele.
+- MD – B – Odpravljena je napaka pri posodobitvi stare cone v tabeli »MD – Območja x Cone«.
+- MD – D – Izboljšana je hitrost kontrole faktorja obnove.
+- MD – D – Zavihek vrednostnih tabel je prestavljen v informacijski prikaz.
+- MD – D – V cone so dodani podatki fonda.
+- MD – D – Posodobljena je tabela novogradenj in pripadajoča migracija.
+- PEV – B – Odpravljena je napaka pri izpisu »Informacije o obsegu«.
+- PEV – B – Odpravljena je napaka pri relativnem položaju oznak zapisov na karti.
+- PEV – B – Odpravljen je nekonsistenten prikaz oznak PEV v GIS pogledu.
+- PEV – B – Odpravljene so napake pri funkcijah verzij modelov PEV.
+- PEV – B – Pri izračunu se v primeru podvojenih poslovnih podatkov uporabi ustrezen zapis, uporabnik pa je o tem obveščen.
 - PEV – D – Produkti so po novem vezani na verzijo modela.
-- POSLI – D – Pri dodajanju enote v posel ali podposel se lahko prevzamejo podatki iz katastra nepremičnin. Dopolnjena je tudi sestava poslov.
-- LIFT – B – Odpravljene so napake pri prikazu zavihka rezultatov in atributnih polj, prikazu vrednosti iz lookupov ter osveževanju atributne tabele v administraciji.
+- POSLI – D – Pri dodajanju enote v posel ali podposel se lahko prevzamejo podatki iz katastra nepremičnin.
+- POSLI – D – Dopolnjena je sestava poslov.
+- LIFT – B – Odpravljena je napaka pri prikazu zavihka rezultatov in atributnih polj.
+- LIFT – B – Odpravljena je napaka pri prikazu vrednosti iz lookupov v atributni tabeli.
+- LIFT – B – Odpravljena je napaka pri osveževanju atributne tabele v administraciji.
 - LIFT – D – Dodan je uvoz začasnih slojev v LIFT. Uporabnik lahko sloj uvozi prek orodja na karti in ga uporablja v okviru svoje prijave oziroma seje.
 
 Večje nadgradnje:
 
-- Dopolnjene so nastavitve atributnih polj: podprto je centralno nastavljanje privzetih vrednosti in urejanje nastavitev polj prek obrazca.
+- Podprto je centralno nastavljanje privzetih vrednosti atributnih polj.
+- Dodano je urejanje nastavitev atributnih polj prek obrazca.
 - Pravila za zaklepanje atributnih polj so prenovljena na princip dovoljenih polj (whitelist), kar omogoča jasnejše upravljanje urejanja podatkov.
-- Poročila se lahko obdelujejo tudi s procesorjem Quarto. Oblikovalnik poročil se nadalje razvija kot administrativno orodje; odpravljena je tudi napaka pri prikazu komponent brez podatkov.
+- Poročila se lahko obdelujejo tudi s procesorjem Quarto.
+- Oblikovalnik poročil se nadalje razvija kot administrativno orodje.
+- Odpravljena je napaka pri prikazu komponent oblikovalnika poročil brez podatkov.
 - Pripravljen je uporabniški vmesnik za geofence območja.
 - V orodju »Pomoč« je dostopna uporabniška dokumentacija, urejena po modulih in datotekah. Posamezno datoteko oziroma dokumentacijo posameznega modula je mogoče prenesti.
 
