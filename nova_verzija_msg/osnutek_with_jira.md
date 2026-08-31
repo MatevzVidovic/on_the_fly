@@ -16,16 +16,9 @@ Opravljena razvojna dela (D – dorazvoj, B – napaka):
 - MD – D – Zaključeno je testiranje izračuna in zapisa ČPT (7. in 8. poglavje). ([GMS-5594](https://flycomtech.atlassian.net/browse/GMS-5594))
 - PEV – B – Odpravljena je napaka ob generiranju izpisa »Informacija o obsegu«. ([GMS-5675](https://flycomtech.atlassian.net/browse/GMS-5675))
 - PEV – B – Odpravljena je napaka pri relativnem položaju oznak PEV na karti. ([GMS-5212](https://flycomtech.atlassian.net/browse/GMS-5212))
-- PEV – B – Odpravljene so napake pri funkcijah verzij modelov PEV. ([GMS-5535](https://flycomtech.atlassian.net/browse/GMS-5535))
-- PEV – B – Pri izračunu vrednosti PEV se v primeru podvojenih poslovnih podatkov uporabi novejši zapis, uporabnik pa je o tem obveščen. ([GMS-5225](https://flycomtech.atlassian.net/browse/GMS-5225))
 - POSLI – D – Pri dodajanju enote v posel ali podposel se lahko prevzamejo podatki iz katastra nepremičnin. ([GMS-5727](https://flycomtech.atlassian.net/browse/GMS-5727))
-- POSLI – D – Avtomatska nastavitev sestave poslov je ob sprotnem posodabljanju prilagojena upoštevanju preglednikove nastavitve.([GMS-5393](https://flycomtech.atlassian.net/browse/GMS-5393))
 - LIFT – B – Ob kliku na vrstico atributne tabele v administraciji ne pride do nepotrebnega osveževanja. ([GMS-5602](https://flycomtech.atlassian.net/browse/GMS-5602))
 - LIFT – D – Dodana je možnost izdelave Quarto poročil znotraj sistema LIFT. ([GMS-5031](https://flycomtech.atlassian.net/browse/GMS-5031))
 
 V primeru nepravilnosti nas prosimo obvestite prek Jire, da jih lahko čim prej preverimo in odpravimo.
 
-
-Best regards / Lep pozdrav
-
-[podpis]
