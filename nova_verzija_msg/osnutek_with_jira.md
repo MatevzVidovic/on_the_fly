@@ -2,7 +2,10 @@ Zadeva: Nova verzija LIFT-a 9.6.9
 
 Pozdravljeni,
 
-danes bomo na produkcijsko in testno okolje naložili novo verzijo LIFT-a 9.6.9.
+danes bomo na testno okolje naložili novo verzijo LIFT-a 9.6.9.
+
+Prosili bi vas, da omenjene spremembe potestirate in potrdite njihovo ustreznost, nato pa jih bomo naložili tudi na produkcijo.
+Po omenjenem postopku morajo potekati naložitve novih verzij, ko je sistem v produkcijski uporabi, zato bi s tem pristopom začeli že zdaj, da bomo na obeh straneh vanj utečeni.
 
 V verziji so vključeni popravki prijavljenih napak, optimizacije in dogovorjene nadgradnje za projekt ISAM ter splošne izboljšave LIFT-a. V nadaljevanju so navedena dela, zaključena oziroma posodobljena od 18. 8. 2026 dalje. Manjši popravki so vodeni na Jiri.
 
