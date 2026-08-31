@@ -4,8 +4,9 @@ Pozdravljeni,
 
 danes bomo na testno okolje naložili novo verzijo LIFT-a 9.6.9.
 
-Prosili bi vas, da omenjene spremembe potestirate in potrdite njihovo ustreznost, nato pa jih bomo naložili tudi na produkcijo.
-Po omenjenem postopku morajo potekati naložitve novih verzij, ko je sistem v produkcijski uporabi, zato bi s tem pristopom začeli že zdaj, da bomo na obeh straneh vanj utečeni.
+Prosimo vas, da navedene spremembe na testnem okolju preizkusite in nam potrdite njihovo ustreznost. Po potrditvi jih bomo naložili tudi na produkcijsko okolje.
+
+Tak postopek je nujen, ko je sistem v redni produkcijski uporabi. Ker je produkcijska uporaba vse bližje, bi z njim začeli že zdaj, da se ga na obeh straneh pravočasno navadimo.
 
 V verziji so vključeni popravki prijavljenih napak, optimizacije in dogovorjene nadgradnje za projekt ISAM ter splošne izboljšave LIFT-a. V nadaljevanju so navedena dela, zaključena oziroma posodobljena od 18. 8. 2026 dalje. Manjši popravki so vodeni na Jiri.
 
@@ -24,4 +25,3 @@ Opravljena razvojna dela (D – dorazvoj, B – napaka):
 - LIFT – D – Dodana je možnost izdelave Quarto poročil znotraj sistema LIFT. ([GMS-5031](https://flycomtech.atlassian.net/browse/GMS-5031))
 
 V primeru nepravilnosti nas prosimo obvestite prek Jire, da jih lahko čim prej preverimo in odpravimo.
-
