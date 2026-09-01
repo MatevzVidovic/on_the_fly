@@ -18,7 +18,6 @@ Opravljena razvojna dela (D – dorazvoj, B – napaka):
 - MD - D - Pohitritev preračuna dodatnega m2 in kontrol ob vnosu osnove v relacijsko tabelo.
 - MD - D - Razvojno okolje za izvajanje umerjanja ČPT je prilagojeno vzporedni uporabi.
 - PEV – B – Odpravljena je napaka ob generiranju izpisa »Informacija o obsegu«.
-- PEV – B – Odpravljena je napaka pri relativnem položaju oznak PEV na karti.
 - POSLI – D – Pri dodajanju enote v posel ali podposel se lahko prevzamejo podatki iz katastra nepremičnin.
 - LIFT – B – Ob kliku na vrstico atributne tabele v administraciji ne pride do nepotrebnega osveževanja.
 - LIFT - D - Dodana je možnost izdelave Quarto poročil znotraj sistema LIFT s splošnimi bralnimi SQL poizvedbami. 

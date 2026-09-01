@@ -18,7 +18,6 @@ Opravljena razvojna dela (D – dorazvoj, B – napaka):
 - MD – D – Pohitritev preračuna dodatnega m2 in kontrol ob vnosu osnove v relacijsko tabelo. ([GMS-5695](https://flycomtech.atlassian.net/browse/GMS-5695))
 - MD – D – Zaključeno je testiranje izračuna in zapisa ČPT (7. in 8. poglavje). ([GMS-5594](https://flycomtech.atlassian.net/browse/GMS-5594))
 - PEV – B – Odpravljena je napaka ob generiranju izpisa »Informacija o obsegu«. ([GMS-5675](https://flycomtech.atlassian.net/browse/GMS-5675))
-- PEV – B – Odpravljena je napaka pri relativnem položaju oznak PEV na karti. ([GMS-5212](https://flycomtech.atlassian.net/browse/GMS-5212))
 - POSLI – D – Pri dodajanju enote v posel ali podposel se lahko prevzamejo podatki iz katastra nepremičnin. ([GMS-5727](https://flycomtech.atlassian.net/browse/GMS-5727))
 - LIFT – B – Ob kliku na vrstico atributne tabele v administraciji ne pride do nepotrebnega osveževanja. ([GMS-5602](https://flycomtech.atlassian.net/browse/GMS-5602))
 - LIFT – D – Dodana je možnost izdelave Quarto poročil znotraj sistema LIFT. ([GMS-5031](https://flycomtech.atlassian.net/browse/GMS-5031))
