@@ -3,7 +3,7 @@
 Problemi iz sestanka:
 - A0-A4 mora bit - to že dela
 - v geopdf z ve; okvirji mora izklopitev sloja ki je vsem skupen (zadnji 3) pri vseh naenkrat izklopit
-- ko ni sestavin (delov stavb ali parcel lahko ne vsebuje), ne sme izrisat prazne tabele samo s headerjem, ampak samo napisat, da jih ni. Predvidevam, da to velja za vse tabele tu. "Izpiše naj glavo, pa spodaj recimo 'Ni sestavin.'  ...  Nej tabelo zgenerira ampak..." - tole sicer ne razumem. Naj potem vseeno bo glava tabele? Kakor kasneje v posnetku razumem: naj bo isto tabela header kot je (ampak pomoje kot čez celo širino? "enako poravnana kot je zgornja tabela"), samo da je čez celo vrstico vnos: ni delov stavb npr.
+- ko ni sestavin (delov stavb ali parcel lahko ne vsebuje), ne sme izrisat prazne tabele samo s headerjem, ampak samo napisat, da jih ni. Predvidevam, da to velja za vse tabele tu. "Izpiše naj glavo, pa spodaj recimo 'Ni sestavin.'  ...  Nej tabelo zgenerira ampak..." - tole sicer ne razumem. Naj potem vseeno bo glava tabele? Kakor kasneje v posnetku razumem: naj bo isto tabela header kot je (samo na levem stolpcu mora pisat 'ni delov stavb' npr "enako poravnana kot je zgornja tabela")
 - da se vidi ID PEV na okvirjih in info o obsegu in se lahko prevezuje (in se verjetno rabi videt tudi id od info o obsegu.) Ampak ko sem sprobal kazat tudi id info o obsgu, sem dobil kar en tretji id, ki ni pripadal info o obsegu na tem PEVu.
 - obvestilo, da je geopdf bil zgeneriran
 - merila ni
