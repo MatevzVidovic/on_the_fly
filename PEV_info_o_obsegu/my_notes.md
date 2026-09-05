@@ -32,6 +32,7 @@ Vprašanja za gurs:
 Bi bilo fajn na backendu, ker je pogost problem.
 Morda vemo, ;e se kdaj to masovno izvaža? Ker sicer lahko naredim temporary fix s SFCjem, kjer ob downloadu preimenujem.
 
+- luknje so mi pomoje jasne - dajmo še preverit, če mislimo isto. AMPAK POMEMBNEJE - kaj mislite s slepimi poligoni?
 
 
 
@@ -45,6 +46,21 @@ Namesto avtomatskega preračuna FO, damo SFC, ki požene preračun.
 Kasneje oni na roke urejajo samo FO.
 
 
+- labele se lahko naredi v liftu, da so vedno prisotne? Pa da se ne porežejo pa da se ne prekrivajo?
+Od kje jih Timotej jemlje?
+
+- smo zdaj sploh že dobili glavo in nogo? Kakor vem, je bil problem, da smo že doglo nazaj prosili zanje pa jih ne dobili.
+Je naslov dokumenta in celjavnost, kot je v docx, v bistvu glava?
+
+- težje zadeve: odmik od roba, takoj pod tabelami brez razmaka kaj pomenijo okrajšave, pa da bi vse strani imele iste checkboxe, pa labele da KO labela ziher prisotna, pa da druge tabele ne prekrivajo in ziher prisotne
+
+
+
+- poimenovanje datotek - lahko naredim SFC na fieldu, kjer za download overrideam ime. Ampak za masovne izvoze to lahko problem, če jih ne bomo reševali s SFC, ampak na backendu (kar bo doti bolje - glej 5239 - sicer ne vem če se bodo tako izvažali kot vprašalniki, ampak je za considerat. Also, v splošnem bi bilo nicer, da bi uploadi na S3 imeli:   /<uuid>/lepo_ime  na splo[no na document fieldu - tudi na isam_dokumentacija je tako, in tam hackam s SFCjem)
+
+- obvestilo o končanju: lahko na SFCju ni async, ampak traja 50 sek, in nih;e ne bo čakal z odprtim SFC za to. Po drugi strani je na backendu tako, da če damo notif, ga vsi dobijo. Kaj naredit?
+
+
 
 
 
@@ -53,7 +69,6 @@ My notes:
 
 
 
-- dodat probleme omenjene verbalno  na sestanku
 
 - po mailu poslat sporočila Timoteju in Gašperju:
 
@@ -67,7 +82,19 @@ V ponedeljek pride Gašper z dopusta in bova najprej skupaj šla čez seznam in 
 potem bi te pa lepo prosil če te lahko rezerviram za en sestanek, kjer bomo še skupaj šli čez in boš dal BE perspektivo, kaj je z lahkoto izvedljivo, kaj je izvedljivo če je res pomembno, pa kaj res raje ne.
 Bi to šlo?
 
-P.S Tule ti še pošiljam vmesni dokument, kaj trenutno vem o rešitvah teh problemov in kje imam še nejasnosti.
+Imam pa nekaj vprašanj, ki mi jih lahko že zdaj odgovoriš, ali pa si mogoče vmes pogledaš, pa jih potem naslovimo:
+- Kako delujejo labele? Ti delaš dobeseden screenshot LIFT-a, če bi viewport karte prilagodil strani v PDFu? Da vem, kako z Gašperjem poskušava matchat to, kar oni želijo, pa se potem posvetujemo, če je kaj treba specifično za dokument, če bi bilo neizvedljivo v LIFTu.
+- Matija mi je pravil, da smo jih enkrat prosili za glavo in nogo in ne dobili odgovora. Mogoče veš, če smo to že dobili?
+- (najbolje kar na sestanku) Mi boš znal povedat, kaj je z legendami. V dokumentih je SSL error v rdečem napisan. Matija je v interni dokumentaciji nekaj omenil, da ne znamo nasloviti. Nimam nič ozadja o tem - za kaj se tu sploh gre?
+Tole je error v dokumentu v rdečem:
+Opozorilo: Legenda KN parcele ni bila dostopna — HTTPSConnectionPool(host=’lift.gurs.sigov.si’,
+port=443): Max retries exceeded with url:
+/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image%2Fpng&WIDTH=31&HEIGHT=31&(Caused by SSLError(SSLCertVerificationError(1, ’[SSL: CERTIFICATE_VERIFY_FAILED] certificate
+verify failed: unable to get local issuer certificate (_ssl.c:1010)’)))
+
+
+
+
 
 
 Gašper:
@@ -89,24 +116,3 @@ Tule je dokument s tem, kako sem do zdaj našel, da se naslevlja te težave:
 
 
 
-
-- luknje so mi pomoje jasne - dajmo še preverit, če mislimo isto. AMPAK POMEMBNEJE - kaj mislite s slepimi poligoni?
-
-- smo zdaj sploh že dobili glavo in nogo? Kakor vem, je bil problem, da smo že doglo nazaj prosili zanje pa jih ne dobili.
-
-- odmik od roba
-
--  A0-A4 pogledat DELA NA NJIHOVEM TESTU IN PROD
-
-- SSL problemi, da ne dobi legende - kaj so te problemi v rde;em z SSL certificate ni valid (vidno na posnetku sestanka)
-Opozorilo: Legenda KN parcele ni bila dostopna — HTTPSConnectionPool(host=’lift.gurs.sigov.si’,
-port=443): Max retries exceeded with url:
-/geoserver/wms?REQUEST=GetLegendGraphic&VERSION=1.0.0&FORMAT=image%2Fpng&WIDTH=31&HEIGHT=31&(Caused by SSLError(SSLCertVerificationError(1, ’[SSL: CERTIFICATE_VERIFY_FAILED] certificate
-verify failed: unable to get local issuer certificate (_ssl.c:1010)’)))
-
-- labele se lahko naredi v liftu, da so vedno prisotne? Pa da se ne pore\ejo pa da se ne prekrivajo?
-
-
-- poimenovanje datotek - lahko naredim SFC na fieldu, kjer za download overrideam ime. Ampak za masovne izvoze to lahko problem, če jih ne bomo reševali s SFC, ampak na backendu (kar bo doti bolje - glej 5239 - sicer ne vem če se bodo tako izvažali kot vprašalniki, ampak je za considerat. Also, v splošnem bi bilo nicer, da bi uploadi na S3 imeli:   /<uuid>/lepo_ime  na splo[no na document fieldu - tudi na isam_dokumentacija je tako, in tam hackam s SFCjem)
-- A0-A4 že deluje? Je na workflowu? Je kje deployed? Je dodano v podatkovni model?
-- obvestilo o končanju: lahko na SFCju ni async, ampak traja 50 sek, in nih;e ne bo čakal z odprtim SFC za to. Po drugi strani je na backendu tako, da če damo notif, ga vsi dobijo. Kaj naredit?
