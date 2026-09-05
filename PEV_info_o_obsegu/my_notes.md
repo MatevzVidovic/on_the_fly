@@ -21,8 +21,35 @@ And in there you can also look at SFCs that exist if that helps you, but this st
 
 
 
+Vprašanja za gurs:
+
+- "Oznaka PEV naj se pojavi samo enkrat v dokumentu, čeprav se je prej ponavljala." - torej samo pri npr. "Posebna enota vrednotenja: PNB-10552 MOL BS MESTINJE"
+
+- To je mišljeno kot glava, ki se pojavlja na vseh straneh, tudi teh s prikazom slojev?
+![alt text](<imgs/Screenshot 2026-09-05 at 19.13.38.png>)
+
+- kako to naslovimo (»PNE_21380_20251212.pdf«) in ne tako, kot je sedaj (primer »45a7ce34-a12b-11f1-9912-02420a0001b0.pdf«.)
+Bi bilo fajn na backendu, ker je pogost problem.
+Morda vemo, ;e se kdaj to masovno izvaža? Ker sicer lahko naredim temporary fix s SFCjem, kjer ob downloadu preimenujem.
+
+
+
+
+
+Za naslovit interno:
+
+- to imamo zdaj narobe zapeljano "(parcele in stavbe se morajo prikazovati v celoti); delež parcele v grafični obliki informativno prikazuje zgolj FO)". Potencialna rešitev: podrejen zapis na pev parcele in deli stavb, ki so clipped na parent-a. Če podrejenega zapisa ni, se gleda celotna parcela, ko se preračunava FO.
+Če prav razumem: deli stavb nimajo geometrije. Ampak ne vem kako se potem tam delež računa npr. Kaj potem delež pomeni? V m2 je pomoje.
+Drug način (jim mogoče ne bo všeč, ker oni kaj prestavljajo stavbe zraven, in potem bi rabli na novo rezat FO):
+Namesto avtomatskega preračuna FO, damo SFC, ki požene preračun.
+Kasneje oni na roke urejajo samo FO.
+
+
+
+
 
 My notes:
+
 
 
 
