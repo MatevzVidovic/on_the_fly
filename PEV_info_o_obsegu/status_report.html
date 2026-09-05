@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PEV · Informacija o obsegu — status</title>
+<style>
+:root{font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#192d3a;background:#f3f5f7;line-height:1.55}*{box-sizing:border-box}body{margin:0}main{max-width:960px;margin:36px auto;padding:36px 42px;background:white;border:1px solid #dce3e8;border-radius:14px}h1{font-size:30px;line-height:1.2;margin:8px 0 14px}h2{font-size:20px;margin:28px 0 10px}p{margin:8px 0 14px}.eyebrow{font-size:12px;letter-spacing:.09em;text-transform:uppercase;color:#526778}.muted,footer{font-size:13px;color:#526778}.lead{font-size:18px;max-width:760px}.status{padding:14px 18px;border-left:4px solid #b57913;background:#fff8e9;margin:20px 0}table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;vertical-align:top;padding:11px 10px;border-bottom:1px solid #dce3e8}th{background:#f1f5f7;font-size:12px}td:first-child{width:22%}a{color:#096887;text-underline-offset:3px}code{font-size:.9em;overflow-wrap:anywhere}strong{font-weight:650}.yes{color:#176044}.open{color:#875508}details{margin-top:26px;border-top:1px solid #dce3e8;padding-top:16px;font-size:13px}summary{cursor:pointer;font-weight:650}li{margin:8px 0}footer{border-top:1px solid #dce3e8;margin-top:22px;padding-top:16px}@media(max-width:650px){main{margin:0;padding:24px 18px;border:0;border-radius:0}h1{font-size:26px}th,td{padding:9px 6px;font-size:13px}}@media print{body{background:white}main{border:0;margin:0;padding:0;max-width:none}details{display:block}h2{break-after:avoid}tr,.status{break-inside:avoid}a{color:inherit}}
+</style>
+</head>
+<body><main>
+<header><div class="eyebrow">Repository &amp; test database review · 5 September 2026</div><h1>PEV · Informacija o obsegu</h1><p class="lead">A0–A2 are supported in the backend, but the test format selector still lacks them. No map-margin fix was found.</p></header>
+<h2>1. A0, A1 and A2 paper formats</h2>
+<table aria-label="Paper format implementation status"><thead><tr><th>Where</th><th>Verified state</th></tr></thead><tbody>
+<tr><td><code>origin/develop</code></td><td><strong class="yes">Supported in code.</strong> The workflow reads the selected format and passes it to the PDF generator.</td></tr>
+<tr><td><code>origin/master</code></td><td><strong class="yes">Supported in code.</strong> Same format constants and PEV workflow as develop.</td></tr>
+<tr><td>Feature branch</td><td><strong>Already merged.</strong> Timotej added this under GMS-4750 on 19 May: <a href="https://bitbucket.org/flycom/fmp/commits/b55cd77aafa9d7e4ce25a9e1f8321e8bdd6f5913"><code>b55cd77aaf</code></a>. No GMS-4750 branch is present among the fetched remote refs.</td></tr>
+<tr><td>Test database</td><td><strong class="open">Still A4 / A3 only.</strong> <code>pev_okvirji.format_papirja</code> has allowed values <code>["A4", "A3"]</code>; field metadata last updated 19 May.</td></tr>
+</tbody></table>
+<div class="status"><strong>Next step:</strong> add A0, A1 and A2 to the environment’s field configuration, then verify generated PDFs in both orientations. The internal “formats fixed” note matches the backend code, but the test selector still needs updating.</div>
+<h2>2. Move the map in from the paper edge</h2>
+<p><strong class="open">No fix found in either main branch or the available feature-branch history.</strong> The PEV workflow calculates the map using the full paper dimensions. GeoPDF composition uses a page-wide bounding box starting at <code>(0, 0)</code> and overlays map PDFs without an inset.</p>
+<p><strong>Next step:</strong> implement an inner map area, keeping map scale, placement and georeferencing consistent. Text-page margins in the Quarto template do not fix the map-page edges.</p>
+<h2>3. What has moved recently?</h2>
+<p>Yes. Timotej’s latest direct change was <strong>18 August</strong>; the latest distinct report-content update found was <strong>10 June</strong>. No later direct PEV-generation change was found through 5 September. Python contains the text/legend template and SQL.</p>
+<table aria-label="Recent report generation changes"><thead><tr><th>Date / author</th><th>Change and branch status</th></tr></thead><tbody>
+<tr><td>18 Aug · Timotej</td><td><strong>Fixed temporary file paths</strong> for upload, download and split PDF pages, matching LIFT’s <code>tmp/</code> storage. GMS-5675 · <a href="https://bitbucket.org/flycom/lift-temporal-python/commits/37d525a1a56132a99d456bd291126d53c17f8c84">37d525a</a> · Python master.</td></tr>
+<tr><td>8–14 Jul · Tadej</td><td><strong>Workflow/storage maintenance:</strong> corrected timeout references and adopted shared S3 configuration. <a href="https://bitbucket.org/flycom/lift-temporal-python/commits/7ce64edd036b2e3cf0f4400b9e135ea1f6e31dd9">7ce64ed</a>, <a href="https://bitbucket.org/flycom/lift-temporal-python/commits/a156b1cac5ca48e7a8ce142ce263e474e77f8b1d">a156b1c</a> · Python master.</td></tr>
+<tr><td>10 Jun · Timotej</td><td><strong>Content and layout:</strong> table spacing and headers; KN/PEV/FO legend sources; visible legend-fetch errors; parcel area fallback when <code>delez</code> is missing. GMS-5313 · <a href="https://bitbucket.org/flycom/lift-temporal-python/commits/053f7a0912493493ba55e4c1151c5662d8662f1a">053f7a0</a> · Python master.</td></tr>
+<tr><td>29 May–2 Jun · Timotej</td><td><strong>Multiple PEVs per run</strong> and per-PEV exception handling so processing continues; the overall run fails if any PEV fails. GMS-4750 · <a href="https://bitbucket.org/flycom/fmp/commits/09afcfb75c">09afcfb75c</a>, <a href="https://bitbucket.org/flycom/fmp/commits/2f0a1e23b7">2f0a1e23b7</a> · FMP develop + master.</td></tr>
+</tbody></table>
+<details><summary>Evidence and review boundaries</summary>
+<ul>
+<li>Both repositories accessible. Fetch timestamps: 5 September, 13:12 local time. Reviewed fetched remote refs and all-ref file history; no fresh fetch or source changes made. FMP: develop <code>df991ba17d</code>, master <code>612d3485a4</code>; Python: master <code>638b75b</code> (no origin/develop).</li>
+<li>Format definitions: <code>app/_Tool/Gdal/Constants/GeoPdfConstants.php</code>. The follow-up <a href="https://bitbucket.org/flycom/fmp/commits/cd827c3858281972c1d1ffa475fef5b8ec85af94">cd827c3858</a> removed other sizes but retained A0–A5. Both May commits are ancestors of develop and master.</li>
+<li>Map layout: <code>app/_Company/Gurs/Services/Workflows/GeneratePevInfoReportWorkflow.php</code>, especially <code>generatePevOkvirjiInformation()</code>, and <code>app/_Tool/Gdal/Services/Facade/GeoPdf/GenerateGeoPdfFacadeService.php</code>. Compared the variants present across fetched remote branches; no newer margin implementation found.</li>
+<li>Test metadata: joined field’s table ID to <code>attribute_tables</code> to confirm <code>pev_okvirji</code>. Field ID <code>92265e5c-1705-11f1-84a0-e690086b3a67</code>; <code>type_params.values = ["A4", "A3"]</code>. Queries used read-only transactions, short timeouts and rollback. No database changes.</li>
+<li>Template and SQL: <code>src/packages/_gurs/pev_reports/</code>. Local July WIP commit <code>d851858</code> carries the same final template/SQL as the June update; it is not additional content progress.</li>
+</ul>
+<p>Branch presence proves merged code, not deployment. No end-to-end generation, UMVN deployment check or separate PDF-generator service inspection was performed. No claim that the legend work resolves all customer concerns. The larger deduplicated issue list is deferred as requested.</p>
+</details>
+<footer>Scope: the two requested issues and recent generation work. Findings describe code and test configuration as checked on 5 September 2026.</footer>
+</main></body></html>
