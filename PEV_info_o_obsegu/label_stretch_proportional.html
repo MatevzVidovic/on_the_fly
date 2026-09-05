@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIFT labels · Stretch and proportional</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#f3f5f7;color:#203440;font:16px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif}main{max-width:800px;margin:40px auto;padding:32px 36px;background:white;border:1px solid #dde4e8;border-radius:12px}h1{font-size:28px;line-height:1.25;margin:6px 0 18px}h2{font-size:19px;margin:24px 0 8px}p{margin:10px 0}.eyebrow,footer{color:#536774;font-size:13px}table{border-collapse:collapse;width:100%;margin:20px 0}th,td{text-align:left;vertical-align:top;padding:12px;border-bottom:1px solid #dce3e8}th{background:#f1f5f7}td:first-child{width:25%;font-weight:650}.note{padding:14px 18px;background:#fff7e6;border-left:4px solid #b58122}a{color:#096887;text-underline-offset:3px}code{font-size:.88em;overflow-wrap:anywhere}footer{margin-top:24px;border-top:1px solid #dce3e8;padding-top:14px}details{margin-top:12px}summary{cursor:pointer}@media(max-width:600px){main{margin:0;padding:24px 18px;border:0;border-radius:0}h1{font-size:25px}th,td{padding:9px}}@media print{body{background:white}main{margin:0;border:0;padding:0}}
+</style>
+</head>
+<body><main>
+<div class="eyebrow">LIFT → Slog → Oznaka · Checked 5 September 2026</div>
+<h1>Stretch or proportional?</h1>
+<p>These settings tell a <strong>background graphic behind the label</strong>—such as a road-sign badge—how to resize to fit its text.</p>
+<table aria-label="Label background resizing options">
+<thead><tr><th>Option</th><th>What it does</th></tr></thead>
+<tbody>
+<tr><td>Stretch</td><td>Adjusts width and height independently to fit the text. A square background can become a wide rectangle around a long label.</td></tr>
+<tr><td>Proportional</td><td>Enlarges the background while keeping its original width-to-height ratio. A square stays square, leaving more empty space above and below a long label.</td></tr>
+</tbody></table>
+<p>The letters keep their font size and shape. This setting does not control text scaling with map zoom or PDF paper size. <a href="https://docs.geoserver.org/main/en/user/styling/sld/reference/labeling/#graphic-resize">GeoServer reference</a></p>
+<h2>What this means in LIFT</h2>
+<div class="note"><strong>For ordinary text labels, expect no visible difference.</strong> In the inspected LIFT code, the dropdown sends this option to GeoServer, but the label generator does not add a background graphic for it to resize.</div>
+<p>To make the text larger, change the label’s <strong>font size</strong>. The halo/outline around the letters is a separate setting.</p>
+<footer>
+<details><summary>Code evidence</summary>
+<p>The dropdown stores <code>graphic-resize</code> in <a href="../fmp/resources/assets/vue/tools/general/layers/StyleEditor/edit/modules/EditLabel.vue">EditLabel.vue</a>. <code>generateLabel()</code> in <a href="../fmp/app/Domain/Util/GeoserverXMLGenerator.php">GeoserverXMLGenerator.php</a> writes the vendor option, but creates no label <code>Graphic</code>. The no-visible-change conclusion is based on this code path; custom SLD styles with a label graphic can use the option.</p>
+</details>
+</footer>
+</main></body>
+</html>
