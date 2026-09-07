@@ -14,6 +14,7 @@ Morda vemo, ;e se kdaj to masovno izvaža? Ker sicer lahko naredim temporary fix
 
 - luknje so mi pomoje jasne - dajmo še preverit, če mislimo isto. AMPAK POMEMBNEJE - kaj mislite s slepimi poligoni?
 
+- "Brez podvojenega izrisa PEV in KN" - sepravi čeprav je pokrito, ker pev sloj višje v hierarhiji, ne sme bit KN parcele? zakaj? To je tehnološko malo problem.
 
 
 
@@ -44,3 +45,43 @@ Je naslov dokumenta in celjavnost, kot je v docx, v bistvu glava?
 
 - obvestilo o končanju: lahko na SFCju ni async, ampak traja 50 sek, in nih;e ne bo čakal z odprtim SFC za to. Po drugi strani je na backendu tako, da če damo notif, ga vsi dobijo. Kaj naredit?
 
+
+
+
+
+
+Timoteju:
+https://flycomtech.atlassian.net/browse/GMS-5796
+- poimenovanje datotek   PEV_id_nep_datum izdelave.pdf, primer PNE_21380_20251212.pdf;
+- obvestilo user-ju na koncu   "Generiranje informacije o obsegu PNE_21380_20251212.pdf končano." 
+- zamik karte noter na vseh straneh, (tole jih še vprašamo, kako bodo imeli: obroba?, dodajanje glave in noge ki še ne vemo kakšna zdaj je)
+- legende ssl
+- merilo
+- (priložena slika) vsak objekt mora imeti oznako (scaled down), KO oznaka mora bit vedno prisotna, problem prekrivanja oznak različnih slojev, odrezanih oznak (ker na robu okvirja)
+
+- (to kasneje - probamo razložit, da tega ne rabijo) - checkbox za vse strani info o obsegu naenkrat za nek sloj
+
+
+Matevž zrihta v SFCju:
+- poimenovanje slojev - vzameš direktno kot poimenovanje iz lifta ali hardcodeaš?
+- zapordeje slojev in ne po skupinah
+
+
+PA:
+- kako nardit, da vse oznake prikazane
+
+
+Matevž:
+- sfc za kopiranje vnosov, da so vidni ali ne na sloju in v upo[tevani v FO ali ne, pa da se mb tudi deli stavb kopirajo? Odvisno kaj FO potrebuje
+
+Gašper:
+- vsi te mini popravki izgleda
+- arhiviranje pev test, in kaj je s tem 10467 id pev, kjer različno število atr podatkov prek upravljalca
+
+
+
+Poglej kaj v dokumentu oni pravijo o oznakah
+
+Jaz SFC kako pošljem sloje, in po skupinah so mapce, tako da to zrihtam.
+
+Mi dajemo userju, ki je zagnal, to obvestilo, na LTP reportu v SDKju_
