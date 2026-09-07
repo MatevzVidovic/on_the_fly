@@ -12,9 +12,14 @@ Vprašanja za gurs:
 Bi bilo fajn na backendu, ker je pogost problem.
 Morda vemo, ;e se kdaj to masovno izvaža? Ker sicer lahko naredim temporary fix s SFCjem, kjer ob downloadu preimenujem.
 
+- obroba karte, glava, noga
+- merilo v nogi?
+
 - luknje so mi pomoje jasne - dajmo še preverit, če mislimo isto. AMPAK POMEMBNEJE - kaj mislite s slepimi poligoni?
 
 - "Brez podvojenega izrisa PEV in KN" - sepravi čeprav je pokrito, ker pev sloj višje v hierarhiji, ne sme bit KN parcele? zakaj? To je tehnološko malo problem.
+
+- lahko tole prosim ne:  Ko ima info o obsegu več okvirjev, se v PDF naredi več strani. Vsaka stran ima v sidepanelu svojih 7 layer checkbox-ov. Želeli bi, da so checkboxes deduplicirani: torej le en checkbox za vsako vrsto sloja. Ko klinejo npr. na ortofoto checkbox, se na vseh straneh ugasne ortofoto.
 
 
 
@@ -67,21 +72,46 @@ Matevž zrihta v SFCju:
 - zapordeje slojev in ne po skupinah
 
 
-PA:
-- kako nardit, da vse oznake prikazane
-
 
 Matevž:
-- sfc za kopiranje vnosov, da so vidni ali ne na sloju in v upo[tevani v FO ali ne, pa da se mb tudi deli stavb kopirajo? Odvisno kaj FO potrebuje
+- sfc za kopiranje vnosov, da so vidni ali ne na sloju in v upoštevani v FO ali ne, pa da se mb tudi deli stavb kopirajo? Odvisno kaj FO potrebuje
+
+I need to make a SFC on the Tabela Rezultatov: Vrstica for PEV - Stavbe and
+    PEV - parcele
+
+    When clicked, it makes a copy of the record, just that it has a new flag:
+    prikazi_na_sloju set to False
+
+  And on the original record, it sets, Uporabi za FO (or whatever that field is) to false.
+
+
+
+  Help me make this
+
+  I need to find out how things work especially on the Stavbe / Del stavbe level
+  What influence Del stavbe has on FO
+
+  So i know i I also need to copy deli stavbe for the FO or not
+
+  How does povrsina of FO get calculated? Directly as the geom? Or does it use non-geom attribute
+  fields on deli stavbe also? But if it does, then cutting up geoms has no effect there
+
+
+
+
+  
 
 Gašper:
-- vsi te mini popravki izgleda
+- te quarto popravki izgleda
 - arhiviranje pev test, in kaj je s tem 10467 id pev, kjer različno število atr podatkov prek upravljalca
 
 
 
-Poglej kaj v dokumentu oni pravijo o oznakah
+
+
 
 Jaz SFC kako pošljem sloje, in po skupinah so mapce, tako da to zrihtam.
 
-Mi dajemo userju, ki je zagnal, to obvestilo, na LTP reportu v SDKju_
+Mi dajemo userju, ki je zagnal, to obvestilo, na LTP reportu v SDKju?
+
+Poglej kako si ti naslavljal Quarto problem z rules tabel da se ne prikazujejo
