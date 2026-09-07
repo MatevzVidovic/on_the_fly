@@ -1,0 +1,1569 @@
+<!doctype html><html lang="en"><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PEV — FO copies: verified analysis and plan</title>
+<style>body{max-width:1100px;margin:40px auto;padding:0 24px;font:17px/1.6 system-ui;color:#183040;background:#f7fafb}h1,h2{line-height:1.2}article{background:white;border:1px solid #d5e0e5;padding:24px;border-radius:10px;margin:20px 0}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:14px/1.55 ui-monospace,monospace}summary{cursor:pointer;font-weight:600}a{color:#066d91}.note{border-left:5px solid #168176}table{border-collapse:collapse}td,th{padding:12px;border:1px solid #ccd9df;text-align:left}</style>
+<h1>PEV copies for independent FO editing</h1><p>Verified against test DB catalog and trigger definitions · 7 September 2026</p>
+<article class="note"><h2>Copy the building parts too</h2><p>The deployed FO trigger joins parts to their parent building. A building with no parts supplies no FO geometry and is copied with zero parts. This preserves its existing lack of FO contribution. Read-only counts found 9,817 such records among 41,478 enabled buildings linked to an FO (see live_building_part_counts.txt). Copy every part and change its parent ID to the new building. The original keeps its parts but its <code>fo_geom_upost=false</code> excludes their contribution.</p></article>
+<article><h2>Geometry and attribute area are separate</h2>
+<table><tr><th>Value</th><th>Generated FO calculation</th><th>Effect of cutting geometry</th></tr>
+<tr><td>geom_povr</td><td>Area of cleaned union of eligible parcel/building geometry</td><td>Changes when the resulting union changes</td></tr>
+<tr><td>atr_povr</td><td>Sum of parcel povrsina + building-part povrsina</td><td>No automatic scaling</td></tr></table>
+<p>FO eligibility is <code>fo_geom_upost=true</code>. The formula ignores part <code>dst_upost</code>, component <code>upostevan</code>, and share fields. When <code>generiraj_nov_geom</code> is not true, the trigger can prefer archive or existing FO geometry/area. An identical copy therefore preserves the inputs but does not switch FO mode.</p></article>
+<article><h2>Verified trigger implications</h2><p><code>prikazan_na_sloju</code> already exists as <code>boolean NOT NULL DEFAULT true</code> on both tables. Read-only verification confirms true on all 41,478 buildings and 107,885 parcels (see live_display_field.txt). No migration or backfill is needed; application layer filters must use this field. Copies set it to false; originals keep it unchanged. The live parcel BEFORE INSERT trigger recalculates <code>delez_bzps</code> only for an enabled FO input, so this implementation inserts the copy disabled and enables it after copying. Synchronization triggers update <code>id_rel_pe</code>; they do not exclude duplicates from reports.</p><p>Existing reports and value distribution can still read both versions. Future parcel-share changes can double-count copied building footprints in the live <code>delez_bzps</code> trigger. These are concrete downstream policy decisions to resolve before enabling broad use; the implementation preserves the requested attributes.</p></article>
+<article><h2>Implementation plan and handoff</h2><p>One SFC → existing workflow endpoint → one workflow → one transaction activity. The original is disabled, the copy inserted disabled, all existing parts copied, and the copy enabled in one transaction. Stable source-derived UUIDs make repeat requests return the same copy. Full architecture notes and limits are in <a href="README.md">README.md</a>.</p><h3>Install later</h3><ol><li>Review the downstream caveats below before enabling the button for users.</li><li>Use the existing `prikazan_na_sloju` field. Read-only verification confirms `boolean NOT NULL DEFAULT true` on both tables and true on all 41,478 buildings and 107,885 parcels (`evidence/live_display_field.txt`). No migration or backfill is needed.</li><li>Add `prikazan_na_sloju = true` to the two ordinary map layers&#x27; existing filters. A database column alone does not hide geometry. Make a separate editing layer/table for `prikazan_na_sloju = false` if users need to cut/edit copies; do not globally hide copies from all access.</li><li>Copy `temporal/pev_copy_for_fo/` to `lift-temporal-python/src/packages/_gurs/pev_copy_for_fo/`. Configure its `.env` for the intended database using the neighboring GURS package conventions. No credentials are supplied here. Restart the worker so discovery registers `CopyPevForFoWorkflow` and `copy_pev_for_fo`; ensure common notification activities are registered as for existing workflows.</li><li>Use the existing authenticated `/xhr/workflows/CopyPevForFoWorkflow` route and its normal access controls. Raw SQL bypasses feature CRUD authorization/events; restrict who may launch this workflow to users entitled to edit these PEV records. The body intentionally does not accept a user ID.</li><li>Install `sfc/pev_stavbe_copy_for_fo.vue` on PEV–Stavbe and `sfc/pev_parcele_copy_for_fo.vue` on PEV–parcele, position **Tabela rezultatov: Vrstica**, with `RECORD_DATA` input. Include `id`, `fo_geom_upost` and `prikazan_na_sloju` in available record fields.</li><li>The requested position replaces the entire ordinary row. These SFCs therefore render a valid `&lt;tr&gt;&lt;td&gt;` containing a record identifier and action. To retain normal columns, choose **Tabela rezultatov: Menu vrstice** instead and replace the template with only its existing `&lt;button&gt;…&lt;/button&gt;`; keep the script unchanged.</li><li>Notifications report actual workflow completion. The SFC&#x27;s “Kopiranje je zagnano” means accepted, not committed. Refresh the table/map after completion (or after failure to retry). No unverified refresh-store action is invented.</li></ol></article>
+<article><h2>Verification boundary</h2><p>Live PostgreSQL inspection succeeded in a read-only transaction. No remote mutation test, deployment, or actual application SFC execution was performed. Local disposable PostgreSQL initialization was blocked by sandbox shared-memory permissions. Seven Python unit tests and Python compilation pass. Both Vue scripts/templates compile using FMP’s installed @vue/compiler-sfc, and the explicit column lists match all business fields in the captured live metadata. Python unit tests exercise transaction control and SQL dispatch with a fake cursor; they do not emulate PostgreSQL triggers.</p></article>
+<h2>Evidence</h2><p>Captured local sources include their original source paths and hashes. Live catalog files show deployed definitions; no credentials are included.</p><details><summary>archive.txt</summary><pre>Source: /Users/matevzvidovic/fmp/app/_Company/Gurs/Services/Activities/ArchivePevActivity.php
+SHA256 (full source): 542391b5409912e17edc425d7eb5f137e071b1647b118860aaaccbd29364af52
+
+230:     public function duplicateStavbe(array $pevFoMapping): array 
+231:     {
+232:         $this-&gt;attributeTableClient-&gt;disableTriggers(&#x27;pev_stavbe&#x27;);
+233: 
+234:         try {
+235:             $records = $this-&gt;attributeTableClient-&gt;fetchRecords(&#x27;pev_stavbe&#x27;, &#x27;id_rel_fo&#x27;, array_keys($pevFoMapping), true);
+236:     
+237:             $this-&gt;temporalActivityUS-&gt;heartbeat([
+238:                 &#x27;table&#x27; =&gt; &#x27;pev_stavbe&#x27;,
+239:                 &#x27;total_records&#x27; =&gt; count($records),
+240:             ]);
+241:     
+242:             $mapping = [];
+243:             $payloads = [];
+244:     
+245:             foreach ($records as $record) {
+246:                 $data = (array) $record;
+247:                 $newId = $this-&gt;attributeTableClient-&gt;generateId();
+248:     
+249:                 $data[&#x27;id&#x27;] = $newId;
+250:                 $data[&#x27;id_rel_fo&#x27;] = $pevFoMapping[$record-&gt;id_rel_fo];
+251:     
+252:                 $payloads[] = $data;
+253:                 $mapping[$record-&gt;id] = $newId;
+254:             }
+255:     
+256:             $this-&gt;attributeTableClient-&gt;bulkInsert(&#x27;pev_stavbe&#x27;, $payloads);
+257:     
+258:             return $mapping;
+259:         } finally {
+260:             $this-&gt;attributeTableClient-&gt;enableTriggers(&#x27;pev_stavbe&#x27;);
+261:         }
+262:     }
+263: 
+264:     /**
+265:      * @param array $stavbeMapping
+266:      * @return array
+267:      */
+268:     #[ActivityMethod]
+269:     public function duplicateDeliStavb(array $stavbeMapping): array 
+270:     {
+271:         $this-&gt;attributeTableClient-&gt;disableTriggers(&#x27;pev_deli_stavb&#x27;);
+272: 
+273:         try {
+274:             $records = $this-&gt;attributeTableClient-&gt;fetchRecords(&#x27;pev_deli_stavb&#x27;, &#x27;id_rel_sta&#x27;, array_keys($stavbeMapping));
+275: 
+276:             $this-&gt;temporalActivityUS-&gt;heartbeat([
+277:                 &#x27;table&#x27; =&gt; &#x27;pev_deli_stavb&#x27;,
+278:                 &#x27;total_records&#x27; =&gt; count($records),
+279:             ]);
+280: 
+281:             $ids = [];
+282:             $payloads = [];
+283: 
+284:             foreach ($records as $record) {
+285:                 $data = (array) $record;
+286:                 $newId = $this-&gt;attributeTableClient-&gt;generateId();
+287: 
+288:                 $data[&#x27;id&#x27;] = $newId;
+289:                 $data[&#x27;id_rel_sta&#x27;] = $stavbeMapping[$record-&gt;id_rel_sta];
+290: 
+291:                 $payloads[] = $data;
+292:                 $ids[] = $newId;
+293:             }
+294: 
+295:             $this-&gt;attributeTableClient-&gt;bulkInsert(&#x27;pev_deli_stavb&#x27;, $payloads);
+296: 
+297:             return $ids;
+298:         } finally {
+299:             $this-&gt;attributeTableClient-&gt;enableTriggers(&#x27;pev_deli_stavb&#x27;);
+300:         }
+301:     }
+302: 
+303:     /**
+304:      * @param array $parceleMapping
+305:      * @param array $stavbeMapping
+306:      * @return array
+307:      */
+308:     #[ActivityMethod]
+309:     public function duplicateParceleStavbe(array $parceleMapping, array $stavbeMapping): array 
+310:     {
+311:         $records = $this-&gt;attributeTableClient-&gt;fetchRecords(
+312:             &#x27;pev_parcele_stavbe&#x27;,
+313:             [
+314:                 &#x27;id_rel_parc&#x27; =&gt; array_keys($parceleMapping),
+315:                 &#x27;id_rel_sta&#x27;  =&gt; array_keys($stavbeMapping),
+316:             ]
+317:         );
+318: 
+319:         $this-&gt;temporalActivityUS-&gt;heartbeat([
+320:             &#x27;table&#x27; =&gt; &#x27;pev_parcele_stavbe&#x27;,
+321:             &#x27;total_records&#x27; =&gt; count($records),
+322:         ]);
+323: 
+324:         $ids = [];
+325:         $payloads = [];
+326: 
+327:         foreach ($records as $record) {
+328:             $data = (array) $record;
+329:             $newId = $this-&gt;attributeTableClient-&gt;generateId();
+330:     
+331:             $data[&#x27;id&#x27;] = $newId;
+332:             $data[&#x27;id_rel_parc&#x27;] = $parceleMapping[$record-&gt;id_rel_parc];
+333:             $data[&#x27;id_rel_sta&#x27;] = $stavbeMapping[$record-&gt;id_rel_sta];
+334: 
+335:             $payloads[] = $data;
+336:             $ids[] = $newId;
+337:         }
+338: 
+339:         $this-&gt;attributeTableClient-&gt;bulkInsert(&#x27;pev_parcele_stavbe&#x27;, $payloads);
+340: 
+341:         return $ids;
+342:     }
+</pre></details><details><summary>controls.txt</summary><pre>Source: /Users/matevzvidovic/isam/pev/kontrole_sestavin/priprava_geom_kontrol.py
+SHA256 (full source): 055954adc5c6ca6b0208ebb67c4958ecd564536e5dd406a4bae62a4d3effb5c4
+
+295:         &quot;Pripravi aktualne PEV dele stavb&quot;,
+296:         &quot;&quot;&quot;
+297:         drop table if exists pg_temp.pev_tmp_pev_deli_stavb;
+298: 
+299:         create temp table pev_tmp_pev_deli_stavb
+300:         on commit drop
+301:         as
+302:         select
+303:             d.seq_id_dst,
+304:             d.id,
+305:             d.id_rel_sta,
+306:             d.povrsina,
+307:             d.del_stavbe_id,
+308:             d.soglasje,
+309:             d.upostevan,
+310:             d.vrsta_dejanske_rabe_del_st_id,
+311:             s.fo_geom_upost,
+312:             s.stavba_id,
+313:             pe.model,
+314:             pe.id_pev,
+315:             pe.id as pev_uuid
+316:         from pev_deli_stavb d
+317:         join pev_stavbe s on d.id_rel_sta = s.id
+318:         join pev_fo fo on s.id_rel_fo = fo.id
+319:         join pev_posebne_enote pe on fo.id_rel_pe = pe.id
+320:         where pe.valid_to is null
+321:           and fo.valid_to_fo is null
+322:           and d.upostevan is true;
+323: 
+324:         create index pev_tmp_pev_deli_stavb_id_idx on pev_tmp_pev_deli_stavb (id);
+
+425:         )
+426:         with parcele_s_statusom as (
+427:             select parcela_id, id_pev, model, bool_and(fo_geom_upost) as vsi_true
+428:             from pev_tmp_pev_parcele
+429:             group by parcela_id, id_pev, model
+430:         ),
+431:         filtrirane_parcele as (
+432:             select distinct on (p.parcela_id, p.id_pev, p.model)
+433:                 p.seq_id_parc,
+434:                 p.geom,
+435:                 p.parcela_id,
+436:                 p.model,
+437:                 p.id_pev
+438:             from pev_tmp_pev_parcele p
+439:             join parcele_s_statusom ps
+440:               on p.parcela_id = ps.parcela_id
+441:              and p.id_pev = ps.id_pev
+442:              and p.model is not distinct from ps.model
+443:             where (ps.vsi_true = false and p.fo_geom_upost = false)
+444:                or ps.vsi_true = true
+445:             order by p.parcela_id, p.id_pev, p.model, p.fo_geom_upost
+446:         ),
+447:         napake_parcele as (
+448:             select
+449:                 3 as id_kontrole,
+450:                 concat(&#x27;PEV parcela &#x27;, p.parcela_id, &#x27; ni znotraj KN parcele&#x27;) as podrobnosti,
+451:                 p.model,
+452:                 p.id_pev,
+453:                 &#x27;Parcela&#x27;::text as vrsta_sestavine,
+454:                 p.seq_id_parc as seq_id_sestavine
+455:             from filtrirane_parcele p
+456:             join kn_nep_parcele_a kn on p.parcela_id = kn.parcela_id
+457:             where p.geom is not null
+458:               and kn.geom is not null
+459:               and not st_within(kn.geom, st_buffer(p.geom, 0.1::double precision))
+460:         ),
+461:         stavbe_s_statusom as (
+462:             select stavba_id, id_pev, model, bool_and(fo_geom_upost) as vsi_true
+463:             from pev_tmp_pev_stavbe
+464:             group by stavba_id, id_pev, model
+465:         ),
+466:         filtrirane_stavbe as (
+467:             select distinct on (s.stavba_id, s.id_pev, s.model)
+468:                 s.seq_id_sta,
+469:                 s.geom,
+470:                 s.stavba_id,
+471:                 s.model,
+472:                 s.id_pev
+473:             from pev_tmp_pev_stavbe s
+474:             join stavbe_s_statusom ss
+475:               on s.stavba_id = ss.stavba_id
+476:              and s.id_pev = ss.id_pev
+477:              and s.model is not distinct from ss.model
+478:             where (ss.vsi_true = false and s.fo_geom_upost = false)
+479:                or ss.vsi_true = true
+480:             order by s.stavba_id, s.id_pev, s.model, s.fo_geom_upost
+</pre></details><details><summary>fo.txt</summary><pre>Source: /Users/matevzvidovic/isam/pev/migracija/sql_skripte/2del_pev_fo_in_sestavine.sql
+SHA256 (full source): 105b2f526ba6eac0b7995b1f4062e2c6e40f910f82372fb501da9440bafdd01a
+
+197:                                                           and st_area(st_intersection(st_makevalid(s.geometry), fo.geom)) &gt; 0.01
+198:                                                       end
+199:                                                   )
+200:                        group by fo.star_id_fo )
+201: insert
+202: into pev_fo (id, created_by, created_at, geom, id_nep, model, valid_from_fo, valid_to_fo,
+203:              vse_sestavine, id_rel_pe, atr_povr, geom_povr, generiraj_nov_geom, gv_geom, star_id_fo)
+204: select uuid_generate_v4(),
+205:        &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+206:        now(),
+207:        fo.geom,
+208:        fo.id_nep,
+209:        fo.model,
+210:        fo.valid_from_fo,
+211:        fo.valid_to_fo,
+212:        fs.vse_sestavine,
+213:        fo.id_rel_pe,
+214:        round(coalesce(fo.povrsina, fs.atr_povr_sestavin)::numeric, 1),
+215:        round(st_area(fo.geom)::numeric, 1),
+216:        false,
+217:        true,
+218:        fo.star_id_fo
+219: from gv_aktivni_fo fo
+220:          left join fo_sestavine fs on fs.star_id_fo = fo.star_id_fo;
+
+282: insert into pev_stavbe (id, created_by, created_at, geom, id_rel_fo, fo_geom_upost, stavba_id, ko_id, st_stavbe,
+283:                         upostevan, id_dnp, id_stavbe, id_nep, model)
+284: select uuid_generate_v4(),
+285:        &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+286:        now(),
+287:        dst.geom,
+288:        dst.id id_rel_fo,
+289:        true,
+290:        null,
+291:        sif_ko,
+292:        st_stavbe,
+293:        upostevan,
+294:        t4.id_dnp,
+295:        t4.id_stavbe,
+296:        t5.id_nep,
+297:        t5.model
+298: from ( select id_stavbe,
+299:               id_rel_fo                                                                   as id,
+300:               st_unaryunion(st_collect(case when ST_GeometryType(geometry) = &#x27;ST_Point&#x27;
+301:                                                 then ST_Multi(ST_Buffer(geometry, 0.0001))
+302:                                             when ST_GeometryType(geometry) = &#x27;ST_Polygon&#x27; then ST_Multi(geometry)
+303:                                             when ST_GeometryType(geometry) = &#x27;ST_MultiPolygon&#x27; then geometry
+304:                                             else null end))::geometry(MultiPolygon, 3794) as geom
+305:        from tmp_deli_stavb_fo
+306:        group by id_stavbe, id_rel_fo ) dst
+307:          left join primoz_pev_stavbe t4 on dst.id_stavbe = t4.id_stavbe
+308:          left join primoz_pev_deli_nepremicnin t5 on t4.id_dnp = t5.id_dnp;
+309: 
+310: 
+311: update pev_stavbe t1
+312: set stavba_id = t2.stavba_id
+313: from ( select distinct on (stavba_id) stavba_id, st_stavbe, ko_id
+314:        from kn_nep_stavbe_centroidi_h
+315:        where datum_do &gt;= &#x27;2050-01-01 00:00:00.000000&#x27;
+316:        order by stavba_id, datum_sys desc ) t2
+317: where t2.ko_id = t1.ko_id
+318:   and t2.st_stavbe = t1.st_stavbe;
+319: 
+320: ------------------------------------------------------------------------------------------------------------------------
+321: -- zapolnimo dele stavb z vezavo na fo
+322: truncate pev_deli_stavb;
+323: insert into pev_deli_stavb (id, created_by, created_at, del_stavbe_id, ko_id,
+324:                             st_stavbe, st_dela_stavbe, dst_upost, hisna_stevilka_id, povrsina, delez_vpr, delez_rez,
+325:                             delez_rez_vir, delez, delez_vir, soglasje, nosilec, upostevan,
+326:                             vrsta_dejanske_rabe_del_st_id, id_dnp, del, id_nep, model,
+327:                             id_dela_stavbe, id_stavbe, id_rel_fo, id_rel_pe, id_rel_sta)
+328: select uuid_generate_v4(),
+329:        &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+330:        now(),
+331:        case
+332:            when dst_sid &lt; 0 then (&#x27;1&#x27; || lpad(abs(dst_sid)::text, 11, &#x27;0&#x27;))::bigint
+333:            else dst_sid
+334:            end,
+335:        sif_ko,
+336:        t1.st_stavbe,
+337:        st_dela_stavbe,
+338:        true,
+339:        hs_mid,
+340:        neto_povr,
+341:        delez_vpr,
+342:        delez_rez,
+343:        delez_rez_vir,
+344:        delez,
+345:        delez_vir,
+346:        soglasje,
+347:        nosilec,
+348:        t1.upostevan,
+349:        nova_dejanska_raba,
+350:        t1.id_dnp,
+351:        del,
+352:        t1.id_nep,
+353:        t1.model,
+354:        id_dela_stavbe,
+355:        t1.id_stavbe,
+356:        t3.id,
+357:        t3.id_rel_pe,
+358:        t4.id
+359: from tmp_deli_stavb_fo t1
+360:          left join pev_fo t3 on t3.id = t1.id_rel_fo
+361:          left join pev_stavbe t4 on t1.id_stavbe = t4.id_stavbe and t1.id_rel_fo = t4.id_rel_fo;
+362: 
+363: ------------------------------------------------------------------------------------------------------------------------
+364: -- zaradi optimizacije uvoza izklopim triggerje, uvozim pdoatke, poženem update iz triggerjev in jih nato vklopin nazaj
+365: truncate pev_parcele;
+366: insert into pev_parcele (id, created_by, created_at, geom, id_rel_fo, fo_geom_upost, parcela_id,
+367:                          ko_id, st_parcele, povrsina, delez_vpr, delez_rez, delez_rez_vir, soglasje, nosilec,
+368:                          upostevan, delez_bzps, delez, delez_vir, id_dnp, del, id_nep, model, id_zemljisca,
+369:                          id_rel_pe)
+370: select uuid_generate_v4(),
+371:        &#x27;00000000-0000-0000-0000-000000000000&#x27;,
+372:        now(),
+373:        t1.geometry,
+374:        t1.id_rel_fo,
+375:        true,
+376:        case
+377:            when pc_mid &lt; 0 then (&#x27;1&#x27; || lpad(abs(pc_mid)::text, 11, &#x27;0&#x27;))::bigint
+378:            else pc_mid
+379:            end,
+380:        sif_ko,
+381:        parcela,
+382:        povrsina,
+383:        delez_vpr,
+384:        delez_rez,
+385:        delez_rez_vir,
+386:        soglasje,
+387:        nosilec,
+388:        upostevan,
+389:        delez_bzps,
+390:        delez,
+391:        delez_vir,
+392:        t1.id_dnp,
+393:        del,
+394:        t1.id_nep,
+395:        t1.model,
+396:        id_zemljisca,
+397:        t3.id_rel_pe
+398: from tmp_zemljisca_fo t1
+399:          left join pev_fo t3 on t3.id = t1.id_rel_fo;
+400: 
+401: update pev_fo
+402: set generiraj_nov_geom = false
+403: where valid_to_fo is null;
+404: 
+405: -- to je trigger fmp_data_gurs.public.trg_update_pev_fo_geom_povr
+406: update pev_fo
+407: set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+408:     atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+409:                      else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+410:     geom_povr = case when fo1.generiraj_nov_geom = true then round(ST_Area(t1_clean.geom)::numeric, 1)
+411:                      else round(ST_Area(pref_clean.geom)::numeric, 1) end,
+412:     gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+413: from ( select id_rel_fo, atr_povr, ST_Union(geom) as geom
+414:        from ( select sub.id_rel_fo,
+415:                      round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+416:                      ST_CollectionExtract(ST_Collect(geom), 3) as geom
+
+665: create or replace function public.trg_update_pev_fo_geom_povr() returns trigger
+666:     language plpgsql as
+667: $function$
+668: declare
+669:     affected_fo_id uuid;
+670: begin
+671:     if tg_table_name = &#x27;pev_parcele&#x27; then
+672:         if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+673: 
+674:     elsif tg_table_name = &#x27;pev_stavbe&#x27; then
+675:         if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+676: 
+677:     elsif tg_table_name = &#x27;pev_deli_stavb&#x27; then
+678:         if tg_op = &#x27;DELETE&#x27; then
+679:             select id_rel_fo into affected_fo_id from pev_stavbe where id = old.id_rel_sta;
+680:         else
+681:             select id_rel_fo into affected_fo_id from pev_stavbe where id = new.id_rel_sta;
+682:         end if;
+683: 
+684:     elsif tg_table_name = &#x27;pev_fo&#x27; then
+685:         affected_fo_id := new.id;
+686:     end if;
+687: 
+688:     if affected_fo_id is null then return null; end if;
+689: 
+690:     update pev_fo
+691:     set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+692:         atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+693:                          else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+694:         geom_povr = case when fo1.generiraj_nov_geom = true then round(st_area(t1_clean.geom)::numeric, 1)
+695:                          else round(st_area(pref_clean.geom)::numeric, 1) end,
+696:         gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+697:     from ( select id_rel_fo, atr_povr, st_union(geom) as geom
+698:            from ( select sub.id_rel_fo,
+699:                          round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+700:                          st_collectionextract(st_collect(geom), 3) as geom
+701:                   from ( select p.id_rel_fo, p.povrsina, p.geom
+702:                          from pev_parcele p
+703:                          where p.fo_geom_upost = true
+704:                            and p.id_rel_fo = affected_fo_id
+705: 
+706:                          union all
+707: 
+708:                          select s.id_rel_fo, d.povrsina, s.geom
+709:                          from pev_deli_stavb d
+710:                                   join pev_stavbe s on d.id_rel_sta = s.id
+711:                          where s.fo_geom_upost = true
+712:                            and s.id_rel_fo = affected_fo_id ) sub
+713:                   group by sub.id_rel_fo ) a
+714:            group by id_rel_fo, atr_povr ) t1
+715:              left join pev_fo fo1 on t1.id_rel_fo = fo1.id
+716:              left join pev_posebne_enote pev1 on fo1.id_rel_pe = pev1.id
+717:              left join ( select distinct on (star_id_fo)
+718:                                        id,
+719:                                        star_id_fo,
+720:                                        povrsina,
+721:                                        geom
+722:                                 from pev_fo_gv_arhiv
+723:                                 where valid_to = date &#x27;3000-01-01&#x27;
+724:                                 order by star_id_fo, spremenjeno desc nulls last, created_at desc, id desc ) fgv
+725:                        on fgv.star_id_fo = fo1.star_id_fo and fo1.valid_to_fo is null
+726: 
+727:              left join lateral ( with params as ( select 0.01::double precision as grid,
+728:                                                          0.05::double precision as min_part_area,
+729:                                                          0.20::double precision as min_hole_area ),
+730:                                       src as ( select st_collectionextract(
+731:                                                               st_makevalid(st_snaptogrid(st_force2d(t1.geom), p.grid)),
+732:                                                               3) as geom,
+733:                                                       p.min_part_area,
+734:                                                       p.min_hole_area
+735:                                                from params p ),
+736:                                       dumped as ( select (st_dump(src.geom)).geom as poly,
+737:                                                          src.min_part_area,
+738:                                                          src.min_hole_area from src ),
+739:                                       rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+740:                                                                          coalesce(( select array_agg(ring)
+741:                                                                                     from ( select st_interiorringn(d.poly, i) as ring
+742:                                                                                            from generate_series(1, st_numinteriorrings(d.poly)) as i
+743:                                                                                            where
+744:                                                                                                abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+745:                                                                                                d.min_hole_area ) r ),
+746:                                                                                   array []::geometry[])) as geom_part,
+747:                                                           d.min_part_area
+748:                                                    from dumped d ),
+749:                                       filtered as ( select geom_part
+750:                                                     from rebuilt
+751:                                                     where st_area(geom_part) &gt;= min_part_area )
+752:                                  select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+753:                                                  st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+754:                                  from filtered ) t1_clean on true
+755: 
+756:              left join lateral ( with params as ( select 0.01::double precision as grid,
+757:                                                          0.05::double precision as min_part_area,
+758:                                                          0.20::double precision as min_hole_area ),
+759:                                       src as ( select st_collectionextract(
+760:                                                               st_makevalid(st_snaptogrid(st_force2d(coalesce(fgv.geom, fo1.geom, t1.geom)), p.grid)),
+761:                                                               3) as geom,
+762:                                                       p.min_part_area,
+763:                                                       p.min_hole_area
+764:                                                from params p ),
+765:                                       dumped as ( select (st_dump(src.geom)).geom as poly,
+766:                                                          src.min_part_area,
+767:                                                          src.min_hole_area from src ),
+768:                                       rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+769:                                                                          coalesce(( select array_agg(ring)
+770:                                                                                     from ( select st_interiorringn(d.poly, i) as ring
+771:                                                                                            from generate_series(1, st_numinteriorrings(d.poly)) as i
+772:                                                                                            where
+773:                                                                                                abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+774:                                                                                                d.min_hole_area ) r ),
+775:                                                                                   array []::geometry[])) as geom_part,
+776:                                                           d.min_part_area
+777:                                                    from dumped d ),
+778:                                       filtered as ( select geom_part
+779:                                                     from rebuilt
+780:                                                     where st_area(geom_part) &gt;= min_part_area )
+781:                                  select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+782:                                                  st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+783:                                  from filtered ) pref_clean on true
+784:     where pev_fo.id = affected_fo_id;
+785: 
+786:     return null;
+787: end;
+788: $function$;
+</pre></details><details><summary>live_building_part_counts.txt</summary><pre>41478|9817
+</pre></details><details><summary>live_display_field.txt</summary><pre>pev_parcele|prikazan_na_sloju|boolean|NO|true
+pev_stavbe|prikazan_na_sloju|boolean|NO|true
+pev_stavbe|t|41478
+pev_parcele|t|107885
+</pre></details><details><summary>live_metadata.txt</summary><pre>public|pev_deli_stavb|id|uuid|uuid|NO||NO|NEVER
+public|pev_deli_stavb|created_by|uuid|uuid|NO||NO|NEVER
+public|pev_deli_stavb|updated_by|uuid|uuid|YES||NO|NEVER
+public|pev_deli_stavb|created_at|timestamp without time zone|timestamp|NO||NO|NEVER
+public|pev_deli_stavb|updated_at|timestamp without time zone|timestamp|YES||NO|NEVER
+public|pev_deli_stavb|del_stavbe_id|bigint|int8|YES||NO|NEVER
+public|pev_deli_stavb|ko_id|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|st_stavbe|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|st_dela_stavbe|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|dst_upost|boolean|bool|YES||NO|NEVER
+public|pev_deli_stavb|hisna_stevilka_id|bigint|int8|YES||NO|NEVER
+public|pev_deli_stavb|povrsina|numeric|numeric|YES||NO|NEVER
+public|pev_deli_stavb|delez_vpr|numeric|numeric|YES||NO|NEVER
+public|pev_deli_stavb|delez_rez|numeric|numeric|YES||NO|NEVER
+public|pev_deli_stavb|delez_rez_vir|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|delez|numeric|numeric|YES||NO|NEVER
+public|pev_deli_stavb|delez_vir|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|soglasje|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|nosilec|boolean|bool|YES||NO|NEVER
+public|pev_deli_stavb|upostevan|boolean|bool|YES||NO|NEVER
+public|pev_deli_stavb|vrsta_dejanske_rabe_del_st_id|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|id_dnp|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|del|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|id_nep|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|model|text|text|YES||NO|NEVER
+public|pev_deli_stavb|id_dela_stavbe|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|ins|date|date|YES||NO|NEVER
+public|pev_deli_stavb|id_stavbe|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|id_rel_fo|uuid|uuid|YES||NO|NEVER
+public|pev_deli_stavb|id_rel_sta|uuid|uuid|YES||NO|NEVER
+public|pev_deli_stavb|gid|integer|int4|NO|nextval(&#x27;pev_deli_stavb_gid_seq&#x27;::regclass)|NO|NEVER
+public|pev_deli_stavb|__mod|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|seq_id_dst|integer|int4|YES|nextval(&#x27;pev_deli_stavb_seq_id_dst_seq&#x27;::regclass)|NO|NEVER
+public|pev_deli_stavb|id_rel_pe|uuid|uuid|YES||NO|NEVER
+public|pev_fo|id|uuid|uuid|NO||NO|NEVER
+public|pev_fo|created_by|uuid|uuid|NO||NO|NEVER
+public|pev_fo|updated_by|uuid|uuid|YES||NO|NEVER
+public|pev_fo|created_at|timestamp without time zone|timestamp|NO||NO|NEVER
+public|pev_fo|updated_at|timestamp without time zone|timestamp|YES||NO|NEVER
+public|pev_fo|model|text|text|YES||NO|NEVER
+public|pev_fo|id_nep|integer|int4|YES||NO|NEVER
+public|pev_fo|valid_from_fo|date|date|YES||NO|NEVER
+public|pev_fo|valid_to_fo|date|date|YES||NO|NEVER
+public|pev_fo|vse_sestavine|text|text|YES||NO|NEVER
+public|pev_fo|id_rel_pe|uuid|uuid|YES||NO|NEVER
+public|pev_fo|seq_id_fo|integer|int4|YES|nextval(&#x27;pev_fo_seq_id_fo_seq&#x27;::regclass)|NO|NEVER
+public|pev_fo|gid|integer|int4|NO|nextval(&#x27;pev_fo_gid_seq&#x27;::regclass)|NO|NEVER
+public|pev_fo|__mod|integer|int4|YES||NO|NEVER
+public|pev_fo|geom|USER-DEFINED|geometry|YES||NO|NEVER
+public|pev_fo|atr_povr|numeric|numeric|YES||NO|NEVER
+public|pev_fo|geom_povr|numeric|numeric|YES||NO|NEVER
+public|pev_fo|gv_geom|boolean|bool|YES||NO|NEVER
+public|pev_fo|generiraj_nov_geom|boolean|bool|YES|true|NO|NEVER
+public|pev_fo|star_id_fo|bigint|int8|YES||NO|NEVER
+public|pev_parcele|id|uuid|uuid|NO||NO|NEVER
+public|pev_parcele|created_at|timestamp without time zone|timestamp|NO||NO|NEVER
+public|pev_parcele|updated_at|timestamp without time zone|timestamp|YES||NO|NEVER
+public|pev_parcele|created_by|uuid|uuid|NO||NO|NEVER
+public|pev_parcele|updated_by|uuid|uuid|YES||NO|NEVER
+public|pev_parcele|gid|integer|int4|NO|nextval(&#x27;pev_parcele_gid_seq&#x27;::regclass)|NO|NEVER
+public|pev_parcele|geom|USER-DEFINED|geometry|YES||NO|NEVER
+public|pev_parcele|id_rel_fo|uuid|uuid|YES||NO|NEVER
+public|pev_parcele|fo_geom_upost|boolean|bool|YES|true|NO|NEVER
+public|pev_parcele|parcela_id|bigint|int8|YES||NO|NEVER
+public|pev_parcele|ko_id|integer|int4|YES||NO|NEVER
+public|pev_parcele|st_parcele|text|text|YES||NO|NEVER
+public|pev_parcele|povrsina|bigint|int8|YES||NO|NEVER
+public|pev_parcele|delez_vpr|numeric|numeric|YES||NO|NEVER
+public|pev_parcele|delez_rez|numeric|numeric|YES||NO|NEVER
+public|pev_parcele|delez_rez_vir|integer|int4|YES||NO|NEVER
+public|pev_parcele|soglasje|integer|int4|YES||NO|NEVER
+public|pev_parcele|nosilec|boolean|bool|YES||NO|NEVER
+public|pev_parcele|upostevan|boolean|bool|YES||NO|NEVER
+public|pev_parcele|delez_bzps|numeric|numeric|YES||NO|NEVER
+public|pev_parcele|delez|numeric|numeric|YES||NO|NEVER
+public|pev_parcele|delez_vir|integer|int4|YES||NO|NEVER
+public|pev_parcele|id_dnp|integer|int4|YES||NO|NEVER
+public|pev_parcele|del|integer|int4|YES||NO|NEVER
+public|pev_parcele|id_nep|integer|int4|YES||NO|NEVER
+public|pev_parcele|model|text|text|YES||NO|NEVER
+public|pev_parcele|id_zemljisca|integer|int4|YES||NO|NEVER
+public|pev_parcele|seq_id_parc|integer|int4|YES|nextval(&#x27;pev_parcele_seq_id_parc_seq&#x27;::regclass)|NO|NEVER
+public|pev_parcele|__mod|integer|int4|YES||NO|NEVER
+public|pev_parcele|id_rel_pe|uuid|uuid|YES||NO|NEVER
+public|pev_parcele_stavbe|id|uuid|uuid|NO||NO|NEVER
+public|pev_parcele_stavbe|created_by|uuid|uuid|NO||NO|NEVER
+public|pev_parcele_stavbe|updated_by|uuid|uuid|YES||NO|NEVER
+public|pev_parcele_stavbe|created_at|timestamp without time zone|timestamp|NO||NO|NEVER
+public|pev_parcele_stavbe|updated_at|timestamp without time zone|timestamp|YES||NO|NEVER
+public|pev_parcele_stavbe|id_zemljisca|integer|int4|YES||NO|NEVER
+public|pev_parcele_stavbe|id_stavbe|integer|int4|YES||NO|NEVER
+public|pev_parcele_stavbe|id_rel_parc|uuid|uuid|YES||NO|NEVER
+public|pev_parcele_stavbe|id_rel_sta|uuid|uuid|YES||NO|NEVER
+public|pev_parcele_stavbe|gid|integer|int4|NO|nextval(&#x27;pev_parcele_stavbe_gid_seq&#x27;::regclass)|NO|NEVER
+public|pev_parcele_stavbe|__mod|integer|int4|YES||NO|NEVER
+public|pev_stavbe|id|uuid|uuid|NO||NO|NEVER
+public|pev_stavbe|created_at|timestamp without time zone|timestamp|NO||NO|NEVER
+public|pev_stavbe|updated_at|timestamp without time zone|timestamp|YES||NO|NEVER
+public|pev_stavbe|created_by|uuid|uuid|NO||NO|NEVER
+public|pev_stavbe|updated_by|uuid|uuid|YES||NO|NEVER
+public|pev_stavbe|gid|integer|int4|NO|nextval(&#x27;pev_stavbe_gid_seq&#x27;::regclass)|NO|NEVER
+public|pev_stavbe|geom|USER-DEFINED|geometry|YES||NO|NEVER
+public|pev_stavbe|id_rel_fo|uuid|uuid|YES||NO|NEVER
+public|pev_stavbe|fo_geom_upost|boolean|bool|YES|true|NO|NEVER
+public|pev_stavbe|stavba_id|bigint|int8|YES||NO|NEVER
+public|pev_stavbe|ko_id|integer|int4|YES||NO|NEVER
+public|pev_stavbe|st_stavbe|integer|int4|YES||NO|NEVER
+public|pev_stavbe|upostevan|boolean|bool|YES||NO|NEVER
+public|pev_stavbe|id_dnp|integer|int4|YES||NO|NEVER
+public|pev_stavbe|id_stavbe|integer|int4|YES||NO|NEVER
+public|pev_stavbe|id_nep|integer|int4|YES||NO|NEVER
+public|pev_stavbe|model|text|text|YES||NO|NEVER
+public|pev_stavbe|seq_id_sta|integer|int4|YES|nextval(&#x27;pev_stavbe_seq_id_sta_seq&#x27;::regclass)|NO|NEVER
+public|pev_stavbe|__mod|integer|int4|YES||NO|NEVER
+public|pev_deli_stavb|call_sync_from_deli|O|CREATE TRIGGER call_sync_from_deli AFTER INSERT OR UPDATE OF id_rel_sta ON public.pev_deli_stavb FOR EACH ROW EXECUTE FUNCTION trg_call_sync_from_deli()|public|trg_call_sync_from_deli|CREATE OR REPLACE FUNCTION public.trg_call_sync_from_deli()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    v_old_pe uuid;
+    v_new_pe uuid;
+begin
+    if TG_OP in (&#x27;INSERT&#x27;, &#x27;UPDATE&#x27;) then
+        if NEW.id_rel_sta is not null then
+            select f.id_rel_pe
+            into v_new_pe
+            from pev_stavbe s
+                     join pev_fo f on f.id = s.id_rel_fo
+            where s.id = NEW.id_rel_sta;
+            if v_new_pe is not null then perform sync_pe_usage(v_new_pe); end if;
+        end if;
+    end if;
+
+    if TG_OP = &#x27;UPDATE&#x27; then
+        if OLD.id_rel_sta is not null then
+            select f.id_rel_pe
+            into v_old_pe
+            from pev_stavbe s
+                     join pev_fo f on f.id = s.id_rel_fo
+            where s.id = OLD.id_rel_sta;
+            if v_old_pe is not null and v_old_pe is distinct from v_new_pe then perform sync_pe_usage(v_old_pe); end if;
+        end if;
+    end if;
+
+    return null;
+end
+$function$
+
+public|pev_deli_stavb|trg_pev_deli_stavb_geom_update|O|CREATE TRIGGER trg_pev_deli_stavb_geom_update AFTER INSERT OR DELETE OR UPDATE OF povrsina, id_rel_fo ON public.pev_deli_stavb FOR EACH ROW EXECUTE FUNCTION trg_update_pev_fo_geom_povr()|public|trg_update_pev_fo_geom_povr|CREATE OR REPLACE FUNCTION public.trg_update_pev_fo_geom_povr()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    affected_fo_id uuid;
+begin
+    if tg_table_name = &#x27;pev_parcele&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_stavbe&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_deli_stavb&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = old.id_rel_sta;
+        else
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = new.id_rel_sta;
+        end if;
+
+    elsif tg_table_name = &#x27;pev_fo&#x27; then
+        affected_fo_id := new.id;
+    end if;
+
+    if affected_fo_id is null then return null; end if;
+
+    update pev_fo
+    set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+        atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+                         else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+        geom_povr = case when fo1.generiraj_nov_geom = true then round(st_area(t1_clean.geom)::numeric, 1)
+                         else round(st_area(pref_clean.geom)::numeric, 1) end,
+        gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+    from ( select id_rel_fo, atr_povr, st_union(geom) as geom
+           from ( select sub.id_rel_fo,
+                         round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+                         st_collectionextract(st_collect(geom), 3) as geom
+                  from ( select p.id_rel_fo, p.povrsina, p.geom
+                         from pev_parcele p
+                         where p.fo_geom_upost = true
+                           and p.id_rel_fo = affected_fo_id
+
+                         union all
+
+                         select s.id_rel_fo, d.povrsina, s.geom
+                         from pev_deli_stavb d
+                                  join pev_stavbe s on d.id_rel_sta = s.id
+                         where s.fo_geom_upost = true
+                           and s.id_rel_fo = affected_fo_id ) sub
+                  group by sub.id_rel_fo ) a
+           group by id_rel_fo, atr_povr ) t1
+             left join pev_fo fo1 on t1.id_rel_fo = fo1.id
+             left join pev_posebne_enote pev1 on fo1.id_rel_pe = pev1.id
+             left join ( select distinct on (star_id_fo)
+                                       id,
+                                       star_id_fo,
+                                       povrsina,
+                                       geom
+                                from pev_fo_gv_arhiv
+                                where valid_to = date &#x27;3000-01-01&#x27;
+                                order by star_id_fo, spremenjeno desc nulls last, created_at desc, id desc ) fgv
+                       on fgv.star_id_fo = fo1.star_id_fo and fo1.valid_to_fo is null
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(t1.geom), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) t1_clean on true
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(coalesce(fgv.geom, fo1.geom, t1.geom)), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) pref_clean on true
+    where pev_fo.id = affected_fo_id;
+
+    return null;
+end;
+$function$
+
+public|pev_fo|call_sync_from_fo|O|CREATE TRIGGER call_sync_from_fo AFTER INSERT OR DELETE OR UPDATE OF id_rel_pe ON public.pev_fo FOR EACH ROW EXECUTE FUNCTION trg_call_sync_from_fo()|public|trg_call_sync_from_fo|CREATE OR REPLACE FUNCTION public.trg_call_sync_from_fo()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+begin
+    if TG_OP = &#x27;UPDATE&#x27; and NEW.id_rel_pe is distinct from OLD.id_rel_pe then
+        if OLD.id_rel_pe is not null then perform sync_pe_usage(OLD.id_rel_pe); end if;
+        if NEW.id_rel_pe is not null then perform sync_pe_usage(NEW.id_rel_pe); end if;
+    elsif TG_OP = &#x27;INSERT&#x27; then
+        if NEW.id_rel_pe is not null then perform sync_pe_usage(NEW.id_rel_pe); end if;
+    elsif TG_OP = &#x27;DELETE&#x27; then
+        if OLD.id_rel_pe is not null then perform sync_pe_usage(OLD.id_rel_pe); end if;
+    end if;
+    return null;
+end
+$function$
+
+public|pev_fo|trg_pev_fo_geom_update|O|CREATE TRIGGER trg_pev_fo_geom_update AFTER UPDATE OF generiraj_nov_geom ON public.pev_fo FOR EACH ROW EXECUTE FUNCTION trg_update_pev_fo_geom_povr()|public|trg_update_pev_fo_geom_povr|CREATE OR REPLACE FUNCTION public.trg_update_pev_fo_geom_povr()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    affected_fo_id uuid;
+begin
+    if tg_table_name = &#x27;pev_parcele&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_stavbe&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_deli_stavb&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = old.id_rel_sta;
+        else
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = new.id_rel_sta;
+        end if;
+
+    elsif tg_table_name = &#x27;pev_fo&#x27; then
+        affected_fo_id := new.id;
+    end if;
+
+    if affected_fo_id is null then return null; end if;
+
+    update pev_fo
+    set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+        atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+                         else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+        geom_povr = case when fo1.generiraj_nov_geom = true then round(st_area(t1_clean.geom)::numeric, 1)
+                         else round(st_area(pref_clean.geom)::numeric, 1) end,
+        gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+    from ( select id_rel_fo, atr_povr, st_union(geom) as geom
+           from ( select sub.id_rel_fo,
+                         round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+                         st_collectionextract(st_collect(geom), 3) as geom
+                  from ( select p.id_rel_fo, p.povrsina, p.geom
+                         from pev_parcele p
+                         where p.fo_geom_upost = true
+                           and p.id_rel_fo = affected_fo_id
+
+                         union all
+
+                         select s.id_rel_fo, d.povrsina, s.geom
+                         from pev_deli_stavb d
+                                  join pev_stavbe s on d.id_rel_sta = s.id
+                         where s.fo_geom_upost = true
+                           and s.id_rel_fo = affected_fo_id ) sub
+                  group by sub.id_rel_fo ) a
+           group by id_rel_fo, atr_povr ) t1
+             left join pev_fo fo1 on t1.id_rel_fo = fo1.id
+             left join pev_posebne_enote pev1 on fo1.id_rel_pe = pev1.id
+             left join ( select distinct on (star_id_fo)
+                                       id,
+                                       star_id_fo,
+                                       povrsina,
+                                       geom
+                                from pev_fo_gv_arhiv
+                                where valid_to = date &#x27;3000-01-01&#x27;
+                                order by star_id_fo, spremenjeno desc nulls last, created_at desc, id desc ) fgv
+                       on fgv.star_id_fo = fo1.star_id_fo and fo1.valid_to_fo is null
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(t1.geom), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) t1_clean on true
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(coalesce(fgv.geom, fo1.geom, t1.geom)), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) pref_clean on true
+    where pev_fo.id = affected_fo_id;
+
+    return null;
+end;
+$function$
+
+public|pev_parcele|call_sync_from_parcele|O|CREATE TRIGGER call_sync_from_parcele AFTER INSERT OR UPDATE OF id_rel_fo ON public.pev_parcele FOR EACH ROW EXECUTE FUNCTION trg_call_sync_from_parcele()|public|trg_call_sync_from_parcele|CREATE OR REPLACE FUNCTION public.trg_call_sync_from_parcele()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    v_old_pe uuid;
+    v_new_pe uuid;
+begin
+    if TG_OP in (&#x27;INSERT&#x27;, &#x27;UPDATE&#x27;) then
+        if NEW.id_rel_fo is not null then
+            select id_rel_pe into v_new_pe from pev_fo where id = NEW.id_rel_fo;
+            if v_new_pe is not null then perform sync_pe_usage(v_new_pe); end if;
+        end if;
+    end if;
+
+    if TG_OP = &#x27;UPDATE&#x27; then
+        if OLD.id_rel_fo is not null then
+            select id_rel_pe into v_old_pe from pev_fo where id = OLD.id_rel_fo;
+            if v_old_pe is not null and v_old_pe is distinct from v_new_pe then perform sync_pe_usage(v_old_pe); end if;
+        end if;
+    end if;
+
+    return null;
+end
+$function$
+
+public|pev_parcele|tr_pev_parcele_delez_bzps|O|CREATE TRIGGER tr_pev_parcele_delez_bzps BEFORE INSERT OR UPDATE OF delez ON public.pev_parcele FOR EACH ROW EXECUTE FUNCTION trg_pev_parcele_delez_bzps()|public|trg_pev_parcele_delez_bzps|CREATE OR REPLACE FUNCTION public.trg_pev_parcele_delez_bzps()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    v_id_rel_pe    uuid;
+    v_valid_to     date;
+    v_povrsina_zps numeric;
+begin
+    -- If this row is not flagged for geometry use, we skip.
+    if not NEW.fo_geom_upost then return NEW; end if;
+
+    -- Figure out which PE is attached
+    select f.id_rel_pe into v_id_rel_pe from pev_fo f where f.id = NEW.id_rel_fo;
+
+    -- If there&#x27;s no PE, we null out delez_bzps and return.
+    if v_id_rel_pe is null then
+        NEW.delez_bzps := null;
+        return NEW;
+    end if;
+
+    -- Grab &#x27;valid_to&#x27; from the PE record, defaulting to 2100-01-01
+    select coalesce(pe.valid_to, date &#x27;2100-01-01&#x27;) into v_valid_to from pev_posebne_enote pe where pe.id = v_id_rel_pe;
+
+    -- Summation of povrsina_zps for matching stavbe
+    select sum(sub_kn.povrsina_zps)
+    into v_povrsina_zps
+    from pev_stavbe st
+             join ( select distinct on (stavba_parcela_id, datum_od, datum_do) stavba_parcela_id,
+                                                                               datum_do,
+                                                                               datum_od,
+                                                                               parcela_id,
+                                                                               stavba_id,
+                                                                               povrsina_zps
+                    from kn_nep_stavbe_parcele_h
+                    order by stavba_parcela_id, datum_od, datum_do, datum_sys desc ) as sub_kn
+                  on sub_kn.parcela_id = NEW.parcela_id and v_valid_to &lt;= sub_kn.datum_do and
+                     st.stavba_id = sub_kn.stavba_id
+    where st.id_rel_fo = NEW.id_rel_fo;
+
+    -- If there&#x27;s no match at all, sum(...) is NULL.
+    if v_povrsina_zps is null then
+        /*
+          We have two common use-cases here:
+            1) On INSERT, there&#x27;s no “old” value, so you probably want to null out.
+            2) On UPDATE, you might prefer to keep whatever was there.
+        */
+        if TG_OP = &#x27;UPDATE&#x27; then
+            -- Keep the old value
+            NEW.delez_bzps := OLD.delez_bzps;
+        else
+            -- For INSERT or other operations, just null it out
+            NEW.delez_bzps := null;
+        end if;
+
+    else
+        -- If we do have a sum(...) =&gt; apply the difference
+        if NEW.delez is not null then
+            NEW.delez_bzps := greatest(NEW.delez - v_povrsina_zps, 0);
+        else
+            NEW.delez_bzps := null;
+        end if;
+    end if;
+
+    return NEW;
+end;
+$function$
+
+public|pev_parcele|trg_pev_parcele_geom_update|O|CREATE TRIGGER trg_pev_parcele_geom_update AFTER INSERT OR DELETE OR UPDATE OF geom, povrsina, fo_geom_upost, id_rel_fo ON public.pev_parcele FOR EACH ROW EXECUTE FUNCTION trg_update_pev_fo_geom_povr()|public|trg_update_pev_fo_geom_povr|CREATE OR REPLACE FUNCTION public.trg_update_pev_fo_geom_povr()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    affected_fo_id uuid;
+begin
+    if tg_table_name = &#x27;pev_parcele&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_stavbe&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_deli_stavb&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = old.id_rel_sta;
+        else
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = new.id_rel_sta;
+        end if;
+
+    elsif tg_table_name = &#x27;pev_fo&#x27; then
+        affected_fo_id := new.id;
+    end if;
+
+    if affected_fo_id is null then return null; end if;
+
+    update pev_fo
+    set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+        atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+                         else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+        geom_povr = case when fo1.generiraj_nov_geom = true then round(st_area(t1_clean.geom)::numeric, 1)
+                         else round(st_area(pref_clean.geom)::numeric, 1) end,
+        gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+    from ( select id_rel_fo, atr_povr, st_union(geom) as geom
+           from ( select sub.id_rel_fo,
+                         round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+                         st_collectionextract(st_collect(geom), 3) as geom
+                  from ( select p.id_rel_fo, p.povrsina, p.geom
+                         from pev_parcele p
+                         where p.fo_geom_upost = true
+                           and p.id_rel_fo = affected_fo_id
+
+                         union all
+
+                         select s.id_rel_fo, d.povrsina, s.geom
+                         from pev_deli_stavb d
+                                  join pev_stavbe s on d.id_rel_sta = s.id
+                         where s.fo_geom_upost = true
+                           and s.id_rel_fo = affected_fo_id ) sub
+                  group by sub.id_rel_fo ) a
+           group by id_rel_fo, atr_povr ) t1
+             left join pev_fo fo1 on t1.id_rel_fo = fo1.id
+             left join pev_posebne_enote pev1 on fo1.id_rel_pe = pev1.id
+             left join ( select distinct on (star_id_fo)
+                                       id,
+                                       star_id_fo,
+                                       povrsina,
+                                       geom
+                                from pev_fo_gv_arhiv
+                                where valid_to = date &#x27;3000-01-01&#x27;
+                                order by star_id_fo, spremenjeno desc nulls last, created_at desc, id desc ) fgv
+                       on fgv.star_id_fo = fo1.star_id_fo and fo1.valid_to_fo is null
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(t1.geom), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) t1_clean on true
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(coalesce(fgv.geom, fo1.geom, t1.geom)), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) pref_clean on true
+    where pev_fo.id = affected_fo_id;
+
+    return null;
+end;
+$function$
+
+public|pev_stavbe|call_sync_from_stavbe|O|CREATE TRIGGER call_sync_from_stavbe AFTER INSERT OR DELETE OR UPDATE OF id_rel_fo ON public.pev_stavbe FOR EACH ROW EXECUTE FUNCTION trg_call_sync_from_stavbe()|public|trg_call_sync_from_stavbe|CREATE OR REPLACE FUNCTION public.trg_call_sync_from_stavbe()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    v_old_pe uuid;
+    v_new_pe uuid;
+begin
+    if TG_OP in (&#x27;INSERT&#x27;, &#x27;UPDATE&#x27;) then
+        if NEW.id_rel_fo is not null then
+            select id_rel_pe into v_new_pe from pev_fo where id = NEW.id_rel_fo;
+            if v_new_pe is not null then perform sync_pe_usage(v_new_pe); end if;
+        end if;
+    end if;
+
+    if TG_OP in (&#x27;UPDATE&#x27;, &#x27;DELETE&#x27;) then
+        if OLD.id_rel_fo is not null then
+            select id_rel_pe into v_old_pe from pev_fo where id = OLD.id_rel_fo;
+            if v_old_pe is not null then perform sync_pe_usage(v_old_pe); end if;
+        end if;
+    end if;
+
+    return null;
+end
+$function$
+
+public|pev_stavbe|trg_pev_stavbe_geom_update|O|CREATE TRIGGER trg_pev_stavbe_geom_update AFTER INSERT OR DELETE OR UPDATE OF geom, fo_geom_upost, id_rel_fo ON public.pev_stavbe FOR EACH ROW EXECUTE FUNCTION trg_update_pev_fo_geom_povr()|public|trg_update_pev_fo_geom_povr|CREATE OR REPLACE FUNCTION public.trg_update_pev_fo_geom_povr()
+ RETURNS trigger
+ LANGUAGE plpgsql
+AS $function$
+declare
+    affected_fo_id uuid;
+begin
+    if tg_table_name = &#x27;pev_parcele&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_stavbe&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then affected_fo_id := old.id_rel_fo; else affected_fo_id := new.id_rel_fo; end if;
+
+    elsif tg_table_name = &#x27;pev_deli_stavb&#x27; then
+        if tg_op = &#x27;DELETE&#x27; then
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = old.id_rel_sta;
+        else
+            select id_rel_fo into affected_fo_id from pev_stavbe where id = new.id_rel_sta;
+        end if;
+
+    elsif tg_table_name = &#x27;pev_fo&#x27; then
+        affected_fo_id := new.id;
+    end if;
+
+    if affected_fo_id is null then return null; end if;
+
+    update pev_fo
+    set geom      = case when fo1.generiraj_nov_geom = true then t1_clean.geom else pref_clean.geom end,
+        atr_povr  = case when fo1.generiraj_nov_geom = true then t1.atr_povr
+                         else round(coalesce(fgv.povrsina, fo1.atr_povr, t1.atr_povr)::numeric, 1) end,
+        geom_povr = case when fo1.generiraj_nov_geom = true then round(st_area(t1_clean.geom)::numeric, 1)
+                         else round(st_area(pref_clean.geom)::numeric, 1) end,
+        gv_geom   = case when fo1.generiraj_nov_geom = true then false when fgv.id is not null or fo1.gv_geom = true then true else false end
+    from ( select id_rel_fo, atr_povr, st_union(geom) as geom
+           from ( select sub.id_rel_fo,
+                         round(sum(sub.povrsina)::numeric, 1)      as atr_povr,
+                         st_collectionextract(st_collect(geom), 3) as geom
+                  from ( select p.id_rel_fo, p.povrsina, p.geom
+                         from pev_parcele p
+                         where p.fo_geom_upost = true
+                           and p.id_rel_fo = affected_fo_id
+
+                         union all
+
+                         select s.id_rel_fo, d.povrsina, s.geom
+                         from pev_deli_stavb d
+                                  join pev_stavbe s on d.id_rel_sta = s.id
+                         where s.fo_geom_upost = true
+                           and s.id_rel_fo = affected_fo_id ) sub
+                  group by sub.id_rel_fo ) a
+           group by id_rel_fo, atr_povr ) t1
+             left join pev_fo fo1 on t1.id_rel_fo = fo1.id
+             left join pev_posebne_enote pev1 on fo1.id_rel_pe = pev1.id
+             left join ( select distinct on (star_id_fo)
+                                       id,
+                                       star_id_fo,
+                                       povrsina,
+                                       geom
+                                from pev_fo_gv_arhiv
+                                where valid_to = date &#x27;3000-01-01&#x27;
+                                order by star_id_fo, spremenjeno desc nulls last, created_at desc, id desc ) fgv
+                       on fgv.star_id_fo = fo1.star_id_fo and fo1.valid_to_fo is null
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(t1.geom), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) t1_clean on true
+
+             left join lateral ( with params as ( select 0.01::double precision as grid,
+                                                         0.05::double precision as min_part_area,
+                                                         0.20::double precision as min_hole_area ),
+                                      src as ( select st_collectionextract(
+                                                              st_makevalid(st_snaptogrid(st_force2d(coalesce(fgv.geom, fo1.geom, t1.geom)), p.grid)),
+                                                              3) as geom,
+                                                      p.min_part_area,
+                                                      p.min_hole_area
+                                               from params p ),
+                                      dumped as ( select (st_dump(src.geom)).geom as poly,
+                                                         src.min_part_area,
+                                                         src.min_hole_area from src ),
+                                      rebuilt as ( select st_makepolygon(st_exteriorring(d.poly),
+                                                                         coalesce(( select array_agg(ring)
+                                                                                    from ( select st_interiorringn(d.poly, i) as ring
+                                                                                           from generate_series(1, st_numinteriorrings(d.poly)) as i
+                                                                                           where
+                                                                                               abs(st_area(st_makepolygon(st_interiorringn(d.poly, i)))) &gt;=
+                                                                                               d.min_hole_area ) r ),
+                                                                                  array []::geometry[])) as geom_part,
+                                                          d.min_part_area
+                                                   from dumped d ),
+                                      filtered as ( select geom_part
+                                                    from rebuilt
+                                                    where st_area(geom_part) &gt;= min_part_area )
+                                 select coalesce(st_setsrid(st_multi(st_union(geom_part)), 3794),
+                                                 st_setsrid(&#x27;MULTIPOLYGON EMPTY&#x27;::geometry, 3794))::geometry(MultiPolygon, 3794) as geom
+                                 from filtered ) pref_clean on true
+    where pev_fo.id = affected_fo_id;
+
+    return null;
+end;
+$function$
+
+public|pev_deli_stavb|pev_deli_stavb_pkey|PRIMARY KEY (id)
+public|pev_deli_stavb|pev_deli_stavb_seq_id_dst_uniq|UNIQUE (seq_id_dst)
+public|pev_fo|pev_fo_pkey|PRIMARY KEY (id)
+public|pev_fo|pev_fo_seq_id_fo_uniq|UNIQUE (seq_id_fo)
+public|pev_parcele|pev_parcele_pkey|PRIMARY KEY (id)
+public|pev_parcele|pev_parcele_seq_id_parc_uniq|UNIQUE (seq_id_parc)
+public|pev_parcele_stavbe|pev_parcele_stavbe_pkey|PRIMARY KEY (id)
+public|pev_stavbe|pev_stavbe_pkey|PRIMARY KEY (id)
+public|pev_stavbe|pev_stavbe_seq_id_sta_uniq|UNIQUE (seq_id_sta)
+public|pev_deli_stavb|pev_deli_stavb___mod_index|CREATE INDEX pev_deli_stavb___mod_index ON public.pev_deli_stavb USING btree (__mod)
+public|pev_deli_stavb|pev_deli_stavb_del_stavbe_id_idx|CREATE INDEX pev_deli_stavb_del_stavbe_id_idx ON public.pev_deli_stavb USING btree (del_stavbe_id)
+public|pev_deli_stavb|pev_deli_stavb_gid_index|CREATE INDEX pev_deli_stavb_gid_index ON public.pev_deli_stavb USING btree (gid)
+public|pev_deli_stavb|pev_deli_stavb_hisna_stevilka_id_idx|CREATE INDEX pev_deli_stavb_hisna_stevilka_id_idx ON public.pev_deli_stavb USING btree (hisna_stevilka_id)
+public|pev_deli_stavb|pev_deli_stavb_id_rel_fo_idx|CREATE INDEX pev_deli_stavb_id_rel_fo_idx ON public.pev_deli_stavb USING btree (id_rel_fo)
+public|pev_deli_stavb|pev_deli_stavb_id_rel_sta_idx|CREATE INDEX pev_deli_stavb_id_rel_sta_idx ON public.pev_deli_stavb USING btree (id_rel_sta)
+public|pev_deli_stavb|pev_deli_stavb_pkey|CREATE UNIQUE INDEX pev_deli_stavb_pkey ON public.pev_deli_stavb USING btree (id)
+public|pev_deli_stavb|pev_deli_stavb_seq_id_dst_uniq|CREATE UNIQUE INDEX pev_deli_stavb_seq_id_dst_uniq ON public.pev_deli_stavb USING btree (seq_id_dst)
+public|pev_fo|pev_fo___mod_index|CREATE INDEX pev_fo___mod_index ON public.pev_fo USING btree (__mod)
+public|pev_fo|pev_fo_gid_index|CREATE INDEX pev_fo_gid_index ON public.pev_fo USING btree (gid)
+public|pev_fo|pev_fo_id_rel_pe_idx|CREATE INDEX pev_fo_id_rel_pe_idx ON public.pev_fo USING btree (id_rel_pe)
+public|pev_fo|pev_fo_pkey|CREATE UNIQUE INDEX pev_fo_pkey ON public.pev_fo USING btree (id)
+public|pev_fo|pev_fo_seq_id_fo_uniq|CREATE UNIQUE INDEX pev_fo_seq_id_fo_uniq ON public.pev_fo USING btree (seq_id_fo)
+public|pev_fo|pev_fo_star_id_fo_idx|CREATE INDEX pev_fo_star_id_fo_idx ON public.pev_fo USING btree (star_id_fo)
+public|pev_parcele|pev_parcele___mod_index|CREATE INDEX pev_parcele___mod_index ON public.pev_parcele USING btree (__mod)
+public|pev_parcele|pev_parcele_del_parcela_id_idx|CREATE INDEX pev_parcele_del_parcela_id_idx ON public.pev_parcele USING btree (parcela_id)
+public|pev_parcele|pev_parcele_fo_geom_upost_idx|CREATE INDEX pev_parcele_fo_geom_upost_idx ON public.pev_parcele USING btree (fo_geom_upost)
+public|pev_parcele|pev_parcele_geom_idx|CREATE INDEX pev_parcele_geom_idx ON public.pev_parcele USING gist (geom)
+public|pev_parcele|pev_parcele_id_rel_fo_idx|CREATE INDEX pev_parcele_id_rel_fo_idx ON public.pev_parcele USING btree (id_rel_fo)
+public|pev_parcele|pev_parcele_pkey|CREATE UNIQUE INDEX pev_parcele_pkey ON public.pev_parcele USING btree (id)
+public|pev_parcele|pev_parcele_povrsina_idx|CREATE INDEX pev_parcele_povrsina_idx ON public.pev_parcele USING btree (povrsina)
+public|pev_parcele|pev_parcele_seq_id_parc_uniq|CREATE UNIQUE INDEX pev_parcele_seq_id_parc_uniq ON public.pev_parcele USING btree (seq_id_parc)
+public|pev_parcele_stavbe|pev_parcele_stavbe___mod_index|CREATE INDEX pev_parcele_stavbe___mod_index ON public.pev_parcele_stavbe USING btree (__mod)
+public|pev_parcele_stavbe|pev_parcele_stavbe_gid_index|CREATE INDEX pev_parcele_stavbe_gid_index ON public.pev_parcele_stavbe USING btree (gid)
+public|pev_parcele_stavbe|pev_parcele_stavbe_id_rel_parc_idx|CREATE INDEX pev_parcele_stavbe_id_rel_parc_idx ON public.pev_parcele_stavbe USING btree (id_rel_parc)
+public|pev_parcele_stavbe|pev_parcele_stavbe_id_rel_sta_idx|CREATE INDEX pev_parcele_stavbe_id_rel_sta_idx ON public.pev_parcele_stavbe USING btree (id_rel_sta)
+public|pev_parcele_stavbe|pev_parcele_stavbe_pkey|CREATE UNIQUE INDEX pev_parcele_stavbe_pkey ON public.pev_parcele_stavbe USING btree (id)
+public|pev_stavbe|pev_stavbe___mod_index|CREATE INDEX pev_stavbe___mod_index ON public.pev_stavbe USING btree (__mod)
+public|pev_stavbe|pev_stavbe_fo_geom_upost_idx|CREATE INDEX pev_stavbe_fo_geom_upost_idx ON public.pev_stavbe USING btree (fo_geom_upost)
+public|pev_stavbe|pev_stavbe_geom_idx|CREATE INDEX pev_stavbe_geom_idx ON public.pev_stavbe USING gist (geom)
+public|pev_stavbe|pev_stavbe_id_rel_fo_idx|CREATE INDEX pev_stavbe_id_rel_fo_idx ON public.pev_stavbe USING btree (id_rel_fo)
+public|pev_stavbe|pev_stavbe_pkey|CREATE UNIQUE INDEX pev_stavbe_pkey ON public.pev_stavbe USING btree (id)
+public|pev_stavbe|pev_stavbe_seq_id_sta_uniq|CREATE UNIQUE INDEX pev_stavbe_seq_id_sta_uniq ON public.pev_stavbe USING btree (seq_id_sta)
+public|pev_stavbe|pev_stavbe_stavba_id_idx|CREATE INDEX pev_stavbe_stavba_id_idx ON public.pev_stavbe USING btree (stavba_id)
+</pre></details><details><summary>live_sync_pe_usage.txt</summary><pre>CREATE OR REPLACE FUNCTION public.sync_pe_usage(p_pe_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+begin
+    if p_pe_id is null then return; end if;
+
+    -- Parcels: set where FO → PE matches
+    update pev_parcele p
+    set id_rel_pe = p_pe_id
+    where exists ( select 1 from pev_fo f where f.id = p.id_rel_fo and f.id_rel_pe = p_pe_id )
+      and p.id_rel_pe is distinct from p_pe_id;
+
+    -- Parcels: clear stale refs to this PE
+    update pev_parcele p
+    set id_rel_pe = null
+    where p.id_rel_pe = p_pe_id
+      and not exists ( select 1 from pev_fo f where f.id = p.id_rel_fo and f.id_rel_pe = p_pe_id );
+
+    -- Building parts: set where STA → FO → PE matches
+    update pev_deli_stavb d
+    set id_rel_pe = p_pe_id
+    where exists ( select 1
+                   from pev_stavbe s
+                            join pev_fo f on f.id = s.id_rel_fo
+                   where s.id = d.id_rel_sta
+                     and f.id_rel_pe = p_pe_id )
+      and d.id_rel_pe is distinct from p_pe_id;
+
+    -- Building parts: clear stale refs to this PE
+    update pev_deli_stavb d
+    set id_rel_pe = null
+    where d.id_rel_pe = p_pe_id
+      and not exists ( select 1
+                       from pev_stavbe s
+                                join pev_fo f on f.id = s.id_rel_fo
+                       where s.id = d.id_rel_sta
+                         and f.id_rel_pe = p_pe_id );
+end
+$function$
+
+</pre></details><details><summary>pripis.txt</summary><pre>Source: /Users/matevzvidovic/isam/pripis/delitev_pev/izracun_delitve_pev.py
+SHA256 (full source): 80158d79a94961bfea132b9e7ae9be9a77c05bd324d200af8ef4742228c50d34
+
+350:         create index on tmp_delitev_zps_stavbe (stavba_id);
+351: 
+352:         drop table if exists tmp_delitev_pev_neto_stavbe cascade;
+353:         create temporary table tmp_delitev_pev_neto_stavbe on commit drop as
+354:         select
+355:             s.stavba_id,
+356:             sum(d.povrsina)::numeric as neto_povrsina_stavba
+357:         from pev_deli_stavb d
+358:         join pev_stavbe s on s.id = d.id_rel_sta
+359:         join pev_fo fo on fo.id = s.id_rel_fo
+360:         where s.stavba_id is not null
+361:           and d.povrsina is not null
+362:           and d.upostevan is true
+363:           and fo.valid_to_fo is null
+364:         group by s.stavba_id;
+365: 
+366:         create index on tmp_delitev_pev_neto_stavbe (stavba_id);
+367: 
+
+460: 
+461:         drop table if exists tmp_delitev_dst cascade;
+462:         create temporary table tmp_delitev_dst on commit drop as
+463:         select
+464:             pe.id_rel_pr_datum,
+465:             pe.id_rel_pev_izracuni_x_pd,
+466:             pe.id_rel_pev_verzije_izracun,
+467:             pe.id_rel_pev_vrednosti,
+468:             pe.id_rel_pe,
+469:             pe.pev_model,
+470:             pe.tip_elektrarne,
+471:             pe.elektrarna_na_stavbi,
+472:             d.id as id_rel_pev_del_stavbe,
+473:             d.del_stavbe_id,
+474:             coalesce(pd.stavba_id, s.stavba_id) as stavba_id,
+475:             coalesce(pd.dejanska_raba_dst, d.vrsta_dejanske_rabe_del_st_id)::integer as dejanska_raba_dst,
+476:             coalesce(pd.neto_povrsina_dst, d.povrsina)::numeric as neto_povrsina_dst,
+477:             coalesce(
+478:                 pd.zps_dst,
+479:                 round(zpss.zps_stavba * d.povrsina::numeric / nullif(ns.neto_povrsina_stavba, 0), 2)
+480:             )::numeric as zps_dst,
+481:             (1::numeric / nullif(coalesce(pc.st_pev_dst, 1), 0))::numeric as del_dst,
+482:             pd.vrednost_izr as vrednost_dst_brez_po,
+483:             1::numeric as faktor_po_dst,
+484:             pd.vrednost_zaokrozena as vrednost_dst_s_po,
+485:             pd.napaka_izracuna as napaka_pripis
+486:         from tmp_delitev_pev pe
+487:         join pev_deli_stavb d on d.id_rel_pe = pe.id_rel_pe
+488:         join pev_stavbe s on s.id = d.id_rel_sta
+489:         join pev_fo dfo
+490:           on dfo.id = s.id_rel_fo
+491:          and dfo.id_rel_pe = pe.id_rel_pe
+492:         left join tmp_delitev_pripis_dst pd on pd.del_stavbe_id = d.del_stavbe_id
+493:         left join tmp_delitev_zps_stavbe zpss on zpss.stavba_id = coalesce(pd.stavba_id, s.stavba_id)
+494:         left join tmp_delitev_pev_neto_stavbe ns on ns.stavba_id = coalesce(pd.stavba_id, s.stavba_id)
+495:         left join tmp_delitev_dst_pev_count pc on pc.del_stavbe_id = d.del_stavbe_id
+496:         where d.upostevan is true
+497:           and dfo.valid_to_fo is null;
+498: 
+499:         create index on tmp_delitev_dst (id_rel_pe);
+500:         create index on tmp_delitev_dst (del_stavbe_id);
+501:         &quot;&quot;&quot;,
+502:         params,
+503:     )
+</pre></details><details><summary>props.txt</summary><pre>Source: /Users/matevzvidovic/fmp/resources/assets/vue/settings/sfcs.js
+SHA256 (full source): 0a582c5ad43f5796009d2bfcbdcb785dd0f0d6dc1c15973c165ee35e9bdcd10c
+
+80: };
+81: 
+82: const positionsInputs = {
+83:     LAYER_DATA: &#x27;LAYER_DATA&#x27;,
+84:     ATTRIBUTE_TABLE_DATA: &#x27;ATTRIBUTE_TABLE_DATA&#x27;,
+85:     RECORD_DATA: &#x27;RECORD_DATA&#x27;,
+86:     ATTRIBUTE_FIELD_DATA: &#x27;ATTRIBUTE_FIELD_DATA&#x27;,
+87:     RESULTS_SET: &#x27;RESULTS_SET&#x27;,
+88:     STATIC_DATA: &#x27;STATIC&#x27;,
+89:     // Live form context (field definitions, values, edit flag) supplied by
+90:     // GmsForm at runtime — not resolved from the store.
+91:     FORM_DATA: &#x27;FORM_DATA&#x27;,
+92: };
+93: 
+94: const positionsVariables = {
+
+186:     [positions.RESULTS_TABLE_ROW]: {
+187:         [positionsInputs.LAYER_DATA]: {
+188:             required: false,
+189:             default: () =&gt; ({}),
+190:         },
+191:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+192:             required: true,
+193:         },
+194:         [positionsInputs.RECORD_DATA]: {
+195:             required: true,
+196:         },
+197:     },
+198:     [positions.RESULTS_TABLE_MENU]: {
+199:         [positionsInputs.LAYER_DATA]: {
+200:             required: false,
+201:             default: () =&gt; ({}),
+202:         },
+203:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+204:             required: true,
+205:         },
+206:         [positionsInputs.RESULTS_SET]: {
+207:             required: true,
+208:         },
+209:     },
+210:     [positions.RESULTS_TABLE_ROW_MENU]: {
+211:         [positionsInputs.LAYER_DATA]: {
+212:             required: false,
+213:             default: () =&gt; ({}),
+214:         },
+215:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+216:             required: true,
+217:         },
+218:         [positionsInputs.RECORD_DATA]: {
+219:             required: true,
+220:         },
+221:     },
+</pre></details><details><summary>report.txt</summary><pre>Source: /Users/matevzvidovic/lift-temporal-python/src/packages/_gurs/pev_reports/sql/pev_info.sql
+SHA256 (full source): 1dd0219c636f357ce3b049de6b94f2eff8ccc21f3f76b193e6b8345e63434ad6
+
+1: --### pev_info
+2: select valid_from, ime_pev, id_pev, pe.model
+3: from pev_posebne_enote pe
+4: where id = &#x27;{{id}}&#x27;;
+5: 
+6: 
+7: --### parc_info
+8: select parc.ko_id,
+9:        parc.st_parcele,
+10:        case
+11:            when parc.delez is null then parc.povrsina
+12:            else parc.delez
+13:            end as delez,
+14:        parc.povrsina
+15: from pev_posebne_enote pe
+16:          join pev_fo fo on pe.id = fo.id_rel_pe
+17:          join pev_parcele parc on fo.id = parc.id_rel_fo
+18: where pe.id = &#x27;{{id}}&#x27;
+19:   and fo.valid_to_fo is null
+20:   and upostevan = True;
+21: 
+22: 
+23: --### st_info
+24: select st.ko_id, st.st_stavbe, dst.st_dela_stavbe, dej_raba.naziv
+25: from pev_posebne_enote pe
+26:          join pev_fo fo on pe.id = fo.id_rel_pe
+27:          join pev_stavbe st on fo.id = st.id_rel_fo
+28:          join pev_deli_stavb dst on st.id = dst.id_rel_sta
+29:          join pp_sif_dej_raba_dst_model dej_raba on dst.vrsta_dejanske_rabe_del_st_id = dej_raba.sifra
+30: where pe.id = &#x27;{{id}}&#x27;
+31:   and fo.valid_to_fo is null
+32:   and st.upostevan = True
+33:   and dst.upostevan = True;
+34:   
+</pre></details><details><summary>row.txt</summary><pre>Source: /Users/matevzvidovic/fmp/resources/assets/vue/templates/mapview/components/Results/components/FeaturesTable/Results.vue
+SHA256 (full source): 87339f0acbbc6dacff7372d47647b63545eadb34a873b9a524d87cfeca4377e1
+
+43: 
+44:         &lt;template #tbody&gt;
+45:             &lt;template v-for=&quot;(feature, featureIndex) in renderedFeatures&quot; :key=&quot;feature.key&quot;&gt;
+46:                 &lt;sfc-store-renderer v-if=&quot;tableId &amp;&amp; getSfcRenderers(
+47:                                         positions.RESULTS_TABLE_ROW,
+48:                                         tableId,
+49:                                         layer?.layer_id,
+50:                                     ).length&quot;
+51:                                     :attribute-table-id=&quot;tableId&quot;
+52:                                     :position=&quot;positions.RESULTS_TABLE_ROW&quot;
+53:                                     :feature-id=&quot;feature.id&quot;
+54:                                     :layer-id=&quot;layer?.layer_id&quot;/&gt;
+55:                 &lt;results-feature v-else class=&quot;sticky-table&quot;
+56:                                  :render-index=&quot;featureIndex&quot;
+57:                                  :style=&quot;offsetY&quot;
+58:                                  :feature-index=&quot;feature.index&quot;
+59:                                  :start-index=&quot;feature.start_index&quot;
+60:                                  :selected-tab-override=&quot;selectedTabOverride&quot;
+61:                                  :field-sizes=&quot;getFieldSizes&quot;
+62:                                  :menu-renderers-count=&quot;menuRenderersCount&quot;
+63:                                  :relationships=&quot;relationships&quot;/&gt;
+</pre></details></html>

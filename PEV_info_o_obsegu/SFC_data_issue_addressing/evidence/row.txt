@@ -1,0 +1,24 @@
+Source: /Users/matevzvidovic/fmp/resources/assets/vue/templates/mapview/components/Results/components/FeaturesTable/Results.vue
+SHA256 (full source): 87339f0acbbc6dacff7372d47647b63545eadb34a873b9a524d87cfeca4377e1
+
+43: 
+44:         <template #tbody>
+45:             <template v-for="(feature, featureIndex) in renderedFeatures" :key="feature.key">
+46:                 <sfc-store-renderer v-if="tableId && getSfcRenderers(
+47:                                         positions.RESULTS_TABLE_ROW,
+48:                                         tableId,
+49:                                         layer?.layer_id,
+50:                                     ).length"
+51:                                     :attribute-table-id="tableId"
+52:                                     :position="positions.RESULTS_TABLE_ROW"
+53:                                     :feature-id="feature.id"
+54:                                     :layer-id="layer?.layer_id"/>
+55:                 <results-feature v-else class="sticky-table"
+56:                                  :render-index="featureIndex"
+57:                                  :style="offsetY"
+58:                                  :feature-index="feature.index"
+59:                                  :start-index="feature.start_index"
+60:                                  :selected-tab-override="selectedTabOverride"
+61:                                  :field-sizes="getFieldSizes"
+62:                                  :menu-renderers-count="menuRenderersCount"
+63:                                  :relationships="relationships"/>

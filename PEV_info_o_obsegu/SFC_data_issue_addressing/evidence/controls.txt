@@ -1,0 +1,90 @@
+Source: /Users/matevzvidovic/isam/pev/kontrole_sestavin/priprava_geom_kontrol.py
+SHA256 (full source): 055954adc5c6ca6b0208ebb67c4958ecd564536e5dd406a4bae62a4d3effb5c4
+
+295:         "Pripravi aktualne PEV dele stavb",
+296:         """
+297:         drop table if exists pg_temp.pev_tmp_pev_deli_stavb;
+298: 
+299:         create temp table pev_tmp_pev_deli_stavb
+300:         on commit drop
+301:         as
+302:         select
+303:             d.seq_id_dst,
+304:             d.id,
+305:             d.id_rel_sta,
+306:             d.povrsina,
+307:             d.del_stavbe_id,
+308:             d.soglasje,
+309:             d.upostevan,
+310:             d.vrsta_dejanske_rabe_del_st_id,
+311:             s.fo_geom_upost,
+312:             s.stavba_id,
+313:             pe.model,
+314:             pe.id_pev,
+315:             pe.id as pev_uuid
+316:         from pev_deli_stavb d
+317:         join pev_stavbe s on d.id_rel_sta = s.id
+318:         join pev_fo fo on s.id_rel_fo = fo.id
+319:         join pev_posebne_enote pe on fo.id_rel_pe = pe.id
+320:         where pe.valid_to is null
+321:           and fo.valid_to_fo is null
+322:           and d.upostevan is true;
+323: 
+324:         create index pev_tmp_pev_deli_stavb_id_idx on pev_tmp_pev_deli_stavb (id);
+
+425:         )
+426:         with parcele_s_statusom as (
+427:             select parcela_id, id_pev, model, bool_and(fo_geom_upost) as vsi_true
+428:             from pev_tmp_pev_parcele
+429:             group by parcela_id, id_pev, model
+430:         ),
+431:         filtrirane_parcele as (
+432:             select distinct on (p.parcela_id, p.id_pev, p.model)
+433:                 p.seq_id_parc,
+434:                 p.geom,
+435:                 p.parcela_id,
+436:                 p.model,
+437:                 p.id_pev
+438:             from pev_tmp_pev_parcele p
+439:             join parcele_s_statusom ps
+440:               on p.parcela_id = ps.parcela_id
+441:              and p.id_pev = ps.id_pev
+442:              and p.model is not distinct from ps.model
+443:             where (ps.vsi_true = false and p.fo_geom_upost = false)
+444:                or ps.vsi_true = true
+445:             order by p.parcela_id, p.id_pev, p.model, p.fo_geom_upost
+446:         ),
+447:         napake_parcele as (
+448:             select
+449:                 3 as id_kontrole,
+450:                 concat('PEV parcela ', p.parcela_id, ' ni znotraj KN parcele') as podrobnosti,
+451:                 p.model,
+452:                 p.id_pev,
+453:                 'Parcela'::text as vrsta_sestavine,
+454:                 p.seq_id_parc as seq_id_sestavine
+455:             from filtrirane_parcele p
+456:             join kn_nep_parcele_a kn on p.parcela_id = kn.parcela_id
+457:             where p.geom is not null
+458:               and kn.geom is not null
+459:               and not st_within(kn.geom, st_buffer(p.geom, 0.1::double precision))
+460:         ),
+461:         stavbe_s_statusom as (
+462:             select stavba_id, id_pev, model, bool_and(fo_geom_upost) as vsi_true
+463:             from pev_tmp_pev_stavbe
+464:             group by stavba_id, id_pev, model
+465:         ),
+466:         filtrirane_stavbe as (
+467:             select distinct on (s.stavba_id, s.id_pev, s.model)
+468:                 s.seq_id_sta,
+469:                 s.geom,
+470:                 s.stavba_id,
+471:                 s.model,
+472:                 s.id_pev
+473:             from pev_tmp_pev_stavbe s
+474:             join stavbe_s_statusom ss
+475:               on s.stavba_id = ss.stavba_id
+476:              and s.id_pev = ss.id_pev
+477:              and s.model is not distinct from ss.model
+478:             where (ss.vsi_true = false and s.fo_geom_upost = false)
+479:                or ss.vsi_true = true
+480:             order by s.stavba_id, s.id_pev, s.model, s.fo_geom_upost

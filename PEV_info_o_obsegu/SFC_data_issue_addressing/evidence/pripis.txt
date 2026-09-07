@@ -1,0 +1,66 @@
+Source: /Users/matevzvidovic/isam/pripis/delitev_pev/izracun_delitve_pev.py
+SHA256 (full source): 80158d79a94961bfea132b9e7ae9be9a77c05bd324d200af8ef4742228c50d34
+
+350:         create index on tmp_delitev_zps_stavbe (stavba_id);
+351: 
+352:         drop table if exists tmp_delitev_pev_neto_stavbe cascade;
+353:         create temporary table tmp_delitev_pev_neto_stavbe on commit drop as
+354:         select
+355:             s.stavba_id,
+356:             sum(d.povrsina)::numeric as neto_povrsina_stavba
+357:         from pev_deli_stavb d
+358:         join pev_stavbe s on s.id = d.id_rel_sta
+359:         join pev_fo fo on fo.id = s.id_rel_fo
+360:         where s.stavba_id is not null
+361:           and d.povrsina is not null
+362:           and d.upostevan is true
+363:           and fo.valid_to_fo is null
+364:         group by s.stavba_id;
+365: 
+366:         create index on tmp_delitev_pev_neto_stavbe (stavba_id);
+367: 
+
+460: 
+461:         drop table if exists tmp_delitev_dst cascade;
+462:         create temporary table tmp_delitev_dst on commit drop as
+463:         select
+464:             pe.id_rel_pr_datum,
+465:             pe.id_rel_pev_izracuni_x_pd,
+466:             pe.id_rel_pev_verzije_izracun,
+467:             pe.id_rel_pev_vrednosti,
+468:             pe.id_rel_pe,
+469:             pe.pev_model,
+470:             pe.tip_elektrarne,
+471:             pe.elektrarna_na_stavbi,
+472:             d.id as id_rel_pev_del_stavbe,
+473:             d.del_stavbe_id,
+474:             coalesce(pd.stavba_id, s.stavba_id) as stavba_id,
+475:             coalesce(pd.dejanska_raba_dst, d.vrsta_dejanske_rabe_del_st_id)::integer as dejanska_raba_dst,
+476:             coalesce(pd.neto_povrsina_dst, d.povrsina)::numeric as neto_povrsina_dst,
+477:             coalesce(
+478:                 pd.zps_dst,
+479:                 round(zpss.zps_stavba * d.povrsina::numeric / nullif(ns.neto_povrsina_stavba, 0), 2)
+480:             )::numeric as zps_dst,
+481:             (1::numeric / nullif(coalesce(pc.st_pev_dst, 1), 0))::numeric as del_dst,
+482:             pd.vrednost_izr as vrednost_dst_brez_po,
+483:             1::numeric as faktor_po_dst,
+484:             pd.vrednost_zaokrozena as vrednost_dst_s_po,
+485:             pd.napaka_izracuna as napaka_pripis
+486:         from tmp_delitev_pev pe
+487:         join pev_deli_stavb d on d.id_rel_pe = pe.id_rel_pe
+488:         join pev_stavbe s on s.id = d.id_rel_sta
+489:         join pev_fo dfo
+490:           on dfo.id = s.id_rel_fo
+491:          and dfo.id_rel_pe = pe.id_rel_pe
+492:         left join tmp_delitev_pripis_dst pd on pd.del_stavbe_id = d.del_stavbe_id
+493:         left join tmp_delitev_zps_stavbe zpss on zpss.stavba_id = coalesce(pd.stavba_id, s.stavba_id)
+494:         left join tmp_delitev_pev_neto_stavbe ns on ns.stavba_id = coalesce(pd.stavba_id, s.stavba_id)
+495:         left join tmp_delitev_dst_pev_count pc on pc.del_stavbe_id = d.del_stavbe_id
+496:         where d.upostevan is true
+497:           and dfo.valid_to_fo is null;
+498: 
+499:         create index on tmp_delitev_dst (id_rel_pe);
+500:         create index on tmp_delitev_dst (del_stavbe_id);
+501:         """,
+502:         params,
+503:     )

@@ -1,0 +1,55 @@
+Source: /Users/matevzvidovic/fmp/resources/assets/vue/settings/sfcs.js
+SHA256 (full source): 0a582c5ad43f5796009d2bfcbdcb785dd0f0d6dc1c15973c165ee35e9bdcd10c
+
+80: };
+81: 
+82: const positionsInputs = {
+83:     LAYER_DATA: 'LAYER_DATA',
+84:     ATTRIBUTE_TABLE_DATA: 'ATTRIBUTE_TABLE_DATA',
+85:     RECORD_DATA: 'RECORD_DATA',
+86:     ATTRIBUTE_FIELD_DATA: 'ATTRIBUTE_FIELD_DATA',
+87:     RESULTS_SET: 'RESULTS_SET',
+88:     STATIC_DATA: 'STATIC',
+89:     // Live form context (field definitions, values, edit flag) supplied by
+90:     // GmsForm at runtime — not resolved from the store.
+91:     FORM_DATA: 'FORM_DATA',
+92: };
+93: 
+94: const positionsVariables = {
+
+186:     [positions.RESULTS_TABLE_ROW]: {
+187:         [positionsInputs.LAYER_DATA]: {
+188:             required: false,
+189:             default: () => ({}),
+190:         },
+191:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+192:             required: true,
+193:         },
+194:         [positionsInputs.RECORD_DATA]: {
+195:             required: true,
+196:         },
+197:     },
+198:     [positions.RESULTS_TABLE_MENU]: {
+199:         [positionsInputs.LAYER_DATA]: {
+200:             required: false,
+201:             default: () => ({}),
+202:         },
+203:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+204:             required: true,
+205:         },
+206:         [positionsInputs.RESULTS_SET]: {
+207:             required: true,
+208:         },
+209:     },
+210:     [positions.RESULTS_TABLE_ROW_MENU]: {
+211:         [positionsInputs.LAYER_DATA]: {
+212:             required: false,
+213:             default: () => ({}),
+214:         },
+215:         [positionsInputs.ATTRIBUTE_TABLE_DATA]: {
+216:             required: true,
+217:         },
+218:         [positionsInputs.RECORD_DATA]: {
+219:             required: true,
+220:         },
+221:     },

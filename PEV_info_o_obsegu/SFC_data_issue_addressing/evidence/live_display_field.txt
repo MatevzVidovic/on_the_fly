@@ -1,0 +1,4 @@
+pev_parcele|prikazan_na_sloju|boolean|NO|true
+pev_stavbe|prikazan_na_sloju|boolean|NO|true
+pev_stavbe|t|41478
+pev_parcele|t|107885

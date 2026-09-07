@@ -1,0 +1,41 @@
+CREATE OR REPLACE FUNCTION public.sync_pe_usage(p_pe_id uuid)
+ RETURNS void
+ LANGUAGE plpgsql
+AS $function$
+begin
+    if p_pe_id is null then return; end if;
+
+    -- Parcels: set where FO → PE matches
+    update pev_parcele p
+    set id_rel_pe = p_pe_id
+    where exists ( select 1 from pev_fo f where f.id = p.id_rel_fo and f.id_rel_pe = p_pe_id )
+      and p.id_rel_pe is distinct from p_pe_id;
+
+    -- Parcels: clear stale refs to this PE
+    update pev_parcele p
+    set id_rel_pe = null
+    where p.id_rel_pe = p_pe_id
+      and not exists ( select 1 from pev_fo f where f.id = p.id_rel_fo and f.id_rel_pe = p_pe_id );
+
+    -- Building parts: set where STA → FO → PE matches
+    update pev_deli_stavb d
+    set id_rel_pe = p_pe_id
+    where exists ( select 1
+                   from pev_stavbe s
+                            join pev_fo f on f.id = s.id_rel_fo
+                   where s.id = d.id_rel_sta
+                     and f.id_rel_pe = p_pe_id )
+      and d.id_rel_pe is distinct from p_pe_id;
+
+    -- Building parts: clear stale refs to this PE
+    update pev_deli_stavb d
+    set id_rel_pe = null
+    where d.id_rel_pe = p_pe_id
+      and not exists ( select 1
+                       from pev_stavbe s
+                                join pev_fo f on f.id = s.id_rel_fo
+                       where s.id = d.id_rel_sta
+                         and f.id_rel_pe = p_pe_id );
+end
+$function$
+

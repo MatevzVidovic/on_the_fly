@@ -1,0 +1,116 @@
+Source: /Users/matevzvidovic/fmp/app/_Company/Gurs/Services/Activities/ArchivePevActivity.php
+SHA256 (full source): 542391b5409912e17edc425d7eb5f137e071b1647b118860aaaccbd29364af52
+
+230:     public function duplicateStavbe(array $pevFoMapping): array 
+231:     {
+232:         $this->attributeTableClient->disableTriggers('pev_stavbe');
+233: 
+234:         try {
+235:             $records = $this->attributeTableClient->fetchRecords('pev_stavbe', 'id_rel_fo', array_keys($pevFoMapping), true);
+236:     
+237:             $this->temporalActivityUS->heartbeat([
+238:                 'table' => 'pev_stavbe',
+239:                 'total_records' => count($records),
+240:             ]);
+241:     
+242:             $mapping = [];
+243:             $payloads = [];
+244:     
+245:             foreach ($records as $record) {
+246:                 $data = (array) $record;
+247:                 $newId = $this->attributeTableClient->generateId();
+248:     
+249:                 $data['id'] = $newId;
+250:                 $data['id_rel_fo'] = $pevFoMapping[$record->id_rel_fo];
+251:     
+252:                 $payloads[] = $data;
+253:                 $mapping[$record->id] = $newId;
+254:             }
+255:     
+256:             $this->attributeTableClient->bulkInsert('pev_stavbe', $payloads);
+257:     
+258:             return $mapping;
+259:         } finally {
+260:             $this->attributeTableClient->enableTriggers('pev_stavbe');
+261:         }
+262:     }
+263: 
+264:     /**
+265:      * @param array $stavbeMapping
+266:      * @return array
+267:      */
+268:     #[ActivityMethod]
+269:     public function duplicateDeliStavb(array $stavbeMapping): array 
+270:     {
+271:         $this->attributeTableClient->disableTriggers('pev_deli_stavb');
+272: 
+273:         try {
+274:             $records = $this->attributeTableClient->fetchRecords('pev_deli_stavb', 'id_rel_sta', array_keys($stavbeMapping));
+275: 
+276:             $this->temporalActivityUS->heartbeat([
+277:                 'table' => 'pev_deli_stavb',
+278:                 'total_records' => count($records),
+279:             ]);
+280: 
+281:             $ids = [];
+282:             $payloads = [];
+283: 
+284:             foreach ($records as $record) {
+285:                 $data = (array) $record;
+286:                 $newId = $this->attributeTableClient->generateId();
+287: 
+288:                 $data['id'] = $newId;
+289:                 $data['id_rel_sta'] = $stavbeMapping[$record->id_rel_sta];
+290: 
+291:                 $payloads[] = $data;
+292:                 $ids[] = $newId;
+293:             }
+294: 
+295:             $this->attributeTableClient->bulkInsert('pev_deli_stavb', $payloads);
+296: 
+297:             return $ids;
+298:         } finally {
+299:             $this->attributeTableClient->enableTriggers('pev_deli_stavb');
+300:         }
+301:     }
+302: 
+303:     /**
+304:      * @param array $parceleMapping
+305:      * @param array $stavbeMapping
+306:      * @return array
+307:      */
+308:     #[ActivityMethod]
+309:     public function duplicateParceleStavbe(array $parceleMapping, array $stavbeMapping): array 
+310:     {
+311:         $records = $this->attributeTableClient->fetchRecords(
+312:             'pev_parcele_stavbe',
+313:             [
+314:                 'id_rel_parc' => array_keys($parceleMapping),
+315:                 'id_rel_sta'  => array_keys($stavbeMapping),
+316:             ]
+317:         );
+318: 
+319:         $this->temporalActivityUS->heartbeat([
+320:             'table' => 'pev_parcele_stavbe',
+321:             'total_records' => count($records),
+322:         ]);
+323: 
+324:         $ids = [];
+325:         $payloads = [];
+326: 
+327:         foreach ($records as $record) {
+328:             $data = (array) $record;
+329:             $newId = $this->attributeTableClient->generateId();
+330:     
+331:             $data['id'] = $newId;
+332:             $data['id_rel_parc'] = $parceleMapping[$record->id_rel_parc];
+333:             $data['id_rel_sta'] = $stavbeMapping[$record->id_rel_sta];
+334: 
+335:             $payloads[] = $data;
+336:             $ids[] = $newId;
+337:         }
+338: 
+339:         $this->attributeTableClient->bulkInsert('pev_parcele_stavbe', $payloads);
+340: 
+341:         return $ids;
+342:     }

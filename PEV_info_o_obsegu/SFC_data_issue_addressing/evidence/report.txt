@@ -1,0 +1,37 @@
+Source: /Users/matevzvidovic/lift-temporal-python/src/packages/_gurs/pev_reports/sql/pev_info.sql
+SHA256 (full source): 1dd0219c636f357ce3b049de6b94f2eff8ccc21f3f76b193e6b8345e63434ad6
+
+1: --### pev_info
+2: select valid_from, ime_pev, id_pev, pe.model
+3: from pev_posebne_enote pe
+4: where id = '{{id}}';
+5: 
+6: 
+7: --### parc_info
+8: select parc.ko_id,
+9:        parc.st_parcele,
+10:        case
+11:            when parc.delez is null then parc.povrsina
+12:            else parc.delez
+13:            end as delez,
+14:        parc.povrsina
+15: from pev_posebne_enote pe
+16:          join pev_fo fo on pe.id = fo.id_rel_pe
+17:          join pev_parcele parc on fo.id = parc.id_rel_fo
+18: where pe.id = '{{id}}'
+19:   and fo.valid_to_fo is null
+20:   and upostevan = True;
+21: 
+22: 
+23: --### st_info
+24: select st.ko_id, st.st_stavbe, dst.st_dela_stavbe, dej_raba.naziv
+25: from pev_posebne_enote pe
+26:          join pev_fo fo on pe.id = fo.id_rel_pe
+27:          join pev_stavbe st on fo.id = st.id_rel_fo
+28:          join pev_deli_stavb dst on st.id = dst.id_rel_sta
+29:          join pp_sif_dej_raba_dst_model dej_raba on dst.vrsta_dejanske_rabe_del_st_id = dej_raba.sifra
+30: where pe.id = '{{id}}'
+31:   and fo.valid_to_fo is null
+32:   and st.upostevan = True
+33:   and dst.upostevan = True;
+34:   
