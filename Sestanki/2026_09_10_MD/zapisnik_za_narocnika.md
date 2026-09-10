@@ -1,0 +1,76 @@
+# Sestanek MD – 10. 9. 2026
+
+**Prisotni:**
+
+- **FCT:** Gašper Oder, Matevž Vidovič
+- **GURS:** Melita Ulbl, Rok Štembal, Andrej Glavica
+
+## Zadeve s prejšnjega sestanka
+
+- **Upoštevanje pasivnih modelov pri izračunu**  
+  Omogočiti je treba poljuben nabor pasivnih modelov in ustrezno odštevanje njihovih vrednosti.  
+  **ODG:** Za pasivne modele, ki se pri poslu ne upoštevajo, bomo v vmesnem izračunu namesto `null` uporabili vrednost `0`, da bo izračun leve strani enačbe mogoč.
+
+- **Preimenovanje faktorja `v_gar`**  
+  Faktor vrednostne tabele garaž ima enako oznako kot pasivni model GAR.  
+  **ODG:** Faktor bomo preimenovali, da bosta oznaki v enačbi nedvoumni.
+
+## Na novo odprte zadeve
+
+- **Vključevanje transakcij v model PPL_NAJ**  
+  V model se ne vključijo transakcije, zato se izračun ne izvede.  
+  **ODG:** Ugotovili smo, da trenutni filter ne zajame nobene transakcije iz izvorne tabele `pp_np_trans`. S prilagojenim filtrom se transakcije vključijo. GURS prosimo, da preveri in posreduje ustrezne filtre za modele s končnicama `_NAJ` in `_MN`, na podlagi katerih bomo izvedli popravke. Pri datumskih pogojih zapis `DATE` ni potreben; zadostuje npr. `dat_pri > '2020-01-01'`.
+
+- **Prikaz vira transakcij pri verziji modela**  
+  Pri posamezni verziji modela mora biti jasno razvidno, iz katere tabele se črpajo transakcije.  
+  **ODG:** Vir se določi glede na končnico imena modela: `*_NAJ` → `pp_np_trans`, `*_MN` → `md_trans_mn`, preostali modeli → `pp_kp_trans`. Dodali bomo atribut za prikaz vira. Način črpanja fiktivnih prodaj in pravila za polnjenje atributa `md_verzije_modeli.skupina` bomo pojasnili naknadno.
+
+- **Napačna vrsta prostora pri poslu 894728**  
+  V ISAM-u je navedena vrsta prostora 99, v GV pa 3 – Poslovni prostor. Podatek v migraciji na strani GURS je pravilen.  
+  **ODG:** Preverili bomo prenos podatka in ugotovili, kje nastane odstopanje.
+
+- **Manjkajoča desna vrednost enačbe pri modelu PPP**  
+  Pri več transakcijah se desna vrednost enačbe ne izračuna, ker atribut `velikost` ni izpolnjen.  
+  **ODG:** Preverili bomo vzrok manjkajočih vrednosti in morebitno povezavo z napačno vrsto prostora 99.
+
+- **Obvestila in zaklep gumba med izdelavo poročila o modelu**  
+  Uporabnik potrebuje obvestilo o začetku in zaključku izdelave poročila ter zaščito pred ponovnim zagonom med izvajanjem.  
+  **ODG:** Dodali bomo obe obvestili in med izdelavo poročila onemogočili gumb za njegovo generiranje.
+
+- **Poročila o modelu v obliki DOCX**  
+  Predlagana je izdelava poročil v obliki DOCX namesto PDF.  
+  **ODG:** Preverili bomo obseg potrebnih prilagoditev in naknadno sporočili odločitev o izvedbi.
+
+- **Velikost oznak in prikaz vseh transakcij na karti**  
+  Pri oddaljevanju se oznake transakcij prekrivajo, kar otežuje oceno njihove prostorske gostote. Prikaz mora ohraniti vse transakcije, velikost oznak pa naj se prilagaja merilu.  
+  **ODG:** Preverili bomo možnosti prilagajanja velikosti oznak, da bodo tudi pri manjšem merilu razločne. Predlog rešitve bomo uskladili z GURS.
+
+- **Manjkajoč prikaz transakcij modela PPL na karti**  
+  Transakcije morajo biti vidne pri vseh verzijah modelov, ki jih vključujejo.  
+  **ODG:** Pri modelu PPL smo ugotovili manjkajočo geometrijo v tabeli `md_trans`; napako bomo odpravili. Za ustrezen prikaz je treba upoštevati tudi filter »Delovna coniranje« = `True` in nastavitev atributa `md_verzije_modeli.delovna` pri izbrani verziji modela.
+
+- **Napačen prikaz vrednosti faktorja obratovalnih stroškov**  
+  V 3D tabeli gradnikov faktorja obratovalnih stroškov so prikazane napačne vrednosti, čeprav so podatki v bazi pravilni.  
+  **ODG:** Preverili bomo vzrok odstopanja pri prikazu vrednosti.
+
+- **Filtriranje transakcij za preverjanje enačb**  
+  Za preverjanje izračunov je treba lažje poiskati transakcije, ki imajo določene vhodne vrednosti izpolnjene.  
+  **ODG:** Preverili bomo možnosti filtriranja transakcij glede na izpolnjenost posameznih vhodnih vrednosti.
+
+- **Kopiranje barvne sheme med verzijami modelov**  
+  Pri kopiranju verzije modela je treba prenesti tudi atribut barvne sheme.  
+  **ODG:** Atribut barvne sheme bomo vključili v kopiranje med verzijami modelov.
+
+- **Prazna tabela dejanskih rab v poročilu o analizi napake za model PPL 192**  
+  V poročilu za model PPL 192 tabela dejanskih rab ni izpolnjena.  
+  **ODG:** Preverili bomo vzrok manjkajočih podatkov v poročilu.
+
+- **Dokumentacija za skripte umerjanja ČPT**  
+  Dokumentacijo je treba dopolniti z navodili za pripravo podatkov in izločanje osamelcev.  
+  **ODG:** Pripravili bomo opis deljenja s trenutnim faktorjem `f_cpt` za pridobitev osnovnih vrednosti leve strani transakcije ter navodila za izločanje osamelcev iz podatkovnega okvira (`dataframe`) na podlagi razmerja `leva/desna` oziroma `index_c/index_v`.
+
+## Teme za naslednji sestanek
+
+- Pomen in delovanje možnosti »Drugi TAO«.
+- Črpanje podatkov za MN in fiktivne transakcije.
+- Odločitev o izdelavi poročil o modelu v obliki DOCX.
