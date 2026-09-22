@@ -38,7 +38,7 @@ class CatalogEntry:
     pending_sql: bool = False
 
 
-def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], source_table: str, index: str | None, kn_sql_name: str | None, lift_sql_name: str | None, index_columns: tuple[str, ...] | None = None, *, requires_jn_status: bool = True, from_2025: bool = False, forbid_columns: tuple[str, ...] = ()) -> CatalogEntry:
+def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], source_table: str, index: str | None, kn_sql_name: str | None, lift_sql_name: str | None, index_columns: tuple[str, ...] | None = None, *, requires_jn_status: bool = True, from_2025: bool = False, forbid_columns: tuple[str, ...] = (), check_page_keys: tuple[str, ...] = ()) -> CatalogEntry:
     # A path is still a TableSpec fact when the integration SQL is pending;
     # live wrappers explicitly reject it rather than falling back to old code.
     source = SQL / (kn_sql_name or f"{name}_kn.sql")
@@ -50,6 +50,7 @@ def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], 
             requires_jn_status=requires_jn_status,
             from_2025=from_2025,
             forbid_columns=forbid_columns,
+            source_page_keys=check_page_keys,
         ),
         lift,
         not source.exists() or not lift.exists() or index is None,
@@ -59,7 +60,7 @@ def _entry(name: str, target: str, membership: str, page_keys: tuple[str, ...], 
 _DECLARED_ENTRIES = {
     "ev_dst_pripis_podatki_h": _entry("ev_dst_pripis_podatki", "ev_dst_pripis_podatki_h", "dst_pripis_podatki_pk", ("dst_pripis_podatki_pk",), "DST_PRIPIS_PODATKI", "SYS_C00102666", "ev_dst_pripis_podatki_h_kn.sql", "ev_dst_pripis_podatki_h_lift.sql", ("id",), requires_jn_status=False),
     "ev_del_stavbe_h": _entry("ev_del_stavbe", "ev_del_stavbe_h", "jn_del_stavbe_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE", "JN_DEL_STAVBE_PK_JNF_IX", "ev_del_stavbe_h_kn.sql", "ev_del_stavbe_h_lift.sql"),
-    "ev_del_stavbe_enota_h_2025_danes": _entry("ev_del_stavbe_enota", "ev_del_stavbe_enota_h_2025_danes", "jn_del_st_enota_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE_ENOTA", "JN_DEL_STAVBE_ENOTA_PK_JNF_IX", "ev_del_stavbe_enota_h_2025_danes_kn.sql", "ev_del_stavbe_enota_h_2025_danes_lift.sql", from_2025=True, forbid_columns=("podatki",)),
+    "ev_del_stavbe_enota_h_2025_danes": _entry("ev_del_stavbe_enota", "ev_del_stavbe_enota_h_2025_danes", "jn_del_st_enota_pk", ("dst_sid", "jn_rev_num"), "JN_DEL_STAVBE_ENOTA", "JN_DEL_STAVBE_ENOTA_PK_JNF_IX", "ev_del_stavbe_enota_h_2025_danes_kn.sql", "ev_del_stavbe_enota_h_2025_danes_lift.sql", from_2025=True, forbid_columns=("podatki",), check_page_keys=("jn_del_st_enota_pk",)),
     "ev_parc_del_h": _entry("ev_parc_del", "ev_parc_del_h", "jn_parcela_del_pk", ("id_parc_del", "jn_rev_num"), "JN_PARC_DEL", "JN_PARC_DEL_PK_JNF_IX", "ev_parc_del_h_kn.sql", "ev_parc_del_h_lift.sql"),
     "ev_parc_enota_h_2025_danes": _entry("ev_parc_enota", "ev_parc_enota_h_2025_danes", "jn_parcela_enota_pk", ("id_parc_enota", "jn_rev_num"), "JN_PARC_ENOTA", "JN_PARC_ENOTA_PK_JNF_IX", "ev_parc_enota_h_2025_danes_kn.sql", "ev_parc_enota_h_2025_danes_lift.sql", from_2025=True, forbid_columns=("podatki",)),
     "ev_parcela_h": _entry("ev_parcela", "ev_parcela_h", "jn_parcela_pk", ("pc_mid", "jn_rev_num"), "JN_PARCELA", "JN_PARCELA_PK_JNF_IX", "ev_parcela_h_kn.sql", "ev_parcela_h_lift.sql"),

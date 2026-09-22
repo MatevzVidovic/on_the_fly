@@ -96,6 +96,40 @@ def test_catalog_hash_uses_shared_table_and_check_specs():
     assert split == ["ev_del_stavbe_enota_h_2025_danes", "ev_parc_enota_h_2025_danes"]
 
 
+def test_building_enota_lift_projection_matches_existing_production_columns():
+    import re
+    from integrations.catalog import ENTRIES
+
+    entry = ENTRIES["ev_del_stavbe_enota_h_2025_danes"]
+    sql = check.canonical_lift_sql(entry)
+    # Business columns in the production DDL supplied on 2026-09-22.
+    expected = {
+        "jn_del_st_enota_pk", "dst_sid", "id_model", "raven", "vpliv",
+        "vrednost", "cona_ime", "faktor_po", "posplosena_vrednost",
+        "jn_status", "valid_from", "valid_to", "date_change",
+    }
+    aliases = set(re.findall(r"\bAS\s+([a-z_][a-z_0-9]*)\s*(?:,|$)", sql.split("\nFROM EV.")[0], re.M))
+    assert aliases == expected
+    view = check.CheckView(entry)
+    assert view.pk == "jn_del_st_enota_pk"
+    assert view.source_page_keys == ("jn_del_st_enota_pk",)
+    assert entry.spec.source_page_keys == ("dst_sid", "jn_rev_num")
+    assert 'AS jn_rev_num,' in entry.spec.source_sql.read_text()
+
+    class Oracle:
+        def cursor(self):
+            class Cursor:
+                description = [(name.upper(),) for name in expected]
+                def __enter__(self): return self
+                def __exit__(self, *_args): return False
+                def execute(self, statement, *_args):
+                    assert 'q."JN_REV_NUM"' not in statement
+            return Cursor()
+
+    _, _, failures = check.validate_sql(Oracle(), sql, view)
+    assert failures == []
+
+
 def test_lift_sql_match_is_literal_copy_paste_verification():
     from integrations.catalog import ENTRIES
     entry = ENTRIES["ev_del_stavbe_h"]

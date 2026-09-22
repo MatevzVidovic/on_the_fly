@@ -82,7 +82,7 @@ class CheckView:
     def __init__(self, entry: CatalogEntry) -> None:
         self.table = entry.spec.target_table
         self.pk = entry.spec.membership_key
-        self.source_page_keys = entry.spec.source_page_keys
+        self.source_page_keys = entry.checks.source_page_keys or entry.spec.source_page_keys
         if entry.spec.date_change is None:
             raise ValueError(f"{entry.spec.target_relation} has no checker date-change field")
         self.date_change = entry.spec.date_change
@@ -130,6 +130,7 @@ def catalog_hash(entries: dict[str, CatalogEntry]) -> str:
         (key, entry.spec.target_table, entry.spec.membership_key, entry.spec.source_page_keys,
          entry.spec.date_change, entry.checks.source_table, entry.checks.requires_jn_status,
          entry.checks.from_2025, entry.checks.forbid_columns, entry.checks.lift_title_prefix,
+         entry.checks.source_page_keys,
          canonical_lift_sql(entry))
         for key, entry in entries.items()
     ]

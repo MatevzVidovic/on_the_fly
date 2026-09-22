@@ -75,6 +75,8 @@ class CheckSpec:
     from_2025: bool = False
     forbid_columns: tuple[str, ...] = field(default_factory=tuple)
     lift_title_prefix: str = "EV H"
+    # Optional LIFT-query paging keys, independent of the loader's native keys.
+    source_page_keys: tuple[str, ...] = field(default_factory=tuple)
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "source_table", _identifier(self.source_table, "checker source table"))
@@ -84,5 +86,9 @@ class CheckSpec:
         if len(set(forbidden)) != len(forbidden):
             raise ValueError("forbid_columns must be distinct")
         object.__setattr__(self, "forbid_columns", forbidden)
+        page_keys = tuple(_identifier(column, "checker page key") for column in self.source_page_keys)
+        if len(set(page_keys)) != len(page_keys):
+            raise ValueError("checker source_page_keys must be distinct")
+        object.__setattr__(self, "source_page_keys", page_keys)
         if not isinstance(self.lift_title_prefix, str) or not self.lift_title_prefix:
             raise ValueError("lift_title_prefix must be a non-empty string")
