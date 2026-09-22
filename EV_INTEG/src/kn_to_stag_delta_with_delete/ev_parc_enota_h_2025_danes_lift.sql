@@ -11,7 +11,6 @@ SELECT
     j."FAKTOR_PO" AS faktor_po,
     j."POSPLOSENA_VREDNOST" AS posplosena_vrednost,
     j."ID_MODEL_VER" AS id_model_ver,
-    j."JN_REV_NUM" AS jn_rev_num,
     CAST(TRIM(j."JN_STATUS") AS VARCHAR2(1)) AS jn_status,
     FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,
     FROM_TZ(CAST(rt.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_to,

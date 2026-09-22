@@ -454,8 +454,13 @@ def upsert_sql(spec: TableSpec, source: tuple[str, ...], destination: tuple[str,
     if duplicates:
         raise RuntimeError(f"integration SQL has duplicate selected aliases: {', '.join(duplicates)}")
     expected_source = destination_set if policy.copy_managed_fields else destination_set - policy.managed.all_fields
+    # Native Oracle paging keys may be selected for cursor traversal without
+    # being stored in a legacy LIFT target (for example JN_REV_NUM).
+    # Only declared paging keys can be omitted; other schema drift still fails.
+    paging_only = (set(spec.source_page_keys) - destination_set
+                   - {spec.membership_key, spec.date_change} - policy.managed.all_fields)
     missing = sorted(expected_source - source_set)
-    extra = sorted(source_set - expected_source)
+    extra = sorted(source_set - expected_source - paging_only)
     if missing or extra:
         raise RuntimeError(
             f"integration SQL columns do not match {spec.target_relation}; "
@@ -463,7 +468,7 @@ def upsert_sql(spec: TableSpec, source: tuple[str, ...], destination: tuple[str,
         )
     if spec.membership_key not in source_set:
         raise RuntimeError("integration SQL membership key is not insertable into staging")
-    insertable = policy.insert_columns(source)
+    insertable = policy.insert_columns(tuple(column for column in source if column not in paging_only))
     generated = {key: value for key, value in policy.generated_insert_values().items() if key in destination}
     columns = (*generated, *insertable)
     values = (*generated.values(), *(f"%({column})s" for column in insertable))

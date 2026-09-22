@@ -130,6 +130,49 @@ def test_building_enota_lift_projection_matches_existing_production_columns():
     assert failures == []
 
 
+def test_parcel_enota_matches_production_ddl_and_retains_loader_paging():
+    import re
+    from integrations.catalog import ENTRIES
+    from integration_core.kn_staging import upsert_sql, validate_selected_columns
+
+    entry = ENTRIES["ev_parc_enota_h_2025_danes"]
+    expected = {
+        "jn_parcela_enota_pk", "id_parc_enota", "pc_mid", "id_model",
+        "delez_povrsine", "vrednost", "raven", "vpliv", "cona_ime",
+        "faktor_po", "posplosena_vrednost", "id_model_ver", "jn_status",
+        "valid_from", "valid_to", "date_change",
+    }
+    sql = check.canonical_lift_sql(entry)
+    aliases = set(re.findall(r"\bAS\s+([a-z_][a-z_0-9]*)\s*(?:,|$)", sql.split("\nFROM EV.")[0], re.M))
+    assert aliases == expected
+    assert 'j."ID_PARC_ENOTA" AS id_parc_enota' in sql
+    view = check.CheckView(entry)
+    assert view.source_page_keys == ("jn_parcela_enota_pk",)
+    assert entry.spec.source_page_keys == ("id_parc_enota", "jn_rev_num")
+    loader_sql = entry.spec.source_sql.read_text()
+    source = tuple(re.findall(r"\bAS\s+([a-z_][a-z_0-9]*)\s*(?:,|$)", loader_sql.split("\nFROM EV.")[0], re.M))
+    assert set(source) == expected | {"jn_rev_num"}
+    validate_selected_columns(source, entry.spec, require_change=True)
+    target = (*sorted(expected), "id", "created_by", "updated_by", "created_at", "updated_at")
+    statement = upsert_sql(entry.spec, source, target)
+    assert 'jn_rev_num' not in statement
+    assert 'ON CONFLICT ("jn_parcela_enota_pk")' in statement
+    assert '"id_parc_enota"' in statement
+
+    class Oracle:
+        def cursor(self):
+            class Cursor:
+                description = [(name.upper(),) for name in expected]
+                def __enter__(self): return self
+                def __exit__(self, *_args): return False
+                def execute(self, statement, *_args):
+                    assert 'q."JN_REV_NUM"' not in statement
+            return Cursor()
+
+    _, _, failures = check.validate_sql(Oracle(), sql, view)
+    assert failures == []
+
+
 def test_lift_sql_match_is_literal_copy_paste_verification():
     from integrations.catalog import ENTRIES
     entry = ENTRIES["ev_del_stavbe_h"]
