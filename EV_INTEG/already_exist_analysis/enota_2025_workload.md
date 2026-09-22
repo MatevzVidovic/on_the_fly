@@ -41,7 +41,7 @@ This is a conditional workload illustration, not a recommendation to run a full 
 
 ## Next measurements
 
-1. Obtain exact production counts and check synthetic-key uniqueness using `jn_del_stavbe_enota_pk` and `jn_parcela_enota_pk` respectively. The prepared [target count SQL](../research/enota_2025_target_counts.sql) provides exact totals.
+1. Obtain exact production counts and check synthetic-key uniqueness using `jn_del_st_enota_pk` and `jn_parcela_enota_pk` respectively. The prepared [target count SQL](../research/enota_2025_target_counts.sql) provides exact totals.
 2. Compare source and target keys to measure inserts precisely; compare matching rows' `date_change` (and imported values if needed) to measure updates.
 3. Inspect each LIFT integration's actual SQL, `last_changed_datetime`, `last_sync_start`, and sync mode. Count selected delta rows with those bounds before deciding between catch-up and scoped reconciliation.
 

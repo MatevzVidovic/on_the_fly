@@ -1,5 +1,5 @@
 SELECT
-    TO_CHAR(j."DST_SID") || '-' || TO_CHAR(j."JN_REV_NUM") AS jn_del_stavbe_enota_pk,
+    TO_CHAR(j."DST_SID") || '-' || TO_CHAR(j."JN_REV_NUM") AS jn_del_st_enota_pk,
     j."DST_SID" AS dst_sid,
     j."ID_MODEL" AS id_model,
     j."RAVEN" AS raven,
