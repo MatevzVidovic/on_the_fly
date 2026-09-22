@@ -14,7 +14,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable, Iterator
 
-from kn_audit_core import (AuditError, LJ, Selection, compare_eligible_rows, normalize_temporal,
+from KN_deltas_reason.old_KN_deltas_reason.kn_audit_core import (AuditError, LJ, Selection, compare_eligible_rows, normalize_temporal,
                            parse_cutoff, qi)
 
 SQL_START = re.compile(r"^\s*(?:with\b|select\b)", re.I | re.S)

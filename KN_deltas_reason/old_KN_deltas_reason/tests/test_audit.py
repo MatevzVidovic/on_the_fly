@@ -3,8 +3,8 @@ from decimal import Decimal
 
 import pytest
 
-from kn_audit_core import AuditError, Selection, compare_eligible_rows, normalize_temporal, parse_cutoff
-from kn_delta_audit import (audit_selection, batch_predicate, configure_oracle, configure_pg, discovery_rows, load_selection, resolve_integrations,
+from KN_deltas_reason.old_KN_deltas_reason.kn_audit_core import AuditError, Selection, compare_eligible_rows, normalize_temporal, parse_cutoff
+from KN_deltas_reason.old_KN_deltas_reason.kn_delta_audit import (audit_selection, batch_predicate, configure_oracle, configure_pg, discovery_rows, load_selection, resolve_integrations,
                             validated_select)
 
 UTC = timezone.utc
