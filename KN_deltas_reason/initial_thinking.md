@@ -10,13 +10,13 @@ The earlier [task evidence](jira.md) already distinguishes missing keys from mat
 
 ## Smallest useful experiment
 
-- Pick a few primary KN integrations and a separate EV group. Save their exact SQL, settings, watermark, field mappings and observation start/end times with each export.
-- Fix a cohort using an agreed immutable **source** field and half-open bounds `[from, to)`. A target `created_at` is the local insertion date and cannot substitute for source creation time. If no shared static field exists, document that limitation rather than guessing one. Re-scan the cohort predicate each time; freezing only the initial keys would hide newly appearing records.
-- Export matching key and change timestamp from both sides, plus PostgreSQL UUID `id` and creation time. Use the integration matching key for source/target comparison; a LIFT-generated UUID normally has no Oracle counterpart. Count the same rows being exported.
-- Start with SQLite: one small streaming exporter, an observations table and row snapshots keyed by observation, integration, side and matching key. Preserve timestamp precision/timezone information and keys without numeric rounding. Compare snapshots locally. Do not implement a larger framework yet.
-- Wrap the saved integration SELECT with the cohort predicate; do not rewrite its joins. For the diagnostic snapshots, do **not** exclude rows merely because their delta timestamp is below the current watermark: those are precisely the suspected misses. Export the watermark separately.
+- Start with one KN dataset: `kn_nep_deli_stavb_h`. The saved integration SQL is captured in `source.sql`; no PostgreSQL access is needed at runtime. EV and additional KN datasets are deferred.
+- Filter `DATUM_SYS` from one configured start, initially 2026-07-01 in Europe/Ljubljana, with no end bound. This mutable change-time window is a deliberate performance compromise, not an immutable creation cohort.
+- Export only the matching key and change timestamp. No established creation timestamp is available; validity dates are not substitutes. PostgreSQL UUIDs and target snapshots are later work.
+- One manual streaming exporter saves complete snapshots to SQLite with query, connection identity, window, start/end observation times, count and maximum timestamp. Discard incomplete exports; no resume framework.
+- Compare latest complete snapshot against the first complete snapshot's fixed maximum timestamp. Export absent-baseline keys strictly below that boundary as candidates. Changing the query, start or source identity starts a separate database/baseline.
 
-A key absent from source snapshot A but present in B, with a change timestamp older than the watermark already recorded at A, is evidence of late visibility/backdating relative to the observed dataset. It does not prove the physical insertion time: a joined row becoming visible can have the same effect. Source/target observations are not simultaneous; preserve acquisition times and confirm differences on subsequent runs.
+A key absent from source snapshot A but present in B, with a change timestamp older than A's maximum timestamp, is a candidate late-visibility finding. This experimental boundary is not the LIFT watermark. The key may have entered the filtered window because its timestamp changed; it does not prove physical insertion time. Preserve acquisition times and confirm differences on subsequent runs. See [README.md](README.md) for the implemented first experiment.
 
 ## Get the integration SQL
 

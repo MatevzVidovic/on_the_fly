@@ -1,5 +1,11 @@
 # KN delta drift investigation — task prompt
 
+This is the original broad request. The accepted first implementation is narrower:
+one Oracle-only dataset, manual snapshots of matching key and `DATUM_SYS`, a
+configurable lower date bound with no end bound, and a fixed baseline comparison.
+Creation-date filters, target UUIDs, target comparisons and EV grouping are deferred.
+See [design_session.md](design_session.md) and [README.md](README.md).
+
 We are pivoting from the EV import work to investigating KN delta synchronization.
 
 The primary focus is the KN tables. Also include the EV tables we just imported, but keep them in a separate group so their counts, exports and findings do not get mixed with the primary KN investigation.
