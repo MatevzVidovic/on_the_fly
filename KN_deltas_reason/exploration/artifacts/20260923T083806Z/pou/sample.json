@@ -1,0 +1,126 @@
+{
+  "type": "FeatureCollection",
+  "totalFeatures": 10001,
+  "features": [
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.842",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 842,
+        "SIF_VRS_UA_KRA_SIF": "UD",
+        "VRS_AKT_2": "MOP-UE0053-P2",
+        "NAZ_UPR_POS": "Uporabno dovoljenje",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.1070",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 1070,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MOP-UE0006-P1",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje za nezahteven objekt",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.1231",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 1231,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MOP-UE0054-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.1502",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 1502,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MOP-UE0054-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.1875",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 1875,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MOP-UE0054-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.2913",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 2913,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MZIP-UE0006-P1",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje za nezahteven objekt",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.3077",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 3077,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MZIP-UE0002-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.3221",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 3221,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MZIP-UE0002-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.3376",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 3376,
+        "SIF_VRS_UA_KRA_SIF": "UD",
+        "VRS_AKT_2": "MZIP-UE0024-P2",
+        "NAZ_UPR_POS": "Uporabno dovoljenje",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    },
+    {
+      "type": "Feature",
+      "id": "UPRAVNI_AKTI.3401",
+      "geometry": null,
+      "properties": {
+        "ID_UA": 3401,
+        "SIF_VRS_UA_KRA_SIF": "GD",
+        "VRS_AKT_2": "MZIP-UE0002-P2",
+        "NAZ_UPR_POS": "Gradbeno dovoljenje ( ZGO \u20131 )",
+        "ZAD_SPR": "2026-09-06T22:00:00Z"
+      }
+    }
+  ]
+}

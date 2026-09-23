@@ -1,0 +1,240 @@
+[
+  {
+    "dataset": "integration:ev_del_stavbe_enota_h_2025_danes:726fc9e4-b684-11f1-b953-02420a00027f",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 14, \"dataset\": \"integration:ev_del_stavbe_enota_h_2025_danes:726fc9e4-b684-11f1-b953-02420a00027f\", \"rows\": 100, \"complete\": false}], \"seconds\": 2.99}\n",
+    "stderr": "",
+    "seconds": 3.473
+  },
+  {
+    "dataset": "integration:ev_del_stavbe_h:b867296c-ab2a-11f0-a252-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 15, \"dataset\": \"integration:ev_del_stavbe_h:b867296c-ab2a-11f0-a252-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 7.129}\n",
+    "stderr": "",
+    "seconds": 7.526
+  },
+  {
+    "dataset": "integration:ev_dst_pripis_podatki_h:ebe9dc2a-9356-11f1-a711-02420a000208",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 16, \"dataset\": \"integration:ev_dst_pripis_podatki_h:ebe9dc2a-9356-11f1-a711-02420a000208\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.194}\n",
+    "stderr": "",
+    "seconds": 0.583
+  },
+  {
+    "dataset": "integration:ev_parc_del_h:8a9ed9a4-ae58-11f0-9f8c-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 17, \"dataset\": \"integration:ev_parc_del_h:8a9ed9a4-ae58-11f0-9f8c-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.264}\n",
+    "stderr": "",
+    "seconds": 0.663
+  },
+  {
+    "dataset": "integration:ev_parcela_h:c469d91a-ae56-11f0-84be-169cd02558fe",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/exploration/export_probe.py\", line 59, in <module>\n    cur.execute(sql,plan['binds'])\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/.venv/lib/python3.14/site-packages/oracledb/cursor.py\", line 844, in execute\n    impl.execute(self)\n    ~~~~~~~~~~~~^^^^^^\n  File \"src/oracledb/impl/thick/cursor.pyx\", line 320, in oracledb.thick_impl.ThickCursorImpl.execute\n  File \"src/oracledb/impl/thick/utils.pyx\", line 484, in oracledb.thick_impl._raise_from_odpi\n  File \"src/oracledb/impl/thick/utils.pyx\", line 474, in oracledb.thick_impl._raise_from_info\noracledb.exceptions.DatabaseError: DPY-4011: the database or network closed the connection\nDPI-1080: connection was closed by ORA-03113\nORA-03113: end-of-file on communication channel\nProcess ID: 259843\nSession ID: 1275 Serial number: 27446\nHelp: https://docs.oracle.com/error-help/db/ora-03113/\n",
+    "seconds": 10.691
+  },
+  {
+    "dataset": "integration:ev_parc_enota_h_2025_danes:1e57d002-f69c-11f0-9f2c-02420a000266",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/exploration/export_probe.py\", line 59, in <module>\n    cur.execute(sql,plan['binds'])\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/.venv/lib/python3.14/site-packages/oracledb/cursor.py\", line 844, in execute\n    impl.execute(self)\n    ~~~~~~~~~~~~^^^^^^\n  File \"src/oracledb/impl/thick/cursor.pyx\", line 320, in oracledb.thick_impl.ThickCursorImpl.execute\n  File \"src/oracledb/impl/thick/utils.pyx\", line 484, in oracledb.thick_impl._raise_from_odpi\n  File \"src/oracledb/impl/thick/utils.pyx\", line 474, in oracledb.thick_impl._raise_from_info\noracledb.exceptions.DatabaseError: DPY-4011: the database or network closed the connection\nDPI-1080: connection was closed by ORA-03113\nORA-03113: end-of-file on communication channel\nProcess ID: 260917\nSession ID: 1503 Serial number: 18107\nHelp: https://docs.oracle.com/error-help/db/ora-03113/\n",
+    "seconds": 10.681
+  },
+  {
+    "dataset": "integration:ev_parc_pripis_podatki_h:5b3da3c2-9357-11f1-a60a-02420a000208",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 18, \"dataset\": \"integration:ev_parc_pripis_podatki_h:5b3da3c2-9357-11f1-a60a-02420a000208\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.219}\n",
+    "stderr": "",
+    "seconds": 0.635
+  },
+  {
+    "dataset": "integration:ev_pe_dst_h:f5519202-ae65-11f0-adb7-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 19, \"dataset\": \"integration:ev_pe_dst_h:f5519202-ae65-11f0-adb7-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.672}\n",
+    "stderr": "",
+    "seconds": 1.071
+  },
+  {
+    "dataset": "integration:ev_pe_parc_h:26856cbc-ae67-11f0-8b08-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 20, \"dataset\": \"integration:ev_pe_parc_h:26856cbc-ae67-11f0-8b08-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.592}\n",
+    "stderr": "",
+    "seconds": 0.986
+  },
+  {
+    "dataset": "integration:ev_posebna_enota_h:a75bfb06-ae69-11f0-941e-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 21, \"dataset\": \"integration:ev_posebna_enota_h:a75bfb06-ae69-11f0-941e-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.3}\n",
+    "stderr": "",
+    "seconds": 0.693
+  },
+  {
+    "dataset": "integration:ev_prostor_h:3d6e03ec-ae6e-11f0-bc34-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 22, \"dataset\": \"integration:ev_prostor_h:3d6e03ec-ae6e-11f0-bc34-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.244}\n",
+    "stderr": "",
+    "seconds": 0.643
+  },
+  {
+    "dataset": "integration:ev_stavba_h:39aa410c-beff-11f0-a601-5212cffe39ac",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 23, \"dataset\": \"integration:ev_stavba_h:39aa410c-beff-11f0-a601-5212cffe39ac\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.208}\n",
+    "stderr": "",
+    "seconds": 0.597
+  },
+  {
+    "dataset": "integration:kn_nep_deli_stavb_h:bfe62b52-9aaf-11ef-9c54-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 24, \"dataset\": \"integration:kn_nep_deli_stavb_h:bfe62b52-9aaf-11ef-9c54-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.247}\n",
+    "stderr": "",
+    "seconds": 0.637
+  },
+  {
+    "dataset": "integration:kn_nep_etaze_h:550a20ee-9d03-11ef-8c7b-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 25, \"dataset\": \"integration:kn_nep_etaze_h:550a20ee-9d03-11ef-8c7b-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.268}\n",
+    "stderr": "",
+    "seconds": 0.669
+  },
+  {
+    "dataset": "integration:kn_nep_etaze_x_deli_stavb_h:fb72d988-b94d-11ef-bb81-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 26, \"dataset\": \"integration:kn_nep_etaze_x_deli_stavb_h:fb72d988-b94d-11ef-bb81-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.275}\n",
+    "stderr": "",
+    "seconds": 0.665
+  },
+  {
+    "dataset": "integration:kn_nep_hisne_stevilke_h:736ac43c-b60b-11ef-a0fc-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 27, \"dataset\": \"integration:kn_nep_hisne_stevilke_h:736ac43c-b60b-11ef-a0fc-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.732}\n",
+    "stderr": "",
+    "seconds": 1.121
+  },
+  {
+    "dataset": "integration:kn_nep_katastrske_obcine_h:f6c3a090-8638-11ef-8275-0242ac120007",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 28, \"dataset\": \"integration:kn_nep_katastrske_obcine_h:f6c3a090-8638-11ef-8275-0242ac120007\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.233}\n",
+    "stderr": "",
+    "seconds": 0.631
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_dejanske_rabe_parcel_h:e0c4ee44-f34c-11ef-9c8f-02420a0001ec",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 29, \"dataset\": \"integration:kn_nep_ostalo_dejanske_rabe_parcel_h:e0c4ee44-f34c-11ef-9c8f-02420a0001ec\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.233}\n",
+    "stderr": "",
+    "seconds": 0.62
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_gozdno_gosp_obm:a99024c6-a8aa-11ef-adaf-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 30, \"dataset\": \"integration:kn_nep_ostalo_gozdno_gosp_obm:a99024c6-a8aa-11ef-adaf-0242ac120008\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.482}\n",
+    "stderr": "",
+    "seconds": 0.872
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_namenske_rabe:74096586-f2b2-11ef-ac67-02420a0001ec",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 31, \"dataset\": \"integration:kn_nep_ostalo_namenske_rabe:74096586-f2b2-11ef-ac67-02420a0001ec\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.194}\n",
+    "stderr": "",
+    "seconds": 0.581
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_parcele_x_dejanske_rabe_h:8264be70-aafd-11ef-947a-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 32, \"dataset\": \"integration:kn_nep_ostalo_parcele_x_dejanske_rabe_h:8264be70-aafd-11ef-947a-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.201}\n",
+    "stderr": "",
+    "seconds": 0.593
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h:e0d985ce-a8bb-11ef-ac18-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 33, \"dataset\": \"integration:kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h:e0d985ce-a8bb-11ef-ac18-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.407}\n",
+    "stderr": "",
+    "seconds": 0.8
+  },
+  {
+    "dataset": "integration:kn_nep_ostalo_parcele_x_namenske_rabe_h:8b9adbea-a59f-11ef-a7dc-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 34, \"dataset\": \"integration:kn_nep_ostalo_parcele_x_namenske_rabe_h:8b9adbea-a59f-11ef-a7dc-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.184}\n",
+    "stderr": "",
+    "seconds": 0.576
+  },
+  {
+    "dataset": "integration:kn_nep_parcele_h:4f44b04c-a7e5-11ef-b133-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 35, \"dataset\": \"integration:kn_nep_parcele_h:4f44b04c-a7e5-11ef-b133-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.25}\n",
+    "stderr": "",
+    "seconds": 0.635
+  },
+  {
+    "dataset": "integration:kn_nep_prostori_h:5b16f1a0-a592-11ef-9316-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 36, \"dataset\": \"integration:kn_nep_prostori_h:5b16f1a0-a592-11ef-9316-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.287}\n",
+    "stderr": "",
+    "seconds": 0.686
+  },
+  {
+    "dataset": "integration:kn_nep_rpe_naselja_h:403dee5c-d34f-11ef-a441-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 37, \"dataset\": \"integration:kn_nep_rpe_naselja_h:403dee5c-d34f-11ef-a441-0242ac120008\", \"rows\": 33, \"complete\": false}], \"seconds\": 0.38}\n",
+    "stderr": "",
+    "seconds": 0.777
+  },
+  {
+    "dataset": "integration:kn_nep_rpe_obcine_h:6460237c-f34d-11ef-91f1-02420a0001ec",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 38, \"dataset\": \"integration:kn_nep_rpe_obcine_h:6460237c-f34d-11ef-91f1-02420a0001ec\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.217}\n",
+    "stderr": "",
+    "seconds": 0.599
+  },
+  {
+    "dataset": "integration:kn_nep_rpe_ulice_h:d1d4521c-bc79-11ef-89e9-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 39, \"dataset\": \"integration:kn_nep_rpe_ulice_h:d1d4521c-bc79-11ef-89e9-0242ac120008\", \"rows\": 18, \"complete\": false}], \"seconds\": 0.284}\n",
+    "stderr": "",
+    "seconds": 0.683
+  },
+  {
+    "dataset": "integration:kn_nep_sestavine_delov_stavb_h:ff8e6f56-b951-11ef-9695-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 40, \"dataset\": \"integration:kn_nep_sestavine_delov_stavb_h:ff8e6f56-b951-11ef-9695-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.213}\n",
+    "stderr": "",
+    "seconds": 0.609
+  },
+  {
+    "dataset": "integration:kn_nep_stanovanja_h:04f9f57a-a1b3-11ef-adba-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 41, \"dataset\": \"integration:kn_nep_stanovanja_h:04f9f57a-a1b3-11ef-adba-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.452}\n",
+    "stderr": "",
+    "seconds": 0.843
+  },
+  {
+    "dataset": "integration:kn_nep_stavbe_centroidi_h:45293dec-bd13-11ef-bde9-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 42, \"dataset\": \"integration:kn_nep_stavbe_centroidi_h:45293dec-bd13-11ef-bde9-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.441}\n",
+    "stderr": "",
+    "seconds": 0.833
+  },
+  {
+    "dataset": "integration:kn_nep_stavbe_obrisi_h:e54577ee-f9b0-11ef-bd51-02420a0001ec",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 43, \"dataset\": \"integration:kn_nep_stavbe_obrisi_h:e54577ee-f9b0-11ef-bd51-02420a0001ec\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.261}\n",
+    "stderr": "",
+    "seconds": 0.659
+  },
+  {
+    "dataset": "integration:kn_nep_stavbe_parcele_h:a33e8606-a8c0-11ef-84ad-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 44, \"dataset\": \"integration:kn_nep_stavbe_parcele_h:a33e8606-a8c0-11ef-84ad-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.242}\n",
+    "stderr": "",
+    "seconds": 0.634
+  },
+  {
+    "dataset": "integration:kn_nep_stavbe_zps_h:969f1312-ff45-11ef-8df0-0242ac120008",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 45, \"dataset\": \"integration:kn_nep_stavbe_zps_h:969f1312-ff45-11ef-8df0-0242ac120008\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.359}\n",
+    "stderr": "",
+    "seconds": 0.764
+  }
+]

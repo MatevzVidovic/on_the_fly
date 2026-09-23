@@ -1,0 +1,72 @@
+[
+  {
+    "dataset": "integration:ev_del_stavbe_cona_h:32af7386-ad7a-11f0-9b38-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 46, \"dataset\": \"integration:ev_del_stavbe_cona_h:32af7386-ad7a-11f0-9b38-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 3.132}\n",
+    "stderr": "",
+    "seconds": 3.655
+  },
+  {
+    "dataset": "integration:ev_g_ceste_l_h:ee78f108-ae49-11f0-9ffa-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 47, \"dataset\": \"integration:ev_g_ceste_l_h:ee78f108-ae49-11f0-9ffa-169cd02558fe\", \"rows\": 100, \"complete\": false}], \"seconds\": 0.313}\n",
+    "stderr": "",
+    "seconds": 0.736
+  },
+  {
+    "dataset": "integration:ev_g_el_energija_l_h:53d3f698-ae4e-11f0-b385-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 48, \"dataset\": \"integration:ev_g_el_energija_l_h:53d3f698-ae4e-11f0-b385-169cd02558fe\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.201}\n",
+    "stderr": "",
+    "seconds": 0.625
+  },
+  {
+    "dataset": "integration:ev_gurs_oseba_h:9af43084-bd57-11f0-b073-5212cffe39ac",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 49, \"dataset\": \"integration:ev_gurs_oseba_h:9af43084-bd57-11f0-b073-5212cffe39ac\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.199}\n",
+    "stderr": "",
+    "seconds": 0.613
+  },
+  {
+    "dataset": "integration:ev_g_zeleznice_l_h:a92b6db8-bd91-11f0-86c8-5212cffe39ac",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 50, \"dataset\": \"integration:ev_g_zeleznice_l_h:a92b6db8-bd91-11f0-86c8-5212cffe39ac\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.175}\n",
+    "stderr": "",
+    "seconds": 0.593
+  },
+  {
+    "dataset": "integration:ev_obcina_h:eec1d294-ae51-11f0-bae7-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 51, \"dataset\": \"integration:ev_obcina_h:eec1d294-ae51-11f0-bae7-169cd02558fe\", \"rows\": 3, \"complete\": false}], \"seconds\": 0.208}\n",
+    "stderr": "",
+    "seconds": 0.631
+  },
+  {
+    "dataset": "integration:ev_oseba_pe_h:8e5fc5b2-ae53-11f0-ad7f-169cd02558fe",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 52, \"dataset\": \"integration:ev_oseba_pe_h:8e5fc5b2-ae53-11f0-ad7f-169cd02558fe\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.197}\n",
+    "stderr": "",
+    "seconds": 0.62
+  },
+  {
+    "dataset": "integration:ev_parc_del_cona_h:38be8174-ae59-11f0-a27d-169cd02558fe",
+    "exit_code": 1,
+    "stdout": "",
+    "stderr": "Traceback (most recent call last):\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/exploration/export_probe.py\", line 59, in <module>\n    cur.execute(sql,plan['binds'])\n    ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^\n  File \"/Users/matevzvidovic/on_the_fly/KN_deltas_reason/.venv/lib/python3.14/site-packages/oracledb/cursor.py\", line 844, in execute\n    impl.execute(self)\n    ~~~~~~~~~~~~^^^^^^\n  File \"src/oracledb/impl/thick/cursor.pyx\", line 320, in oracledb.thick_impl.ThickCursorImpl.execute\n  File \"src/oracledb/impl/thick/utils.pyx\", line 484, in oracledb.thick_impl._raise_from_odpi\n  File \"src/oracledb/impl/thick/utils.pyx\", line 474, in oracledb.thick_impl._raise_from_info\noracledb.exceptions.DatabaseError: DPY-4011: the database or network closed the connection\nDPI-1080: connection was closed by ORA-03113\nORA-03113: end-of-file on communication channel\nProcess ID: 288243\nSession ID: 1973 Serial number: 29887\nHelp: https://docs.oracle.com/error-help/db/ora-03113/\n",
+    "seconds": 10.714
+  },
+  {
+    "dataset": "integration:ev_posebna_enota_pod_h:c52259ac-bee3-11f0-bbb0-5212cffe39ac",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\n{\"results\": [{\"snapshot_id\": 53, \"dataset\": \"integration:ev_posebna_enota_pod_h:c52259ac-bee3-11f0-bbb0-5212cffe39ac\", \"rows\": 0, \"complete\": false}], \"seconds\": 0.488}\n",
+    "stderr": "",
+    "seconds": 0.915
+  },
+  {
+    "dataset": "integration:ev_sta_par_h:77577da8-befa-11f0-84b1-5212cffe39ac",
+    "exit_code": 0,
+    "stdout": "Oracle output: [('MATCHING_KEY', '<DbType DB_TYPE_VARCHAR>'), ('CHANGED_AT', '<DbType DB_TYPE_VARCHAR>')]\nPython types: {'str'}\n{\"results\": [{\"snapshot_id\": 54, \"dataset\": \"integration:ev_sta_par_h:77577da8-befa-11f0-84b1-5212cffe39ac\", \"rows\": 100, \"complete\": false}], \"seconds\": 5.622}\n",
+    "stderr": "",
+    "seconds": 6.039
+  }
+]

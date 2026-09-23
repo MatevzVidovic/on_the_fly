@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?><xsd:schema xmlns:SI.GURS.EDM="https://storitve.eprostor.gov.si/SI.GURS.EDM" xmlns:SI.GURS.RPE="https://storitve.eprostor.gov.si/SI.GURS.RPE" xmlns:SI.GURS.ZK="https://storitve.eprostor.gov.si/SI.GURS.ZK" xmlns:SI.MOP.GRAD="https://storitve.eprostor.gov.si/SI.MOP.GRAD" xmlns:gml="http://www.opengis.net/gml/3.2" xmlns:wfs="http://www.opengis.net/wfs/2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" targetNamespace="https://storitve.eprostor.gov.si/SI.MOP.GRAD">
+  <xsd:import namespace="http://www.opengis.net/gml/3.2" schemaLocation="https://storitve.eprostor.gov.si:443/ows-pub-wfs/schemas/gml/3.2.1/gml.xsd"/>
+  <xsd:complexType name="UPRAVNI_AKTIType">
+    <xsd:complexContent>
+      <xsd:extension base="gml:AbstractFeatureType">
+        <xsd:sequence>
+          <xsd:element maxOccurs="1" minOccurs="1" name="ID_UA" nillable="false" type="xsd:decimal"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="SIF_PU" nillable="true" type="xsd:decimal"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="NAZ_UPR_ORG" nillable="true" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="STEV_ZAD" nillable="true" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="OB_ID" nillable="true" type="xsd:decimal"/>
+          <xsd:element maxOccurs="1" minOccurs="1" name="SIF_VRS_UA_KRA_SIF" nillable="false" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="1" name="VRS_AKT_2" nillable="false" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="1" name="NAZ_UPR_POS" nillable="false" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="OBJ" nillable="true" type="xsd:string"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DAT_IZD" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DAT_POP" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="MAX_DAT_PRA" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DAT_RAZ" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="ZAD_SPR" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="VRS_AKT" nillable="true" type="xsd:decimal"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="DAT_ZAC_GRA" nillable="true" type="xsd:dateTime"/>
+          <xsd:element maxOccurs="1" minOccurs="0" name="GEOMETRY" nillable="true" type="gml:GeometryPropertyType"/>
+        </xsd:sequence>
+      </xsd:extension>
+    </xsd:complexContent>
+  </xsd:complexType>
+  <xsd:element name="UPRAVNI_AKTI" substitutionGroup="gml:AbstractFeature" type="SI.MOP.GRAD:UPRAVNI_AKTIType"/>
+</xsd:schema>

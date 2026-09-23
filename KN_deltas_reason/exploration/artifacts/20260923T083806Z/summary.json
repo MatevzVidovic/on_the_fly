@@ -1,0 +1,16 @@
+{
+  "collected_at": "2026-09-23T08:38:55.575808+00:00",
+  "integrations": 80,
+  "objects": 108,
+  "parser_failures": [
+    "550a20ee-9d03-11ef-8c7b-0242ac120008",
+    "fb72d988-b94d-11ef-bb81-0242ac120008",
+    "f6c3a090-8638-11ef-8275-0242ac120007",
+    "74096586-f2b2-11ef-ac67-02420a0001ec",
+    "d1d4521c-bc79-11ef-89e9-0242ac120008",
+    "e54577ee-f9b0-11ef-bd51-02420a0001ec",
+    "a33e8606-a8c0-11ef-84ad-0242ac120008",
+    "969f1312-ff45-11ef-8df0-0242ac120008"
+  ],
+  "note": "All Oracle metadata collected through KN_ORACLE credentials. GURS ORCL endpoint equivalence is NOT established. Empty dictionary results do not prove absence."
+}

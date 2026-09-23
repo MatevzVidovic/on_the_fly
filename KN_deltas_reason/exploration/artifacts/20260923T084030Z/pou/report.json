@@ -1,0 +1,343 @@
+{
+  "observed_at": "2026-09-23T08:43:53.099932+00:00",
+  "complete": false,
+  "source_layer": "SI.MOP.GRAD:UPRAVNI_AKTI",
+  "target": "si_mop_ua_tock",
+  "key": "ID_UA",
+  "change_field": "ZAD_SPR",
+  "errors": {},
+  "target_columns": [
+    {
+      "column_name": "id",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "udt_name": "uuid",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "zad_spr",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "gid",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "id_ua",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "NO",
+      "column_default": null
+    },
+    {
+      "column_name": "sif_pu",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "naz_upr_org",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "stev_zad",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "ob_id",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "sif_vrs_ua_kra_sif",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "vrs_akt_2",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "naz_upr_pos",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "obj",
+      "data_type": "text",
+      "udt_name": "text",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dat_izd",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dat_pop",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "max_dat_pra",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dat_raz",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "vrs_akt",
+      "data_type": "numeric",
+      "udt_name": "numeric",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "dat_zac_gra",
+      "data_type": "timestamp without time zone",
+      "udt_name": "timestamp",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "geom",
+      "data_type": "USER-DEFINED",
+      "udt_name": "geometry",
+      "is_nullable": "YES",
+      "column_default": null
+    },
+    {
+      "column_name": "__mod",
+      "data_type": "integer",
+      "udt_name": "int4",
+      "is_nullable": "YES",
+      "column_default": null
+    }
+  ],
+  "target_indexes": [
+    {
+      "indexname": "si_mop_ua_tock_pkey",
+      "indexdef": "CREATE UNIQUE INDEX si_mop_ua_tock_pkey ON public.si_mop_ua_tock USING btree (id)"
+    },
+    {
+      "indexname": "si_mop_ua_tock_geom_idx",
+      "indexdef": "CREATE INDEX si_mop_ua_tock_geom_idx ON public.si_mop_ua_tock USING gist (geom)"
+    },
+    {
+      "indexname": "si_mop_ua_tock___mod_index",
+      "indexdef": "CREATE INDEX si_mop_ua_tock___mod_index ON public.si_mop_ua_tock USING btree (__mod)"
+    },
+    {
+      "indexname": "si_mop_ua_tock_id_ua_key",
+      "indexdef": "CREATE UNIQUE INDEX si_mop_ua_tock_id_ua_key ON public.si_mop_ua_tock USING btree (id_ua)"
+    }
+  ],
+  "target_constraints": [
+    {
+      "conname": "si_mop_ua_tock_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "si_mop_ua_tock_id_ua_key",
+      "definition": "UNIQUE (id_ua)"
+    }
+  ],
+  "source_fields": [
+    {
+      "maxOccurs": "1",
+      "minOccurs": "1",
+      "name": "ID_UA",
+      "nillable": "false",
+      "type": "xsd:decimal"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "SIF_PU",
+      "nillable": "true",
+      "type": "xsd:decimal"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "NAZ_UPR_ORG",
+      "nillable": "true",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "STEV_ZAD",
+      "nillable": "true",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "OB_ID",
+      "nillable": "true",
+      "type": "xsd:decimal"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "1",
+      "name": "SIF_VRS_UA_KRA_SIF",
+      "nillable": "false",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "1",
+      "name": "VRS_AKT_2",
+      "nillable": "false",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "1",
+      "name": "NAZ_UPR_POS",
+      "nillable": "false",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "OBJ",
+      "nillable": "true",
+      "type": "xsd:string"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "DAT_IZD",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "DAT_POP",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "MAX_DAT_PRA",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "DAT_RAZ",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "ZAD_SPR",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "VRS_AKT",
+      "nillable": "true",
+      "type": "xsd:decimal"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "DAT_ZAC_GRA",
+      "nillable": "true",
+      "type": "xsd:dateTime"
+    },
+    {
+      "maxOccurs": "1",
+      "minOccurs": "0",
+      "name": "GEOMETRY",
+      "nillable": "true",
+      "type": "gml:GeometryPropertyType"
+    },
+    {
+      "name": "UPRAVNI_AKTI",
+      "substitutionGroup": "gml:AbstractFeature",
+      "type": "SI.MOP.GRAD:UPRAVNI_AKTIType"
+    }
+  ],
+  "sample_count": 10,
+  "reported_totalFeatures": 10001,
+  "property_types": {
+    "ID_UA": "int",
+    "SIF_VRS_UA_KRA_SIF": "str",
+    "VRS_AKT_2": "str",
+    "NAZ_UPR_POS": "str",
+    "ZAD_SPR": "str"
+  },
+  "future_filter_rows": 0
+}

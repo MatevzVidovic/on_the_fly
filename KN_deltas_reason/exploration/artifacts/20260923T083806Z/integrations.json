@@ -1,0 +1,1882 @@
+[
+  {
+    "target_table": "etn3_address",
+    "integration_id": "a7a0f036-879a-11ef-9bea-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT ID_ADDRESS, PLACE, STREET_NAME, STREET_NUMBER, ADDITION_TO_NUMBER, JN_REV_NUM, MUNICIPALITY, HS_MID, FULL_ADDRESS\nFROM ETN3.ADDRESS",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-24 00:00:00",
+    "last_sync_end": "2026-05-24 00:07:05",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:00:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "ADDRESS"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_building_part",
+    "integration_id": "4548b8f0-7823-11ef-bc3f-02420a0001cd",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\n    BP.ID_BUILDING_PART,\n    BP.ID_CONTRACT,\n    BP.ID_ADDRESS,\n    BP.CADASTRAL_MUNICIPALITY,\n    BP.CADASTRAL_MNCPLTY_CODE,\n    BP.PARCEL_CODE,\n    BP.BUILDING_CODE,\n    BP.BUILDING_PART_CODE,\n    BP.BUILDING_PART_NUMBER,\n    BP.BUILDING_CONSTRUCTION_YEAR,\n    BP.BUILDING_PART_CNSTRCTN_YEAR,\n    BP.NUMBER_OF_ROOMS_IN_APRTMNT,\n    BP.LOCATION_IN_BUILDING,\n    BP.OTHER_ROOMS,\n    BP.CLASSIFICATION,\n    BP.AREA,\n    BP.USE_AREA,\n    BP.X,\n    BP.Y,\n    BP.NOTES,\n    BP.CL_LST_REN_STATUS,\n    BP.CL_VAL_REN_STATUS,\n    BP.CL_LST_IS_ATRIUM,\n    BP.CL_VAL_IS_ATRIUM,\n    BP.JN_REV_NUM,\n    BP.DST_SID,\n    BP.ID_ANALYTICAL_AREA,\n    BP.NA_MID,\n    BP.NEW_CLASSIFICATION,\n    BP.INTERNAL_CODE\nFROM\n    ETN3.BUILDING_PART BP",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-17 00:10:00",
+    "last_sync_end": "2026-05-17 00:22:47",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:10:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "BUILDING_PART"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_building_part_h",
+    "integration_id": "80a4c4a4-7f06-11ef-8bd9-02420a0001e5",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\n    BP.ID_BUILDING_PART,\n    BP.ID_CONTRACT,\n    BP.ID_ADDRESS,\n    BP.CADASTRAL_MUNICIPALITY,\n    BP.CADASTRAL_MNCPLTY_CODE,\n    BP.PARCEL_CODE,\n    BP.BUILDING_CODE,\n    BP.BUILDING_PART_CODE,\n    BP.BUILDING_PART_NUMBER,\n    BP.BUILDING_CONSTRUCTION_YEAR,\n    BP.BUILDING_PART_CNSTRCTN_YEAR,\n    BP.NUMBER_OF_ROOMS_IN_APRTMNT,\n    BP.LOCATION_IN_BUILDING,\n    BP.OTHER_ROOMS,\n    BP.CLASSIFICATION,\n    BP.AREA,\n    BP.USE_AREA,\n    BP.X,\n    BP.Y,\n    BP.NOTES,\n    BP.CL_LST_REN_STATUS,\n    BP.CL_VAL_REN_STATUS,\n    BP.CL_LST_IS_ATRIUM,\n    BP.CL_VAL_IS_ATRIUM,\n    BP.JN_REV_NUM,\n    BP.DST_SID,\n    BP.ID_ANALYTICAL_AREA,\n    BP.NA_MID,\n    BP.NEW_CLASSIFICATION,\n    BP.INTERNAL_CODE\nFROM\n    ETN3.BUILDING_PART BP",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "CONFIGURED",
+    "updated_at": "2024-09-30 08:32:49",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "BUILDING_PART"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_building_part_prchs_det",
+    "integration_id": "e7e643cc-870d-11ef-a626-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\n    BP.ID_BUL_PAR_PUR_DET,\n    BP.ID_BUILDING_PART,\n    BP.CL_LST_BUILDING_PART_TYPE,\n    BP.CL_VAL_BUILDING_PART_TYPE,\n    BP.CL_LST_CONSTRUCTION_PHASE,\n    BP.CL_VAL_CONSTRUCTION_PHASE,\n    BP.SOLD_AREA,\n    BP.SOLD_NET_GRUND_AREA,\n    BP.SOLD_SHARE,\n    BP.JN_REV_NUM,\n    BP.CL_LST_PRIMARY_MARKET,\n    BP.CL_VAL_PRIMARY_MARKET,\n    BP.CL_LST_CONSTRUCTION_CMPLTD,\n    BP.CL_VAL_CONSTRUCTION_CMPLTD,\n    BP.SOLD_SHARE_NUMERIC,\n    BP.PRICE,\n    BP.CL_LST_VAT_TAX_RATE,\n    BP.CL_VAL_VAT_TAX_RATE\nFROM\n    ETN3.BUILDING_PART_PRCHS_DET BP",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:11:46",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:20:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "BUILDING_PART_PRCHS_DET"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_building_part_rntl_det",
+    "integration_id": "6f3a7f90-8791-11ef-826b-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \n    RNTL_DET.ID_BUL_PAR_RNT_DET,\n    RNTL_DET.ID_BUILDING_PART,\n    RNTL_DET.CL_LST_RENTED_AREA_TYPE,\n    RNTL_DET.CL_VAL_RENTED_AREA_TYPE,\n    RNTL_DET.RENTED_AREA,\n    RNTL_DET.JN_REV_NUM,\n    RNTL_DET.CL_LST_MICROLOCATION,\n    RNTL_DET.CL_VAL_MICROLOCATION,\n    RNTL_DET.CL_LST_AREA_EQUIPPED,\n    RNTL_DET.CL_VAL_AREA_EQUIPPED,\n    RNTL_DET.CL_LST_HAS_GARDEN,\n    RNTL_DET.CL_VAL_HAS_GARDEN,\n    RNTL_DET.CL_LST_GARDEN_COST_INCLUDED,\n    RNTL_DET.CL_VAL_GARDEN_COST_INCLUDED,\n    RNTL_DET.GARDEN_AREA,\n    RNTL_DET.RENTED_USE_AREA\nFROM \n    ETN3.BUILDING_PART_RNTL_DET RNTL_DET",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:11:25",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:30:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "BUILDING_PART_RNTL_DET"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_codelist",
+    "integration_id": "0cd4139c-8792-11ef-bf28-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT ID_LST || '_' || ID_VAL AS LST_VAL_ID,\n       ID_LST,\n       LST_DESC,\n       ID_VAL,\n       VAL_CODE,\n       DESC_SLO,\n       DESC_ENG,\n       SORT,\n       IS_ACTIVE,\n       JN_REV_NUM\nFROM ETN3.CODELIST",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:08:36",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:40:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CODELIST"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_contract",
+    "integration_id": "be7cd60e-87ad-11ef-a2ea-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \n    CONTRACT.ID_CONTRACT,\n    CONTRACT.CONTRACT_CODE,\n    CONTRACT.CL_LST_REPORTING_TYPE,\n    CONTRACT.CL_VAL_REPORTING_TYPE,\n    CONTRACT.ID_USER_REPORTER,\n    CONTRACT.SUBJECT_REG_NUM,\n    CONTRACT.CL_LST_TRANSACTION_TYPE,\n    CONTRACT.CL_VAL_TRANSACTION_TYPE,\n    CONTRACT.CONTRACT_DATE,\n    CONTRACT.CL_LST_VAT_TAX_RATE,\n    CONTRACT.CL_VAL_VAT_TAX_RATE,\n    CONTRACT.CL_LST_CONTRACT_STATUS,\n    CONTRACT.CL_VAL_CONTRACT_STATUS,\n    CONTRACT.REPORT_COMPLETION_DATE,\n    CONTRACT.NOTES,\n    CONTRACT.JN_REV_NUM,\n    CONTRACT.PRICE,\n    CONTRACT.CL_LST_VAT_INCLUDED,\n    CONTRACT.CL_VAL_VAT_INCLUDED,\n    CONTRACT.IS_BUSINESS_SECRET,\n    CONTRACT.ID_PRIMARY_CONTRACT,\n    CONTRACT.ID_ANNEX_PREV,\n    CONTRACT.ID_ANNEX_NEXT,\n    CONTRACT.ID_ANNEX_TO_CONTRACT,\n    CONTRACT.CL_LST_CONTRACT_TYPE,\n    CONTRACT.CL_VAL_CONTRACT_TYPE,\n    CONTRACT.FOR_DISTRIBUTION,\n    CONTRACT.LAST_REPORT_COMPLETION_DATE,\n    CONTRACT.CL_LST_MARKETABILITY,\n    CONTRACT.CL_VAL_MARKETABILITY\nFROM \n    ETN3.CONTRACT CONTRACT",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:17:52",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:40:17",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CONTRACT"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_contract_location",
+    "integration_id": "3fee7b8c-7919-11ef-8989-02420a0001cd",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\n    ETN3.CONTRACT_LOCATION.ID_CONTRACT,\n    ETN3.CONTRACT_LOCATION.X,\n    ETN3.CONTRACT_LOCATION.Y,\n    SDO_UTIL.TO_WKTGEOMETRY(ETN3.CONTRACT_LOCATION.GEOMETRY) AS GEOMETRY,\n    ETN3.CONTRACT_LOCATION.ID_AREA_OF_ANALYSIS,\n    ETN3.CONTRACT_LOCATION.ID_LOCAL_CENTRE,\n    ETN3.CONTRACT_LOCATION.STATISTICAL_AREA_MID,\n    ETN3.CONTRACT_LOCATION.SIFKO,\n    ETN3.CONTRACT_LOCATION.NA_MID,\n    ETN3.CONTRACT_LOCATION.OB_MID,\n    ETN3.CONTRACT_LOCATION.JN_REV_NUM,\n    ETN3.CONTRACT_LOCATION.ID_PMVN\nFROM\n    ETN3.CONTRACT_LOCATION",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-09-28 00:50:03",
+    "last_sync_end": "2025-09-28 02:18:26",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 00:50:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CONTRACT_LOCATION"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_contractor",
+    "integration_id": "e2074c06-7913-11ef-aaf4-02420a0001cd",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \n    CONTRACTOR.ID_CONTRACTOR,\n    CONTRACTOR.ID_CONTRACT,\n    CONTRACTOR.CL_LST_LEGAL_FORM,\n    CONTRACTOR.CL_VAL_LEGAL_FORM,\n    CONTRACTOR.NAME,\n    CONTRACTOR.ADDRESS,\n    CONTRACTOR.REGISTRATION_CODE,\n    CONTRACTOR.CL_LST_COUNTRY,\n    CONTRACTOR.CL_VAL_COUNTRY,\n    CONTRACTOR.JN_REV_NUM,\n    CONTRACTOR.CL_LST_CNTRCTR_TYPE,\n    CONTRACTOR.CL_VAL_CNTRCTR_TYPE,\n    CONTRACTOR.FULL_TEXT\nFROM \n    ETN3.CONTRACTOR CONTRACTOR",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:32:44",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 02:20:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CONTRACTOR"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_contract_purchase_details",
+    "integration_id": "bb02e81a-8794-11ef-93af-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\n    ETN3.CONTRACT_PURCHASE_DETAILS.ID_CON_PUR_DET,\n    ETN3.CONTRACT_PURCHASE_DETAILS.ID_CONTRACT,\n    ETN3.CONTRACT_PURCHASE_DETAILS.JN_REV_NUM,\n    ETN3.CONTRACT_PURCHASE_DETAILS.DPN_BASIS,\n    ETN3.CONTRACT_PURCHASE_DETAILS.CL_LST_UNIQUE_VAT_TAX_RATE,\n    ETN3.CONTRACT_PURCHASE_DETAILS.CL_VAL_UNIQUE_VAT_TAX_RATE\nFROM\n    ETN3.CONTRACT_PURCHASE_DETAILS",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:11:20",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 02:00:17",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CONTRACT_PURCHASE_DETAILS"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_contract_rental_details",
+    "integration_id": "037b622a-8795-11ef-b6e7-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select ID_CON_RNT_DET,\n       ID_CONTRACT,\n       CL_LST_TERM_RENTAL,\n       CL_VAL_TERM_RENTAL,\n       replace(to_char(RENT_STARTING_DATE, 'YYYY-MM-DD'), '0000-00-00', null) as RENT_STARTING_DATE,\n       replace(to_char(RENT_ENDING_DATE, 'YYYY-MM-DD'), '0000-00-00', null)   as RENT_ENDING_DATE,\n       RENT_DURATION,\n       replace(to_char(RENT_COMPLETE_DATE, 'YYYY-MM-DD'), '0000-00-00', null) as RENT_COMPLETE_DATE,\n       JN_REV_NUM,\n       CL_LST_OPERATING_COST_INCLD,\n       CL_VAL_OPERATING_COST_INCLD,\n       RENT_PRECOMPLT_REASON,\n       RN_FORM_ARRIVAL\nfrom ETN3.CONTRACT_RENTAL_DETAILS",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:36",
+    "last_sync_end": "2026-05-25 08:11:44",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 02:10:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "CONTRACT_RENTAL_DETAILS"
+      ]
+    ]
+  },
+  {
+    "target_table": "etn3_parcel",
+    "integration_id": "023681f4-8797-11ef-adab-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \n    PARCEL.ID_PARCEL,\n    PARCEL.ID_CONTRACT,\n    PARCEL.ID_LAND,\n    PARCEL.MUNICIPALITY,\n    PARCEL.CADASTRAL_MUNICIPALITY,\n    PARCEL.CADASTRAL_MUNICIPALITY_CODE,\n    PARCEL.PARCEL_CODE,\n    PARCEL.CL_LST_LAND_TYPE,\n    PARCEL.CL_VAL_LAND_TYPE,\n    PARCEL.CL_LST_PLANTATION_TYPE,\n    PARCEL.CL_VAL_PLANTATION_TYPE,\n    PARCEL.PLANTATION_AGE,\n    PARCEL.AREA,\n    PARCEL.SOLD_SHARE,\n    PARCEL.PURPOSE_OF_USE,\n    PARCEL.X,\n    PARCEL.Y,\n    PARCEL.NOTES,\n    PARCEL.JN_REV_NUM,\n    PARCEL.PC_MID,\n    PARCEL.ID_ANALYTICAL_AREA,\n    PARCEL.SOLD_SHARE_NUMERIC,\n    PARCEL.NA_MID,\n    PARCEL.PRICE,\n    PARCEL.CL_LST_VAT_TAX_RATE,\n    PARCEL.CL_VAL_VAT_TAX_RATE\nFROM \n    ETN3.PARCEL PARCEL",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-25 08:08:38",
+    "last_sync_end": "2026-05-25 08:19:18",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 02:40:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "ETN3",
+        "PARCEL"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_del_stavbe",
+    "integration_id": "4ac89af2-19ef-11f0-8c27-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT\nSDO_UTIL.TO_WKTGEOMETRY(HS_MID_CENTROID) AS HS_MID_CENTROID,\nDST_SID,\nSTA_SID,\nSTEV_DST,\nSTEV_STAN,\nPOVRSINA,\nUPOR_POV,\nHS_MID,\nLETO_OBN_OKEN,\nLETO_OBN_INST,\nST_NADSTROPJA,\nID_LEGA,\nPROSTORNINA,\nIMA_DVIGALO_DN,\nVISINA_ETAZE,\nID_DR_DST,\nJN_REV_NUM,\nDELEZ_DST_STAVBA,\nZPS_DST,\nID_MODEL,\nCCSI_STAR,\nIMA_KATAS_VPIS_DN,\nEID,\nHS_MID_CENY,\nHS_MID_CENX\nFROM EV.DEL_STAVBE",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-04-15 14:55:56",
+    "last_sync_end": "2025-04-15 17:27:05",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-04-15 17:27:05",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "DEL_STAVBE"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_del_stavbe_cona_h",
+    "integration_id": "32af7386-ad7a-11f0-9b38-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"DST_SID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_del_stavbe_cona_pk,\n    j.DST_SID         ,\n    j.ID_MODEL       ,\n    j.RAVEN           ,\n    j.CONA_IME       ,\n    j.JN_REV_NUM     ,\n    j.JN_REV_NUM_TO   ,\n    j.JN_REV_NUM_PREV ,\n    CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_DEL_STAVBE_CONA j\n             join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:55:23",
+    "last_sync_start": "2025-11-23 05:40:02",
+    "last_sync_end": "2025-11-23 05:40:10",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 05:40:16",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_DEL_STAVBE_CONA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_del_stavbe_enota",
+    "integration_id": "bfae807e-8724-11ef-918a-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select DST_SID,\n       ID_MODEL,\n       RAVEN,\n       VREDNOST,\n       CONA_IME,\n       FAKTOR_PO,\n       POSPLOSENA_VREDNOST,\n       ERR_MSG,\n       ID_MODEL_VER\nfrom EV.DEL_STAVBE_ENOTA",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-04-22 08:33:49",
+    "last_sync_end": "2025-04-22 08:38:17",
+    "processing_status": "CONFIGURED",
+    "updated_at": "2025-08-04 12:31:07",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "DEL_STAVBE_ENOTA"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_g_ceste_l_h",
+    "integration_id": "ee78f108-ae49-11f0-9ffa-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_ceste_pk,\nID,\nSIF_VRSTE,\nATR1,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_G_CESTE_L j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-04-21 04:00:00",
+    "last_sync_start": "2025-11-23 06:00:02",
+    "last_sync_end": "2025-11-23 06:00:02",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 06:00:16",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_G_CESTE_L"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_g_el_energija_l_h",
+    "integration_id": "53d3f698-ae4e-11f0-b385-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_energija_pk,\nID,\nSIF_VRSTE,\nATR2,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_G_EL_ENERGIJA_L j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2023-08-22 00:30:44",
+    "last_sync_start": "2025-11-24 00:00:04",
+    "last_sync_end": "2025-11-24 00:00:04",
+    "processing_status": "FAILED",
+    "updated_at": "2026-02-02 09:27:50",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_G_EL_ENERGIJA_L"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_gurs_oseba_h",
+    "integration_id": "9af43084-bd57-11f0-b073-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_GURS_OSEBA\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_gurs_oseba_pk,\nID_GURS_OSEBA,\nUSERNAME,\nIME,\nPRIIMEK,\nSTROKOVNI_NAZIV,\nEMAIL,\nTELEFON,\nID_PMVN,\nJE_AKTIVEN_DN,\nID_TIP_GURS_OSEBE,\nZNANSTVENI_NASLOV,\nSTROKOVNI_NASLOV,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_GURS_OSEBA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2022-03-04 10:09:59.498242",
+    "last_sync_start": "2025-11-23 05:20:04",
+    "last_sync_end": "2025-11-23 05:20:04",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 05:20:16",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_GURS_OSEBA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_g_zeleznice_l_h",
+    "integration_id": "a92b6db8-bd91-11f0-86c8-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_zeleznice_pk,\nID,\nSIF_VRSTE,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_G_ZELEZNICE_L j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'AND  ID = '77920'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2023-08-22 00:30:19",
+    "last_sync_start": "2025-11-23 06:10:03",
+    "last_sync_end": "2025-11-23 06:10:03",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-20 06:10:16",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_G_ZELEZNICE_L"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_nrp_parc_h",
+    "integration_id": "b63d2c80-ae50-11f0-b0f3-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_NRP_PARC\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_nrp_parc_pk,\nID_NRP_PARC,\nPC_MID,\nID_NR_PARC,\nDELEZ,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n  CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_NRP_PARC j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X' AND  ID_NRP_PARC = '158169179'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-10-21 07:38:10",
+    "last_sync_end": "2025-10-21 07:38:10",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-10-21 07:38:10",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_NRP_PARC"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_obcina_h",
+    "integration_id": "eec1d294-ae51-11f0-bae7-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"OBCINA_ID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_obcina_pk,\nKO_ID,\nKO_IME,\nOBCINA_IME,\nKO_UIME,\nOB_MID,\nOBCINA_ID,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_OBCINA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2022-04-05 04:00:01.497723",
+    "last_sync_start": "2025-11-11 06:43:46",
+    "last_sync_end": "2025-11-11 06:43:46",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 06:43:46",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_OBCINA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_oseba_h",
+    "integration_id": "b37b77a2-ae52-11f0-8d2f-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_OSEBA\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_oseba_pk,\nID_OSEBA,\nEMSO_MS,\nIME,\nNASLOV_STALNI,\nFULL_TEXT,\nJN_REV_NUM,\nVIR_POSEBNE_DN,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\nVROCANJE_ULICA,\nVROCANJE_STEVILKA,\nVROCANJE_MESTO,\nVROCANJE_DRZAVA,\nJE_FIZICNA_DN,\nVROCANJE_HS_MID,\nVROCANJE_VIR,\nVROCANJE_GU_NASLOV,\nVROCANJE_NASELJE,\nVROCANJE_ST_STAN,\nREN_HS_MID,\nREN_ST_STANOVANJA,\nTIP,\nNASLOV_VROCANJE,\nKN_OSEBA_ID,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_OSEBA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:57:00",
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "FAILED",
+    "updated_at": "2025-11-11 13:14:17",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_OSEBA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_oseba_pe_h",
+    "integration_id": "8e5fc5b2-ae53-11f0-ad7f-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_OSEBA\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_oseba_pe_pk,\nID_OSEBA_PE,\nID_PE,\nID_OSEBA,\nDELEZ_STEV,\nDELEZ_IMEN,\nJN_REV_NUM,\nVIR_DELEZ,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_OSEBA_PE j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-04-10 00:30:00",
+    "last_sync_start": "2025-11-11 08:41:18",
+    "last_sync_end": "2025-11-11 08:41:18",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 08:41:18",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_OSEBA_PE"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_del_cona_h",
+    "integration_id": "38be8174-ae59-11f0-a27d-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_PARC_DEL_CONA\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_parcela_del_cona_pk,\nID_PARC_DEL_CONA,\nPC_MID,\nID_MODEL,\nRAVEN,\nCONA_IME,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PARC_DEL_CONA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:57:00",
+    "last_sync_start": "2025-11-11 10:45:43",
+    "last_sync_end": "2025-11-11 10:46:13",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 10:46:13",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PARC_DEL_CONA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_del_enota",
+    "integration_id": "11778702-ae5c-11f0-9f3d-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_PARC_DEL\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_parcela_del_enota_pk,\nID_PARC_DEL,\nPC_MID,\nID_MODEL,\nVREDNOST,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nPODATKI,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PARC_DEL_ENOTA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "NOT_CONFIGURED",
+    "updated_at": "2025-10-21 09:29:39",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PARC_DEL_ENOTA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_enota",
+    "integration_id": "24e92eb6-8726-11ef-9bb8-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select ID_PARC_ENOTA,\n       PC_MID,\n       ID_MODEL,\n       DELEZ_POVRSINE,\n       VREDNOST,\n       RAVEN,\n       CONA_IME,\n       FAKTOR_PO,\n       POSPLOSENA_VREDNOST,\n       ERR_MSG,\n       ID_MODEL_VER\nfrom EV.PARC_ENOTA",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-08-04 14:43:27",
+    "last_sync_end": "2025-08-04 16:10:44",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-08-04 16:10:44",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "PARC_ENOTA"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_posebna_enota_pod_h",
+    "integration_id": "c52259ac-bee3-11f0-bbb0-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_PE_POD\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_posebna_enota_pod_pk,\nID_PE_POD,\nID_PE,\nLETO,\nPRODUKT,\nATRIBUT,\nVREDNOST_ATR,\nENOTA_ATR,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nVIR_ATR,\n  CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_POSEBNA_ENOTA_POD j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-04-10 00:30:01",
+    "last_sync_start": "2025-11-11 10:53:08",
+    "last_sync_end": "2025-11-11 10:53:16",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 10:53:16",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_POSEBNA_ENOTA_POD"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_dr_dst_h",
+    "integration_id": "ed62d240-ae6f-11f0-9b87-169cd02558fe",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_DR_DST\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_sif_dr_dst_pk,\nID_DR_DST,\nSIFRA,\nNAZIV,\nOPIS,\nPRIMERI,\nCCSI,\nID_MODEL,\nFAKTOR_NIVO,\nVRSTNI_RED,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_SIF_DR_DST j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 08:28:01",
+    "last_sync_end": "2025-11-10 08:28:01",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 08:28:01",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_DR_DST"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_dr_parc_h",
+    "integration_id": "80696876-be63-11f0-83b8-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(j.\"ID_DR_PARC\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_sif_dr_parc_pk,\n    ID_DR_PARC        ,\n    SIFRA             ,\n    NAZIV             ,\n    PRIORITETA        ,\n    ZDRUZI_ID_DR_PARC ,\n    SKUPINA           ,\n    ID_MODEL          ,\n    FAKTOR_NIVO       ,\n    VRSTNI_RED        ,\n    JN_REV_NUM        ,\n    JN_REV_NUM_TO     ,\n    JN_REV_NUM_PREV   ,\n    ORGAN             ,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_SIF_DR_PARC j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 18:36:14",
+    "last_sync_end": "2025-11-10 18:36:14",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 18:36:14",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_DR_PARC"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_dr_pros_h",
+    "integration_id": "bfdf8dcc-be64-11f0-b879-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_DR_PROS\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_dr_pros_pk,\nID_DR_PROS      ,\nSIFRA           ,\nNAZIV           ,\nOPIS            ,\nMIN_POVRSINA    ,\nPRIMERI         ,\nVRSTNI_RED      ,\njN_REV_NUM      ,\nJN_REV_NUM_TO   ,\nJN_REV_NUM_PREV ,\nCAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\nfrom_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \nfrom_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\nfrom_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_SIF_DR_PROS\n             join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 18:42:30",
+    "last_sync_end": "2025-11-10 18:42:30",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 18:42:30",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_DR_PROS"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_kontrukcija_h",
+    "integration_id": "78d31f10-be65-11f0-9cef-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_KONSTRUKCIJA\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_konst_pk,\nID_KONSTRUKCIJA ,\nSIFRA           ,\nNAZIV           ,\nVRSTNI_RED      ,\nJN_REV_NUM      ,\nJN_REV_NUM_TO   ,\nJN_REV_NUM_PREV ,\nCAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\nfrom_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \nfrom_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\nfrom_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom ev.JN_SIF_KONSTRUKCIJA \n               join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 18:50:32",
+    "last_sync_end": "2025-11-10 18:50:33",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 18:50:33",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_KONSTRUKCIJA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_lega_h",
+    "integration_id": "e8ce2a84-be66-11f0-aea0-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_LEGA\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_lega_pk,\n    ID_LEGA         ,\n    SIFRA           ,\n    NAZIV           ,\n    VRSTNI_RED      ,\n    JN_REV_NUM      ,\n    JN_REV_NUM_TO   ,\n    JN_REV_NUM_PREV ,\n   CAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom ev.JN_SIF_LEGA\n               join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 18:57:33",
+    "last_sync_end": "2025-11-10 18:57:33",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 18:57:33",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_LEGA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_model_h",
+    "integration_id": "6f975c0c-be67-11f0-acd1-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_MODEL\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_model_pk,\n       ID_MODEL     ,\n    NAZIV           ,\n    VRSTNI_RED      ,\n    JN_REV_NUM      ,\n    JN_REV_NUM_TO   ,\n    JN_REV_NUM_PREV ,\n    OPIS            ,\n    TIP_NEPREMICNINE,\nCAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom ev.JN_SIF_MODEL\n               join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 19:00:24",
+    "last_sync_end": "2025-11-10 19:00:24",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 19:00:24",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_MODEL"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_vpliv_h",
+    "integration_id": "ea07b432-be67-11f0-a98f-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_VPLIV\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_vpliv_pk,\n    ID_VPLIV           ,\n    NAZIV              ,\n    RAZDALJA_PREDPIS   ,\n    RAZDALJA_TOLERANCA ,\n    VRSTNI_RED         ,\n    JN_REV_NUM         ,\n    JN_REV_NUM_TO      ,\n    JN_REV_NUM_PREV    ,\n    DELEZ_VPLIVA       ,\nCAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom ev.JN_SIF_VPLIV\n               join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 19:03:55",
+    "last_sync_end": "2025-11-10 19:03:55",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 19:03:55",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_VPLIV"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sif_vpliv_model_h",
+    "integration_id": "48dc487e-be68-11f0-8c6b-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_VPLIV_MODEL\") || '-' || to_char(\"JN_REV_NUM\") as jn_sif_vpliv_model_pk,\n    ID_VPLIV_MODEL ,\n    ID_VPLIV       ,\n    ID_MODEL       ,\n    JN_REV_NUM     ,\n    JN_REV_NUM_TO  ,\n    JN_REV_NUM_PREV,\nCAST(TRIM(JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom ev.JN_SIF_VPLIV_MODEL\n               join ev.revision rf on (jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-11-10 19:06:28",
+    "last_sync_end": "2025-11-10 19:06:28",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-10 19:06:28",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_SIF_VPLIV_MODEL"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_sta_par_h",
+    "integration_id": "77577da8-befa-11f0-84b1-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_STA_PAR\") || '-' || to_char(\"JN_REV_NUM\") as jn_sta_par_pk,\nID_STA_PAR,\nSTA_SID,\nPC_MID,\nPOVRSINA_REN,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_STA_PAR j\n             join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:56:01",
+    "last_sync_start": "2025-11-11 12:44:55",
+    "last_sync_end": "2025-11-11 12:52:47",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 12:52:47",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_STA_PAR"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_stavba",
+    "integration_id": "57bff780-19ec-11f0-98b3-0242ac120007",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \nSDO_UTIL.TO_WKTGEOMETRY(CENTROID) AS CENTROID,\nEID,\nSTA_SID,\nKO_SIFKO,\nSTEV_ST,\nST_ETAZ,\nLETO_IZG_STA,\nLETO_OBN_STREHE,\nLETO_OBN_FASADE,\nID_KONSTRUKCIJA,\nIMA_VODOVOD_DN,\nIMA_ELEKTRIKO_DN,\nIMA_KANALIZACIJO_DN,\nIMA_PLIN_DN,\nID_TIP_STAVBE,\nCENX,\nCENY,\nST_STANOVANJ,\nST_POSLOVNIH_PROSTOROV,\nJN_REV_NUM,\nPOV_STAVBE,\nZPS_STAVBA,\nOB_MID\nFROM EV.STAVBA",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2025-04-15 11:40:20",
+    "last_sync_end": "2025-04-15 13:25:02",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-04-15 13:25:02",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "STAVBA"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_upravljalec_dst_h",
+    "integration_id": "341b09a4-bef7-11f0-9965-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_UPRAVLJAVEC_DST\") || '-' || to_char(\"JN_REV_NUM\") as jn_upr_dst_pk,\n    ID_UPRAVLJAVEC_DST ,\n    DST_SID            ,\n    ID_OSEBA           ,\n    TIP_LASTNISTVA     ,\n    JN_REV_NUM         ,\n    JN_REV_NUM_TO      ,\n    JN_REV_NUM_PREV    ,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_UPRAVLJAVEC_DST j\n             join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:56:01",
+    "last_sync_start": "2025-11-11 12:21:53",
+    "last_sync_end": "2025-11-11 12:22:08",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-11 12:22:08",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_UPRAVLJAVEC_DST"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_upravljalec_parc_h",
+    "integration_id": "3576e4ec-bf03-11f0-bdbd-5212cffe39ac",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "select to_char(\"ID_UPRAVLJAVEC_PARC\") || '-' || to_char(\"JN_REV_NUM\") as jn_upr_parc_pk,\nID_UPRAVLJAVEC_PARC,\nPC_MID,\nID_OSEBA,\nTIP_LASTNISTVA,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_UPRAVLJAVEC_PARC j\n             join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2025-05-10 09:56:01",
+    "last_sync_start": "2025-11-12 17:28:54",
+    "last_sync_end": "2025-11-12 18:05:39",
+    "processing_status": "PROCESSED",
+    "updated_at": "2025-11-12 18:05:39",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_UPRAVLJAVEC_PARC"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "prs",
+    "integration_id": "09f2a340-b2d6-11ef-b869-0242ac120008",
+    "connection_name": "GURS ORCL",
+    "integration_sql": "SELECT \n       PRS_ID,\n       maticna,\n       CASE \n         WHEN KRATKO_IME IS NULL OR KRATKO_IME = '/' THEN POPOLNO_IME\n         ELSE KRATKO_IME\n       END AS ime_za_pev,\n       ENOTA,\n       POPOLNO_IME,\n       KRATKO_IME,\n       OB_ID,\n       NA_ID,\n       UL_ID,\n       HS,\n       DOD_HS,\n       PTT_ID,\n       HS_MID,\n       DATUM_VPISA,\n       OBLIKA_SIF,\n       SKD_DEJAV,\n       AKTIVNOST_SIF,\n       NASELJE,\n       ULICA,\n       POSTA,\n       DAVCNA,\n       VRSTA_SPR,\n       DAT_SPR,\n       STATUS,\n       POSTOPEK_ID,\n       DATUM_SYS,\n       EPOSTA_VROCANJE,\n       (ulica || ' ' || hs || dod_hs) AS naslov,\n       (ptt_id || ' ' || posta)       AS posta_id_ime,\n       (ulica || ' ' || hs || dod_hs || ', ' || ptt_id || ' ' || posta) as naslov_s_posto\n  FROM nep_etl.prs$enote@pripis_proxy_kn",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-01 21:00:00",
+    "last_sync_end": "2026-05-01 21:02:14",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-01 21:00:16",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_ETL",
+        "PRS$ENOTE@PRIPIS_PROXY_KN"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_del_stavbe_enota_h_2025_danes",
+    "integration_id": "726fc9e4-b684-11f1-b953-02420a00027f",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\n    TO_CHAR(j.\"DST_SID\") || '-' || TO_CHAR(j.\"JN_REV_NUM\") AS jn_del_st_enota_pk,\n    j.\"DST_SID\" AS dst_sid,\n    j.\"ID_MODEL\" AS id_model,\n    j.\"RAVEN\" AS raven,\n    j.\"VPLIV\" AS vpliv,\n    j.\"VREDNOST\" AS vrednost,\n    j.\"CONA_IME\" AS cona_ime,\n    CAST(TRIM(j.\"JN_STATUS\") AS VARCHAR2(1)) AS jn_status,\n    j.\"FAKTOR_PO\" AS faktor_po,\n    j.\"POSPLOSENA_VREDNOST\" AS posplosena_vrednost,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,\n    FROM_TZ(CAST(rt.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_to,\n    FROM_TZ(CAST(COALESCE(rt.CREATED, rf.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AS date_change\nFROM EV.JN_DEL_STAVBE_ENOTA j\nJOIN EV.REVISION rf ON j.\"JN_REV_NUM\" = rf.REV_NUM\nLEFT JOIN EV.REVISION rt ON j.\"JN_REV_NUM_TO\" = rt.REV_NUM\nWHERE j.\"JN_STATUS\" <> 'X'\n  AND rf.CREATED >= TIMESTAMP '2025-01-01 00:00:00'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 13:06:34",
+    "last_sync_end": "2026-09-22 13:32:59",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 13:32:59",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_DEL_STAVBE_ENOTA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_del_stavbe_h",
+    "integration_id": "b867296c-ab2a-11f0-a252-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"DST_SID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_del_stavbe_pk,\n       j.\"DST_SID\",\n       j.\"STA_SID\",\n       j.\"STEV_DST\",\n       j.\"STEV_STAN\",\n       j.\"POVRSINA\",\n       j.\"UPOR_POV\",\n       j.\"HS_MID\",\n       j.\"LETO_OBN_OKEN\",\n       j.\"LETO_OBN_INST\",\n       j.\"ST_NADSTROPJA\",\n       j.\"ID_LEGA\",\n       j.\"PROSTORNINA\",\n       j.\"IMA_DVIGALO_DN\",\n       j.\"VISINA_ETAZE\",\n       j.\"ID_DR_DST\",\n       j.\"JN_REV_NUM\",\n       j.\"JN_REV_NUM_TO\",\n       j.\"JN_REV_NUM_PREV\",\n       j.\"DELEZ_DST_STAVBA\",\n       j.\"ZPS_DST\",\n       j.\"ID_MODEL\",\n       j.\"CCSI_STAR\",\n       j.\"IMA_KATAS_VPIS_DN\",\n       j.\"EID\",\n       j.\"HS_MID_CENX\",\n       j.\"HS_MID_CENY\",\n       CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_DEL_STAVBE j\n         join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join Ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 13:49:14",
+    "last_sync_end": "2026-09-23 03:16:52",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-23 03:16:52",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_DEL_STAVBE"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_dst_pripis_podatki_h",
+    "integration_id": "ebe9dc2a-9356-11f1-a711-02420a000208",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\n    j.\"ID\" AS dst_pripis_podatki_pk,\n    j.\"DST_SID\" AS dst_sid,\n    j.\"EID\" AS eid,\n    j.\"ID_MODEL\" AS id_model,\n    j.\"ERROR_MSG\" AS error_msg,\n    j.\"RAVEN\" AS raven,\n    j.\"CONA_IME\" AS cona_ime,\n    j.\"D_DST\" AS d_dst,\n    j.\"IZMERA\" AS izmera,\n    j.\"LETO_IZG_STA\" AS leto_izg_sta,\n    j.\"VT_DST\" AS vt_dst,\n    j.\"POV_LETO_OBN\" AS pov_leto_obn,\n    j.\"F_OBN\" AS f_obn,\n    j.\"T_LAST\" AS t_last,\n    j.\"F_LAST\" AS f_last,\n    j.\"F_NK\" AS f_nk,\n    j.\"POVR_ZPS\" AS povr_zps,\n    j.\"F_D_DST\" AS f_d_dst,\n    j.\"VT_ZPS_M2\" AS vt_zps_m2,\n    j.\"VT_PRI\" AS vt_pri,\n    j.\"VPLIVI\" AS vplivi,\n    j.\"F_ODD\" AS f_odd,\n    j.\"T_DP\" AS t_dp,\n    j.\"F_DP\" AS f_dp,\n    j.\"T_LEGE\" AS t_lege,\n    j.\"F_LEGE\" AS f_lege,\n    j.\"F_GAR\" AS f_gar,\n    j.\"POVR_PPP_P\" AS povr_ppp_p,\n    j.\"POVR_PPL_P\" AS povr_ppl_p,\n    j.\"FAKTOR_P\" AS faktor_p,\n    j.\"F_LP\" AS f_lp,\n    j.\"POVR_DP_P\" AS povr_dp_p,\n    j.\"VT_DP_M2_P\" AS vt_dp_m2_p,\n    j.\"POVR_PPL_L\" AS povr_ppl_l,\n    j.\"POVR_PPP_L\" AS povr_ppp_l,\n    j.\"FAKTOR_L\" AS faktor_l,\n    j.\"F_PL\" AS f_pl,\n    j.\"POVR_DP_L\" AS povr_dp_l,\n    j.\"VT_DP_M2_L\" AS vt_dp_m2_l,\n    j.\"POVR_DP_TUR\" AS povr_dp_tur,\n    j.\"VT_DP_M2_TUR\" AS vt_dp_m2_tur,\n    j.\"JN_REV_NUM\" AS jn_rev_num,\n    j.\"VREDNOST\" AS vrednost,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,\n    CAST(NULL AS TIMESTAMP WITH TIME ZONE) AS valid_to,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS date_change\nFROM EV.DST_PRIPIS_PODATKI j\nJOIN EV.REVISION rf ON j.\"JN_REV_NUM\" = rf.REV_NUM",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:42:28",
+    "last_sync_end": "2026-09-22 11:42:34",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:42:34",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "DST_PRIPIS_PODATKI"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_del_h",
+    "integration_id": "8a9ed9a4-ae58-11f0-9f8c-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"ID_PARC_DEL\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_parcela_del_pk,\nID_PARC_DEL,\nPC_MID,\nID_NR_PARC,\nID_DR_PARC,\nDELEZ_POVRSINE,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nID_MODEL,\nMESSAGE,\n CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PARC_DEL j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 12:02:04",
+    "last_sync_end": "2026-09-22 13:43:21",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 13:43:21",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PARC_DEL"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parcela_h",
+    "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"PC_MID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_parcela_pk,\nPC_MID,\nOB_MID,\nKO_SIFKO,\nPARCELA,\nPOVRSINA,\nCENX,\nCENY,\nBONITETA,\nODPRTOST,\nRK,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nEID,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PARCELA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 12:12:43",
+    "last_sync_end": "2026-09-22 12:18:09",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 12:18:09",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PARCELA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_enota_h_2025_danes",
+    "integration_id": "1e57d002-f69c-11f0-9f2c-02420a000266",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\n    TO_CHAR(j.\"ID_PARC_ENOTA\") || '-' || TO_CHAR(j.\"JN_REV_NUM\") AS jn_parcela_enota_pk,\n    j.\"ID_PARC_ENOTA\" AS id_parc_enota,\n    j.\"PC_MID\" AS pc_mid,\n    j.\"ID_MODEL\" AS id_model,\n    j.\"DELEZ_POVRSINE\" AS delez_povrsine,\n    j.\"VREDNOST\" AS vrednost,\n    j.\"RAVEN\" AS raven,\n    j.\"VPLIV\" AS vpliv,\n    j.\"CONA_IME\" AS cona_ime,\n    j.\"FAKTOR_PO\" AS faktor_po,\n    j.\"POSPLOSENA_VREDNOST\" AS posplosena_vrednost,\n    j.\"ID_MODEL_VER\" AS id_model_ver,\n    CAST(TRIM(j.\"JN_STATUS\") AS VARCHAR2(1)) AS jn_status,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,\n    FROM_TZ(CAST(rt.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_to,\n    FROM_TZ(CAST(COALESCE(rt.CREATED, rf.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AS date_change\nFROM EV.JN_PARC_ENOTA j\nJOIN EV.REVISION rf ON j.\"JN_REV_NUM\" = rf.REV_NUM\nLEFT JOIN EV.REVISION rt ON j.\"JN_REV_NUM_TO\" = rt.REV_NUM\nWHERE j.\"JN_STATUS\" <> 'X'\n  AND rf.CREATED >= TIMESTAMP '2025-01-01 00:00:00'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 13:33:51",
+    "last_sync_end": "2026-09-23 00:13:14",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-23 00:13:14",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PARC_ENOTA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_parc_pripis_podatki_h",
+    "integration_id": "5b3da3c2-9357-11f1-a60a-02420a000208",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\n    j.\"ID\" AS parc_pripis_podatki_pk,\n    j.\"PC_MID\" AS pc_mid,\n    j.\"EID\" AS eid,\n    j.\"ID_MODEL\" AS id_model,\n    j.\"ERROR_MSG\" AS error_msg,\n    j.\"RAVEN\" AS raven,\n    j.\"CONA_IME\" AS cona_ime,\n    j.\"IZMERA\" AS izmera,\n    j.\"POVR_HME\" AS povr_hme,\n    j.\"VT_HME_M2\" AS vt_hme_m2,\n    j.\"POVR_VIN\" AS povr_vin,\n    j.\"VT_VIN_M2\" AS vt_vin_m2,\n    j.\"POVR_SAD\" AS povr_sad,\n    j.\"VT_SAD_M2\" AS vt_sad_m2,\n    j.\"POVR_OLJ\" AS povr_olj,\n    j.\"VT_OLJ_M2\" AS vt_olj_m2,\n    j.\"VT_Z_M2\" AS vt_z_m2,\n    j.\"BONITETA\" AS boniteta,\n    j.\"F_BON\" AS f_bon,\n    j.\"RK\" AS rk,\n    j.\"F_RK\" AS f_rk,\n    j.\"ODPRTOST\" AS odprtost,\n    j.\"F_ODP\" AS f_odp,\n    j.\"F_POVR\" AS f_povr,\n    j.\"POVR_A\" AS povr_a,\n    j.\"VT_A_M2\" AS vt_a_m2,\n    j.\"POVR_B\" AS povr_b,\n    j.\"VT_B_M2\" AS vt_b_m2,\n    j.\"POVR_C\" AS povr_c,\n    j.\"VT_C_M2\" AS vt_c_m2,\n    j.\"POVR_D\" AS povr_d,\n    j.\"VT_D_M2\" AS vt_d_m2,\n    j.\"POVR_E\" AS povr_e,\n    j.\"VT_E_M2\" AS vt_e_m2,\n    j.\"POVR_F\" AS povr_f,\n    j.\"VT_F_M2\" AS vt_f_m2,\n    j.\"POVR_G\" AS povr_g,\n    j.\"VT_G_M2\" AS vt_g_m2,\n    j.\"POVR_H\" AS povr_h,\n    j.\"VT_H_M2\" AS vt_h_m2,\n    j.\"POVR_VOD\" AS povr_vod,\n    j.\"VT_VOD_M2\" AS vt_vod_m2,\n    j.\"POVR_POZ\" AS povr_poz,\n    j.\"VT_POZ_M2\" AS vt_poz_m2,\n    j.\"JN_REV_NUM\" AS jn_rev_num,\n    j.\"F_ODD\" AS f_odd,\n    j.\"VPLIVI\" AS vplivi,\n    j.\"VREDNOST\" AS vrednost,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,\n    CAST(NULL AS TIMESTAMP WITH TIME ZONE) AS valid_to,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS date_change\nFROM EV.PARC_PRIPIS_PODATKI j\nJOIN EV.REVISION rf ON j.\"JN_REV_NUM\" = rf.REV_NUM",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:43:01",
+    "last_sync_end": "2026-09-22 11:43:15",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:43:15",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "PARC_PRIPIS_PODATKI"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_pe_dst_h",
+    "integration_id": "f5519202-ae65-11f0-adb7-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"ID_PE_DST\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_pe_dst_pk,\nID_PE_DST,\nID_PE,\nDST_SID,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nVREDNOST_DODATEK,\nPODATKI,\nDELITEV_MSG,\n  CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,\n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PE_DST j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:29:21",
+    "last_sync_end": "2026-09-22 11:31:02",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:32:38",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PE_DST"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_pe_parc_h",
+    "integration_id": "26856cbc-ae67-11f0-8b08-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"ID_PE_PARC\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_pe_parc_pk,\nID_PE_PARC,\nID_PE,\nPC_MID,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nPOVRSINA_PE,\nVIR_POVRSINA_PE,\nVREDNOST_DODATEK,\nPOV_PARC_BREZ_ZPS,\nPOV_PE_BREZ_ZPS,\nDELITEV_MSG,\nPOVR_PARC_IZR,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PE_PARC j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:22:29",
+    "last_sync_end": "2026-09-22 11:25:02",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:25:02",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PE_PARC"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_posebna_enota",
+    "integration_id": "b03b586a-cf31-11ef-acb5-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select id_pe,\n       id_pn,\n       naziv,\n       id_model,\n       vrednost,\n       jn_rev_num,\n       raven,\n       cenx,\n       ceny,\n       naslov,\n       posplosena_vrednost,\n       podatki,\n       ob_mid,\n       naslov_vrocanja,\n       tip,\n       faktor_po,\n       id_dokument,\n       delitev_status,\n       delitev_msg,\n       dat_plomba,\n       plomba_razlog,\n       id_model_ver,\n       ('POINT(' || REPLACE(ceny, ',', '.') || ' ' || REPLACE(cenx, ',', '.') || ')') AS wkt\nfrom ev.POSEBNA_ENOTA",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-09-23 00:00:00",
+    "last_sync_end": "2026-09-23 00:00:01",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-23 00:00:01",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "POSEBNA_ENOTA"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_posebna_enota_h",
+    "integration_id": "a75bfb06-ae69-11f0-941e-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"ID_PE\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_posebna_enota_pk,\nID_PE,\nID_PN,\nNAZIV,\nID_MODEL,\nVREDNOST,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\nRAVEN,\nCENX,\nCENY,\nNASLOV,\nPOSPLOSENA_VREDNOST,\nPODATKI,\nOB_MID,\nNASLOV_VROCANJA,\nTIP,\nFAKTOR_PO,\nID_DOKUMENT,\nDELITEV_STATUS,\nDELITEV_MSG,\nDAT_PLOMBA,\nPLOMBA_RAZLOG,\nID_MODEL_VER,\nCAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_POSEBNA_ENOTA j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:34:10",
+    "last_sync_end": "2026-09-22 11:35:09",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:35:09",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_POSEBNA_ENOTA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_prostor_h",
+    "integration_id": "3d6e03ec-ae6e-11f0-bc34-169cd02558fe",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(j.\"PRO_ID\") || '-' || to_char(j.\"JN_REV_NUM\") as jn_prostor_pk,\nPRO_ID,\nDST_SID,\nID_DR_PROS,\nPOVRSINA,\nJN_REV_NUM,\nJN_REV_NUM_TO,\nJN_REV_NUM_PREV,\n  CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_PROSTOR j\n             join ev.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:39:07",
+    "last_sync_end": "2026-09-22 11:56:19",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 11:56:19",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_PROSTOR"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "ev_stavba_h",
+    "integration_id": "39aa410c-beff-11f0-a601-5212cffe39ac",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select to_char(\"STA_SID\") || '-' || to_char(\"JN_REV_NUM\") as jn_sta_pk,\n  STA_SID               ,\n  KO_SIFKO              ,\n  STEV_ST               ,\n  ST_ETAZ               ,\n  LETO_IZG_STA          ,\n  LETO_OBN_STREHE       ,\n  LETO_OBN_FASADE       ,\n  ID_KONSTRUKCIJA       ,\n  IMA_VODOVOD_DN        ,\n  IMA_ELEKTRIKO_DN      ,\n  IMA_KANALIZACIJO_DN   ,\n  IMA_PLIN_DN           ,\n  ID_TIP_STAVBE         ,\n  CENX                  ,\n  CENY                  ,\n  ST_STANOVANJ          ,\n  ST_POSLOVNIH_PROSTOROV,\n  JN_REV_NUM            ,\n  JN_REV_NUM_TO         ,\n  JN_REV_NUM_PREV       ,\n  POV_STAVBE            ,\n  ZPS_STAVBA            ,\n  OB_MID                ,\n  EID                   ,\n   CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,\n    from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, \n    from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,\n    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change\nfrom EV.JN_STAVBA j\n             join EV.revision rf on (j.jn_rev_num = rf.rev_num)\n         left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)\nwhere jn_status <> 'X'",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-21 23:59:59.999000",
+    "last_sync_start": "2026-09-22 11:48:18",
+    "last_sync_end": "2026-09-22 16:07:47",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 16:07:47",
+    "group": "EV",
+    "source_tables": [
+      [
+        "EV",
+        "JN_STAVBA"
+      ],
+      [
+        "EV",
+        "REVISION"
+      ]
+    ]
+  },
+  {
+    "target_table": "gji_ceste_l",
+    "integration_id": "773c3ebe-4d28-11f1-8b96-3e973ca51b14",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select lin.linija_id                                   as id,\n       vob.sifra                                       as sif_vrste,\n       at1.sifra                                       as atr1,\n       at1.naziv_sl                                    as atr1_opis,\n\n       SDO_UTIL.TO_WKTGEOMETRY(case when lin.geom is null then null\n\n           -- LINESTRING -> MULTILINESTRING\n                                    when mod(lin.geom.sdo_gtype, 1000) = 2 then SDO_GEOMETRY(\n                                            trunc(lin.geom.sdo_gtype / 1000) * 1000 + 6, lin.geom.sdo_srid, null,\n                                            lin.geom.sdo_elem_info, lin.geom.sdo_ordinates)\n\n           -- already MULTILINESTRING\n                                    when mod(lin.geom.sdo_gtype, 1000) = 6 then lin.geom\n\n                                    else lin.geom end) as geom,\n\n       case when at1.sifra in (1, 2) then 1 -- CESTE --> AC\n            when at1.sifra in (3, 4, 5, 6) then 2 -- CESTE --> I in II\n           end                                         as vrsta_odd\n\nfrom GJI.LINIJE lin\n         left join sif.gji_vrste_objektov vob on lin.gji_vrsta_objekta_id = vob.gji_vrsta_objekta_id\n         left join sif.gji_atr1 at1 on lin.gji_atr1_id = at1.gji_atr1_id\nwhere lin.GJI_ATR1_ID in (14, 18, 7, 2, 3, 12)\norder by atr1, id",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-05-11 11:06:43",
+    "last_sync_end": "2026-05-11 11:07:11",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-05-11 11:07:11",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "GJI",
+        "LINIJE"
+      ],
+      [
+        "SIF",
+        "GJI_ATR1"
+      ],
+      [
+        "SIF",
+        "GJI_VRSTE_OBJEKTOV"
+      ]
+    ]
+  },
+  {
+    "target_table": "gji_daljnovodi_l",
+    "integration_id": "67e3a9e0-4d2b-11f1-8820-3e973ca51b14",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "with q as ( select lin.linija_id          as linija_id,\n                   vob.sifra              as sif_vrste,\n                   at2.sifra              as atr2,\n                   at2.naziv_sl           as atr2_opis,\n\n                   case when lin.geom is null then null\n\n                       -- LINESTRING -> MULTILINESTRING\n                        when mod(lin.geom.sdo_gtype, 1000) = 2 then SDO_GEOMETRY(\n                                trunc(lin.geom.sdo_gtype / 1000) * 1000 + 6, lin.geom.sdo_srid, null,\n                                lin.geom.sdo_elem_info, lin.geom.sdo_ordinates)\n\n                       -- already MULTILINESTRING\n                        when mod(lin.geom.sdo_gtype, 1000) = 6 then lin.geom\n\n                        else lin.geom end as geom_sdo,\n\n                   case when at2.sifra in (3) then 4 -- DALJNOVODI --> 110kV\n                        when at2.sifra in (1, 2) then 5 -- DALJNOVODI --> nad 110kV\n                       end                as vrsta_odd\n\n            from GJI.LINIJE lin\n                     left join sif.gji_vrste_objektov vob on lin.gji_vrsta_objekta_id = vob.gji_vrsta_objekta_id\n                     left join sif.gji_atr2 at2 on lin.gji_atr2_id = at2.gji_atr2_id\n            where lin.GJI_ATR2_ID in (24, 22, 18) )\nselect linija_id,\n       sif_vrste,\n       atr2,\n       atr2_opis,\n       SDO_UTIL.TO_WKTGEOMETRY(geom_sdo)                     as geom,\n       vrsta_odd\nfrom q\norder by atr2 desc, linija_id",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "FAILED",
+    "updated_at": "2026-05-11 11:30:42",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "GJI",
+        "LINIJE"
+      ],
+      [
+        "SIF",
+        "GJI_ATR2"
+      ],
+      [
+        "SIF",
+        "GJI_VRSTE_OBJEKTOV"
+      ]
+    ]
+  },
+  {
+    "target_table": "gji_zeleznice_l",
+    "integration_id": "1c2a471c-4d2a-11f1-8a86-3e973ca51b14",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select cast(lin.linija_id as integer)                                   as id,\n       cast(vob.sifra as integer)                                       as sif_vrste,\n       SDO_UTIL.TO_WKTGEOMETRY(case when lin.geom is null then null\n\n           -- LINESTRING -> MULTILINESTRING\n                                    when mod(lin.geom.sdo_gtype, 1000) = 2 then SDO_GEOMETRY(\n                                            trunc(lin.geom.sdo_gtype / 1000) * 1000 + 6, lin.geom.sdo_srid, null,\n                                            lin.geom.sdo_elem_info, lin.geom.sdo_ordinates)\n\n           -- already MULTILINESTRING\n                                    when mod(lin.geom.sdo_gtype, 1000) = 6 then lin.geom\n\n                                    else lin.geom end) as geom,\n       3                                               as vrsta_odd\nfrom GJI.LINIJE lin\n         left join sif.gji_vrste_objektov vob on lin.gji_vrsta_objekta_id = vob.gji_vrsta_objekta_id\nwhere lin.GJI_VRSTA_OBJEKTA_ID in (4)\norder by sif_vrste, id",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "CONFIGURED",
+    "updated_at": "2026-05-11 11:18:04",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "GJI",
+        "LINIJE"
+      ],
+      [
+        "SIF",
+        "GJI_VRSTE_OBJEKTOV"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_deli_stavb_h",
+    "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\nDEL_STAVBE_H_ID,\nDEL_STAVBE_ID,\nSTAVBA_ID,\nHISNA_STEVILKA_ID,\nUPRAVNIK_ID,\nVRSTA_DEJANSKE_RABE_DEL_ST_ID,\nDVIGALO,\nLETO_OBNOVE_INSTALACIJ,\nLETO_OBNOVE_OKEN,\nPOVRSINA,\nSTATUS,\nST_DELA_STAVBE,\nSTANOVANJE_ID,\nUPORABNA_POVRSINA,\nPROSTORNINA_CISTERN_SILOSOV,\nPOSTOPEK_ID_OD,\nPOSTOPEK_ID_DO,\nFROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\nFROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nEID,\nNACIN_DOLOCITVE_POVRSINE_DELA_STAVBE_ID,\nUPRAVNIK_STATUS,\nOMEJITEV_VPOGLEDA,\nETAZNA_LASTNINA,\nSKUPNI_DEL_ETAZNA_LASTNINA\nFROM nep.DELI_STAVB_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 02:50:00",
+    "last_sync_end": "2026-09-19 02:50:55",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 02:50:55",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "DELI_STAVB_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_etaze_h",
+    "integration_id": "550a20ee-9d03-11ef-8c7b-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select ETAZA_H_ID ,\nETAZA_ID ,\nSTEVILKA_ETAZE ,\nSTAVBA_ID ,\nNADMORSKA_VISINA ,\nVISINA_ETAZE ,\nPOSTOPEK_ID_OD ,\nPOSTOPEK_ID_DO ,\nFROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\nFROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nCASE\n        WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'MULTIPOLYGON%' THEN SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n        WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'POLYGON%' THEN\n            SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(\n                2007,\n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_SRID,\n                NULL,\n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO,\n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_ORDINATES\n            ))\n        END AS GEOM,\nPOVRSINA ,\nEID ,\nPRITLICNA_ETAZA\nfrom nep.ETAZE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 02:20:00",
+    "last_sync_end": "2026-09-19 02:20:29",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 02:20:29",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_etaze_x_deli_stavb_h",
+    "integration_id": "fb72d988-b94d-11ef-bb81-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select ETAZA_X_DEL_STAVBE_H_ID,\n       ETAZA_X_DEL_STAVBE_ID,\n       ETAZA_ID,\n       DEL_STAVBE_ID,\n       POVRSINA_ATRIBUTNA,\n       case when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'MULTIPOLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n            when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'POLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(2007,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_SRID,\n                                                                                                         null,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_ORDINATES)) end as GEOM,\n       POVRSINA,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                                                                                   DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                                                                                   DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                  DATUM_SYS,\n       TIP_POLIGONA_DELA_STAVBE_ID,\n       GLAVNI_VHOD_DELA_STAVBE\nfrom nep.ETAZE_X_DELI_STAVB_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 04:00:00",
+    "last_sync_end": "2026-09-19 04:00:45",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 04:00:45",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_hisne_stevilke_h",
+    "integration_id": "736ac43c-b60b-11ef-a0fc-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select HISNA_STEVILKA_H_ID,\n       HISNA_STEVILKA_ID,\n       HS_STEVILKA,\n       HS_DODATEK,\n       cast(STAVBA_ID as NUMBER(28))  as                         STAVBA_ID,\n       cast(NASELJE_ID as NUMBER(28)) as                         NASELJE_ID,\n       cast(ULICA_ID as NUMBER(28))   as                         ULICA_ID,\n       cast(TIP_TABLICE as NUMBER(8)) as                         TIP_TABLICE,\n       SDO_UTIL.TO_WKTGEOMETRY(GEOM)  as                         geom,\n       POSTNI_OKOLIS_ID,\n       ST_HS,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       EID\nfrom nep.HISNE_STEVILKE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-22 16:03:30",
+    "last_sync_start": "2026-09-22 23:10:00",
+    "last_sync_end": "2026-09-22 23:10:06",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 23:10:06",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "HISNE_STEVILKE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_katastrske_obcine_h",
+    "integration_id": "f6c3a090-8638-11ef-8275-0242ac120007",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select KO_ID_H,\n       KO_ID,\n       NAZIV,\n       CASE\n        WHEN GEOM IS NULL THEN NULL\n        WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'MULTIPOLYGON%' THEN SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n        WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'POLYGON%' THEN\n            SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(\n                2007, \n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_SRID, \n                NULL,\n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO, \n                TREAT(geom AS MDSYS.SDO_GEOMETRY).SDO_ORDINATES \n            ))\n        ELSE NULL\n        END AS GEOMETRY,\n       POVRSINA_GEOM,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\n       FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\n       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       SIFKO,\n       EID\nfrom nep.KATASTRSKE_OBCINE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 12:42:52",
+    "last_sync_start": "2026-09-19 04:40:00",
+    "last_sync_end": "2026-09-19 04:40:03",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 04:40:03",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+    "integration_id": "e0c4ee44-f34c-11ef-9c8f-02420a0001ec",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT  DEJANSKA_RABA_H_ID,\n        DEJANSKA_RABA_ID,\n               case when regexp_count(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+') = 1\n                then to_number(regexp_substr(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+'))\n            when regexp_count(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+') > 1 then 99\n            else null end            as                          ENOSTAVNA_VRSTA_DRABE_SIFRA,\n        DEJANSKA_RABA_KG_ID,\n        KG_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_PO_ID,\n        PO_VRSTA_DEJANSKE_RABE_ID,\n        STAVBA_ID,\n        ST_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN_ID,\n        IN_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN1_ID,\n        IN1_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN2_ID,\n        IN2_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN3_ID,\n        IN3_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_VZ_ID,\n        VZ_VRSTA_DEJANSKE_RABE_ID,\n        POLIGONI_SI800M_1K_ID,\n        NN_VRSTA_DEJANSKE_RABE_ID,\n        SESTAVLJENA_VRSTA_DRABE_SIFRA,\n        LOKACIJSKA_NAT,\n        from_tz(cast(VIR_DATUM as TIMESTAMP), 'Europe/Ljubljana')  VIR_DATUM,\n        POVRSINA_GEOM,\n        SDO_UTIL.TO_WKTGEOMETRY(GEOM) AS GEOM,\n        EID,\n        POSTOPEK_ID_OD,\n        POSTOPEK_ID_DO,\n        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS\nfrom nep_ostalo.DEJANSKE_RABE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-01-29 14:24:19",
+    "last_sync_start": "2026-01-30 04:50:00",
+    "last_sync_end": "2026-01-30 04:51:00",
+    "processing_status": "FAILED",
+    "updated_at": "2026-09-09 11:30:45",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_OSTALO",
+        "DEJANSKE_RABE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_ostalo_gozdno_gosp_obm",
+    "integration_id": "a99024c6-a8aa-11ef-adaf-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select \nGOZDNO_GOSP_OBM_ID, \nODSEK, \nODPRTOST, \nRASTISCNI_KOEFICIENT, \nPOVRSINA_GEOM, \nSDO_UTIL.TO_WKTGEOMETRY(geom) AS geom, \nPOSTOPEK_ID, \nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nGGO\nfrom nep_ostalo.gozdno_gosp_obm",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2024-06-03 21:42:35",
+    "last_sync_start": "2026-09-19 05:50:00",
+    "last_sync_end": "2026-09-19 05:50:00",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 05:50:00",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_OSTALO",
+        "GOZDNO_GOSP_OBM"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_ostalo_namenske_rabe",
+    "integration_id": "74096586-f2b2-11ef-ac67-02420a0001ec",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select NAMENSKA_RABA_ID,\n       PODROBNA_NAMENSKA_RABA_ID,\n       POSTOPEK_ID,\n       case when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'MULTIPOLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n            when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'POLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(2007,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_SRID,\n                                                                                                         null,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO,\n                                                                                                         treat(geom as MDSYS.SDO_GEOMETRY).SDO_ORDINATES)) end as GEOM,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                  DATUM_SYS,\n       OBCINA_ID,\n       from_tz(cast(DATUM_VELJAVNOSTI as TIMESTAMP), 'Europe/Ljubljana')                                                                                          DATUM_VELJAVNOSTI,\n       povrsina_geom,\n       VIR_IDENT\nfrom nep_ostalo.NAMENSKE_RABE",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-08 12:31:08",
+    "last_sync_start": "2026-09-19 06:20:00",
+    "last_sync_end": "2026-09-19 06:20:03",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 06:20:03",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+    "integration_id": "8264be70-aafd-11ef-947a-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select PARCELA_X_DEJANSKA_RABA_H_ID,\n       PARCELA_X_DEJANSKA_RABA_ID,\n       PARCELA_ID,\n       KG_VRSTA_DEJANSKE_RABE_ID,\n       PO_VRSTA_DEJANSKE_RABE_ID,\n       ST_VRSTA_DEJANSKE_RABE_ID,\n       IN_VRSTA_DEJANSKE_RABE_ID,\n       IN1_VRSTA_DEJANSKE_RABE_ID,\n       IN2_VRSTA_DEJANSKE_RABE_ID,\n       IN3_VRSTA_DEJANSKE_RABE_ID,\n       VZ_VRSTA_DEJANSKE_RABE_ID,\n       NN_VRSTA_DEJANSKE_RABE_ID,\n       DELEZ,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS\nfrom nep_ostalo.PARCELE_X_DEJANSKE_RABE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 12:44:39",
+    "last_sync_start": "2026-09-19 06:00:00",
+    "last_sync_end": "2026-09-19 06:01:39",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 06:01:39",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_OSTALO",
+        "PARCELE_X_DEJANSKE_RABE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+    "integration_id": "e0d985ce-a8bb-11ef-ac18-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select PARCELE_X_GOZDNO_GOSP_OBM_H_ID,\n       PARCELE_X_GOZDNO_GOSP_OBM_ID,\n       PARCELA_ID,\n       ODPRTOST,\n       RASTISCNI_KOEFICIENT,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS\nfrom nep_ostalo.PARCELE_X_GOZDNO_GOSP_OBM_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 12:24:43",
+    "last_sync_start": "2026-09-19 04:00:00",
+    "last_sync_end": "2026-09-19 04:00:20",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 04:00:20",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_OSTALO",
+        "PARCELE_X_GOZDNO_GOSP_OBM_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+    "integration_id": "8b9adbea-a59f-11ef-a7dc-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "SELECT\nPARCELA_X_NAMENSKA_RABA_H_ID, \nPARCELA_X_NAMENSKA_RABA_ID, \nPARCELA_ID, \nVRSTA_NAMENSKE_RABE_ID, \nPOSTOPEK_ID_OD, \nPOSTOPEK_ID_DO, \nOBCINA_ID,\nFROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\nFROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nVIR_NAMENSKE_RABE_ID, \nDELEZ\nFROM nep_ostalo.PARCELE_X_NAMENSKE_RABE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-22 17:20:48",
+    "last_sync_start": "2026-09-22 23:40:00",
+    "last_sync_end": "2026-09-22 23:40:34",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 23:40:34",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP_OSTALO",
+        "PARCELE_X_NAMENSKE_RABE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_parcele_h",
+    "integration_id": "4f44b04c-a7e5-11ef-b133-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select PARCELA_H_ID, \nPARCELA_ID, \nKO_ID, \nST_PARCELE, \nPOVRSINA, \nDOLOCITEV_POVRSINE, \nUPRAVNI_STATUS_ID, \nE_CEN, \nN_CEN, \nSDO_UTIL.TO_WKTGEOMETRY(GEOM) as GEOM, \nREPLACE(povrsina_geom, ',', '.') AS povrsina_geom,\nPOSTOPEK_ID_OD, \nPOSTOPEK_ID_DO, \nFROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\nFROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nEID, \nBONITETA, \nDRZAVNA_MEJA, \nSKUPNI_DEL_ETAZNA_LASTNINA\nfrom nep.PARCELE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-22 17:19:49",
+    "last_sync_start": "2026-09-22 23:00:00",
+    "last_sync_end": "2026-09-22 23:01:38",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 23:01:38",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "PARCELE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_prostori_h",
+    "integration_id": "5b16f1a0-a592-11ef-9316-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select \nPROSTOR_H_ID, \nPROSTOR_ID, \nDEL_STAVBE_ID, \nVRSTA_PROSTORA_ID, \nPOVRSINA, \nPOSTOPEK_ID_OD, \nPOSTOPEK_ID_DO, \nFROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\nFROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\nFROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\nEID\nfrom nep.PROSTORI_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 02:40:00",
+    "last_sync_end": "2026-09-19 02:40:42",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 02:40:42",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "PROSTORI_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_rpe_naselja_h",
+    "integration_id": "403dee5c-d34f-11ef-a441-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select NASELJE_H_ID,\n       NASELJE_ID,\n       SIFRA,\n       NAZIV,\n       NAZIV_KRATKO,\n       OBCINA_ID,\n       UPRAVNA_ENOTA_ID,\n       ULICNI_SISTEM,\n       POVRSINA_GEOM,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       EID,\n       NAZIV_DJ,\n       SESTAVLJENA_SIFRA,\n       SDO_UTIL.TO_WKTGEOMETRY(GEOM) as                          geom,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS\nfrom nep.RPE_NASELJA_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-08-21 07:54:45",
+    "last_sync_start": "2026-09-19 04:35:00",
+    "last_sync_end": "2026-09-19 04:35:21",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 04:35:21",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "RPE_NASELJA_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_rpe_obcine_h",
+    "integration_id": "6460237c-f34d-11ef-91f1-02420a0001ec",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select OBCINA_H_ID,\n       OBCINA_ID,\n       SIFRA,\n       NAZIV,\n       OZNAKA_MESTNE_OBCINE,\n       SDO_UTIL.TO_WKTGEOMETRY(GEOM)     as                      geom_one,\n       POVRSINA_GEOM,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       EID,\n       SDO_UTIL.TO_WKTGEOMETRY(GEOM_RPE) as                      geom_rpe,\n       NAZIV_DJ\nfrom nep.RPE_OBCINE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-17 09:27:51",
+    "last_sync_start": "2026-09-19 06:10:00",
+    "last_sync_end": "2026-09-19 06:10:03",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 06:10:03",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "RPE_OBCINE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_rpe_ulice_h",
+    "integration_id": "d1d4521c-bc79-11ef-89e9-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select ULICA_H_ID,\n       ULICA_ID,\n       SIFRA,\n       NAZIV,\n       NAZIV_KRATKO,\n       OBCINA_ID,\n       NASELJE_ID,\n       case when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'MULTILINESTRING%' then SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n            when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'LINESTRING%' then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(2006,\n                                                                                                            treat(GEOM as MDSYS.SDO_GEOMETRY).SDO_SRID,\n                                                                                                            null,\n                                                                                                            treat(GEOM as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO,\n                                                                                                            treat(GEOM as MDSYS.SDO_GEOMETRY).SDO_ORDINATES)) end as GEOM,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                                                                                      DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                                                                                      DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                     DATUM_SYS,\n       EID,\n       NAZIV_DJ,\n       SESTAVLJENA_SIFRA,\n       cast(case when SDO_UTIL.TO_WKTGEOMETRY(GEOM) like 'GEOMETRYCOLLECTION%'\n                     then 'Zapis geometrije je prisoten v KN, vendar ni tipa MULTILINESTRING ali LINESTRING.' end as VARCHAR2(255))                                  opomba_fct\nfrom nep.RPE_ULICE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-10 13:53:47",
+    "last_sync_start": "2026-09-19 04:20:00",
+    "last_sync_end": "2026-09-19 04:20:00",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 04:20:00",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_sestavine_delov_stavb_h",
+    "integration_id": "ff8e6f56-b951-11ef-9695-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select SESTAVINA_DELA_STAVBE_H_ID,\n       SESTAVINA_DELA_STAVBE_ID,\n       DEL_STAVBE_ID,\n       PARCELA_ID,\n       POVRSINA,\n       VRSTA_ID,\n       SDO_UTIL.TO_WKTGEOMETRY(GEOM) as                          GEOMETRY,\n       POVRSINA_GEOM,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       EID\nfrom nep.sestavine_delov_stavb_h",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": "2026-09-17 14:20:45",
+    "last_sync_start": "2026-09-19 05:31:06",
+    "last_sync_end": "2026-09-19 05:31:29",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 05:31:29",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "SESTAVINE_DELOV_STAVB_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_sifranti",
+    "integration_id": "0b125500-0121-11f1-9b93-02420a0001f4",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select s.sifrant_id || ':' || s.kn_id as unikaten_id,\n       cast(s.sifrant_id as integer) as sifrant_id,\n       s.sifrant,\n       cast(s.kn_id as integer) as kn_id ,\n       cast(s.sifra as integer) as sifra,\n       s.naziv_sl,\n       s.oznaka,\n       s.opis_sl\nfrom ( select 13                      as sifrant_id,\n              'nosilne_konstrukcije'  as sifrant,\n              nosilna_konstrukcija_id as kn_id,\n              cast(sifra as integer)  as sifra,\n              naziv_sl,\n              null                    as oznaka,\n              opis_sl\n       from sif.nosilne_konstrukcije\n\n       union all\n\n       select 19, 'tipi_lastnikov', tip_lastnika_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.tipi_lastnikov\n\n       union all\n\n       select 20, 'tipi_stavb', tip_stavbe_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.tipi_stavb\n\n       union all\n\n       select 22, 'upravni_statusi', upravni_status_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.upravni_statusi\n\n       union all\n\n       select 23, 'viri_dejanskih_rab', vir_dejanske_rabe_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.viri_dejanskih_rab\n\n       union all\n\n       select 24, 'viri_namenske_rabe', vir_namenske_rabe_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.viri_namenske_rabe\n\n       union all\n\n       select 25, 'viri_posebnih_rezimov', vir_posebnega_rezima_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.viri_posebnih_rezimov\n\n       union all\n\n       select 26, 'vrste_dejanske_rabe', vrsta_dejanske_rabe_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_dejanske_rabe\n       \n       union all\n       \n       select 26, 'vrste_dejanske_rabe', 99, 99, 'Skupna dejanska raba', null, 'Dodal Flycom, ni v uradnem GURS \u0161ifrantu' from dual\n\n       union all\n\n       select 27,\n              'vrste_dejanskih_rab_del_st',\n              vrsta_dejanske_rabe_del_st_id,\n              cast(sifra as integer),\n              naziv_sl,\n              null,\n              opis_sl\n       from sif.vrste_dejanskih_rab_del_st\n\n       union all\n\n       select 28, 'vrste_gradbenih_parcel', vrsta_gradbene_parcele_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_gradbenih_parcel\n\n       union all\n\n       select 29,\n              'vrste_namenske_rabe',\n              vrsta_namenske_rabe_id,\n              cast(sifra as integer),\n              naziv_sl,\n              case vrsta_namenske_rabe_id\n                  when 2 then 'S'\n                  when 3 then 'SS'\n                  when 4 then 'SB'\n                  when 5 then 'SK'\n                  when 6 then 'SP'\n                  when 7 then 'C'\n                  when 8 then 'CU'\n                  when 9 then 'CD'\n                  when 10 then 'I'\n                  when 11 then 'IP'\n                  when 12 then 'IG'\n                  when 13 then 'IK'\n                  when 14 then 'B'\n                  when 15 then 'BT'\n                  when 16 then 'BD'\n                  when 17 then 'BC'\n                  when 18 then 'Z'\n                  when 19 then 'ZS'\n                  when 20 then 'ZP'\n                  when 21 then 'ZV'\n                  when 22 then 'ZD'\n                  when 23 then 'ZK'\n                  when 24 then 'P'\n                  when 25 then 'PC'\n                  when 26 then 'P\u017d'\n                  when 27 then 'PL'\n                  when 28 then 'PH'\n                  when 29 then 'PR'\n                  when 30 then 'PO'\n                  when 31 then 'T'\n                  when 32 then 'E'\n                  when 33 then 'O'\n                  when 34 then 'F'\n                  when 35 then 'A'\n                  when 36 then 'A'\n                  when 38 then 'K1'\n                  when 39 then 'K2'\n                  when 41 then 'G'\n                  when 43 then 'V'\n                  when 44 then 'VC'\n                  when 45 then 'VM'\n                  when 46 then 'VI'\n                  when 48 then 'L'\n                  when 49 then 'LN'\n                  when 50 then 'LP'\n                  when 51 then 'N'\n                  when 52 then 'f'\n                  when 53 then 'OO'\n              end,\n              opis_sl\n       from sif.vrste_namenske_rabe\n\n       union all\n\n       select 31, 'vrste_plomb', vrsta_plombe_id, vrsta_plombe_id, naziv_sl, sifra, opis_sl\n       from sif.vrste_plomb\n\n       union all\n\n       select 35, 'vrste_stavba_parcela', vrsta_stavba_parcela_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_stavba_parcela\n\n       union all\n\n       select 37, 'vrste_upravljavcev', vrsta_upravljavca_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_upravljavcev\n\n       union all\n\n       select 42, 'tipi_lastnistva', tip_lastnistva_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.tipi_lastnistva\n\n       union all\n\n       select 53, 'da_ne', da_ne_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.da_ne\n\n       union all\n\n       select 77, 'tipi_nepremicnin', tip_nepremicnine_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.tipi_nepremicnin\n\n       union all\n\n       select 78, 'tipi_poslovnih_enot', tip_poslovne_enote_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.tipi_poslovnih_enot\n\n       union all\n\n       select 87, 'vrste_lastnikov', vrsta_lastnika_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_lastnikov\n\n       union all\n\n       select 95, 'vrste_stanovanj', vrsta_stanovanja_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_stanovanj\n\n       union all\n\n       select 96, 'vrste_streh', vrsta_strehe_id, vrsta_strehe_id, naziv_sl, sifra, opis_sl\n       from sif.vrste_streh\n\n       union all\n\n       select 113,\n              'vrste_sestavin_delov_stavb',\n              vrsta_sestavine_dela_stavbe_id,\n              cast(sifra as integer),\n              naziv_sl,\n              null,\n              opis_sl\n       from sif.vrste_sestavin_delov_stavb\n\n       union all\n\n       select 114,\n              'nacini_dolocitve_povrsin_dela_stavbe',\n              nacin_dolocitve_povrsine_dela_stavbe_id,\n              cast(sifra as integer),\n              naziv_sl,\n              null,\n              opis_sl\n       from sif.nacini_dolocitve_povrsin_dela_stavbe\n\n       union all\n\n       select 171, 'vrste_postopkov_rpe', vrsta_postopka_rpe_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_postopkov_rpe\n\n       union all\n\n       select 172,\n              'vrste_podrobne_dejanske_rabe',\n              vrsta_podrobne_dejanske_rabe_id,\n              cast(sifra as integer),\n              naziv_sl,\n              null,\n              opis_sl\n       from sif.vrste_podrobne_dejanske_rabe\n\n       union all\n\n       select 173, 'gji', gji_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji\n\n       union all\n\n       select 174, 'gji_aktivnosti_vodov', gji_aktivnost_voda_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_aktivnosti_vodov\n\n       union all\n\n       select 175, 'gji_atr1', gji_atr1_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_atr1\n\n       union all\n\n       select 176, 'gji_atr2', gji_atr2_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_atr2\n\n       union all\n\n       select 177, 'gji_atr3', gji_atr3_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_atr3\n\n       union all\n\n       select 178, 'gji_atr4', gji_atr4_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_atr4\n\n       union all\n\n       select 187, 'gji_tematike', gji_tematika_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_tematike\n\n       union all\n\n       select 188, 'gji_viri', gji_vir_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.gji_viri\n\n       union all\n\n       select 194, 'podrobne_namenske_rabe', podrobna_namenska_raba_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.podrobne_namenske_rabe\n\n       union all\n\n       select 199, 'drzave', drzava_id, drzava_id, naziv_sl, sifra, null\n       from sif.drzave\n\n       union all\n\n       select 214, 'pod_nam_rabe', pod_nam_raba_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.pod_nam_rabe\n\n       union all\n\n       select 267, 'vrste_draba', vrsta_draba_id, cast(sifra as integer), naziv_sl, null, opis_sl\n       from sif.vrste_draba ) s\n         join ( select metadata_sifrant_id, lower(trim(sifrant)) as sifrant\n                from sif.metadata_sifranti\n                where vidnost_distribucija = 1\n                  and metadata_sifrant_id in\n                      (13, 19, 20, 22, 23, 24, 25, 26, 27, 28, 29, 31, 35, 37, 42, 53, 77, 78, 87, 95, 96, 113, 114,\n                       171, 172, 173, 174, 175, 176, 177, 178, 187, 188, 194, 199, 214, 267) ) m\n              on m.metadata_sifrant_id = s.sifrant_id and m.sifrant = s.sifrant\norder by s.sifrant_id, s.sifra",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": "2026-09-01 00:00:00",
+    "last_sync_end": "2026-09-01 00:00:01",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-01 00:00:01",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "",
+        "DUAL"
+      ],
+      [
+        "SIF",
+        "DA_NE"
+      ],
+      [
+        "SIF",
+        "DRZAVE"
+      ],
+      [
+        "SIF",
+        "GJI"
+      ],
+      [
+        "SIF",
+        "GJI_AKTIVNOSTI_VODOV"
+      ],
+      [
+        "SIF",
+        "GJI_ATR1"
+      ],
+      [
+        "SIF",
+        "GJI_ATR2"
+      ],
+      [
+        "SIF",
+        "GJI_ATR3"
+      ],
+      [
+        "SIF",
+        "GJI_ATR4"
+      ],
+      [
+        "SIF",
+        "GJI_TEMATIKE"
+      ],
+      [
+        "SIF",
+        "GJI_VIRI"
+      ],
+      [
+        "SIF",
+        "METADATA_SIFRANTI"
+      ],
+      [
+        "SIF",
+        "NACINI_DOLOCITVE_POVRSIN_DELA_STAVBE"
+      ],
+      [
+        "SIF",
+        "NOSILNE_KONSTRUKCIJE"
+      ],
+      [
+        "SIF",
+        "PODROBNE_NAMENSKE_RABE"
+      ],
+      [
+        "SIF",
+        "POD_NAM_RABE"
+      ],
+      [
+        "SIF",
+        "TIPI_LASTNIKOV"
+      ],
+      [
+        "SIF",
+        "TIPI_LASTNISTVA"
+      ],
+      [
+        "SIF",
+        "TIPI_NEPREMICNIN"
+      ],
+      [
+        "SIF",
+        "TIPI_POSLOVNIH_ENOT"
+      ],
+      [
+        "SIF",
+        "TIPI_STAVB"
+      ],
+      [
+        "SIF",
+        "UPRAVNI_STATUSI"
+      ],
+      [
+        "SIF",
+        "VIRI_DEJANSKIH_RAB"
+      ],
+      [
+        "SIF",
+        "VIRI_NAMENSKE_RABE"
+      ],
+      [
+        "SIF",
+        "VIRI_POSEBNIH_REZIMOV"
+      ],
+      [
+        "SIF",
+        "VRSTE_DEJANSKE_RABE"
+      ],
+      [
+        "SIF",
+        "VRSTE_DEJANSKIH_RAB_DEL_ST"
+      ],
+      [
+        "SIF",
+        "VRSTE_DRABA"
+      ],
+      [
+        "SIF",
+        "VRSTE_GRADBENIH_PARCEL"
+      ],
+      [
+        "SIF",
+        "VRSTE_LASTNIKOV"
+      ],
+      [
+        "SIF",
+        "VRSTE_NAMENSKE_RABE"
+      ],
+      [
+        "SIF",
+        "VRSTE_PLOMB"
+      ],
+      [
+        "SIF",
+        "VRSTE_PODROBNE_DEJANSKE_RABE"
+      ],
+      [
+        "SIF",
+        "VRSTE_POSTOPKOV_RPE"
+      ],
+      [
+        "SIF",
+        "VRSTE_SESTAVIN_DELOV_STAVB"
+      ],
+      [
+        "SIF",
+        "VRSTE_STANOVANJ"
+      ],
+      [
+        "SIF",
+        "VRSTE_STAVBA_PARCELA"
+      ],
+      [
+        "SIF",
+        "VRSTE_STREH"
+      ],
+      [
+        "SIF",
+        "VRSTE_UPRAVLJAVCEV"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_stanovanja_h",
+    "integration_id": "04f9f57a-a1b3-11ef-adba-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select\n    STANOVANJE_H_ID  ,\n    STANOVANJE_ID  ,\n    ST_STANOVANJA  ,\n    VRSTA_ID  ,\n    POSTOPEK_ID_OD  ,\n    POSTOPEK_ID_DO  ,\n    FROM_TZ(CAST(DATUM_OD  AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS DATUM_OD ,\n    FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS DATUM_DO,\n    FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS DATUM_SYS,\n    EID  ,\n    STAVBA_ID\n\nfrom nep.STANOVANJA_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 10:43:29",
+    "last_sync_start": "2026-09-19 02:30:00",
+    "last_sync_end": "2026-09-19 02:30:05",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 02:30:05",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "STANOVANJA_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_stavbe_centroidi_h",
+    "integration_id": "45293dec-bd13-11ef-bde9-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select stavba_h_id,\n    stavba_id,\n    ko_id,\n    st_stavbe,\n    stevilo_etaz,\n    stevilo_stanovanj,\n    tip_stavbe_id,\n    elektrika,\n    plin,\n    vodovod,\n    kanalizacija,\n    leto_izgradnje,\n    leto_obnove_fasade,\n    leto_obnove_strehe,\n    visina_h1,\n    visina_h2,\n    visina_h3,\n    polozajna_natancnost_stavbe_id,\n    visinska_natancnost_stavbe_id,\n    nosilna_konstrukcija_id,\n    SDO_UTIL.TO_WKTGEOMETRY(CENTROID_GEOM) as CENTROID_GEOM,\n    postopek_id_od,\n    postopek_id_do,\n    FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,\n    FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,\n    FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n    eid,\n    visinski_datum_stavbe_id,\n    status_vpisa_id,\n    stevilo_poslovnih_prostorov,\n    bruto_tlorisna_povrsina,\n    obcina_id,\n    obmocje_slo,\n    omejitev_vpogleda\nfrom nep.STAVBE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-22 16:02:58",
+    "last_sync_start": "2026-09-22 23:20:00",
+    "last_sync_end": "2026-09-22 23:20:13",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 23:20:13",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "STAVBE_H"
+      ]
+    ]
+  },
+  {
+    "target_table": "kn_nep_stavbe_obrisi_h",
+    "integration_id": "e54577ee-f9b0-11ef-bd51-02420a0001ec",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select STAVBA_H_ID,\n       STAVBA_ID,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       EID,\n       case when OBRIS_GEOM is null then null\n           -- \u010ce je \u017ee MULTIPOLYGON, ohrani enako\n            when SDO_UTIL.TO_WKTGEOMETRY(OBRIS_GEOM) like 'MULTIPOLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(OBRIS_GEOM)\n           -- \u010ce je POLYGON in vsebuje SDO_ORDINATES, pretvori v MULTIPOLYGON\n            when SDO_UTIL.TO_WKTGEOMETRY(OBRIS_GEOM) like 'POLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(\n                    2007, -- GTYPE za MULTIPOLYGON\n                    treat(OBRIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_SRID, -- Retain the original SRID\n                    null, treat(OBRIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO, -- Use existing element info\n                    treat(OBRIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_ORDINATES -- Use existing ordinates\n                                                                                                  ))\n            else null end as                                     GEOM\nfrom nep.STAVBE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-22 16:02:58",
+    "last_sync_start": "2026-09-22 23:30:00",
+    "last_sync_end": "2026-09-22 23:30:12",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-22 23:30:12",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_stavbe_parcele_h",
+    "integration_id": "a33e8606-a8c0-11ef-84ad-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select STAVBA_PARCELA_H_ID,\n       STAVBA_PARCELA_ID,\n       POVRSINA,\n       PARCELA_ID,\n       STAVBA_ID,\n       STEVILKA_STAVBE,\n       E_CEN,\n       N_CEN,\n       case when mod(treat(GEOM as MDSYS.SDO_GEOMETRY).SDO_GTYPE, 1000) != 1 then SDO_UTIL.TO_WKTGEOMETRY(GEOM)\n            when mod(treat(GEOM as MDSYS.SDO_GEOMETRY).SDO_GTYPE, 1000) = 1 then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(\n                    2003, null, null, SDO_ELEM_INFO_ARRAY(1, 1003, 1),\n                    SDO_ORDINATE_ARRAY(treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.X - 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.Y - 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.X - 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.Y + 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.X + 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.Y + 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.X + 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.Y - 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.X - 0.05,\n                                       treat(geom as MDSYS.SDO_GEOMETRY).SDO_POINT.Y - 0.05))) end as GEOM,\n       POVRSINA_GEOM,\n       VRSTA_POVEZAVE_ID,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                       DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                       DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                      DATUM_SYS,\n       EID,\n       POVRSINA_ZPS,\n       regexp_substr(SDO_UTIL.TO_WKTGEOMETRY(GEOM), '^[A-Z]+')                                     as ORIGINAL_TIP_GEOM\nfrom nep.STAVBE_PARCELE_H",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 05:50:00",
+    "last_sync_end": "2026-09-19 05:50:56",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 05:50:56",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "kn_nep_stavbe_zps_h",
+    "integration_id": "969f1312-ff45-11ef-8df0-0242ac120008",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select STAVBA_H_ID,\n       STAVBA_ID,\n       KO_ID,\n       POSTOPEK_ID_OD,\n       POSTOPEK_ID_DO,\n       from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n       from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n       EID,\n       case when TLORIS_GEOM is null then null\n           -- \u010ce je \u017ee MULTIPOLYGON, ohrani enako\n            when SDO_UTIL.TO_WKTGEOMETRY(TLORIS_GEOM) like 'MULTIPOLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(TLORIS_GEOM)\n           -- \u010ce je POLYGON in vsebuje SDO_ORDINATES, pretvori v MULTIPOLYGON\n            when SDO_UTIL.TO_WKTGEOMETRY(TLORIS_GEOM) like 'POLYGON%' then SDO_UTIL.TO_WKTGEOMETRY(SDO_GEOMETRY(\n                    2007, -- GTYPE za MULTIPOLYGON\n                    treat(TLORIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_SRID, -- Retain the original SRID\n                    null, treat(TLORIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO, -- Use existing element info\n                    treat(TLORIS_GEOM as MDSYS.SDO_GEOMETRY).SDO_ORDINATES -- Use existing ordinates\n                                                                                                   ))\n            else null end            as                          GEOM,\n       OBCINA_ID,\n       SDO_GEOM.SDO_AREA(TEREN_GEOM) as                          pov_zps\nfrom nep.STAVBE_H\nwhere TEREN_GEOM is not null",
+    "is_full_sync": false,
+    "use_changed_datetime_for_delta": true,
+    "last_changed_datetime": "2026-09-18 15:29:40",
+    "last_sync_start": "2026-09-19 03:20:00",
+    "last_sync_end": "2026-09-19 03:22:24",
+    "processing_status": "PROCESSED",
+    "updated_at": "2026-09-19 03:22:24",
+    "group": "KN_OR_OTHER",
+    "discovery_error": "ParseError",
+    "source_tables": []
+  },
+  {
+    "target_table": "test_primoz1234",
+    "integration_id": "b2f8239a-3983-11f1-9d68-06be7399cd5a",
+    "connection_name": "KN ORACLE",
+    "integration_sql": "select drzava_id, sifra, naziv, povrsina_geom, plomba, postopek_id, datum_sys, eid from nep.DRZAVE",
+    "is_full_sync": true,
+    "use_changed_datetime_for_delta": false,
+    "last_changed_datetime": null,
+    "last_sync_start": null,
+    "last_sync_end": null,
+    "processing_status": "FAILED",
+    "updated_at": "2026-04-16 11:04:08",
+    "group": "KN_OR_OTHER",
+    "source_tables": [
+      [
+        "NEP",
+        "DRZAVE"
+      ]
+    ]
+  }
+]

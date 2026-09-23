@@ -5,7 +5,26 @@ Vocabulary for investigating how records become visible in KN source datasets ov
 ## Language
 
 **Source dataset**:
-The records returned by an integration's saved Oracle query, including its joins and filters. It is not necessarily the contents of a single Oracle table.
+The records defined by an explicit source query and observation window. It may represent a raw Oracle table or an integration's joined and filtered result.
+
+**RAW**:
+An observation of a source table without the integration's joins or business filters, eligible only when the integration's change timestamp comes from that table itself. RAW describes dataset shape, not the number of columns or whether an observation is complete.
+_Avoid_: FULL_EXPORT
+
+**INTEGRATION_LIKE**:
+An observation defined by the integration's saved source query, preserving its joins and business filters. It observes source results without running the integration or writing to its target.
+
+**Dataset group**:
+The KN or EV classification used to keep the two investigation cohorts separate. It identifies the dataset's domain, not the current or historical connection name.
+
+**Extract**:
+A named source dataset in one observation mode, RAW or INTEGRATION_LIKE. Each extract has its own observations and baseline even when it shares a source table with another extract.
+
+**Experiment**:
+A collection of observations made under fixed source, query, field and window definitions. Observations with different definitions belong to different experiments and are not directly compared.
+
+**Source audit timestamp**:
+A native source timestamp retained to investigate creation or modification, distinct from the mapped change timestamp where applicable. Its name or default does not establish immutability, physical arrival time or timezone.
 
 **Matching key**:
 The integration's identifier for the same record across observations or source and target. A generated target UUID is not automatically this identifier.
