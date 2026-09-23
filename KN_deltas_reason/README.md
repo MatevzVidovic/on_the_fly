@@ -1,119 +1,152 @@
-# KN source snapshots
+# KN / EV source observations
 
-One manual experiment for `kn_nep_deli_stavb_h`: capture Oracle matching keys and
-change timestamps, then find keys newly visible behind the first snapshot's maximum
-timestamp. No PostgreSQL access, integration execution or source-data writes.
+A manual diagnostic experiment: export matching keys, mapped change timestamps and
+available native audit timestamps from Oracle; compare later observations locally.
+No source writes, LIFT runs, PostgreSQL access, or business-payload comparison.
 
-## Setup
+## Run
 
-Run from the repository root (Python 3.10+):
+Use the existing virtual environment, `.env` credentials and Oracle tunnel:
 
 ```sh
 cd KN_deltas_reason
-python3 -m venv .venv
 source .venv/bin/activate
-pip install -r requirements.txt
-cp .env.example .env
+python monitor.py export --table kn_nep_deli_stavb_h
+python monitor.py export --group KN
+python monitor.py export --group EV
+python monitor.py export                       # All 40 extracts, sequentially
+python monitor.py compare > differences.csv
 ```
 
-Fill in `.env` with your KN Oracle credentials. For Oracle native network encryption,
-set `KN_ORACLE_CLIENT_LIB_DIR` to your installed Instant Client directory. Otherwise
-the driver uses thin mode. The script never prints credentials.
+Repeat exports manually on later days. `--group` and `--table` are optional,
+mutually exclusive, and also work with `compare`. There is no scheduler or retry.
+For a fresh installation: `python3 -m venv .venv`, activate it, run
+`pip install -r requirements.txt`, and copy `.env.example` to `.env`.
+Set `KN_ORACLE_CLIENT_LIB_DIR` to the Instant Client directory when thick mode is
+needed. The DSN is an Oracle DSN such as `localhost:10522/service`, not a JDBC URL.
+Existing shell environment variables take precedence over `.env`.
 
-`config.json` contains the single editable `window_start`, initially
-`2026-07-01 00:00:00` in **Europe/Ljubljana** time. There is **no end bound**.
-`source.sql` is the saved integration query supplied in [source_query_evidence.md](source_query_evidence.md).
-The exporter wraps it to project only `DEL_STAVBE_H_ID` and `DATUM_SYS` and apply
-the lower bound. There is no automatic query discovery or target-data comparison.
+## What is selected
 
-## Each observation
+`config.json` has one shared, inclusive `window_start`, initially
+`2026-07-01 00:00:00` in **Europe/Ljubljana**. There is **no upper bound**.
+The predicate uses the integration's mapped change timestamp, never an audit date.
+
+`sqls/tables.json` maps each dataset to KN or EV. Each dataset has an explicit
+`raw.sql` or `integration-like.sql`. These SQLs select only diagnostics that we
+store—not geometry or unused business fields. No runtime SQL parser or discovery.
+
+| Group / mode | Extracts | Meaning |
+| --- | ---: | --- |
+| KN / RAW | 20 | Native key and DATUM_SYS from each distinct source table |
+| KN / INTEGRATION_LIKE | 1 | STAVBE_H restricted by the saved ZPS geometry-presence filter |
+| EV / INTEGRATION_LIKE | 19 | Original key/date expressions, revision joins and membership filters |
+
+The Jira table is `kn_nep_deli_stavb_h` → `NEP.DELI_STAVB_H`, keyed by
+`DEL_STAVBE_H_ID`, changed by `DATUM_SYS`. Shared raw `NEP.STAVBE_H` is captured
+once as `kn_nep_stavbe_h`; ZPS is separately `kn_nep_stavbe_zps_h`.
+EV cannot use RAW because its mapped change date depends on revision joins.
+The failed exploratory candidates `ev_parcela_h`,
+`ev_parc_enota_h_2025_danes`, and `ev_parc_del_cona_h` are not included.
+
+Original integration SQL and catalog evidence remain in
+`exploration/artifacts/20260923T084030Z/`. The runtime does not depend on them.
+Special saved predicates remain, including railway `ID = '77920'` and enota's
+2025 start. Changing those would create a different diagnostic cohort.
+
+## Stored data
+
+- `matching_key`: Oracle-formatted text; never passed through a Python number.
+- `changed_at`: fixed-width UTC `YYYY-MM-DDTHH:MM:SS.fffffffffZ`. Original
+  integration timestamp casts are preserved; nine output digits do not invent precision.
+- `source_created_at`: native CREATED_AT for the two EV pripis datasets.
+- `source_datum_sys`: native DATUM_SYS for EV ceste, el_energija and zeleznice.
+
+The last two fields are **timezone-less native timestamps**, not assumed UTC.
+Names/defaults do not prove physical insertion time or immutability. Other datasets
+leave these optional columns NULL; validity/business dates are not audit substitutes.
+
+Each export streams batches of 5,000 rows. A fresh read-only Oracle transaction is
+used per extract, with a 60-second **per-round-trip** timeout (not a total time cap).
+There is no extra COUNT(*) scan: counts come from records actually stored.
+Each complete observation commits independently. Null/duplicate keys, null change
+timestamps and connection/fetch failures roll back the observation's records.
+Ordinary failures are recorded, the next dataset continues, and the command exits
+nonzero. Ctrl-C records failure and stops. A killed process can leave a RUNNING
+attempt with no committed records; comparisons never use it.
+
+## Experiments
+
+Exports choose `observations_<12-character-hash>.sqlite3` automatically.
+The fingerprint includes config, the **entire** configured SQL path/content set,
+group mapping, Oracle username and DSN. It excludes passwords and runtime
+`--group` / `--table` selection. The full hash and manifest are checked before append.
+
+Identical definitions append; edits select a new file; reverting edits resumes
+the previous file. Keep the actual server behind your DSN unchanged: the hash
+cannot detect a tunnel/DNS alias redirected to another server.
+
+Existing `snapshots.sqlite3` and exploratory observations are preserved, not
+migrated or merged. This command expects the new observation format.
+
+## Local comparison
 
 ```sh
-python monitor.py export
+python monitor.py compare > differences.csv
+# Historical experiment; no .env, credentials or Oracle installation required:
+python monitor.py compare --database observations_<hash>.sqlite3 > differences.csv
 ```
 
-Run it again on a later day, with the same configuration. Each export uses one
-Oracle SELECT/cursor and streams batches of 5,000 rows into `snapshots.sqlite3`.
-The first complete export is the baseline. The SQLite file retains every completed
-snapshot, its exact saved SQL, Oracle username/DSN, start/end observation times,
-window start, row count and maximum timestamp. A failed export or Ctrl-C rolls back
-the entire observation. Rerun from the beginning; there is no resume mechanism.
-Null or duplicate matching keys abort the observation instead of being hidden.
+Default comparison uses username/DSN from the environment only to find the current
+experiment. It never authenticates to Oracle and needs no password.
+The explicit `--database` option uses that database's saved definition, not today's SQL.
 
-Changing the SQL, start date, Oracle username or DSN refuses to append to this
-experiment. Use a new filename to deliberately start a new baseline:
+For each extract, compare the **first** and **latest** complete observations:
 
-```sh
-python monitor.py export --database wider-window.sqlite3
-```
+| Category | Meaning |
+| --- | --- |
+| NEW_KEY | Newly visible; flag when changed_at is strictly older than the baseline maximum |
+| ABSENT_KEY | No longer in the selected window; not proof of deletion |
+| CHANGED_TIMESTAMP | Existing key's mapped change timestamp differs, forwards or backwards |
+| CHANGED_AUDIT_TIMESTAMP | An extra source timestamp differs, including NULL transitions |
 
-Keep the same actual Oracle endpoint behind your DSN/alias for an experiment.
-Connection identity checks cannot detect a DNS/TNS alias being redirected.
+An empty first observation stays the baseline: new keys can be reported but no
+older-than-maximum flag is possible. Equal timestamps are not flagged as older.
+Fewer than two completed observations is explicitly **insufficient**, not a clean
+result. Stderr shows baseline/latest acquisition dates, counts, categories and
+failed or RUNNING attempts since the latest success. CSV stdout contains detailed
+differences, observation IDs, old/new values and the older-than-maximum flag.
+Empty CSV values represent NULL. A key can have multiple difference rows.
 
-## Compare locally
-
-```sh
-python monitor.py compare > candidates.csv
-```
-
-No credentials or Oracle connection are needed to compare. This compares the
-**latest** complete snapshot against the **first** and emits CSV with `matching_key`
-and `changed_at_utc`. A candidate must be absent from the baseline and have a
-timestamp **strictly less than** the baseline maximum. Equal timestamps are excluded.
-The baseline boundary never advances. Candidates still present on successive days
-are reported again. Counts and snapshot IDs go to stderr, not into the CSV.
-
-For another file, pass `--database wider-window.sqlite3` to `compare` too. Restore
-that experiment's original `source.sql` and `config.json` before comparing it. An
-empty first snapshot has no boundary: choose a new database when collecting the
-next baseline. A header-only CSV means no candidates were found, not an export error.
-
-You can inspect snapshots or filter candidates further using any SQLite client:
+Inspect with any SQLite client:
 
 ```sql
-SELECT id, started_at, completed_at, row_count, max_changed_at
-FROM snapshots ORDER BY id;
+SELECT id, dataset, mode, status, started_at, completed_at, row_count,
+       max_changed_at, error
+FROM observations ORDER BY id;
 
-SELECT matching_key, changed_at
-FROM records
-WHERE snapshot_id = 2
-  AND changed_at < '2026-09-23T00:00:00.000000000Z';
+SELECT matching_key, changed_at, source_created_at, source_datum_sys
+FROM records WHERE observation_id = 1;
 ```
 
-## What the dates mean
+## Limits and verification
 
-Oracle converts the saved query's timezone-aware `DATUM_SYS` to fixed-width UTC
-text: `YYYY-MM-DDTHH:MM:SS.fffffffffZ`. This preserves the saved query's precision
-(its `CAST AS TIMESTAMP` defaults to six fractional digits), avoids driver timezone
-conversion, and makes SQLite text comparisons chronological. The lower bound is
-explicitly Ljubljana local time; observation start/end timestamps are UTC. Numeric
-keys are converted to text in Oracle so Python never rounds them through a float.
+Visibility changes do not prove physical insertion time or that all delta
+integrations are impossible. An older row can move into the selected time window.
+Records below the bound, full payload differences and changes between observations
+are not covered. Different extracts do not share one point-in-time snapshot.
 
-The supplied query and DDL expose no established source creation/update audit
-fields beyond the change timestamp. `DATUM_OD` and `DATUM_DO` are validity dates,
-so we do not pretend they are creation dates or export them for this experiment.
-
-## Limits and cost
-
-- A candidate is **newly visible inside the filtered window**, not proof of a new
-  physical insert. An older record's timestamp can move into this window. Separate
-  snapshots bound observation, not insertion or commit time.
-- This does not detect payload changes to existing keys, records below the lower
-  bound, or rows that appear and disappear between exports. A negative result does
-  not clear GURS. It does not compare with the actual LIFT watermark.
-- Oracle may still scan many rows if it cannot use an index for the wrapped timestamp
-  filter. Export time must be measured; no useful index was established by the DDL.
-- Every run stores the entire selected key/date set again. Disk use grows with rows
-  times snapshots. Comparison scans the latest snapshot and probes baseline keys;
-  no additional framework, compression or incremental storage is included.
-
-## Local checks
+Oracle can still scan large tables because timestamp expressions may not use
+indexes. Complete-window runs may be much slower than bounded exploratory probes.
+Every observation stores the full selected diagnostic set again: disk use grows
+with rows × observations. Comparison uses indexed SQLite joins and streams results,
+but scans the selected observations several times. Optimize only if measurements
+show a problem; no compression, incremental storage or framework is included.
 
 ```sh
 python -m unittest -v test_monitor.py
 ```
 
-These tests use a fake Oracle cursor and real temporary SQLite files. They check
-comparison boundaries, exact large keys, configuration changes, empty baselines,
-and rollback after connection errors, duplicate/null values and interruption.
-They do not establish live Oracle performance or connectivity.
+Local tests cover all comparison categories, precision, empty/unchanged baselines,
+fixed first-observation behavior, hashes, failure isolation and rollback.
+See [VERIFICATION.md](VERIFICATION.md) for the live acceptance results.

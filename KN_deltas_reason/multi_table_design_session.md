@@ -1,6 +1,6 @@
 # Multi-table extraction design interview
 
-Status: interview decisions settled; consolidated specification awaits the user's final implementation confirmation.
+Status: approved by the user and implemented on 2026-09-23. See `VERIFICATION.md` for tests, reviews and live acceptance results. Earlier interview sections below are retained as decision history.
 This extends the original single-dataset design in `design_session.md`.
 
 ## Settled in the current conversation
@@ -183,4 +183,4 @@ python monitor.py compare > differences.csv
 - This does not require an extra COUNT(*) scan for every export. Count the rows actually streamed and committed; use small known fixtures and bounded live checks for correctness.
 - Document that comparison of separate source observations detects visibility changes within the selected window, not physical insertion times or universal delta failure. No cross-extract point-in-time equality guarantee: observations have their own acquisition times.
 
-No irreversible architecture decision warrants an ADR yet. Keep implementation small and local; retain the separate exploration findings for historical context. Implementation is pending final confirmation of this consolidated specification.
+No irreversible architecture decision warrants an ADR yet. Keep implementation small and local; retain the separate exploration findings for historical context. The user approved implementation after confirming this consolidated specification.
