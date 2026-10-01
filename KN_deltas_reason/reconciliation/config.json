@@ -1,0 +1,9 @@
+{
+  "preflight_verified": false,
+  "reviewed_integration_sql_sha256": "",
+  "target_timezone": "",
+  "watermark_timezone": "",
+  "verification_notes": "Record how query membership, mappings, target/date types, timezone interpretation, endpoints and load were verified.",
+  "inspected_fmp_commit": "8e0296c485",
+  "deployed_fmp_commit": "UNVERIFIED"
+}

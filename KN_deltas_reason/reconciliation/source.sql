@@ -1,0 +1,5 @@
+SELECT TO_CHAR(DEL_STAVBE_H_ID, 'TM9') AS business_key,
+       TO_CHAR(SYS_EXTRACT_UTC(FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')),
+               'YYYY-MM-DD"T"HH24:MI:SS.FF6"Z"') AS changed_at,
+       TO_CHAR(CAST(DATUM_SYS AS TIMESTAMP), 'YYYY-MM-DD"T"HH24:MI:SS.FF6') AS native_changed_at
+FROM NEP.DELI_STAVB_H
