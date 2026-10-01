@@ -4,7 +4,7 @@ This is the original broad request. The accepted first implementation is narrowe
 one Oracle-only dataset, manual snapshots of matching key and `DATUM_SYS`, a
 configurable lower date bound with no end bound, and a fixed baseline comparison.
 Creation-date filters, target UUIDs, target comparisons and EV grouping are deferred.
-See [design_session.md](design_session.md) and [README.md](README.md).
+See [design_session.md](backdated_test_attempt/design_session.md) and the [experiment README](backdated_test_attempt/README.md).
 
 We are pivoting from the EV import work to investigating KN delta synchronization.
 

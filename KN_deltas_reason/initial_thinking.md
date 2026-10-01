@@ -1,6 +1,6 @@
 # Initial thinking and integration discovery
 
-The [design session](design_session.md) narrows the first version to manual Oracle-only observations. Target comparisons and PostgreSQL UUID exports below are later work, not requirements for the first exporter.
+The [design session](backdated_test_attempt/design_session.md) narrows the first version to manual Oracle-only observations. Target comparisons and PostgreSQL UUID exports below are later work, not requirements for the first exporter.
 
 ## Working hypothesis
 
@@ -10,13 +10,13 @@ The earlier [task evidence](jira.md) already distinguishes missing keys from mat
 
 ## Smallest useful experiment
 
-- Start with one KN dataset: `kn_nep_deli_stavb_h`. The saved integration SQL is captured in `source.sql`; no PostgreSQL access is needed at runtime. EV and additional KN datasets are deferred.
+- Start with one KN dataset: `kn_nep_deli_stavb_h`. The saved integration SQL is captured in `backdated_test_attempt/source.sql`; no PostgreSQL access is needed at runtime. EV and additional KN datasets are deferred.
 - Filter `DATUM_SYS` from one configured start, initially 2026-07-01 in Europe/Ljubljana, with no end bound. This mutable change-time window is a deliberate performance compromise, not an immutable creation cohort.
 - Export only the matching key and change timestamp. No established creation timestamp is available; validity dates are not substitutes. PostgreSQL UUIDs and target snapshots are later work.
 - One manual streaming exporter saves complete snapshots to SQLite with query, connection identity, window, start/end observation times, count and maximum timestamp. Discard incomplete exports; no resume framework.
 - Compare latest complete snapshot against the first complete snapshot's fixed maximum timestamp. Export absent-baseline keys strictly below that boundary as candidates. Changing the query, start or source identity starts a separate database/baseline.
 
-A key absent from source snapshot A but present in B, with a change timestamp older than A's maximum timestamp, is a candidate late-visibility finding. This experimental boundary is not the LIFT watermark. The key may have entered the filtered window because its timestamp changed; it does not prove physical insertion time. Preserve acquisition times and confirm differences on subsequent runs. See [README.md](README.md) for the implemented first experiment.
+A key absent from source snapshot A but present in B, with a change timestamp older than A's maximum timestamp, is a candidate late-visibility finding. This experimental boundary is not the LIFT watermark. The key may have entered the filtered window because its timestamp changed; it does not prove physical insertion time. Preserve acquisition times and confirm differences on subsequent runs. See [the experiment README](backdated_test_attempt/README.md) for the implemented first experiment.
 
 ## Get the integration SQL
 
