@@ -1,9 +1,9 @@
 {
-  "preflight_verified": false,
-  "reviewed_integration_sql_sha256": "",
-  "target_timezone": "",
+  "preflight_verified": true,
+  "reviewed_integration_sql_sha256": "98d6fe66c99a12d597caf285a1e0f8897aa5e6c9d902436151023517701a53a7",
+  "target_timezone": "Europe/Ljubljana",
   "watermark_timezone": "",
-  "verification_notes": "Record how query membership, mappings, target/date types, timezone interpretation, endpoints and load were verified.",
+  "verification_notes": "2026-10-01 readonly preflight: live KN ORACLE integration SQL has no membership-changing joins/filters; exact key/date mappings verified. Oracle EPRO source key NUMBER(28,0), DATUM_SYS DATE. Target fmp_data_gurs.public.kn_nep_deli_stavb_h key bigint, datum_sys timestamp without time zone, UUID NOT NULL, audit columns present; business-key unique index valid/ready. 23 matched source/target samples spanning winter and summer preserve Ljubljana wall time, not UTC. Current target catalog estimate 2717208 rows; Oracle stale estimate 2636805 (2025-09-08). Export and source/target comparison verified; effective watermark timezone remains UNKNOWN. Local code default UTC and stored schedule/start times support UTC but running worker configuration was not independently verified. See PREFLIGHT.md.",
   "inspected_fmp_commit": "8e0296c485",
   "deployed_fmp_commit": "UNVERIFIED"
 }

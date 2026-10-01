@@ -52,6 +52,8 @@ def effective_bound(before, after, zone):
         return None, 'UNKNOWN: settings changed or integration processing'
     if before['is_full_sync'] or not before['last_sync_start']:
         return None, 'NOT_DELTA: full sync or first sync'
+    if not zone:
+        return None, 'UNKNOWN: production worker timezone not verified'
     value = (before['last_changed_datetime'] if before['use_changed_datetime_for_delta']
              and before['last_changed_datetime'] else before['last_sync_start'])
     try:
@@ -65,7 +67,8 @@ def export_capture(env_file, output):
     if not config['preflight_verified'] or len(config['reviewed_integration_sql_sha256']) != 64:
         raise ValueError('Complete README preflight and config.json before exporting')
     ZoneInfo(config['target_timezone'])
-    ZoneInfo(config['watermark_timezone'])
+    if config['watermark_timezone']:
+        ZoneInfo(config['watermark_timezone'])
     # Drivers are deliberately absent from the offline comparison/test path.
     from dotenv import load_dotenv
     import oracledb

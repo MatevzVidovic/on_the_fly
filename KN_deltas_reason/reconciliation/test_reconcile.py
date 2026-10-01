@@ -80,6 +80,7 @@ class ReconciliationTests(unittest.TestCase):
         self.assertEqual(float(row['delta_seconds']), .000001)
 
     def test_bound_branches(self):
+        self.assertIsNone(effective_bound(self.settings,self.settings,'')[0])
         bound, _ = effective_bound(self.settings,self.settings,'UTC')
         self.assertEqual(bound,'2026-07-02T00:00:00.000000Z')
         for change in [dict(is_full_sync=True),dict(last_sync_start=None),dict(processing_status='PROCESSING')]:

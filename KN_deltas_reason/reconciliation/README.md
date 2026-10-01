@@ -6,7 +6,8 @@ integration execution, or production writes. Source business key is `DEL_STAVBE_
 
 ## Before the first export
 
-The implementation is offline-tested, **not live-verified**. `config.json` intentionally blocks export.
+The initial live preflight is recorded in [PREFLIGHT.md](PREFLIGHT.md). Recheck these assumptions
+if connections, mappings or SQL change. `config.json` records the reviewed configuration.
 
 1. Run `metadata.sql` in the FMP metadata database. Check the exact integration ID, target,
    KN connection, key mapping (`DEL_STAVBE_H_ID` → `del_stavbe_h_id`) and change mapping
@@ -22,7 +23,9 @@ The implementation is offline-tested, **not live-verified**. `config.json` inten
    Inspect target business-key indexes. The export records column types/index definitions too.
 4. Establish how FMP stored zoned values into that naive target field using known matching rows
    and application/session conversion. Set `target_timezone` to **that verified zone**, not a guess.
-   Independently verify naive metadata watermark interpretation and set `watermark_timezone`.
+   Independently verify the production worker timezone used to parse a naive watermark and set
+   `watermark_timezone`. Leave it empty if unverified: export/comparison still work, but watermark
+   eligibility remains UNKNOWN. Stored watermark wall time alone does not prove runtime interpretation.
    Metadata timestamptz is read with a UTC session and includes its offset; that offset wins.
    Oracle DATE is interpreted as Europe/Ljubljana, matching the saved integration SQL.
    Oracle DST overlaps fail instead of guessing. Target naive dates are normalized by the same
