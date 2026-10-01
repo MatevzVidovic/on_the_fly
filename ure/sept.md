@@ -2,9 +2,9 @@
 
 **Skupaj: 177h 50m | Obveznost: 176h 00m | Saldo: +1h 50m**
 
-**V: 12 | D: 8 | Dop: 0 | Konf: 3**
+**V: 12 | D: 7 | Dop: 0 | Konf: 3 | Skupaj: 22 delovnih dni**
 
-Obveznost: 8h na delovni dan (pon–pet), skupaj 22 dni. Sob in Ned imata 0h obveznosti; opravljene ure štejejo v seštevek in saldo. Vikendi so samodejno D (delo od doma), zato ob dnevih nimajo oznake V/D. Dop = dopust (8h); Konf = konferenca (8h). Saldo je izračunan iz spodnjih vnosov, brez prenosa iz prejšnjega meseca. Datumi so določeni glede na september 2026.
+Obveznost: 8h na delovni dan (pon–pet), skupaj 22 dni. Sob in Ned imata 0h obveznosti; opravljene ure štejejo v seštevek in saldo. Vikendi pomenijo delo od doma, vendar nimajo oznake V/D in ne štejejo v seštevke oznak. Od delovnih dni so ločeni s prazno vrstico. Seštevek V + D + Dop + Konf ustreza številu delovnih dni. Dop = dopust (8h); Konf = konferenca (8h). Saldo je izračunan iz spodnjih vnosov, brez prenosa iz prejšnjega meseca. Datumi so določeni glede na september 2026.
 
 ---
 
@@ -54,7 +54,7 @@ V Pon 9:00-17:20                     8h 20m
 
 ---
 
-### 1.–6. 9. | Skupaj: 36h 30m | Saldo: +4h 30m | V: 3 | D: 2 | Dop: 0 | Konf: 0
+### 1.–6. 9. | Skupaj: 36h 30m | Saldo: +4h 30m | V: 3 | D: 1 | Dop: 0 | Konf: 0
 
 ```text
   Sob (12:20-15:20)+(18:45-20:40)    4h 55m

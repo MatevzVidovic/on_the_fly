@@ -17,4 +17,5 @@ Konf means konferenca, so standard 8 hours
 Sob and Ned dont count as worksays, so have a newline between the week and the weekend days, and dont count the weekend days into expected hours
 
 
-  They dont have V or D, because they are automatically D (from home)
+  They dont have V or D, because they are passively really D (from home)
+  But they shouldnt count in the letters - we want the num of letters in the sum to match the num of actual working days
