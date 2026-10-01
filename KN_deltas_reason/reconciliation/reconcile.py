@@ -53,7 +53,7 @@ def effective_bound(before, after, zone):
     if before['is_full_sync'] or not before['last_sync_start']:
         return None, 'NOT_DELTA: full sync or first sync'
     if not zone:
-        return None, 'UNKNOWN: production worker timezone not verified'
+        return None, 'UNKNOWN: selected environment worker timezone not verified'
     value = (before['last_changed_datetime'] if before['use_changed_datetime_for_delta']
              and before['last_changed_datetime'] else before['last_sync_start'])
     try:
@@ -62,8 +62,9 @@ def effective_bound(before, after, zone):
         return None, 'UNKNOWN: uninterpretable watermark'
 
 
-def export_capture(env_file, output):
+def export_capture(env_file, output, environment='production'):
     config = json.loads((HERE / 'config.json').read_text())
+    prefix = {'production': 'PROD', 'staging': 'STAG'}[environment]
     if not config['preflight_verified'] or len(config['reviewed_integration_sql_sha256']) != 64:
         raise ValueError('Complete README preflight and config.json before exporting')
     ZoneInfo(config['target_timezone'])
@@ -76,14 +77,14 @@ def export_capture(env_file, output):
     load_dotenv(env_file, override=False)
     if os.getenv('KN_ORACLE_CLIENT_LIB_DIR'):
         oracledb.init_oracle_client(lib_dir=os.environ['KN_ORACLE_CLIENT_LIB_DIR'])
-    pg = dict(host=os.environ['PROD_HOST'], port=os.environ['PROD_PORT'],
-              user=os.environ['PROD_USER'], password=os.environ['PROD_PASSWORD'], connect_timeout=20)
+    pg = dict(host=os.environ[prefix + '_HOST'], port=os.environ[prefix + '_PORT'],
+              user=os.environ[prefix + '_USER'], password=os.environ[prefix + '_PASSWORD'], connect_timeout=20)
     output.mkdir(parents=True, exist_ok=False)
     partial = output / 'capture.partial.sqlite3'
-    info = {'config': config, 'started_at': datetime.now(UTC).isoformat(), 'sql': {}, 'intervals': {}, 'counts': {}}
+    info = {'environment': environment, 'config': config, 'started_at': datetime.now(UTC).isoformat(), 'sql': {}, 'intervals': {}, 'counts': {}}
     try:
         with closing(sqlite3.connect(partial)) as db, psycopg.connect(
-            **pg, dbname=os.getenv('PROD_METADATA_DATABASE', 'fmp'), autocommit=True
+            **pg, dbname=os.getenv(prefix + '_METADATA_DATABASE', 'fmp'), autocommit=True
         ) as meta:
             meta.execute('SET default_transaction_read_only = on')
             meta.execute("SET TIME ZONE 'UTC'")
@@ -102,8 +103,8 @@ def export_capture(env_file, output):
             info['sql'] = {name: (HERE / f'{name}.sql').read_text() for name in ('source', 'target', 'metadata')}
             info['endpoints'] = {'oracle_dsn': os.environ['KN_ORACLE_DSN'], 'oracle_user': os.environ['KN_ORACLE_USER'],
                                  'pg_host': pg['host'], 'pg_port': pg['port'], 'pg_user': pg['user'],
-                                 'target_database': os.getenv('PROD_DATABASE', 'fmp_data_gurs'),
-                                 'metadata_database': os.getenv('PROD_METADATA_DATABASE', 'fmp')}
+                                 'target_database': os.getenv(prefix + '_DATABASE', 'fmp_data_gurs'),
+                                 'metadata_database': os.getenv(prefix + '_METADATA_DATABASE', 'fmp')}
             # One consistent Oracle stream, no pagination or retry.
             info['intervals']['source_start'] = datetime.now(UTC).isoformat()
             with oracledb.connect(user=os.environ['KN_ORACLE_USER'], password=os.environ['KN_ORACLE_PASSWORD'],
@@ -188,8 +189,8 @@ def compare_capture(database, start, end, page_size=None):
         ''')
         query = (HERE / 'compare.sql').read_text()
         db.execute('CREATE TEMP TABLE results AS ' + query, params)
-        prefix = [start, end, start_utc, end_utc, 'Europe/Ljubljana']
-        prefix_names = ['span_start_input', 'span_end_input', 'span_start_utc', 'span_end_utc', 'report_timezone']
+        prefix = [info.get('environment', 'not recorded (legacy capture)'), start, end, start_utc, end_utc, 'Europe/Ljubljana']
+        prefix_names = ['environment', 'span_start_input', 'span_end_input', 'span_start_utc', 'span_end_utc', 'report_timezone']
         folder = Path(report_dir)
         # All evidence rows are streamed. No dictionary containing millions of keys.
         with (folder / 'differences.csv').open('w', newline='') as stream:
@@ -235,7 +236,7 @@ def compare_capture(database, start, end, page_size=None):
                     if count > 1:
                         writer.writerow(prefix + [value, count, cumulative, page_size, cumulative // page_size != (cumulative + count - 1) // page_size])
                     cumulative += count
-        summary = ['# KN reconciliation', '', f'Span: `{start}` to `{end}` (exclusive end), Europe/Ljubljana.',
+        summary = ['# KN reconciliation', '', f'Environment: {info.get("environment", "not recorded (legacy capture)")}.', '', f'Span: `{start}` to `{end}` (exclusive end), Europe/Ljubljana.',
                    f'UTC: `{start_utc}` to `{end_utc}`.', '', f'Effective lower bound: `{bound}`. {bound_note}.',
                    '', f'Capture intervals: `{json.dumps(info["intervals"])}`.', '',
                    '| Scope | Category | Distinct keys | Target rows |', '|---|---|---:|---:|']
@@ -272,8 +273,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest='command', required=True)
     export = commands.add_parser('export')
+    export.add_argument('--environment', required=True, choices=['staging', 'production'])
     export.add_argument('--env', type=Path, default=HERE / '.env')
-    export.add_argument('--output', type=Path, default=HERE / 'captures' / datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ'))
+    export.add_argument('--output', type=Path)
     compare = commands.add_parser('compare')
     compare.add_argument('database', type=Path)
     compare.add_argument('--start', required=True)
@@ -281,6 +283,7 @@ if __name__ == '__main__':
     compare.add_argument('--page-size', type=int, help='Optional hypothetical old OFFSET page-boundary analysis')
     args = parser.parse_args()
     if args.command == 'export':
-        export_capture(args.env, args.output)
+        output = args.output or HERE / 'captures' / args.environment / datetime.now(UTC).strftime('%Y%m%dT%H%M%S%fZ')
+        export_capture(args.env, output, args.environment)
     else:
         compare_capture(args.database, args.start, args.end, args.page_size)

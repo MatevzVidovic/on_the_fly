@@ -1,0 +1,10 @@
+-- Read-only, indexed historical-key sample. Run after the Oracle tunnel returns.
+-- Compare old version 463 and successor 2875323 for entity 29990557.
+SELECT DEL_STAVBE_H_ID, DEL_STAVBE_ID,
+       TO_CHAR(DATUM_SYS, 'YYYY-MM-DD HH24:MI:SS') AS DATUM_SYS,
+       TO_CHAR(DATUM_OD, 'YYYY-MM-DD HH24:MI:SS') AS DATUM_OD,
+       TO_CHAR(DATUM_DO, 'YYYY-MM-DD HH24:MI:SS') AS DATUM_DO,
+       POSTOPEK_ID_OD, POSTOPEK_ID_DO
+FROM NEP.DELI_STAVB_H
+WHERE DEL_STAVBE_H_ID IN (463, 2875323)
+ORDER BY DEL_STAVBE_H_ID;

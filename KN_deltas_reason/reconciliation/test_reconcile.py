@@ -176,8 +176,11 @@ class ReconciliationTests(unittest.TestCase):
         env = dict(PROD_HOST='fake',PROD_PORT='123',PROD_USER='reader',PROD_PASSWORD='not-real',
                    KN_ORACLE_USER='reader',KN_ORACLE_PASSWORD='not-real',KN_ORACLE_DSN='fake/service')
         # Both ordinary failures and Ctrl-C occur after at least one inserted batch.
-        for scenario in ('success','source_failure','target_failure','interrupt','dst_overlap','dst_gap'):
+        for scenario in ('success','staging_success','source_failure','target_failure','interrupt','dst_overlap','dst_gap'):
             with self.subTest(scenario=scenario):
+                environment = 'staging' if scenario=='staging_success' else 'production'
+                selected_env = {k.replace('PROD_', 'STAG_') if k.startswith('PROD_') else k: v
+                                for k,v in env.items()} if environment=='staging' else env
                 source_cursor = Cursor([[('1','2026-07-02T00:00:00.000000Z','2026-07-02T02:00:00.000000')],
                                         [('2','2026-07-02T00:00:00.000000Z','2026-07-02T02:00:00.000000')]],
                                        RuntimeError('source failed') if scenario=='source_failure' else None)
@@ -191,14 +194,15 @@ class ReconciliationTests(unittest.TestCase):
                            'psycopg':SimpleNamespace(connect=lambda **kw:meta if kw.get('autocommit') else target),
                            'dotenv':SimpleNamespace(load_dotenv=lambda *args,**kw:None)}
                 output = self.folder/scenario
-                with patch.object(reconcile,'HERE',config_dir), patch.dict(os.environ,env,clear=True), \
+                with patch.object(reconcile,'HERE',config_dir), patch.dict(os.environ,selected_env,clear=True), \
                      patch.dict('sys.modules',drivers), patch.object(reconcile,'metadata',side_effect=[before,after]):
-                    if scenario=='success':
-                        export_capture(config_dir/'.env',output)
+                    if scenario in ('success','staging_success'):
+                        export_capture(config_dir/'.env',output,environment)
                         with closing(sqlite3.connect(output/'capture.sqlite3')) as db:
                             status, info = db.execute('SELECT * FROM capture').fetchone()
                             info = json.loads(info)
                             self.assertEqual(status,'COMPLETE')
+                            self.assertEqual(info['environment'],environment)
                             self.assertEqual(info['counts'],dict(source=2,target=2))
                             self.assertEqual(info['before'],before)
                             self.assertEqual(info['after'],after)

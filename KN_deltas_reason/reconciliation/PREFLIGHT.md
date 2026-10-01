@@ -62,3 +62,37 @@ these counts establish full business-payload equality or a cause.
 
 The only unresolved configuration is the worker's effective watermark timezone. Empty means UNKNOWN
 and does not block export/comparison. The local regression suite passes after this adjustment.
+
+## Staging verification
+
+The `STAG_*` connection reaches a different PostgreSQL server from `PROD_*`; both are writable
+primaries, but our sessions are explicitly read-only. Staging uses databases `fmp` and `fmp_data_gurs`.
+The KN integration ID, exact SQL hash, key/change mappings and selected target column types match
+production. Five matching key/date probes spanning winter and summer also retain Ljubljana wall time.
+The same source Oracle connection and diagnostic SQL can therefore be used for this table pair.
+
+The UI completion time `2026-10-01 13:40:58` belongs to staging **ev_parcela_h**, integration
+`prnos_ev_parcela`, whose recorded start is `13:38:42`. It was not a run of `kn_nep_deli_stavb_h`.
+The KN staging metadata still showed September 26 when checked. Do not treat that EV run as a
+before/after test of KN or assume staging and production are identical merely because samples match.
+
+Exports now require `--environment staging` or `--environment production`. Captures are partitioned
+by environment, and new capture metadata and reports name their environment. Legacy captures remain
+unchanged; this document identifies `20261001T133732435890Z` as production.
+
+### Staging capture after a newly completed KN run
+
+By capture time, KN staging had completed a new run: start `2026-10-01 13:48:14`,
+end `13:48:39`, watermark `2026-10-01 14:53:26`. These settings were unchanged before/after
+the capture. Therefore this is a **post-run** staging snapshot, not a pre-run baseline.
+
+`captures/staging/20261001T134900129421Z/capture.sqlite3` contains 2,736,617 source rows and
+2,736,508 staging rows. July–September report: 48,208 timestamp-equal keys, 16 missing target
+keys, 1,856 stale target keys. No null keys/dates or duplicate keys anywhere in either inventory.
+The source/target acquisitions ran 13:49:00–13:50:41 UTC.
+
+Staging is measurably different from the earlier production snapshot. Cross-environment counts
+are not a controlled before/after test, even though staging currently has fewer discrepancies.
+The new run's execution timestamps further support UTC worker behavior while the source-derived
+watermark retains Ljubljana wall time. Runtime-bound verification remains separate; eligibility
+labels deliberately stay UNKNOWN.

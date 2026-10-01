@@ -47,17 +47,23 @@ From this directory, using the existing parent virtualenv:
 ../.venv/bin/pip install -r requirements.txt
 cp .env.example .env
 # Fill .env locally. Do not put passwords in commands/chat.
-../.venv/bin/python reconcile.py export
-../.venv/bin/python reconcile.py compare captures/<capture>/capture.sqlite3 \
+../.venv/bin/python reconcile.py export --environment staging
+# Or: ../.venv/bin/python reconcile.py export --environment production
+../.venv/bin/python reconcile.py compare captures/staging/<capture>/capture.sqlite3 \
   --start '2026-07-01 00:00:00' --end '2026-10-01 00:00:00'
 ```
 
 `--env /path/to/.env` can select another combined credentials file. Existing environment variables win.
-Oracle uses the prior `KN_ORACLE_*` names; PG uses the existing `PROD_*` convention.
+Oracle uses the same `KN_ORACLE_*` source in both cases. PostgreSQL uses `STAG_*` for staging
+and `PROD_*` for production. The environment flag is required at the command line.
+SQL/timezone configuration is shared because both environments were checked against the same
+projection and storage convention; the live SQL/mapping checks still apply.
 Oracle DSN is `localhost:10522/EPRO.cman.prim`, **not a JDBC URL**. Set the Instant Client directory
 for Thick mode if required. Keep both needed tunnels open. Compare uses only Python's standard library.
 
-Each export creates a new ignored `captures/<timestamp>/` directory. It streams Oracle in a read-only
+Each export creates a new ignored `captures/<environment>/<timestamp>/` directory and records the
+environment in SQLite and every generated report. Earlier captures remain untouched.
+It streams Oracle in a read-only
 transaction and PostgreSQL in an independent repeatable-read/read-only transaction. SQLite publishes
 `capture.sqlite3` only after both finish, metadata is saved and the local transaction commits.
 An exception/Ctrl-C leaves a partial file and failure note, not a valid capture. No resume: rerun.
