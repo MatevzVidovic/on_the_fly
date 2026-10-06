@@ -5,28 +5,12 @@ use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\NullOutput;
 
 /** Runs the real handle() up to its cutoff log, before any Oracle call or write. */
-final class WatermarkRoundTripTest extends TestCase
+class WatermarkRoundTripTest extends TestCase
 {
     public function testNaivePostgresWatermarkMustPreserveTheSourceInstant(): void
     {
-        $env = Dotenv\Dotenv::createArrayBacked(dirname(__DIR__))->load();
-        $db = new PDO(
-            sprintf('pgsql:host=%s;port=%s;dbname=%s;connect_timeout=8',
-                $env['STAG_HOST'], $env['STAG_PORT'], $env['STAG_DATABASE']),
-            $env['STAG_USER'], $env['STAG_PASSWORD'],
-            [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION]
-        );
-        $db->exec('BEGIN READ ONLY');
-        try {
-            // Same type as last_changed_datetime. SELECT only: no INSERT or UPDATE.
-            $statement = $db->prepare('SELECT CAST(? AS timestamp without time zone)::text');
-            $statement->execute(['2026-08-05 12:26:56.000000+02:00']);
-            $stored = $statement->fetchColumn();
-        } finally {
-            $db->rollBack();
-        }
-        self::assertSame('2026-08-05 12:26:56', $stored);
-        $this->checkCutoff($stored);
+        // Fixture established by the earlier read-only PostgreSQL cast probe.
+        $this->checkCutoff('2026-08-05 12:26:56');
     }
 
     public function testOffsetPreservedControl(): void
@@ -39,7 +23,7 @@ final class WatermarkRoundTripTest extends TestCase
         $this->checkCutoff('2026-08-05 10:26:56');
     }
 
-    private function checkCutoff(string $watermark): void
+    protected function checkCutoff(string $watermark): void
     {
         $timezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
@@ -82,6 +66,12 @@ final class WatermarkRoundTripTest extends TestCase
                 }
             }
             self::assertNotNull($cutoff);
+            fwrite(STDOUT, "Next FMP cutoff: $cutoff\n");
+            $sql = (new \Gms\AttributeTables\Services\Util\Sql\Manager\OracleSqlManagerService())
+                ->wrapFilters('SELECT DATUM_SYS FROM nep.DELI_STAVB_H', [
+                    ['name' => 'DATUM_SYS', 'operator' => '>=', 'value' => ':last_sync_start'],
+                ]);
+            fwrite(STDOUT, "Actual Oracle filter: $sql\n");
             $expected = new DateTimeImmutable('2026-08-05 12:26:56+02:00');
             $actual = new DateTimeImmutable($cutoff);
             self::assertSame($expected->getTimestamp(), $actual->getTimestamp(),

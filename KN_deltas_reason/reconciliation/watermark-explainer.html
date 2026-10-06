@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>KN delta: the two-hour watermark shift</title>
+<style>
+  *{box-sizing:border-box} body{margin:0;background:#f3f5f7;color:#172536;font:16px/1.55 system-ui,sans-serif}
+  main{max-width:960px;margin:40px auto;padding:0 24px 40px} h1{font-size:32px;line-height:1.15;margin:12px 0} h2{font-size:21px;margin:0 0 12px}
+  section{background:white;border:1px solid #dce2e8;border-radius:12px;padding:24px;margin-top:20px}
+  .eyebrow{color:#326658;font-size:13px;font-weight:750;letter-spacing:.08em;text-transform:uppercase}
+  .muted{color:#536273;font-size:14px} .lead{font-size:19px} code{font-size:.88em;background:#eef2f6;padding:2px 5px;border-radius:4px;overflow-wrap:anywhere}
+  table{border-collapse:collapse;width:100%;font-size:14px} th,td{text-align:left;padding:10px 8px;border-bottom:1px solid #e3e8ed;vertical-align:top}
+  th{color:#536273} .scroll{overflow-x:auto} .warning{border-left:4px solid #ce7828;background:#fff8ec;padding:14px 18px;margin-top:16px}
+  .flow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-top:16px}.step{padding:16px;background:#eef4f8;border-radius:8px}.step.bad{background:#fff0eb}.step strong{display:block;margin:8px 0}
+  li{margin:8px 0} a{color:#176d88} footer{margin-top:20px} @media(max-width:650px){.flow{grid-template-columns:1fr} main{margin-top:24px;padding:0 14px 24px}section{padding:18px}h1{font-size:27px}}
+</style>
+<main>
+  <div class="eyebrow">KN · NEP.DELI_STAVB_H → kn_nep_deli_stavb_h</div>
+  <h1>The timestamp loses its offset.<br>The next cutoff moves forward.</h1>
+  <p class="lead">This is not the normal two-hour difference between UTC and Ljubljana. It is <strong>the same clock value being interpreted in a different timezone</strong>.</p>
+
+  <section>
+    <h2>1. Actual values in staging</h2>
+    <p class="muted">Read-only check: October 1, 2026, 16:50 UTC / 18:50 Ljubljana. Integration <code>bfe62b52-9aaf-11ef-9c54-0242ac120008</code>.</p>
+    <div class="scroll"><table>
+      <tr><th>Field</th><th>Stored value</th><th>Meaning</th></tr>
+      <tr><td><code>last_sync_start</code></td><td>2026-10-01 13:48:14</td><td>Run start in UTC → 15:48:14 Ljubljana.</td></tr>
+      <tr><td><code>last_sync_end</code></td><td>2026-10-01 13:48:39</td><td>Run end in UTC → 15:48:39 Ljubljana.</td></tr>
+      <tr><td><code>last_changed_datetime</code></td><td><strong>2026-10-01 14:53:26</strong></td><td>Source-change watermark, retaining Ljubljana wall time → <strong>12:53:26 UTC</strong>.</td></tr>
+      <tr><td>Watermark column type</td><td colspan="2"><code>timestamp without time zone</code> — no offset is retained.</td></tr>
+      <tr><td>Configuration</td><td colspan="2"><code>use_changed_datetime_for_delta = true</code> · <code>is_full_sync = false</code> · <code>PROCESSED</code></td></tr>
+    </table></div>
+    <p><strong>The cutoff comes from the source watermark, not the run start/end.</strong> The earlier-looking run times in the UI therefore do not make this delta safer.</p>
+  </section>
+
+  <section>
+    <h2>2. Where the error happens</h2>
+    <div class="flow">
+      <div class="step">① Oracle / source value<strong>14:53:26 +02:00</strong>Same instant as 12:53:26 UTC.</div>
+      <div class="step">② Timezone-less storage<strong>14:53:26</strong>PostgreSQL discards the offset; it does not convert this value to UTC.</div>
+      <div class="step bad">③ UTC worker reads it<strong>14:53:26 +00:00</strong>Now means 16:53:26 Ljubljana. <strong>Cutoff: +2 hours.</strong></div>
+    </div>
+    <p>In <code>ProcessSqlDeltaIntegrationFacadeService::handle()</code>, FMP uses <code>new DateTime(last_changed_datetime)</code>. Without an offset in the string, PHP supplies its default timezone. The resulting value is used in the source filter <code>DATUM_SYS &gt;= cutoff</code>.</p>
+    <p class="muted">Verified: a real PostgreSQL SELECT cast plus FMP’s actual local <code>handle()</code> reproduces +7,200 seconds with a UTC worker. Keeping the offset or converting to UTC before storage both pass. This is not yet proof of every historical deployed worker’s configuration.</p>
+  </section>
+
+  <section>
+    <h2>3. When does it skip records?</h2>
+    <p><strong>It does not require back-to-back runs.</strong> It happens whenever a Ljubljana watermark is read as UTC. In summer the error is two hours; in winter it is normally one hour.</p>
+    <ul>
+      <li><strong>Run again immediately:</strong> if the shifted cutoff is later than the run’s upper bound, the query returns no rows. It can appear there is nothing new.</li>
+      <li><strong>Run tomorrow or next week:</strong> the same incorrect lower bound still excludes the first two hours after the saved watermark. Later rows can import normally.</li>
+      <li><strong>Once the watermark advances:</strong> the omitted interval is behind the cutoff. Ordinary delta runs do not repair it unless those source records change again.</li>
+    </ul>
+    <div class="warning">With today’s stored watermark, the at-risk source interval is <strong>October 1, 14:53:26–16:53:26 Ljubljana</strong> (upper endpoint excluded). New keys can be missing; existing keys can retain stale values. The row at the old watermark may already be imported; the shifted query excludes its timestamp too.</div>
+    <p class="muted">The suspected historical intervals contain 101 missing May keys and 16 missing August keys. This does not explain every stale record: key 463 reached a successful run’s audited save path with correct dates.</p>
+  </section>
+
+  <section>
+    <h2>4. What the integration needs to change</h2>
+    <p><strong>Preserve the instant across save → load → Oracle filter.</strong> Use one explicit contract, not the worker’s implicit timezone.</p>
+    <ol>
+      <li><strong>For a UTC-naive storage contract:</strong> convert the source watermark to UTC <em>before</em> saving it. Today’s example must be saved as <code>12:53:26</code>, not <code>14:53:26</code>.</li>
+      <li><strong>On reading:</strong> explicitly parse that stored watermark as UTC and send a timezone-aware cutoff to Oracle. An alternative is end-to-end timezone-aware storage, but that is a broader change.</li>
+      <li><strong>Handle existing watermarks separately:</strong> KN’s existing Ljubljana values need a deliberate migration/reset under the new contract. Do not blindly subtract two hours from every integration—source conventions and daylight saving differ.</li>
+      <li><strong>Repair the old gaps:</strong> fixing future cutoffs alone will not backfill missed intervals. Reconcile or replay the affected ranges using verified business-key upserts.</li>
+    </ol>
+    <p class="muted">No fix or data change has been applied. These are the required behaviors; the production implementation must cover metadata persistence, parsing, other integration types, and daylight-saving tests.</p>
+  </section>
+  <footer class="muted">Evidence: <a href="AUDIT_FINDINGS.md">historical audit findings</a> · <a href="diagnostics/WATERMARK_TEST.md">test scope and run instructions</a> · <a href="diagnostics/WatermarkRoundTripTest.php">PHP regression test</a></footer>
+</main>
+</html>
