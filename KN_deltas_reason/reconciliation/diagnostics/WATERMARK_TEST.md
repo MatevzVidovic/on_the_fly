@@ -15,6 +15,10 @@ Executed October 6: one assertion fails, showing source `14:00+02:00` becoming c
 
 ## Actual-service test (also offline)
 
+The actual-service test now also prints a copyable Oracle query built by FMP's real `OracleSqlManagerService::wrapFilters()` / `wrapCount()`, substituting the captured cutoff for the bind parameter. Run only `--filter testNaivePostgresWatermarkMustPreserveTheSourceInstant` to print the failing case alone. Its expected assertion failure happens after SQL is printed.
+
+`oracle-watermark-check.sql` contains that generated query formatted for copying, plus a display query for the October 6 watermark. Run it on KN Oracle: the synthetic row at 13:00 Ljubljana is excluded by the FMP cutoff and included by the correct cutoff. These queries use only DUAL. They verify Oracle's comparison semantics, not historical worker configuration or current missing-key counts.
+
 Run from `/Users/matevzvidovic/on_the_fly`:
 
 ```bash

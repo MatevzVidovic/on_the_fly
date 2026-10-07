@@ -74,6 +74,23 @@ class WatermarkRoundTripTest extends TestCase
             fwrite(STDOUT, "Actual Oracle filter: $sql\n");
             $expected = new DateTimeImmutable('2026-08-05 12:26:56+02:00');
             $actual = new DateTimeImmutable($cutoff);
+            // Copyable Oracle experiment: same source row, actual vs correct bound.
+            // DUAL makes this fast and independent of the current KN table contents.
+            $oracle = new \Gms\AttributeTables\Services\Util\Sql\Manager\OracleSqlManagerService();
+            $source = "SELECT FROM_TZ(TIMESTAMP '2026-08-05 13:00:00', 'Europe/Ljubljana') AS DATUM_SYS FROM dual";
+            $filtered = $oracle->wrapFilters($source, [
+                ['name' => 'DATUM_SYS', 'operator' => '>=', 'value' => ':last_sync_start'],
+                ['name' => 'DATUM_SYS', 'operator' => '<=', 'value' => ':current_sync_start'],
+            ]);
+            $experiment = [];
+            foreach (['FMP_ACTUAL_BOUND' => $cutoff, 'CORRECT_BOUND' => $expected->format('Y-m-d H:i:s.uP')] as $label => $bound) {
+                $query = strtr($oracle->wrapCount($filtered), [
+                    ':last_sync_start' => "'$bound'",
+                    ':current_sync_start' => "'2026-08-08 02:50:00.000000+00:00'",
+                ]);
+                $experiment[] = "SELECT '$label' AS mode, q.\"count\" AS included_rows FROM ($query) q";
+            }
+            fwrite(STDOUT, "\n-- Paste into Oracle: expect FMP_ACTUAL_BOUND=0, CORRECT_BOUND=1.\n" . implode("\nUNION ALL\n", $experiment) . ";\n\n");
             self::assertSame($expected->getTimestamp(), $actual->getTimestamp(),
                 "FMP cutoff=$cutoff; shift=" . ($actual->getTimestamp() - $expected->getTimestamp()) . ' seconds');
         } finally {
