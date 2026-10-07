@@ -14,7 +14,7 @@ source ../.venv/bin/activate
 python monitor.py export --table kn_nep_deli_stavb_h
 python monitor.py export --group KN
 python monitor.py export --group EV
-python monitor.py export                       # All 40 extracts, sequentially
+python monitor.py export                       # All 42 extracts, sequentially
 python monitor.py compare > differences.csv
 ```
 
@@ -41,14 +41,17 @@ store—not geometry or unused business fields. No runtime SQL parser or discove
 | --- | ---: | --- |
 | KN / RAW | 20 | Native key and DATUM_SYS from each distinct source table |
 | KN / INTEGRATION_LIKE | 1 | STAVBE_H restricted by the saved ZPS geometry-presence filter |
-| EV / INTEGRATION_LIKE | 19 | Original key/date expressions, revision joins and membership filters |
+| EV / INTEGRATION_LIKE | 21 | Original key/date expressions, revision joins and membership filters |
 
 The Jira table is `kn_nep_deli_stavb_h` → `NEP.DELI_STAVB_H`, keyed by
 `DEL_STAVBE_H_ID`, changed by `DATUM_SYS`. Shared raw `NEP.STAVBE_H` is captured
 once as `kn_nep_stavbe_h`; ZPS is separately `kn_nep_stavbe_zps_h`.
 EV cannot use RAW because its mapped change date depends on revision joins.
-The failed exploratory candidates `ev_parcela_h`,
-`ev_parc_enota_h_2025_danes`, and `ev_parc_del_cona_h` are not included.
+`ev_parcela_h` and `ev_parc_enota_h_2025_danes` were added on October 7 using
+the now-working staging integration definitions. This starts a new hashed experiment;
+the September 23–October 1 database remains unchanged and can still be compared
+with `--database observations_ea4f75d1c93f.sqlite3`.
+The failed exploratory candidate `ev_parc_del_cona_h` remains excluded.
 
 Original integration SQL and catalog evidence remain in
 `exploration/artifacts/20260923T084030Z/`. The runtime does not depend on them.

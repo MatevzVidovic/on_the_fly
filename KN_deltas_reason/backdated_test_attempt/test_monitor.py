@@ -186,14 +186,19 @@ class MonitorTest(unittest.TestCase):
         folder = Path(__file__).resolve().parent
         definition, _, _ = experiment_definition(folder, "fixture", "fixture")
         extracts = definition["extracts"]
-        self.assertEqual(len(extracts), 40)
+        self.assertEqual(len(extracts), 42)
         self.assertEqual(sum(e["mode"] == "RAW" for e in extracts), 20)
-        self.assertEqual(sum(e["group"] == "EV" for e in extracts), 19)
+        self.assertEqual(sum(e["group"] == "EV" for e in extracts), 21)
         sql = {e["dataset"]: e["sql"] for e in extracts}
         self.assertIn("DEL_STAVBE_H_ID", sql["kn_nep_deli_stavb_h"])
         self.assertIn("TEREN_GEOM is not null", sql["kn_nep_stavbe_zps_h"])
         self.assertIn("ID = '77920'", sql["ev_g_zeleznice_l_h"])
         self.assertIn("2025-01-01", sql["ev_del_stavbe_enota_h_2025_danes"])
+        self.assertIn("2025-01-01", sql["ev_parc_enota_h_2025_danes"])
+        for name in ("ev_parcela_h", "ev_parc_enota_h_2025_danes"):
+            self.assertIn("j.JN_STATUS <> 'X'", sql[name])
+            self.assertIn("LEFT JOIN EV.REVISION rt", sql[name])
+            self.assertIn("COALESCE(rt.CREATED, rf.CREATED)", sql[name])
         self.assertEqual(sum("AS source_created_at" in s for s in sql.values()), 2)
         self.assertEqual(sum("AS source_datum_sys" in s for s in sql.values()), 3)
         for extract in extracts:
