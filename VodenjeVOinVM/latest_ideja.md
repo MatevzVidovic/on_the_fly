@@ -42,9 +42,9 @@ Kopiranje se lahko izvaja tudi znotraj VO, in sicer na 3 načine:
 
    1. Prekopiranje hierarhij VM: izberemo izvorni VM in ciljni VM ki sta v istem VO. Celotna veriga geometrij (cone, LAO, TAO) izbranega VM se kopira na geometrije VM, ki ga prestavljamo.  
       
-       1. Če je število vrednostnih ravni ciljnega VM večje ali enako od števila vrednostnih ravni premikajočega VM, se številka vrednostne ravni na conah prav tako kopira. 
+       1. Če je število vrednostnih ravni ciljnega VM večje ali enako od števila vrednostnih ravni izvornega VM, se številka vrednostne ravni na conah prav tako kopira. 
           
-       2. Če ni, potem se na premikajočem VM vsem conam št. vrednostne ravni nastavi na 1. 
+       2. Če ni, potem se na izvornega VM vsem conam št. vrednostne ravni nastavi na 1. 
           
    2. Ponastavitev hierarhij VM: izbrišejo se vsi TAO, LAO, cone, obmxcone. Potem se ustvari ena cona, in zanjo se ustvari vnose v obmxcone za vsa območja VO, in št. ravni se ji nastavi na 1. (tako je bilo rečeno na sestanku, da se naredi 1 cona.) (Če hočejo potem to cono izbrisati, lahko pogledajo obmxcone izven administracije, filtrirajo za verzijo modela, in pobrišejo vse vnose.)
 
@@ -82,6 +82,7 @@ Morda, da ko se med nefrontnimi VO dogaja premikanje, da se najprej zgodi kopija
 
 
 Tako da zgornje omejitve morda predrugačim v 2 veji izvedb s to psevdokodo:
+- če VM nima VO (utvarjen iz nule) se lahko pridruži na VO z delovna_geo_coniranje false. Lahko pa na VO z delovna_geo_coniranje True, kjer obstaja enak tip modela, lot ga pridružujemo (to bo nov frontni model).
 - izvorni VO in ciljni VO nimata enak delovna_geo_coniranje (nista oba frontna ali nefrontna) -> error
 - če imata oba VO false, se naredi kopija VM, potem pa se izvede WF premika za to kopijo
 - če imata oba true, potem:
