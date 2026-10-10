@@ -1,8 +1,5 @@
 
 
-
-
-
 Ustvarjanje VM je na 2 načina:
 - kopiranje modela: dobi št. verzije MAX(številke tipa modela) + 1. Poveže se na isti VO kot izvoren model.
 - ustvarjanje iz nule: tudi dobi št. verzije MAX(številke tipa modela) + 1. Povezan na noben VO.
@@ -24,7 +21,7 @@ Samo za frontni VO se lahko dela kopija VO - izvorni VO dobi "Delovna geo conira
 - nefrontni VO se lahko kopira, in se vzamejo psevdo-frontni modeli, ampak ciljni VO ima vseeno "Delovna geo coniranje" na false, ker ni frontni.
 - lahko delaš prazno kopijo VO, kejr se kopirajo le območja, ampak se ne prenese noben model. Ta ima tudi "Delovna geo coniranje" false, potem pa lahko vanj pridružuješ neke VM in morda enkrat nam rečeš, da je zdaj to fronten VO.)
 
-Zaklenjen: Lahko true samo pri frontnih VO, torej teh, ki imajo delovna_geo_coniranje na true.
+Zaklenjen: Lahko false samo pri frontnih VO, torej teh, ki imajo delovna_geo_coniranje na true.
 
 
 Sidenote vidnosti na slojih:
@@ -57,6 +54,14 @@ Kopiranje se lahko izvaja tudi znotraj VO, in sicer na 3 načine:
 Za izvedbo smiselnega premikanja torej potrebujemo le eno stvar:
 Ko se model pridruži na nek VO, se mora izvesti "Ponastavitev hierarhij VM".
 Če želijo, lahko potem naredijo "Prekopiranje hierarhije VM"
+
+Moramo pa paziti na nekaj:
+Če premikamo model iz frontnega VO (ima delovna_geo_coniranje True) potem mora to biti edini model tega tipa na VO (kar lahko zagotovimo tako, da prej naredimo kopijo VO).
+Sicer se lahko zgodi, da 2 frontna VO vsebujeta isti tip modela, torej ima nek tip modela dva frontna VM, kar pa je problem.
+
+Torej premik mora biti preprečen če:
+- se premika VM iz VO z Delovna geo coniranje na True, pa ta VM ni edini s tem tipom modela na VO.
+- je VM zaklenjen ali pripisen.
 
 
 
