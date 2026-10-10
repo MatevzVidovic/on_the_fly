@@ -84,7 +84,7 @@ Morda, da ko se med nefrontnimi VO dogaja premikanje, da se najprej zgodi kopija
 Tako da zgornje omejitve morda predrugačim v 2 veji izvedb s to psevdokodo:
 - če VM nima VO (utvarjen iz nule) se lahko pridruži na VO z delovna_geo_coniranje false. Lahko pa na VO z delovna_geo_coniranje True, kjer obstaja enak tip modela, lot ga pridružujemo (to bo nov frontni model). Pridruži se in izvede se premik WF -> exit.
 - izvorni VO in ciljni VO nimata enak delovna_geo_coniranje (nista oba frontna ali nefrontna) -> error
-- če imata oba VO false, se naredi kopija VM, potem pa se izvede WF premika za to kopijo
+- če imata oba VO false, se naredi kopija VM, za nov VM se zaklenjena_verzija da na false, potem pa se izvede WF premika za to kopijo
 - če imata oba true, potem:
     - Če VM, ki se premika, je zaklenjen ali je pripisen, potem error
     - Če VM, ki se premika, na izvornem VO ni edini VM s tem tipom modela (kar lahko naredimo s predhodno kopijo izvornega VO), potem error.
