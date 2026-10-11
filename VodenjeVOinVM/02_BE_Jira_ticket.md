@@ -2,44 +2,24 @@
 
 ## Cilj
 
-Uvesti tri namenske workflowe: pridružitev VM na VO, ponastavitev hierarhije VM in nadomestitev hierarhije s kopijo drugega VM na istem VO. Pridružitev vedno konča s ponastavitvijo na eno cono na ravni 1. Kopiranje hierarhije je ločena uporabniška akcija.
+Uvesti tri namenske workflowe: pridružitev VM na VO, ponastavitev hierarhije VM in nadomestitev hierarhije s kopijo hierarhije drugega VM na istem VO.
+### Definicije
 
-Ta ticket uporablja potrjeni koncept **frontnega VO in lokalno frontnega VM**, ne globalnega »latest VM«. Domenske odločitve so povzete v [pojasnilu za naročnika](01_Pojasnilo_za_narocnika.md).
-
+- VO: verzija območij.
+- VM: verzija modela
+- Hierarhija geometrij: Za nek VM, vsi prišadajoči vnosi v md_geo_obmxcona, md_geo_cona, md_geo_lao, md_geo_tao. NE PA md_geo_obm.
+- Editabilen VM: ima `zaklenjena_verzija = false` in `pripisna = false`. 
+- Delovni VO: ima `delovna_geo_coniranje = true`
 ## Obseg
 
 ### Novi workflowi
 
-Predlagana imena so del tega ticketa; v obstoječem FMP jih še ni.
+| Workflow                         | Vhod                           | Namen                                                                                                                              |
+| -------------------------------- | ------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------- |
+| `JoinModelToGeoVersionWorkflow`  | `vm_id`, `target_vo_id`        | Izbere izvorni VM in ciljni VO. V določenih primerih kopira VM, prestavi VM in sproži ponastavitev.                                |
+| `ResetModelGeoHierarchyWorkflow` | `vm_id`                        | Nadomesti hierarhijo geometrij z eno cono, ki je povezana z vsemi območji njegove VO (za vsako območje en vnos v md_geo_obmxcona). |
+| `CopyModelGeoHierarchyWorkflow`  | `source_vm_id`, `target_vm_id` | Nadomesti ciljno hierarhijo s kopijo hierarhije drugega VM na istem VO.                                                            |
 
-| Workflow | Vhod | Namen |
-|---|---|---|
-| `JoinModelToGeoVersionWorkflow` | `vm_id`, `target_vo_id` | Izbere vejo pridružitve, po potrebi kopira VM, prestavi VM in počaka na ponastavitev. |
-| `ResetModelGeoHierarchyWorkflow` | `vm_id` | Nadomesti hierarhijo z eno cono na ravni 1 in povezavami do vseh območij njegove VO. |
-| `CopyModelGeoHierarchyWorkflow` | `source_vm_id`, `target_vm_id` | Nadomesti ciljno hierarhijo s kopijo hierarhije drugega VM na istem VO. |
-
-Skupne aktivnosti za brisanje in ustvarjanje hierarhije naj se ponovno uporabijo. Za brisanje naj ne bo potrebna dodatna uporabniška akcija.
-
-### Obstoječi workflowi in integracije
-
-- Ponovno uporabiti `CloneModelVersionWorkflow` za vejo zgodovinski → zgodovinski, z zagotovitvijo odklenjene kopije.
-- Ohraniti `GeoObmCopyWorkflow`: kopira območja, premakne lokalno najvišjo verzijo vsakega tipa iz izvorne VO in preveže `obmxcona`. Omejiti kopiranje na frontni VO.
-- Podpreti ustvarjanje VM brez VO: ustvarjanje številke verzije deluje, VO-locking workflow pa se za tak VM ne sme zagnati oziroma mora varno zaključiti brez VO.
-- Preprečiti običajno ročno spreminjanje `md_verzije_modeli.id_rel_geo_verzija`. Namenski workflowi, vključno z obstoječim kopiranjem VO, morajo ohraniti možnost nadzorovane spremembe.
-
-## Definicije in pravila
-
-| Pojem | Pravilo |
-|---|---|
-| Frontni VO | `md_geo_obm_verzije.delovna_geo_coniranje = true`. |
-| Frontni VM | VM z največjim `verzija` za svoj `model` znotraj posameznega frontnega VO. |
-| Zgodovinski VO | `delovna_geo_coniranje = false`; območja so zaklenjena. |
-| Spremenljiv VM | `zaklenjena_verzija = false` in `pripisna = false`. Če je katerakoli od teh vrednosti true, se VM ne spreminja. |
-| Zaklenjen VO | Varuje VO/območja; sam po sebi ne preprečuje spreminjanja hierarhije spremenljivega VM. |
-
-Izhodiščno stanje sistema že zagotavlja razporeditev tipov po frontnih VO. Pridružitev ohranja to razporeditev z omejitvami spodaj. Ne uvajamo nove izbire frontnega VM; frontnost se še naprej določa z lokalno najvišjo številko.
-
-Izvorni zaklenjeni oziroma pripisni VM se lahko bere za kopiranje. Omejitev spreminjanja velja za dejanski VM, ki se premika, ponastavlja ali prejema kopirano hierarhijo.
 
 ## 1. JoinModelToGeoVersionWorkflow
 
