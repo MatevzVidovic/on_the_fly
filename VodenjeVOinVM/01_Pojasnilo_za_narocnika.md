@@ -1,4 +1,4 @@
-# Pridružitev modela na VO ter ponastavitev in kopiranje hierarhije
+# Pridružitev modela na verzijo območja ter ponastavitev in kopiranje hierarhije
 
 Definicije:
 - **VO:** verzija območij.

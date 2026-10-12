@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="sl" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pridružitev modela na VO ter ponastavitev in kopiranje hierarhije</title>
+<style>
+@page WordSection1 { size: 21cm 29.7cm; margin: 2cm 2.2cm; }
+div.WordSection1 { page: WordSection1; }
+html { background: #eef1f5; }
+body { box-sizing: border-box; max-width: 21cm; margin: 24px auto; padding: 2cm 2.2cm; background: #fff; color: #202b38; font-family: Calibri, Arial, sans-serif; font-size: 11pt; }
+@media print {
+  html { background: #fff; }
+  body { max-width: none; margin: 0; padding: 0; }
+}
+</style>
+</head>
+<body>
+<div class="WordSection1">
+<h1 style="font-family:Calibri,Arial,sans-serif;font-size:23pt;line-height:1.15;font-weight:700;color:#17365d;margin:0 0 22pt 0;page-break-after:avoid;">Pridružitev modela na VO ter ponastavitev in kopiranje hierarhije</h1>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Definicije:</p>
+<ul style="margin:0 0 11pt 0;padding-left:22pt;list-style-type:disc;">
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;"><strong style="font-weight:700;">VO:</strong> verzija območij.</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;"><strong style="font-weight:700;">VM:</strong> verzija modela.</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;"><strong style="font-weight:700;">Hierarhija geometrij VM:</strong> cone, LAO, TAO in povezave con z območji.</li>
+</ul>
+<h2 style="font-family:Calibri,Arial,sans-serif;font-size:15pt;line-height:1.25;font-weight:700;color:#17365d;margin:22pt 0 10pt 0;page-break-after:avoid;">1. Pridružitev VM drugemu VO</h2>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">VM lahko pridružite drugemu VO, če:</p>
+<ul style="margin:0 0 11pt 0;padding-left:22pt;list-style-type:disc;">
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">imata <strong style="font-weight:700;">izvorni in ciljni VO oba »Delovna geo coniranje« nastavljeno na true</strong>;</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">je izbrani VM <strong style="font-weight:700;">edini VM svojega tipa na izvornem VO</strong> (npr. edini PPP);</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">izbrani VM ni zaklenjen ali pripisen.</li>
+</ul>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;"><strong style="font-weight:700;">Če željeni VM ni edini svojega tipa na VO, lahko pred pridružitvijo najprej naredite kopijo izvornega VO.</strong> Na novi VO se prenese samo najvišja verzija VM posameznega tipa. Prejšnji VO dobi »Delovna geo coniranje = false«, novi pa »Delovna geo coniranje = true«.</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Na primer: če izvorni VO vsebuje PPP v5 in PPP v6, premik nobenega od njiju ni dovoljen. Po kopiranju VO je na novi VO samo PPP v6, zato ga lahko pridružite drugemu VO z »Delovna geo coniranje = true«.</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Omejitev na en VM istega tipa na izvoru zagotavlja, da po premiku tam ne ostane drug VM tega tipa. Tako isti tip modela ne ostane na dveh VO z »Delovna geo coniranje = true«, ampak le na enem.</p>
+<h3 style="font-family:Calibri,Arial,sans-serif;font-size:12pt;line-height:1.3;font-weight:700;color:#17365d;margin:15pt 0 7pt 0;page-break-after:avoid;">Kaj se zgodi ob pridružitvi?</h3>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Izberete VM in ciljni VO. Izbrani VM se premakne na ciljni VO, njegova hierarhija pa se <strong style="font-weight:700;">samodejno ponastavi</strong>:</p>
+<ol style="margin:0 0 11pt 0;padding-left:22pt;list-style-type:decimal;">
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">Prejšnje cone, LAO, TAO in povezave z območji se odstranijo.</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">Ustvari se ena cona na vrednostni ravni 1, povezana z vsemi območji ciljnega VO, brez LAO in TAO.</li>
+</ol>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Prejšnje geometrije VM se ne ohranijo. Območja obeh VO in drugi VM se ne spremenijo. Povezavo VM–VO spreminjate s to akcijo, ne z ročnim prevezovanjem.</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Po pridružitvi lahko začnete coniranje iz te začetne cone. Če želite uporabiti hierarhijo drugega VM na ciljnem VO, sprožite <strong style="font-weight:700;">kopiranje hierarhije</strong>, opisano spodaj.</p>
+<h2 style="font-family:Calibri,Arial,sans-serif;font-size:15pt;line-height:1.25;font-weight:700;color:#17365d;margin:22pt 0 10pt 0;page-break-after:avoid;">2. Dva workflowa za hierarhijo na istem VO</h2>
+<h3 style="font-family:Calibri,Arial,sans-serif;font-size:12pt;line-height:1.3;font-weight:700;color:#17365d;margin:15pt 0 7pt 0;page-break-after:avoid;">Ponastavitev hierarhije</h3>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Za izbrani VM odstranimo obstoječe cone, LAO, TAO in njihove povezave z območji. Ustvarimo <strong style="font-weight:700;">eno cono na vrednostni ravni 1</strong>, povezano z vsemi območji njegove VO, brez LAO in TAO. Če VO nima območij, je cona brez povezav in geometrije.</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">To je ista ponastavitev, ki se samodejno izvede ob pridružitvi. Lahko jo sprožite tudi pozneje, kadar želite coniranje začeti znova.</p>
+<h3 style="font-family:Calibri,Arial,sans-serif;font-size:12pt;line-height:1.3;font-weight:700;color:#17365d;margin:15pt 0 7pt 0;page-break-after:avoid;">Kopiranje hierarhije iz drugega VM</h3>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Izberete izvorni in ciljni VM, ki sta na <strong style="font-weight:700;">istem VO</strong>. Celotno hierarhijo ciljnega VM nadomestimo s kopijo con, LAO, TAO in povezav z območji izvornega VM. Izvorni VM ostane nespremenjen.</p>
+<ul style="margin:0 0 11pt 0;padding-left:22pt;list-style-type:disc;">
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">Če ciljni VM podpira vsaj toliko vrednostnih ravni kot izvorni, se ravni con ohranijo.</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">Če jih podpira manj, se vsem kopiranim conam nastavi raven 1.</li>
+</ul>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Pri obeh workflowih VM, ki ga spreminjamo, <strong style="font-weight:700;">ne sme biti zaklenjen ali pripisen</strong>. Območja VO in hierarhije drugih VM ostanejo nespremenjeni.</p>
+<h2 style="font-family:Calibri,Arial,sans-serif;font-size:15pt;line-height:1.25;font-weight:700;color:#17365d;margin:22pt 0 10pt 0;page-break-after:avoid;">3. Kasnejša izboljšava: pridružitev z geometrijskim uparjanjem</h2>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Ob pridružitvi bi lahko namesto osnovne ponastavitve <strong style="font-weight:700;">ohranili cone, LAO in TAO premaknjenega VM</strong> ter njegove cone povezali z območji ciljnega VO glede na geometrijsko ujemanje.</p>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Uporabili bi eno od strategij uparjanja:</p>
+<ul style="margin:0 0 11pt 0;padding-left:22pt;list-style-type:disc;">
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">cona v celoti vsebuje območje;</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">cona in območje se prekrivata;</li>
+<li style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 5pt 0;">cona pokriva vsaj izbrani delež območja (98%, 80%, 51%).</li>
+</ul>
+<p style="font-family:Calibri,Arial,sans-serif;font-size:11pt;line-height:1.35;margin:0 0 9pt 0;orphans:2;widows:2;">Tako bi lahko na ciljnem VO nadaljevali z obstoječo hierarhijo premaknjenega VM. Ta možnost bo implementirana kasneje. V trenutni izvedbi pridružitev vedno izvede osnovno ponastavitev, kopiranje hierarhije drugega VM pa je ločena akcija.</p>
+</div>
+</body>
+</html>
