@@ -1,4 +1,4 @@
-# BE: pridružitev VM na VO, ponastavitev in kopiranje hierarhije
+# Pridružitev modela območjem ter ponastavitev in kopiranje hierarhije
 
 
 ## OPIS
@@ -7,7 +7,7 @@ Omogočiti pridružitev različice modela različici območij, ponastavitev njen
 
 ## KRITERIJI SPREJETJA
 
-Pridružitev skladno s tabelo pravil premakne različico ali njeno kopijo in ponastavi hierarhijo.
+Pridružitev skladno s tabelo pravil premakne izbrano različico in ponastavi hierarhijo. 
 
 Ponastavitev ustvari eno cono na ravni 1, povezano z vsemi trenutnimi območji, brez LAO/TAO. Če območij ni, je cona brez povezav in geometrije.
 
@@ -19,7 +19,7 @@ Spreminjana različica in kopirani zapisi omogočajo urejanje.
 
 V okolju test.gurs.lift.flycom.si:
 
-Pridružitev → primeri iz tabele pravil → predviden premik oziroma kopija in ponastavitev ali zavrnitev.
+Pridružitev → primeri iz tabele pravil → predviden premik in ponastavitev ali zavrnitev.
 
 Ponastavitev → model z območji in brez njih → ustrezna osnovna cona.
 
@@ -50,7 +50,7 @@ Editabilen mora biti VM, ki ga spreminjamo. Zaklenjen ali pripisen izvor lahko b
 
 **Vhod:** `vm_id`, `target_vo_id`.
 
-BE preveri pogoje spodaj, po potrebi kopira VM, spremeni `id_rel_geo_verzija` in počaka na ponastavitev. Celoten postopek izvede en workflow.
+BE preveri pogoje spodaj, spremeni `id_rel_geo_verzija` izbranega VM in počaka na ponastavitev. Celoten postopek izvede en workflow.
 
 ### Pravila po vejah
 
@@ -60,12 +60,12 @@ V stolpcih za izvorni in ciljni VO sta `true` in `false` vrednosti polja `delovn
 | -------------------------------- | ------------------------------- | ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
 | VM nima VO                       | `false`                         | VM je editabilen.                                                   | Prestavi podani VM in ponastavi njegovo hierarhijo.                                                                       |
 | VM nima VO                       | `true`                          | VM je editabilen; ciljni VO že vsebuje VM istega tipa.              | Prestavi podani VM in ponastavi njegovo hierarhijo.                                                                       |
-| `false`                          | `false`                         | —                                                                   | Kopira VM, zagotovi editabilnost kopije (zaklenjen=false, pripisna=false), prestavi kopijo in ponastavi njeno hierarhijo. |
+| `false` | `false` | — | Zavrne; pridružitev med nedelovnima VO ni del trenutnega obsega. |
 | `true`                           | `true`                          | Podani VM je editabilen in je edini VM svojega tipa na izvornem VO. | Prestavi podani VM brez predhodne kopije in ponastavi njegovo hierarhijo.                                                 |
 | `false`                          | `true`                          | —                                                                   | Zavrne.                                                                                                                   |
 | `true`                           | `false`                         | —                                                                   | Zavrne.                                                                                                                   |
 
-Torej: Pri že povezanem VM se editabilnost preveri na VM, ki se dejansko premika: pri obeh nedelovnih VO je to nova kopija, pri obeh delovnih VO pa podani VM.
+Vedno se premakne podani VM, ki mora biti editabilen. Če VM že ima VO, je pridružitev dovoljena samo med dvema delovnima VO.
 
 ### Psevdokoda
 
@@ -76,24 +76,17 @@ izvorni_vo = preberi VO(vm.id_rel_geo_verzija), če je povezan
 
 preveri obstoj zapisov in pogoje iz tabele
 
-če izvorni_vo obstaja in ima delovna_geo_coniranje=false:
-    vm = počakaj na CloneModelVersionWorkflow(vm.id)
-    zagotovi editabilnost kopije in njenih pripadajočih zapisov
-
 nastavi vm.id_rel_geo_verzija = ciljni_vo.id
 počakaj na ResetModelGeoHierarchyWorkflow(vm.id)    // opisan kasneje
 ```
 
 Za štetje VM istega tipa uporabiti `md_verzije_modeli`, filtrirano po izvornem `id_rel_geo_verzija` in `model`. Štejejo **vse verzije**, ne glede na editabilnost.
 
-Kopija dobi `pripisna=false`, `zaklenjena_verzija=false` in `__readonly=false` na pripadajočih zapisih, kjer atribut obstaja. Izvor ostane nespremenjen.
-
 Enak izvorni in ciljni VO je dovoljen ob izpolnjenih pogojih iste veje. Pridružitev ne kopira območij, ne spreminja `delovna_geo_coniranje` in ne premika drugih VM.
 
-### Primera
+### Primer
 
 - **Delovni VO A vsebuje PPP v5 in v6:** premik katerega od njiju je zavrnjen. Po obstoječem kopiranju VO je na novi delovni VO samo PPP v6, zato ga lahko premaknemo. Pogoj je število VM istega tipa na izvoru; cilj v tej veji ne potrebuje obstoječega PPP.
-- **Zaklenjen PPP na nedelovnem A → nedelovni B:** BE ustvari editabilno kopijo in na B premakne ter ponastavi kopijo. Zaklenjeni izvor na A ostane nespremenjen.
 
 ## 2. ResetModelGeoHierarchyWorkflow
 
@@ -126,4 +119,4 @@ Enak izvorni in ciljni VO je dovoljen ob izpolnjenih pogojih iste veje. Pridruž
 
 ## Obstoječa koda, ki jo lahko uporabimo
 
-- **[CloneModelVersionWorkflow](/Users/matevzvidovic/fmp/app/_Company/Gurs/Services/Workflows/CloneModelVersionWorkflow.php:19):** ponovno uporabiti za pridružitev med nedelovnima VO. Trenutno eksplicitno nastavi `pripisna=false`, ne pa `zaklenjena_verzija=false`- to moramo potem storiti dodatno. Morda kopiranje geometrij iz njegovih aktivnosti ponovno uporabiti za tretji workflow.
+- **[CloneModelVersionWorkflow](/Users/matevzvidovic/fmp/app/_Company/Gurs/Services/Workflows/CloneModelVersionWorkflow.php:19):** aktivnosti za kopiranje geometrij lahko ponovno uporabimo v `CopyModelGeoHierarchyWorkflow`. 
