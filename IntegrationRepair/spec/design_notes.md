@@ -34,7 +34,7 @@ This document records decisions and supporting evidence from the design intervie
 
 ## Review state
 
-All interview choices are settled. The consolidated flow and proposed four-table SQLite shape in [basic_spec.md](basic_spec.md) are ready for the user's shared-understanding confirmation before implementation.
+All interview choices are settled, and the user authorized implementation. The tool implements the agreed four-table flow in five Python files, with the seven logical roles described in [README.md](../README.md). The worker/reviewer loop finished with no remaining actionable correctness or simplicity findings; 16 tests pass. Read-only PostgreSQL checks covered metadata, WKT conversion, timestamp binding, and preparation of generated write statements without execution. Oracle execution and live writes remain unverified.
 
 ## Verified backend behavior
 

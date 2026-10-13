@@ -95,6 +95,6 @@ Keep the originally requested four-table shape. These names and fields describe 
 
 All child rows belong to their repair UUID. Do not store full source payloads or create a second persistent LIFT inventory table.
 
-## Implementation shape for review
+## Implementation shape
 
-A small `repair.py` with `prepare <integration_uuid>` and `apply <repair_uuid>` commands is sufficient. Use direct Oracle/PostgreSQL access and SQLite, with environment-based connection settings. Keep the integration discovery, comparison, mapping, and batch handling easy to follow.
+A small `repair.py` provides `prepare <integration_uuid>` and `apply <repair_uuid>` commands. Use direct Oracle/PostgreSQL access and SQLite, with environment-based connection settings. Keep the integration discovery, comparison, mapping, and batch handling easy to follow. The implemented roles and setup instructions are in [README.md](../README.md).
