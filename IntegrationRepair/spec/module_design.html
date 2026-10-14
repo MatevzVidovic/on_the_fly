@@ -73,14 +73,14 @@
       <li>Read a pending upsert page and fetch its source payloads.</li>
       <li>Recheck prepared pairs; map valid payloads.</li>
       <li>Commit PostgreSQL upserts, then save SQLite outcomes.</li>
-      <li>Fill point sampling fields, refresh direct views, and finish.</li>
+      <li>Fill point sampling fields and finish; leave materialized views untouched.</li>
     </ol></section>
   </div>
   <div class="gate">Prepare → Review run counts and upsert_diff → Apply</div>
   <h2>Visibility into each table</h2>
   <p>Each run stores its creation time, table name, cutoff, Oracle/LIFT counts, and planned insert/update counts. Both populations use <code>change_time ≤ cutoff</code>. The Oracle count comes from the integration query's eligible result.</p>
   <pre>expected_needed_deletions = lift_count + insert_count - oracle_count</pre>
-  <p>A signed diagnostic estimate: negative values are saved and warned about. It assumes planned inserts succeed. Updates do not change row counts; actual writes can differ when apply skips changed source rows. LIFT-only rows are left untouched.</p>
+  <p>A signed diagnostic estimate: negative values are saved and warned about. It assumes planned inserts succeed. Updates do not change row counts; actual writes can differ when apply skips changed source rows. LIFT-only rows and materialized views are left untouched.</p>
   <h2>Small storage, bounded memory</h2>
   <p>SQLite contains only <code>integration_transfer</code> and <code>upsert_diff</code>. One current source page, one fetched-ahead page, and current comparison data stay in memory. All source key/date pairs still cross the network; full payloads are fetched only for pending upserts.</p>
   <footer>Start with a fresh SQLite file. The old schema is not carried forward. <a href="../README.md">Setup and debugger instructions</a> · <a href="basic_spec.md">Current spec</a></footer>

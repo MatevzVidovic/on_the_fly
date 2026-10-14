@@ -13,7 +13,6 @@ class IntegrationDefinition:
     key: dict
     date: dict
     geometry: dict | None
-    table_params: dict
     point_layer: bool
 
     @classmethod
@@ -58,7 +57,7 @@ class IntegrationDefinition:
                 raise ValueError('Custom table hooks are unsupported')
         return cls(str(row['id']), row['table_name'], row['url'].strip().rstrip(';'),
                    row['last_changed_datetime'], fields, keys[0], dates[0],
-                   locations[0] if locations else None, table_params, row['point_layer'])
+                   locations[0] if locations else None, row['point_layer'])
 
     def key_value(self, value):
         if value is None:

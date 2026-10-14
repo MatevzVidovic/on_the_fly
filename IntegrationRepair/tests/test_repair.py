@@ -10,7 +10,7 @@ from target import LiftTarget
 
 def test_prepare(definition, store):
     source = OracleSource(Database(Cursor([(1, DATE)])), definition)
-    target = LiftTarget(Database(Cursor()), Database(Cursor()), definition)
+    target = LiftTarget(Database(Cursor()), definition)
     target.count = lambda cutoff: 0
 
     run_id = repair.prepare(definition, source, target, store)
@@ -25,7 +25,7 @@ def test_prepare(definition, store):
 def test_apply(definition, store, prepared_run):
     source = OracleSource(Database(Cursor([(1, DATE)])), definition)
     db = Database(Cursor())
-    target = LiftTarget(db, Database(Cursor()), definition)
+    target = LiftTarget(db, definition)
 
     repair.apply(prepared_run, definition, source, target, store)
 

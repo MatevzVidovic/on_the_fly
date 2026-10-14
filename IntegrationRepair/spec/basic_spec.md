@@ -61,7 +61,7 @@ Write no separate audit history. Set both row timestamps to the persisted first 
 
 For WKT mappings, bind values through `ST_Transform(ST_GeomFromText(value, source_srid), target_srid)`. Wrap with `ST_Multi` for MULTI destination types.
 
-After upserts, fill point-layer sampling fields as FMP does and refresh directly subscribed materialized views concurrently. Respect `prevent_materialized_view_refresh`; resolve active `sql_related_table` subscriptions into `sql_view` destinations, deduplicate, and use no recursive traversal. Completion failures leave the run unfinished so apply can repeat completion. Map caches are refreshed by a later normal integration.
+After upserts, fill point-layer sampling fields as FMP does. Completion failures leave the run unfinished so apply can repeat completion. Materialized views and map caches are outside this tool: they may stay stale until maintained separately. Normal LIFT integration completion requests MV refreshes, but the inspected FMP path uses `CONCURRENTLY` too, so missing unique indexes can make that later refresh fail. Repair creates no view indexes and makes no promise that a later integration will refresh these views successfully.
 
 ## SQLite and roles
 

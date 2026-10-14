@@ -34,8 +34,8 @@ def map_row(payload, definition, max_date):
 
 
 class LiftTarget:
-    def __init__(self, db, metadata, definition):
-        self.db, self.metadata, self.d = db, metadata, definition
+    def __init__(self, db, definition):
+        self.db, self.d = db, definition
         self.table = sql.Identifier(definition.table)
         self.key = sql.Identifier(definition.key['target'])
         self.date = sql.Identifier(definition.date['target'])
@@ -102,13 +102,3 @@ class LiftTarget:
                             sql.Identifier(f'{self.d.table}_{column}_idx'), self.table, sql.Identifier(column)))
                 cur.execute(sql.SQL('UPDATE {} SET __mod=gid % 1000 WHERE __mod IS NULL').format(self.table))
             self.db.commit()
-        if not self.d.table_params.get('prevent_materialized_view_refresh'):
-            views = self.metadata.execute("""SELECT DISTINCT v.source_destination
-                FROM attribute_table_sources r JOIN attribute_table_sources v
-                  ON v.attribute_table_id=r.attribute_table_id
-                WHERE r.source_type='sql_related_table' AND r.source_destination=%s
-                  AND NOT r.is_archived AND v.source_type='sql_view' AND NOT v.is_archived
-                  AND v.source_destination IS NOT NULL""", (self.d.table,)).fetchall()
-            for (view,) in views:
-                self.db.execute(sql.SQL('REFRESH MATERIALIZED VIEW CONCURRENTLY {}').format(sql.Identifier(view)))
-                self.db.commit()

@@ -18,7 +18,7 @@ def definition():
     key = dict(api_name='KEY', target='key', field_type='plain-text-single-row', api_location=False)
     date = dict(api_name='CHANGED', target='changed', field_type='date-time', api_location=False)
     return SimpleNamespace(id='integration', cutoff=NEW, key=key, date=date, fields=[key, date],
-                           table='records', point_layer=False, table_params={}, key_value=lambda v: str(v))
+                           table='records', point_layer=False, key_value=lambda v: str(v))
 
 
 @pytest.mark.parametrize('source,target,result', [
@@ -121,7 +121,7 @@ def test_completion_failure_resumes_without_rewriting(tmp_path):
     store, target, d = RepairStore(tmp_path / 'repair.sqlite'), Target(), definition()
     run = prepare(d, Source(), target, store)
     def fail():
-        raise RuntimeError('Refresh failed')
+        raise RuntimeError('Completion failed')
     target.complete = fail
     with pytest.raises(RuntimeError):
         apply(run, d, Source(), target, store)
@@ -153,7 +153,7 @@ class Cursor:
 
 def test_target_retains_uuid_and_skips_newer():
     cursor = Cursor(('existing-uuid', datetime(2025, 1, 1, 12)))
-    target = LiftTarget(SimpleNamespace(cursor=lambda: cursor), None, definition())
+    target = LiftTarget(SimpleNamespace(cursor=lambda: cursor), definition())
     assert target.upsert(dict(KEY='001', CHANGED=NEW), NEW) is None
     assert cursor.calls[1][0].startswith('UPDATE "records" SET')
     assert cursor.calls[1][1][-1] == 'existing-uuid'
@@ -192,7 +192,7 @@ def test_source_inventory_validates_rows_beyond_cutoff():
 
 def test_definition_preserves_text_key_meaning():
     from definition import IntegrationDefinition
-    d = IntegrationDefinition('i', 't', 'q', OLD, [], {'field_type': 'plain-text-single-row'}, {}, None, {}, False)
+    d = IntegrationDefinition('i', 't', 'q', OLD, [], {'field_type': 'plain-text-single-row'}, {}, None, False)
     assert d.key_value('001') == '001'
     d.key['field_type'] = 'bigint'
     assert d.key_value(123) == 123
@@ -288,7 +288,7 @@ def test_reader_failure_leaves_run_unprepared(tmp_path):
 
 def test_target_lookup_rejects_duplicate_and_null_dates(definition):
     from conftest import Cursor as ExampleCursor, Database
-    target = LiftTarget(Database(ExampleCursor([(1, OLD), (1, OLD)])), None, definition)
+    target = LiftTarget(Database(ExampleCursor([(1, OLD), (1, OLD)])), definition)
     with pytest.raises(ValueError, match='Duplicate LIFT key'):
         target.lookup_pairs([1], NEW)
     target.db = Database(ExampleCursor([(1, None)]))

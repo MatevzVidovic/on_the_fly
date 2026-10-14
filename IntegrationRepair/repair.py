@@ -113,7 +113,7 @@ def main():
             oracledb.init_oracle_client(lib_dir=os.environ['KN_ORACLE_CLIENT_LIB_DIR'])
         oracle = connections.enter_context(oracledb.connect(user=os.environ['KN_ORACLE_USER'],
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
-        source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
+        source, target = OracleSource(oracle, definition), LiftTarget(destination, definition)
         if args.command == 'prepare':
             prepare(definition, source, target, store)
         else:

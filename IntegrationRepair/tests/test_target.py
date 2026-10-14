@@ -12,18 +12,17 @@ def test_map_row(definition):
 
 
 def test_init(definition):
-    db, metadata = Database(Cursor()), Database(Cursor())
+    db = Database(Cursor())
 
-    target = LiftTarget(db, metadata, definition)
+    target = LiftTarget(db, definition)
 
     assert target.db is db
-    assert target.metadata is metadata
     assert target.table.as_string() == '"records"'
 
 
 def test_count(definition):
     db = Database(Cursor([(1,)]))
-    target = LiftTarget(db, None, definition)
+    target = LiftTarget(db, definition)
 
     count = target.count(DATE)
 
@@ -32,7 +31,7 @@ def test_count(definition):
 
 
 def test_lookup_pairs(definition):
-    target = LiftTarget(Database(Cursor([(1, DATE)])), None, definition)
+    target = LiftTarget(Database(Cursor([(1, DATE)])), definition)
 
     dates = target.lookup_pairs([1], DATE)
 
@@ -42,7 +41,7 @@ def test_lookup_pairs(definition):
 
 def test_upsert(definition):
     cursor = Cursor([('target-uuid', '2025-01-01 12:00:00')])
-    target = LiftTarget(Database(cursor), None, definition)
+    target = LiftTarget(Database(cursor), definition)
 
     warning = target.upsert(dict(KEY=1, CHANGED=DATE), DATE)
 
@@ -54,7 +53,7 @@ def test_upsert(definition):
 
 def test_upsert_batch(definition):
     db = Database(Cursor())
-    target = LiftTarget(db, None, definition)
+    target = LiftTarget(db, definition)
 
     outcomes = target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE)
 
@@ -66,12 +65,10 @@ def test_upsert_batch(definition):
 def test_complete(definition):
     definition.point_layer = True
     db = Database(Cursor([('gid',), ('__mod',)]))
-    metadata = Database(Cursor([('related_view',)]))
-    target = LiftTarget(db, metadata, definition)
+    target = LiftTarget(db, definition)
 
     target.complete()
 
     queries = [query.as_string() for query, _ in db.example_cursor.calls[1:]]
-    assert queries == ['UPDATE "records" SET __mod=gid % 1000 WHERE __mod IS NULL',
-                       'REFRESH MATERIALIZED VIEW CONCURRENTLY "related_view"']
-    assert db.commits == 2
+    assert queries == ['UPDATE "records" SET __mod=gid % 1000 WHERE __mod IS NULL']
+    assert db.commits == 1

@@ -70,7 +70,7 @@ def definition():
     date = dict(api_name='CHANGED', target='changed', field_type='date-time', api_location=False,
                 api_id=False, api_last_sync_field=True)
     return IntegrationDefinition('integration', 'records', 'SELECT KEY, CHANGED FROM records',
-                                 DATE, [key, date], key, date, None, {}, False)
+                                 DATE, [key, date], key, date, None, False)
 
 
 @pytest.fixture

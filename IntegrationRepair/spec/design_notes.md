@@ -21,7 +21,7 @@ This document records decisions and supporting evidence from the design intervie
 - The normal integration's watermark and processing status are left untouched.
 - No separate audit-history writes are made. Target-row metadata follows FMP's system integration path: both timestamp fields use run `maxDate` and both user fields use the NIL UUID, including on updates. `maxDate` is the first apply-start timestamp stored on the run and reused on restarts.
 - Scalar NULL or missing source values are omitted from mapped payloads, matching FMP.
-- After apply, resolve and refresh dependent materialized views using FMP's metadata rules and perform the point-layer `__mod` fill.
+- After apply, perform the point-layer `__mod` fill. MV maintenance and index creation are outside the repair tool; later LIFT refresh requests can still fail if their prerequisites are unmet.
 - WKT mappings reproduce FMP's PostGIS parsing, source/destination SRID handling, and MULTI conversion after running the saved Oracle integration SQL.
 - Repair does not clear map caches. A later normal integration handles clearing; temporarily stale map displays are accepted until then.
 - Unsupported location transformations, payload decorators, and other custom hooks stop preparation with a clear explanation, except for behavior explicitly supported or deliberately deferred by this spec.
@@ -40,7 +40,7 @@ Primary implementation references: [integration payload handler](/Users/matevzvi
 - `applyFieldMapping()` normally omits null or missing remote values. Copying those values as SQL NULL would behave differently.
 - `BaseModelManager::upsert()` looks up an existing row by the mapped key, updates it by its target UUID, or generates a UUID v1 for a missing row unless the mapped payload supplies `id`.
 - `AttributeTableDataManager::save()` overwrites both audit-user fields with the current FMP user identity. System CLI integrations use the NIL UUID; user-triggered integrations can use their initiating user's UUID. Repair uses the NIL identity.
-- Geometry transformations, save decorators, and application events may add behavior beyond direct database writes. The spec supports WKT, point sampling fill, and direct materialized-view refresh; unknown behavior fails preparation and cache clearing is deferred.
+- Geometry transformations, save decorators, and application events may add behavior beyond direct database writes. The spec supports WKT and point sampling fill; MV maintenance and cache clearing are deferred, while unknown behavior fails preparation.
 - `ignore_audit=true` prevents separate audit database history writes; it does not suppress target-row metadata or other application event listeners.
 - Normal completion also fills point-map sampling metadata (`__mod`), refreshes dependent materialized views, and clears map caches. A Python tool bypasses these completion listeners unless it explicitly reproduces their effects.
 - WKT geometry handling has two stages: the saved Oracle SQL produces geometry text, then FMP's WKT handler builds a PostGIS expression using `ST_GeomFromText`, `ST_Transform`, and `ST_Multi` for MULTI targets. Running the saved Oracle SQL covers the first stage only.
