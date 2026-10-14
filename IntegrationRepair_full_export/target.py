@@ -41,11 +41,15 @@ class LiftTarget:
         self.key = sql.Identifier(definition.key['target'])
         self.date = sql.Identifier(definition.date['target'])
 
-    def inventory(self, cutoff):
+    def inventory(self, cutoff, after_key=None):
         with self.db.cursor(name='repair_inventory') as cur:
             cur.itersize = PAGE_SIZE
-            cur.execute(sql.SQL('SELECT id, {}, {} FROM {} ORDER BY {}').format(
-                self.key, self.date, self.table, self.key))
+            query = sql.SQL('SELECT id, {}, {} FROM {}').format(self.key, self.date, self.table)
+            if after_key is not None:
+                query += sql.SQL(' WHERE {} >= %s').format(self.key)
+                cur.execute(query + sql.SQL(' ORDER BY {}').format(self.key), (after_key,))
+            else:
+                cur.execute(query + sql.SQL(' ORDER BY {}').format(self.key))
             previous = None
             while rows := cur.fetchmany(PAGE_SIZE):
                 page = []
@@ -54,6 +58,8 @@ class LiftTarget:
                     if key == previous:
                         raise ValueError(f'Duplicate LIFT key: {key}')
                     previous = key
+                    if key == after_key:
+                        continue
                     if date <= cutoff:
                         page.append((str(target_id), key, date))
                 yield page

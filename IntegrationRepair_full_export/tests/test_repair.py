@@ -87,3 +87,39 @@ def test_main_prepare_requires_integration_id(monkeypatch):
     with pytest.raises(SystemExit) as error:
         repair.main()
     assert error.value.code == 2
+
+
+def test_main_only_source_then_resume_without_integration_id(definition, tmp_path, monkeypatch):
+    path = tmp_path / 'source-only.sqlite'
+    monkeypatch.setattr(repair, 'load_dotenv', lambda path: None)
+    for name in ('PG_HOST', 'PG_PORT', 'PG_USER', 'PG_PASSWORD', 'PG_DATABASE_SYSTEM',
+                 'KN_ORACLE_USER', 'KN_ORACLE_PASSWORD', 'KN_ORACLE_DSN'):
+        monkeypatch.setenv(name, 'example')
+    monkeypatch.delenv('PG_DATABASE_DATA', raising=False)
+    monkeypatch.delenv('KN_ORACLE_CLIENT_LIB_DIR', raising=False)
+    monkeypatch.setattr(repair.IntegrationDefinition, 'load', lambda db, integration_id: definition)
+    calls = []
+    def connect(**settings):
+        calls.append(settings)
+        return Database(Cursor())
+    monkeypatch.setattr(repair.psycopg, 'connect', connect)
+    monkeypatch.setattr(repair.oracledb, 'connect', lambda **settings: Database(Cursor([(1, DATE)])))
+    monkeypatch.setattr(sys, 'argv', ['repair.py', '--store', str(path), 'prepare', 'integration', '--only-src'])
+    repair.main()
+    assert len(calls) == 1  # Metadata only; no LIFT data connection.
+    with sqlite3.connect(path) as db:
+        run_id, source_complete, prepared = db.execute('SELECT id,source_complete,prepared FROM integration_transfer').fetchone()
+        assert source_complete == 1 and prepared == 0
+    monkeypatch.setenv('PG_DATABASE_DATA', 'data')
+    monkeypatch.setattr(sys, 'argv', ['repair.py', '--store', str(path), 'prepare', '--resume', run_id])
+    repair.main()
+    with sqlite3.connect(path) as db:
+        assert db.execute('SELECT count(*),prepared FROM integration_transfer').fetchone() == (1, 1)
+
+
+def test_main_apply_rejects_prepare_flags(monkeypatch):
+    import pytest
+    monkeypatch.setattr(sys, 'argv', ['repair.py', 'apply', '--only-src'])
+    with pytest.raises(SystemExit) as error:
+        repair.main()
+    assert error.value.code == 2

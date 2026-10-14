@@ -44,11 +44,17 @@ class OracleSource:
                                   oracledb.DB_TYPE_TIMESTAMP_TZ, oracledb.DB_TYPE_TIMESTAMP_LTZ):
             return cursor.var(oracledb.DB_TYPE_VARCHAR, size=80, arraysize=cursor.arraysize)
 
-    def inventory(self, cutoff):
+    def inventory(self, cutoff, after_key=None):
         # Scan all pairs so NULLs and duplicate keys cannot hide beyond the cutoff.
         with self.db.cursor() as cur:
             cur.arraysize = PAGE_SIZE
-            cur.execute(f'SELECT {self.key}, {self.date} FROM ({self.d.query}) ORDER BY {self.key}')
+            query = f'SELECT {self.key}, {self.date} FROM ({self.d.query})'
+            if after_key is not None:
+                # Include the boundary to detect duplicate keys across a restart.
+                query += f' WHERE {self.key} >= :after_key'
+                cur.execute(query + f' ORDER BY {self.key}', {'after_key': after_key})
+            else:
+                cur.execute(query + f' ORDER BY {self.key}')
             previous = None
             while rows := cur.fetchmany(PAGE_SIZE):
                 page = []
@@ -57,6 +63,8 @@ class OracleSource:
                     if key == previous:
                         raise ValueError(f'Duplicate Oracle key: {key}')
                     previous = key
+                    if key == after_key:
+                        continue
                     if cutoff is None or date <= cutoff:
                         page.append((key, date))
                 yield page

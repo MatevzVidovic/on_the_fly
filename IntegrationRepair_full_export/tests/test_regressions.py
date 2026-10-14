@@ -54,7 +54,7 @@ def test_mapping_nulls_geometry_and_metadata():
 
 
 class Source:
-    def inventory(self, cutoff):
+    def inventory(self, cutoff, after_key=None):
         yield [('same', OLD), ('old', NEW), ('ahead', OLD), ('missing', OLD)]
 
     def fetch_payloads(self, keys):
@@ -69,7 +69,7 @@ class Target:
         self.writes, self.deletes, self.commits = {}, set(), 0
         self.completed = False
 
-    def inventory(self, cutoff):
+    def inventory(self, cutoff, after_key=None):
         yield [('id-same', 'same', OLD), ('id-old', 'old', OLD),
                ('id-ahead', 'ahead', NEW), ('id-remove', 'remove', OLD)]
 

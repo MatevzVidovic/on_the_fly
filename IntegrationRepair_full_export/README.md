@@ -30,7 +30,7 @@ Existing SQLite files gain these columns automatically on opening; counts are
 filled for old prepared runs, while unavailable historical creation times and
 table names remain NULL.
 
-All warnings are printed with the business key. Apply warnings also remain on addition entries. Skips are terminal for this run. Rerun the same apply command after an execution failure; committed but unmarked batches safely replay. Failed prepare runs remain unprepared: start a fresh prepare instead.
+All warnings are printed with the business key. Apply warnings also remain on addition entries. Skips are terminal for this run. Rerun the same apply command after an execution failure; committed but unmarked batches safely replay. Failed prepare runs remain unprepared: use `prepare --resume RUN_UUID` to continue committed progress.
 
 ## Where each role lives
 
@@ -88,5 +88,53 @@ Timed commands for the verified integrations are in [RUN_COMMANDS.md](RUN_COMMAN
 repair UUID still selects that run. If the newest run is unprepared, apply refuses;
 it does not select an older run. Applied runs are reported without repeating writes.
 
-Apply resumes committed progress after failure. Prepare always starts a fresh run;
-interrupted preparation does not resume.
+Apply resumes committed progress after failure. Prepare with an integration UUID starts a new run; `prepare --resume RUN_UUID` continues an existing run.
+
+## Resumable prepare and source-only export
+
+Fetch only Oracle keys/dates (no LIFT data connection, comparisons, or target writes):
+
+```sh
+.venv/bin/python repair.py --store full-ev-parcela.sqlite prepare c469d91a-ae56-11f0-84be-169cd02558fe --only-src
+```
+
+Resume an interrupted Oracle export, still stopping before LIFT:
+
+```sh
+.venv/bin/python repair.py --store full-ev-parcela.sqlite prepare --resume RUN_UUID --only-src
+```
+
+Continue the same run through LIFT comparison and final diff construction:
+
+```sh
+.venv/bin/python repair.py --store full-ev-parcela.sqlite prepare --resume RUN_UUID
+.venv/bin/python repair.py --store full-ev-parcela.sqlite apply
+```
+
+Each Oracle batch commits with `source_last_key` and `source_count`. After the
+cursor finishes, `source_complete=1` is committed. Each eligible LIFT page commits
+its diffs, seen flags, warnings, `target_last_key`, and `target_count` together.
+Resume seeks to the saved native key (numeric or text) in database ordering. The
+boundary key is read again only to detect duplicates, then skipped. Rows after the
+LIFT cutoff are still validated, but do not advance the eligible-row checkpoint.
+
+`--only-src` leaves `prepared=0`; apply refuses until LIFT comparison finishes.
+A completed source stage is reused without fetching its inventory again. The
+original cutoff remains fixed even if the metadata watermark has advanced.
+A prepared run is reported without repeating preparation.
+
+Keep integration SQL/mappings unchanged and normal integrations writing the target
+stopped through prepare and apply. Oracle resume opens a new query snapshot: changes
+or new keys below the checkpoint are not revisited. This is the accepted key-based
+resume behavior, not a historical snapshot guarantee. It can affect deletion
+membership; start a fresh run when you need a fresh complete inventory.
+
+For legacy runs without checkpoints, saved comparison progress proves Oracle
+export finished. Resume keeps that export, clears partial comparisons, resets seen
+flags, and starts LIFT comparison from the beginning. With no such evidence, resume
+clears the partial Oracle inventory and restarts source acquisition. These resets
+can take time for large inventories. Existing prepared plans are not rebuilt.
+
+Close SQLite viewers with open transactions before restarting; checkpointing
+allows recovery from a lock failure but does not prevent another reader blocking
+SQLite commits. Only run one prepare/apply process against a given run at a time.

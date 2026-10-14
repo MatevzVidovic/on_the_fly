@@ -36,7 +36,7 @@ The cutoff defines a boundary on the current query result; it is not an Oracle h
 
 Stop preparation with a clear error for missing or ambiguous key/change-time mappings, a missing watermark, duplicate keys, or NULL keys/change times. NULL values must not disappear silently through the cutoff predicate. Stop for unsupported location transformations, payload decorators, or custom hooks beyond the behavior explicitly supported or deliberately deferred here.
 
-Inventory reads are streamed with bounded memory. Apply must refuse an unfinished preparation. There is no requirement to resume preparation after a failure; a fresh preparation creates a fresh run.
+Inventory reads are streamed with bounded memory. Apply must refuse an unfinished preparation. Preparation resumes by explicit repair UUID. Commit each Oracle batch together with its last native key and row count; record source completion separately. Commit each LIFT comparison page together with its last eligible native key, row count, differences, seen flags, and warnings. Reuse completed source acquisition and preserve the original cutoff. Resume key-ordered scans from the checkpoint; it is accepted that restarting Oracle opens a new snapshot and will not revisit changes below the checkpoint. New preparations still create fresh runs. `--only-src` stops after Oracle export, with preparation unfinished until the LIFT stage runs.
 
 ## Apply
 

@@ -45,3 +45,17 @@ speed. This copy also writes the entire Oracle inventory to SQLite during prepar
 
 After a failure, rerun the same apply command to resume. MVs and map displays can
 remain stale until the normal integration runs; this tool does not refresh them.
+
+## Resume the failed EV parcela prepare
+
+This legacy run has a completed Oracle export, so its first resume reuses Oracle
+and restarts LIFT comparison. Further interruptions use the new page checkpoints.
+Close the SQLite viewer before running:
+
+```sh
+time .venv/bin/python repair.py --store full-ev-parcela.sqlite prepare --resume f367fe38-f811-4d32-ab08-7ccc694f6955
+```
+
+For any new source-only export, append `--only-src` to prepare. Resume it with
+`prepare --resume RUN_UUID --only-src` to finish only Oracle, or omit `--only-src`
+to also compare LIFT and finish preparation. Apply still defaults to the latest run.

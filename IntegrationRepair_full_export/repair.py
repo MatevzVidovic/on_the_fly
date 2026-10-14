@@ -17,14 +17,30 @@ from store import RepairStore
 from target import LiftTarget
 
 
-def prepare(definition, source, target, store):
-    cutoff = wall_time(definition.cutoff)
-    run_id = store.create_run(definition.id, cutoff, definition.table)
+def prepare(definition, source, target, store, run_id=None, only_src=False):
+    if run_id is None:
+        run_id = store.create_run(definition.id, wall_time(definition.cutoff), definition.table)
+    run = store.resume_preparation(run_id)
+    if run['integration_id'] != definition.id or run['attribute_table_name'] != definition.table:
+        raise ValueError('Resume requires the same integration and target table')
+    if run['prepared']:
+        store.summary(run_id)
+        return run_id
+    cutoff = run['cutoff']
     print(f'Preparing run {run_id}, cutoff {cutoff}', flush=True)
-    # Keep newer source keys too: being outside cutoff does not mean deleted.
-    for page in source.inventory(None):
-        store.save_source(run_id, page)
-    for page in target.inventory(cutoff):
+    if not run['source_complete']:
+        last_key = json.loads(run['source_last_key']) if run['source_last_key'] is not None else None
+        # Keep newer source keys too: being outside cutoff does not mean deleted.
+        for page in source.inventory(None, after_key=last_key):
+            store.save_source(run_id, page)
+        store.finish_source(run_id)
+        run = store.resume_preparation(run_id)
+    print(f"Oracle export complete: {run['source_count']:,} rows for run {run_id}", flush=True)
+    if only_src:
+        print('Stopped after Oracle export; resume without --only-src to compare LIFT', flush=True)
+        return run_id
+    last_key = json.loads(run['target_last_key']) if run['target_last_key'] is not None else None
+    for page in target.inventory(cutoff, after_key=last_key):
         for key, warning in store.compare_target_page(run_id, page):
             print(f'Warning key={key}: {warning}', flush=True)
     store.finish_preparation(run_id)
@@ -71,11 +87,17 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env', default='.env')
     parser.add_argument('--store', default='repair.sqlite')
+    parser.add_argument('--resume', metavar='RUN_UUID', help='resume preparation of this saved run')
+    parser.add_argument('--only-src', action='store_true', help='prepare only the Oracle inventory')
     parser.add_argument('command', choices=('prepare', 'apply'))
     parser.add_argument('id', nargs='?', help='integration UUID for prepare; repair UUID for apply (default: latest run)')
     args = parser.parse_args()
-    if args.command == 'prepare' and args.id is None:
-        parser.error('prepare requires an integration UUID')
+    if args.command == 'prepare' and args.id is None and args.resume is None:
+        parser.error('prepare requires an integration UUID or --resume RUN_UUID')
+    if args.command == 'apply' and (args.resume or args.only_src):
+        parser.error('--resume and --only-src are prepare options')
+    if args.resume and args.id:
+        parser.error('use an integration UUID for a new prepare, or --resume RUN_UUID')
     load_dotenv(args.env)
     store = RepairStore(args.store)
     if args.command == 'apply' and args.id is None:
@@ -87,6 +109,16 @@ def main():
         args.id = latest['id']
         print(f'Using latest run {args.id}', flush=True)
     integration_id = args.id
+    if args.resume:
+        run = store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (args.resume,)).fetchone()
+        if run is None:
+            store.db.close()
+            parser.error('repair run not found in this SQLite store')
+        if run['prepared']:
+            store.summary(args.resume)
+            store.db.close()
+            return
+        integration_id = run['integration_id']
     if args.command == 'apply':
         run = store.require_prepared_run(args.id)
         if run['applied']:
@@ -100,14 +132,16 @@ def main():
         connections.callback(store.db.close)
         metadata = connections.enter_context(psycopg.connect(**pg, dbname=os.environ['PG_DATABASE_SYSTEM'], autocommit=True))
         definition = IntegrationDefinition.load(metadata, integration_id)
-        destination = connections.enter_context(psycopg.connect(**pg, dbname=os.environ['PG_DATABASE_DATA']))
+        destination = None
+        if not args.only_src:
+            destination = connections.enter_context(psycopg.connect(**pg, dbname=os.environ['PG_DATABASE_DATA']))
         if os.environ.get('KN_ORACLE_CLIENT_LIB_DIR'):
             oracledb.init_oracle_client(lib_dir=os.environ['KN_ORACLE_CLIENT_LIB_DIR'])
         oracle = connections.enter_context(oracledb.connect(user=os.environ['KN_ORACLE_USER'],
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
         source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
         if args.command == 'prepare':
-            prepare(definition, source, target, store)
+            prepare(definition, source, target, store, args.resume, args.only_src)
         else:
             apply(args.id, definition, source, target, store)
 

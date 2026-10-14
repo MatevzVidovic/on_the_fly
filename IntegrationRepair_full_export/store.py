@@ -46,7 +46,10 @@ class RepairStore:
         columns = {row['name'] for row in self.db.execute('PRAGMA table_info(integration_transfer)')}
         with self.db:
             for name, kind in (('created_at', 'TEXT'), ('attribute_table_name', 'TEXT'),
-                               ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER'), ('user_id', 'TEXT')):
+                               ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER'), ('user_id', 'TEXT'),
+                               ('source_complete', 'INTEGER'), ('source_last_key', 'TEXT'),
+                               ('target_last_key', 'TEXT'), ('source_count', 'INTEGER NOT NULL DEFAULT 0'),
+                               ('target_count', 'INTEGER NOT NULL DEFAULT 0')):
                 if name not in columns:
                     self.db.execute(f'ALTER TABLE integration_transfer ADD COLUMN {name} {kind}')
             if 'upsert_count' not in columns or 'delete_count' not in columns:
@@ -60,7 +63,7 @@ class RepairStore:
         created_at = datetime.now(timezone.utc).isoformat(timespec='microseconds')
         with self.db:
             self.db.execute('''INSERT INTO integration_transfer
-                (id,integration_id,cutoff,created_at,attribute_table_name,user_id) VALUES (?,?,?,?,?,?)''',
+                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete) VALUES (?,?,?,?,?,?,0)''',
                 (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID))
         return run_id
 
@@ -70,10 +73,47 @@ class RepairStore:
             raise ValueError('Apply requires a prepared run')
         return run
 
+    def resume_preparation(self, run_id):
+        run = self.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+        if run is None:
+            raise ValueError('Repair run not found')
+        if run['prepared']:
+            return run
+        # Old runs have no checkpoints. Comparison proves their source export finished.
+        if run['source_complete'] is None:
+            compared = self.db.execute('''SELECT 1 FROM remote_ids_and_date_changed
+                WHERE run_id=? AND seen=1 LIMIT 1''', (run_id,)).fetchone()
+            if compared is None:
+                compared = self.db.execute('''SELECT 1 FROM addition_diff WHERE run_id=?
+                    UNION ALL SELECT 1 FROM removal_diff WHERE run_id=? LIMIT 1''', (run_id, run_id)).fetchone()
+            with self.db:
+                self.db.execute('DELETE FROM addition_diff WHERE run_id=?', (run_id,))
+                self.db.execute('DELETE FROM removal_diff WHERE run_id=?', (run_id,))
+                if compared:
+                    self.db.execute('UPDATE remote_ids_and_date_changed SET seen=0 WHERE run_id=? AND seen=1', (run_id,))
+                else:
+                    self.db.execute('DELETE FROM remote_ids_and_date_changed WHERE run_id=?', (run_id,))
+                self.db.execute('''UPDATE integration_transfer SET source_complete=?, warnings=0,
+                    source_last_key=NULL, target_last_key=NULL, target_count=0,
+                    source_count=(SELECT count(*) FROM remote_ids_and_date_changed WHERE run_id=?)
+                    WHERE id=?''', (int(bool(compared)), run_id, run_id))
+            print('Legacy run: keeping complete Oracle export; restarting LIFT comparison' if compared
+                  else 'Legacy run: restarting Oracle export (no saved checkpoint)', flush=True)
+            run = self.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+        return run
+
     def save_source(self, run_id, page):
         with self.db:
             self.db.executemany('INSERT INTO remote_ids_and_date_changed(run_id,key,date) VALUES (?,?,?)',
                                 [(run_id, json.dumps(key), date) for key, date in page])
+            if page:
+                self.db.execute('''UPDATE integration_transfer
+                    SET source_last_key=?, source_count=source_count+? WHERE id=?''',
+                    (json.dumps(page[-1][0]), len(page), run_id))
+
+    def finish_source(self, run_id):
+        with self.db:
+            self.db.execute('UPDATE integration_transfer SET source_complete=1 WHERE id=?', (run_id,))
 
     def compare_target_page(self, run_id, page):
         warnings = []
@@ -101,6 +141,10 @@ class RepairStore:
                     warnings.append((key, f'LIFT {date} is newer than Oracle {source_date}'))
             self.db.execute('UPDATE integration_transfer SET warnings=warnings+? WHERE id=?',
                             (len(warnings), run_id))
+            if page:
+                self.db.execute('''UPDATE integration_transfer
+                    SET target_last_key=?, target_count=target_count+? WHERE id=?''',
+                    (json.dumps(page[-1][1]), len(page), run_id))
         return warnings
 
     def finish_preparation(self, run_id):
