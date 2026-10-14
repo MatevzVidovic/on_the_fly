@@ -166,3 +166,29 @@ runs a real apply.
 
 The recorded EV parcela apply still has all 28,621 entries pending and zero
 processed after these read-only trials.
+
+## Matched commit/RAM experiments and the full report
+
+[Full speed report](reports/speed_report.md) and [short visual HTML](reports/speed_report.html)
+include the matched SQLite/file-DuckDB/RAM-snapshot trials, failure/reload checks,
+large-table prerequisites and conditional runtime scenarios.
+
+`storage_trials.py` reads a bounded cached text-key sample once and reuses it for
+local-only trials. It compares current row lookups and order-independent bulk
+matching without persisting the entire target table. Commit frequency and batch
+size are controlled separately; conversion, final commit and snapshot costs are
+included. The experiment is not a replacement `RepairStore` implementation.
+
+```sh
+# Explicit read-only acquisition once (100k source keys and matching target rows):
+.venv/bin/python storage_trials.py --capture --sizes 10000 100000 --repeats 3
+# Subsequent runs use only cached local data:
+.venv/bin/python storage_trials.py --sizes 10000 100000 --repeats 3 --ingestion csv
+.venv/bin/python storage_trials.py --sizes 100000 --batch-size 100000 --repeats 3 --ingestion csv
+```
+
+Raw `*-storage.json`, `ram-end-commit.json`, `storage_summary.json`,
+`storage_trials.csv` and `recovery-tests.json` retain the new evidence. A RAM
+transaction commit is not a disk snapshot. A healthy transaction may be committed
+after a caught external fetch error; a SQL rollback discards its transaction.
+Abrupt exit cannot run a RAM export handler. These cases were tested locally.

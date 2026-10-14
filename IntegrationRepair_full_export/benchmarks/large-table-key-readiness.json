@@ -1,0 +1,64 @@
+[
+  {
+    "table": "ev_parc_pripis_podatki_h",
+    "integration_id": "5b3da3c2-9357-11f1-a60a-02420a000208",
+    "oracle_table": "EV.PARC_PRIPIS_PODATKI",
+    "primary_key": [
+      "ID"
+    ],
+    "needed_columns": [
+      "ID"
+    ],
+    "missing_output_columns": [
+      "ID"
+    ],
+    "configured": false
+  },
+  {
+    "table": "ev_parc_enota_h_2025_danes",
+    "integration_id": "1e57d002-f69c-11f0-9f2c-02420a000266",
+    "oracle_table": "EV.JN_PARC_ENOTA",
+    "primary_key": [
+      "ID_PARC_ENOTA",
+      "JN_REV_NUM"
+    ],
+    "needed_columns": [
+      "ID_PARC_ENOTA",
+      "JN_REV_NUM"
+    ],
+    "missing_output_columns": [
+      "JN_REV_NUM"
+    ],
+    "configured": false
+  },
+  {
+    "table": "ev_stavba_h",
+    "integration_id": "39aa410c-beff-11f0-a601-5212cffe39ac",
+    "oracle_table": "EV.JN_STAVBA",
+    "primary_key": [
+      "STA_SID",
+      "JN_REV_NUM"
+    ],
+    "needed_columns": [
+      "STA_SID",
+      "JN_REV_NUM"
+    ],
+    "missing_output_columns": [],
+    "configured": false
+  },
+  {
+    "table": "ev_parc_del_h",
+    "integration_id": "8a9ed9a4-ae58-11f0-9f8c-169cd02558fe",
+    "oracle_table": "EV.JN_PARC_DEL",
+    "primary_key": [
+      "ID_PARC_DEL",
+      "JN_REV_NUM"
+    ],
+    "needed_columns": [
+      "ID_PARC_DEL",
+      "JN_REV_NUM"
+    ],
+    "missing_output_columns": [],
+    "configured": false
+  }
+]

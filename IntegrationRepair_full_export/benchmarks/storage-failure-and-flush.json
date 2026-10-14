@@ -1,0 +1,110 @@
+{
+  "failure_tests": [
+    {
+      "mode": "file_one_transaction",
+      "persisted_keys": []
+    },
+    {
+      "mode": "ram_page_transactions",
+      "persisted_keys": [
+        1,
+        2
+      ]
+    },
+    {
+      "mode": "reload_ram_snapshot_and_continue",
+      "persisted_keys": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "mode": "abrupt_process_exit",
+      "exit_code": 23,
+      "snapshot_created": false
+    }
+  ],
+  "durability_spot_checks": [
+    {
+      "engine": "sqlite",
+      "algorithm": "row_loop",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "executemany",
+      "source_seconds": 0.045869666999351466,
+      "compare_seconds": 0.1682497500005411,
+      "file_bytes_before_final_commit": 24576,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.0070306669986166526,
+      "snapshot_seconds": 0,
+      "total_seconds": 0.2216979579970939,
+      "file_bytes": 8290304,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      }
+    },
+    {
+      "engine": "duckdb",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.21078283300084877,
+      "compare_seconds": 0.4480429590003041,
+      "file_bytes_before_final_commit": 12288,
+      "wal_bytes_before_final_commit": 577,
+      "final_commit_seconds": 0.029527416998462286,
+      "engine_memory_after_compare_bytes": 19167232,
+      "snapshot_seconds": 0,
+      "total_seconds": 0.713517915999546,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      }
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.24000149999847054,
+      "compare_seconds": 0.5743280409988074,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 9.574999785399996e-05,
+      "engine_memory_after_compare_bytes": 31854592,
+      "snapshot_seconds": 0.07709562500167522,
+      "total_seconds": 0.8936534999993455,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      }
+    }
+  ]
+}

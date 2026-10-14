@@ -1,0 +1,286 @@
+{
+  "trials": [
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 10000,
+      "target_rows": 9994,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.022336707999784267,
+      "compare_seconds": 0.03409924999868963,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.007661791998543777,
+      "engine_memory_after_compare_bytes": 6946816,
+      "snapshot_seconds": 0.010631125001964392,
+      "total_seconds": 0.07582658300088951,
+      "file_bytes": 2109440,
+      "reopened_source_rows": 10000,
+      "reopened_prepared": true,
+      "signature_sha256": "04e94102a64b4d7ca1c26599872241b632b916445a0d9542f150b9fc38c1fb70",
+      "diff_counts": {
+        "insert": 1,
+        "update": 2,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 1
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 10000,
+      "target_rows": 9994,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.021723624999140156,
+      "compare_seconds": 0.03314304100058507,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.007416666001518024,
+      "engine_memory_after_compare_bytes": 6946816,
+      "snapshot_seconds": 0.010593791001156205,
+      "total_seconds": 0.07388374999936786,
+      "file_bytes": 2109440,
+      "reopened_source_rows": 10000,
+      "reopened_prepared": true,
+      "signature_sha256": "04e94102a64b4d7ca1c26599872241b632b916445a0d9542f150b9fc38c1fb70",
+      "diff_counts": {
+        "insert": 1,
+        "update": 2,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 2
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 10000,
+      "target_rows": 9994,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.021573416001047008,
+      "compare_seconds": 0.03349745800005621,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.0076177919982001185,
+      "engine_memory_after_compare_bytes": 6946816,
+      "snapshot_seconds": 0.010861583999940194,
+      "total_seconds": 0.07460770800025784,
+      "file_bytes": 2109440,
+      "reopened_source_rows": 10000,
+      "reopened_prepared": true,
+      "signature_sha256": "04e94102a64b4d7ca1c26599872241b632b916445a0d9542f150b9fc38c1fb70",
+      "diff_counts": {
+        "insert": 1,
+        "update": 2,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 3
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.20852758299952256,
+      "compare_seconds": 0.45010820800234796,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.025891583998600254,
+      "engine_memory_after_compare_bytes": 19167232,
+      "snapshot_seconds": 0.07467495899982168,
+      "total_seconds": 0.7613653330008674,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 1
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.21117945899823098,
+      "compare_seconds": 0.4520162920016446,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.026602833000652026,
+      "engine_memory_after_compare_bytes": 19167232,
+      "snapshot_seconds": 0.07649029200183577,
+      "total_seconds": 0.7685505829977046,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 2
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 10000,
+      "ingestion": "csv",
+      "source_seconds": 0.21256416699907277,
+      "compare_seconds": 0.45264529199994286,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.026021833000413608,
+      "engine_memory_after_compare_bytes": 19167232,
+      "snapshot_seconds": 0.0759774580001249,
+      "total_seconds": 0.7695889580027142,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 3
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 100000,
+      "ingestion": "csv",
+      "source_seconds": 0.08882087500023772,
+      "compare_seconds": 0.16782154099928448,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.07615262500257813,
+      "engine_memory_after_compare_bytes": 40239104,
+      "snapshot_seconds": 0.07663379199948395,
+      "total_seconds": 0.41201675000047544,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 1
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 100000,
+      "ingestion": "csv",
+      "source_seconds": 0.0852649169974029,
+      "compare_seconds": 0.1704572080016078,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.07884783299959963,
+      "engine_memory_after_compare_bytes": 40239104,
+      "snapshot_seconds": 0.07773166699917056,
+      "total_seconds": 0.41501174999939394,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 2
+    },
+    {
+      "engine": "ram",
+      "algorithm": "bulk",
+      "commit_rows": 0,
+      "source_rows": 100000,
+      "target_rows": 99910,
+      "batch_rows": 100000,
+      "ingestion": "csv",
+      "source_seconds": 0.08717316699767252,
+      "compare_seconds": 0.1725979170005303,
+      "file_bytes_before_final_commit": 0,
+      "wal_bytes_before_final_commit": 0,
+      "final_commit_seconds": 0.07762899999943329,
+      "engine_memory_after_compare_bytes": 40239104,
+      "snapshot_seconds": 0.07558366699959151,
+      "total_seconds": 0.4155866250002873,
+      "file_bytes": 7876608,
+      "reopened_source_rows": 100000,
+      "reopened_prepared": true,
+      "signature_sha256": "3d415c835f0622ceaf8b504309e826c5f3e836a6450625991e6482423468ff33",
+      "diff_counts": {
+        "insert": 52,
+        "update": 42,
+        "remove": 0,
+        "ahead": 0
+      },
+      "repeat": 3
+    }
+  ],
+  "failure_tests": [
+    {
+      "mode": "file_one_transaction",
+      "persisted_keys": []
+    },
+    {
+      "mode": "ram_page_transactions",
+      "persisted_keys": [
+        1,
+        2
+      ]
+    },
+    {
+      "mode": "ram_one_transaction",
+      "persisted_keys": []
+    },
+    {
+      "mode": "reload_ram_snapshot_and_continue",
+      "persisted_keys": [
+        1,
+        2,
+        3
+      ]
+    },
+    {
+      "mode": "abrupt_process_exit",
+      "exit_code": 23,
+      "snapshot_created": false
+    }
+  ]
+}

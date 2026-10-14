@@ -1,0 +1,44 @@
+[
+  {
+    "mode": "file_one_transaction",
+    "persisted_keys": []
+  },
+  {
+    "mode": "ram_page_transactions",
+    "persisted_keys": [
+      1,
+      2
+    ]
+  },
+  {
+    "mode": "ram_one_transaction",
+    "persisted_keys": []
+  },
+  {
+    "mode": "reload_ram_snapshot_and_continue",
+    "persisted_keys": [
+      1,
+      2,
+      3
+    ]
+  },
+  {
+    "mode": "controlled_fetch_failure_commit_healthy_transaction",
+    "persisted_keys": [
+      1,
+      2
+    ]
+  },
+  {
+    "mode": "abrupt_process_exit",
+    "exit_code": 23,
+    "snapshot_created": false
+  },
+  {
+    "mode": "abrupt_exit_with_previous_file_commit",
+    "persisted_keys": [
+      1,
+      2
+    ]
+  }
+]

@@ -155,3 +155,7 @@ Raw benchmark reports, `benchmarks/trials.csv`, `benchmarks/scale_summary.json` 
 `benchmarks/session_notes.json` retain timings, scale, correctness checks and
 implementation status for a later impact report. Remote tests run sequentially
 and use read-only transactions; local DuckDB/SQLite trials use disposable files.
+
+The matched SQLite/DuckDB/RAM commit experiments and conditional large-table
+runtime estimates are in [reports/speed_report.md](reports/speed_report.md),
+with a [short interactive HTML report](reports/speed_report.html).

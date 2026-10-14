@@ -1,0 +1,91 @@
+{
+  "model": {
+    "fast_seconds_per_1000": 1.7870000000000001,
+    "slow_seconds_per_1000": 9.919,
+    "central_seconds_per_1000": 3.65,
+    "write_budget_ms_fast": 1,
+    "write_budget_ms_slow": 5,
+    "prepare_seconds_per_million": [
+      15,
+      19
+    ]
+  },
+  "tables": [
+    {
+      "table": "ev_parc_enota_h_2025_danes",
+      "source_rows": 25948560,
+      "upserts": 847269,
+      "prepare_min": [
+        6.48714,
+        8.217044
+      ],
+      "apply_min": [
+        25.234495050000003,
+        140.06768685000003
+      ],
+      "central_total_min": 58.8942895,
+      "config_state": "Needs revision output column + mapping"
+    },
+    {
+      "table": "ev_stavba_h",
+      "source_rows": 3189514,
+      "upserts": 679160,
+      "prepare_min": [
+        0.7973785,
+        1.0100127666666667
+      ],
+      "apply_min": [
+        20.22764866666667,
+        112.27646733333333
+      ],
+      "central_total_min": 42.219262300000004,
+      "config_state": "Needs mapping + payload check"
+    },
+    {
+      "table": "ev_parc_del_h",
+      "source_rows": 16883929,
+      "upserts": 647361,
+      "prepare_min": [
+        4.22098225,
+        5.346577516666667
+      ],
+      "apply_min": [
+        19.28056845,
+        107.01956265000001
+      ],
+      "central_total_min": 44.16490738333333,
+      "config_state": "Needs mapping + payload check"
+    },
+    {
+      "table": "ev_parc_pripis_podatki_h",
+      "source_rows": 8822728,
+      "upserts": 170570,
+      "prepare_min": [
+        2.205682,
+        2.793863866666667
+      ],
+      "apply_min": [
+        5.080143166666667,
+        28.198063833333336
+      ],
+      "central_total_min": 12.876114600000001,
+      "config_state": "Direct numeric key; payload unmeasured"
+    },
+    {
+      "table": "ev_parcela_h",
+      "source_rows": 26515869,
+      "upserts": 28621,
+      "prepare_min": [
+        6.62896725,
+        8.39669185
+      ],
+      "apply_min": [
+        0.8524287833333334,
+        4.731528316666667
+      ],
+      "central_total_min": 9.253940383333333,
+      "config_state": "Configured; write speed unmeasured"
+    }
+  ],
+  "warning": "Planning scenarios, not measured write throughput. Other composite-key fast paths are not configured."
+}
