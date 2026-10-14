@@ -1,6 +1,10 @@
 """Read the existing LIFT integration; no repair state lives here."""
 from dataclasses import dataclass
+import json
+from pathlib import Path
 from psycopg.rows import dict_row
+
+ORACLE_KEYS_PATH = Path(__file__).with_name('oracle_keys.json')
 
 REPAIR_USER_ID = '955ee6d4-d98e-11f0-bd04-de28270b37c5'
 
@@ -17,6 +21,7 @@ class IntegrationDefinition:
     geometry: dict | None
     table_params: dict
     point_layer: bool
+    oracle_key: dict | None = None
 
     @classmethod
     def load(cls, db, integration_id):
@@ -60,7 +65,8 @@ class IntegrationDefinition:
                 raise ValueError('Custom table hooks are unsupported')
         return cls(str(row['id']), row['table_name'], row['url'].strip().rstrip(';'),
                    row['last_changed_datetime'], fields, keys[0], dates[0],
-                   locations[0] if locations else None, table_params, row['point_layer'])
+                   locations[0] if locations else None, table_params, row['point_layer'],
+                   json.loads(ORACLE_KEYS_PATH.read_text()).get(str(row['id'])))
 
     def key_value(self, value):
         if value is None:

@@ -69,20 +69,38 @@ class OracleSource:
                         page.append((key, date))
                 yield page
 
-    def fetch_payloads(self, keys):
+    def fetch_payloads(self, keys, use_key_columns=True):
         payloads = {}
         # Oracle 19c limits IN to 1000 expressions.
         for start in range(0, len(keys), 1000):
             subset = keys[start:start + 1000]
-            binds = {f'k{i}': key for i, key in enumerate(subset)}
-            placeholders = ','.join(':' + name for name in binds)
+            requested = set(subset)
+            config = self.d.oracle_key if use_key_columns else None
+            if config:
+                columns = ['"' + column.replace('"', '""') + '"' for column in config['columns']]
+                predicate = '(' + ','.join(columns) + ')'
+                binds, tuples = {}, []
+                for i, key in enumerate(subset):
+                    parts = str(key).split(config['separator'])
+                    if len(parts) != len(columns):
+                        raise ValueError(f'Key does not match oracle_keys.json: {key}')
+                    names = [f'k{i}_{j}' for j in range(len(columns))]
+                    binds.update((name, int(part)) for name, part in zip(names, parts))
+                    tuples.append('(' + ','.join(':' + name for name in names) + ')')
+                placeholders = ','.join(tuples)
+            else:
+                predicate = self.key
+                binds = {f'k{i}': key for i, key in enumerate(subset)}
+                placeholders = ','.join(':' + name for name in binds)
             with self.db.cursor() as cur:
                 cur.arraysize = len(subset)
-                cur.execute(f'SELECT * FROM ({self.d.query}) WHERE {self.key} IN ({placeholders})', binds)
+                cur.execute(f'SELECT * FROM ({self.d.query}) WHERE {predicate} IN ({placeholders})', binds)
                 names = [c[0] for c in cur.description]
                 for values in cur:
                     row = dict(zip(names, (v.read() if isinstance(v, oracledb.LOB) else v for v in values)))
                     key = self.d.key_value(row[self.d.key['api_name']])
+                    if key not in requested:
+                        raise ValueError(f'Oracle key configuration returned an unrequested key: {key}')
                     if key in payloads:
                         raise ValueError(f'Duplicate Oracle key: {key}')
                     if row.get('__OPERATION', 'UPSERT') != 'UPSERT':

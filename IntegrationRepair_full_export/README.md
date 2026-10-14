@@ -68,7 +68,7 @@ Run a single file or step through one example:
 
 In the debugger, `s` steps into a call, `n` runs the next line, and `c` continues. Set a breakpoint inside the production method to skip fixture setup. You can also debug an individual pytest test from your IDE.
 
-Tests cover comparison, mapping, actual generated SQL, stored progress, terminal skips, replay after commit and completion restart. Read-only test metadata was checked against real KN definitions: bigint/text keys, date-time values, WKT mappings, point layers and direct materialized subscriptions. Oracle was unavailable during development, so source SQL/driver execution has not been checked live. The read-only data DB successfully evaluated the configured PostGIS WKT expression and timestamp binding; generated INSERT/UPDATE/DELETE statements were PREPAREd and DEALLOCATEd without executing them. PostgreSQL writes were not executed during this check. Materialized view refresh is deliberately omitted. Verify those on a writable disposable copy before production use.
+Tests cover comparison, mapping, actual generated SQL, stored progress, terminal skips, replay after commit and completion restart. Read-only test metadata was checked against real KN definitions: bigint/text keys, date-time values, WKT mappings, point layers and direct materialized subscriptions. Initial development used fixed driver examples; current read-only benchmarks also check live Oracle fetching and PostgreSQL lookups. The read-only data DB successfully evaluated the configured PostGIS WKT expression and timestamp binding; generated INSERT/UPDATE/DELETE statements were PREPAREd and DEALLOCATEd without executing them. PostgreSQL writes were not executed during this check. Materialized view refresh is deliberately omitted. Verify those on a writable disposable copy before production use.
 
 ## Corrections to the saved export (2026-10-14)
 
@@ -138,3 +138,20 @@ can take time for large inventories. Existing prepared plans are not rebuilt.
 Close SQLite viewers with open transactions before restarting; checkpointing
 allows recovery from a lock failure but does not prevent another reader blocking
 SQLite commits. Only run one prepare/apply process against a given run at a time.
+
+## Performance measurements and optional Oracle key columns
+
+See [BENCHMARKS.md](BENCHMARKS.md) for read-only old/new benchmarks, measured results,
+and the optional per-integration `oracle_keys.json` mapping. EV parcela now fetches
+payloads using its original numeric key columns. Unconfigured integrations retain
+the previous lookup. Apply reads target UUIDs/dates once per page and pipelines
+writes before committing; row mapping, NULL omission, date guards and progress
+ordering are unchanged. Normal runs record phase timings in
+`benchmarks/timings.jsonl`. Prepare comparison is unchanged because the candidate
+SQLite joins were slower in measured samples. DuckDB and alternate Oracle inventory
+ordering remain benchmark prototypes.
+
+Raw benchmark reports, `benchmarks/trials.csv`, `benchmarks/scale_summary.json` and
+`benchmarks/session_notes.json` retain timings, scale, correctness checks and
+implementation status for a later impact report. Remote tests run sequentially
+and use read-only transactions; local DuckDB/SQLite trials use disposable files.

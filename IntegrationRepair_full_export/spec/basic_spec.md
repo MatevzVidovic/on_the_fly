@@ -90,3 +90,15 @@ All child rows belong to their repair UUID. Do not store full source payloads or
 ## Implementation shape
 
 A small `repair.py` provides `prepare <integration_uuid>` and `apply <repair_uuid>` commands. Use direct Oracle/PostgreSQL access and SQLite, with environment-based connection settings. Keep the integration discovery, comparison, mapping, and batch handling easy to follow. The implemented roles and setup instructions are in [README.md](../README.md).
+
+## Measured performance paths
+
+An optional integration-UUID entry in `oracle_keys.json` provides integer source
+key component column names and a separator. Payload fetch uses numeric tuple
+predicates on those saved-query output columns; without an entry it uses the
+original integration-key predicate. This does not change inventory ordering.
+Apply reads existing target UUIDs/change times for a whole page in one query and
+pipelines its writes, checking pipeline completion before PostgreSQL commit and
+SQLite progress marking. Preserve existing metadata and newer-date semantics.
+Normal runs record phase timings. Read-only benchmarks and disposable local
+comparison trials are documented in `BENCHMARKS.md`; they never apply repairs.

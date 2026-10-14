@@ -31,16 +31,11 @@ def test_inventory(definition):
     assert db.commits == 1
 
 
-def test_upsert(definition):
-    cursor = Cursor([('target-uuid', '2025-01-01 12:00:00')])
+def test_lookup_rows(definition):
+    cursor = Cursor([(1, 'target-uuid', DATE)])
     target = LiftTarget(Database(cursor), None, definition)
-
-    warning = target.upsert(dict(KEY=1, CHANGED=DATE), DATE)
-
-    query, values = cursor.calls[1]
-    assert query.as_string().startswith('UPDATE "records" SET')
-    assert values[-1] == 'target-uuid'
-    assert warning is None
+    assert target.lookup_rows([1]) == {1: ('target-uuid', DATE)}
+    assert 'ANY(%s)' in cursor.calls[0][0].as_string()
 
 
 def test_upsert_batch(definition):
@@ -85,3 +80,38 @@ def test_map_row_uses_initiating_user(definition):
     user_id = '7b87a13c-2c28-11f1-96ae-f649468e5bd6'
     _, _, values = map_row(dict(KEY=1, CHANGED=DATE), definition, DATE, user_id)
     assert values[-2:] == [user_id, user_id]
+
+
+def test_batch_reads_once_and_preserves_update_insert_and_ahead_rules(definition):
+    cursor = Cursor([(1, 'keep-uuid', '2025-01-01 00:00:00'),
+                     (3, 'newer-uuid', '2099-01-01 00:00:00')])
+    db = Database(cursor)
+    target = LiftTarget(db, None, definition)
+    outcomes = target.upsert_batch([(str(key), dict(KEY=key, CHANGED=DATE)) for key in (1, 2, 3)], DATE)
+    assert len(cursor.calls) == 3  # One lookup, one UPDATE, one INSERT.
+    assert cursor.calls[0][1] == ([1, 2, 3],)
+    assert cursor.calls[1][1][-1] == 'keep-uuid'
+    assert cursor.calls[2][1][0].version == 1
+    assert outcomes == [('1', None), ('2', None), ('3', 'LIFT date is newer than Oracle date')]
+    assert db.commits == 1
+
+
+def test_pipeline_error_prevents_commit(definition):
+    import pytest
+    class FailingPipeline:
+        def __enter__(self):
+            pass
+        def __exit__(self, *args):
+            raise RuntimeError('Server rejected queued write')
+    db = Database(Cursor())
+    db.pipeline = FailingPipeline
+    target = LiftTarget(db, None, definition)
+    with pytest.raises(RuntimeError, match='queued write'):
+        target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE)
+    assert db.commits == 0
+
+
+def test_empty_batch_has_no_database_work(definition):
+    db = Database(Cursor())
+    assert LiftTarget(db, None, definition).upsert_batch([], DATE) == []
+    assert db.commits == 0 and db.example_cursor.calls == []

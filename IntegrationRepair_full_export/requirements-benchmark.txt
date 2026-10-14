@@ -1,0 +1,2 @@
+# Optional: only needed for benchmark.py compare --duckdb
+duckdb>=1.5,<2

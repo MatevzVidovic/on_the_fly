@@ -21,7 +21,7 @@ def query(env,sql):
     wrapped="BEGIN READ ONLY;\nSET LOCAL statement_timeout='8s';\nSET LOCAL lock_timeout='1s';\n"+sql+"\nROLLBACK;\n"
     p=subprocess.run(['psql','-X','-w','-qAt','-v','ON_ERROR_STOP=1'],input=wrapped,text=True,capture_output=True,env=env,timeout=15)
     if p.returncode: raise RuntimeError('Database connection/query unavailable; credentials and server details omitted.')
-    return [json.loads(line) for line in p.stdout.splitlines() if line.strip()]
+    return [json.loads(p.stdout)]
 
 def probe(name):
     try:
@@ -31,7 +31,7 @@ SELECT COALESCE(json_agg(x ORDER BY table_schema,table_name,ordinal_position),'[
  SELECT table_schema,table_name,column_name,data_type,udt_name,numeric_precision,numeric_scale,ordinal_position
  FROM information_schema.columns
  WHERE table_schema NOT IN ('pg_catalog','information_schema')
- AND (table_name IN ('pripis_presecni_datum','pripis_vm_x_pd','pripis_vmxpd_x_enote','md_verzije_modeli','pripis_enote_deli_stavb','pripis_enote_deli_parcel') OR table_name LIKE 'ev\\_%' ESCAPE '\\')
+ AND (table_name IN ('pripis_presecni_datum','pripis_vm_x_pd','pripis_vmxpd_x_enote','md_verzije_modeli','pripis_enote_deli_stavb','pripis_enote_deli_parcel') OR table_name IN ('ev_del_stavbe_enota','ev_parc_enota','ev_dst_pripis_podatki_h','ev_parc_pripis_podatki_h') OR table_name LIKE 'ev_del_stavbe_enota_h_%' OR table_name LIKE 'ev_parc_enota_h_%')
 ) x;
 """)
         return name,env,data[0]

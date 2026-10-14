@@ -1,0 +1,343 @@
+{
+  "ev_samples": [
+    {
+      "source": "building",
+      "id_model": "STA",
+      "id_model_ver": 1148
+    },
+    {
+      "source": "building",
+      "id_model": "HIS",
+      "id_model_ver": 1149
+    },
+    {
+      "source": "building",
+      "id_model": "KDS",
+      "id_model_ver": 1165
+    },
+    {
+      "source": "building",
+      "id_model": "STA",
+      "id_model_ver": 1148
+    },
+    {
+      "source": "building",
+      "id_model": "GAR",
+      "id_model_ver": 1155
+    },
+    {
+      "source": "building",
+      "id_model": "HIS",
+      "id_model_ver": 1149
+    },
+    {
+      "source": "building",
+      "id_model": "STA",
+      "id_model_ver": 1148
+    },
+    {
+      "source": "building",
+      "id_model": "HIS",
+      "id_model_ver": 1149
+    },
+    {
+      "source": "building",
+      "id_model": "HIS",
+      "id_model_ver": 1149
+    },
+    {
+      "source": "building",
+      "id_model": "PPP",
+      "id_model_ver": 1153
+    }
+  ],
+  "parcel_samples": [
+    {
+      "source": "parcel",
+      "id_model": "KME",
+      "id_model_ver": 1161
+    },
+    {
+      "source": "parcel",
+      "id_model": "STZ",
+      "id_model_ver": 1164
+    },
+    {
+      "source": "parcel",
+      "id_model": "STZ",
+      "id_model_ver": 1164
+    },
+    {
+      "source": "parcel",
+      "id_model": "ZPS",
+      "id_model_ver": null
+    },
+    {
+      "source": "parcel",
+      "id_model": "STZ",
+      "id_model_ver": 1164
+    },
+    {
+      "source": "parcel",
+      "id_model": "ZPS",
+      "id_model_ver": null
+    },
+    {
+      "source": "parcel",
+      "id_model": "STZ",
+      "id_model_ver": 1164
+    },
+    {
+      "source": "parcel",
+      "id_model": "ZPS",
+      "id_model_ver": null
+    },
+    {
+      "source": "parcel",
+      "id_model": "DRZ",
+      "id_model_ver": 1163
+    },
+    {
+      "source": "parcel",
+      "id_model": "STZ",
+      "id_model_ver": 1164
+    }
+  ],
+  "model_tables": [
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2020",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2021",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2022",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2023",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2024",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "jn_sif_model_pk",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "id_model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "naziv",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "vrstni_red",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "jn_rev_num",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "jn_rev_num_to",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "jn_rev_num_prev",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "opis",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "tip_nepremicnine",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "jn_status",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "jn_sif_vpliv_model_pk",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "id_vpliv_model",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "id_vpliv",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "id_model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "jn_rev_num",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "jn_rev_num_to",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "jn_rev_num_prev",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "jn_status",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "primoz_impot_parc1",
+      "column_name": "id_model_ver",
+      "data_type": "text"
+    }
+  ],
+  "constraints": [
+    {
+      "conname": "ev_del_stavbe_enota_pkey",
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "conname": "ev_parc_enota_pkey",
+      "definition": "PRIMARY KEY (id)"
+    }
+  ]
+}

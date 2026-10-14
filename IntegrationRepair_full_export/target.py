@@ -65,33 +65,41 @@ class LiftTarget:
                 yield page
         self.db.commit()
 
-    def upsert(self, payload, max_date):
-        key = self.d.key_value(payload[self.d.key['api_name']])
-        source_date = wall_time(payload[self.d.date['api_name']])
+    def lookup_rows(self, keys):
+        """Read the existing UUIDs and dates in one database round trip."""
         with self.db.cursor() as cur:
-            cur.execute(sql.SQL('SELECT id, {} FROM {} WHERE {}=%s').format(self.date, self.table, self.key), (key,))
-            existing = cur.fetchone()
-            if existing and wall_time(existing[1]) > source_date:
-                return 'LIFT date is newer than Oracle date'
-            columns, expressions, values = map_row(payload, self.d, max_date, self.user_id)
-            if existing:
-                assignments = sql.SQL(',').join(sql.SQL('{}={}').format(sql.Identifier(c), e)
-                                               for c, e in zip(columns, expressions))
-                cur.execute(sql.SQL('UPDATE {} SET {} WHERE id=%s').format(self.table, assignments),
-                            values + [existing[0]])
-            else:
-                cur.execute(sql.SQL('INSERT INTO {} ({}) VALUES ({})').format(
-                    self.table, sql.SQL(',').join(map(sql.Identifier, ['id'] + columns)),
-                    sql.SQL(',').join([sql.SQL('%s')] + expressions)), [uuid1()] + values)
-        return None
+            cur.execute(sql.SQL('SELECT {}, id, {} FROM {} WHERE {}=ANY(%s)').format(
+                self.key, self.date, self.table, self.key), (keys,))
+            return {self.d.key_value(key): (target_id, wall_time(date)) for key, target_id, date in cur}
 
     def upsert_batch(self, writes, max_date):
+        if not writes:
+            return []
+        existing = self.lookup_rows([self.d.key_value(payload[self.d.key['api_name']])
+                                     for _, payload in writes])
         outcomes = []
-        for key, payload in writes:
-            warning = self.upsert(payload, max_date)
-            if warning:
-                print(f'Warning key={key}: {warning}', flush=True)
-            outcomes.append((key, warning))
+        # Pipeline sends writes without waiting for a reply after every row.
+        # Exiting the pipeline checks every reply before we commit this page.
+        with self.db.pipeline(), self.db.cursor() as cur:
+            for encoded_key, payload in writes:
+                key = self.d.key_value(payload[self.d.key['api_name']])
+                row = existing.get(key)
+                if row and row[1] > wall_time(payload[self.d.date['api_name']]):
+                    warning = 'LIFT date is newer than Oracle date'
+                    print(f'Warning key={key}: {warning}', flush=True)
+                    outcomes.append((encoded_key, warning))
+                    continue
+                columns, expressions, values = map_row(payload, self.d, max_date, self.user_id)
+                if row:
+                    assignments = sql.SQL(',').join(sql.SQL('{}={}').format(sql.Identifier(c), e)
+                                                   for c, e in zip(columns, expressions))
+                    cur.execute(sql.SQL('UPDATE {} SET {} WHERE id=%s').format(self.table, assignments),
+                                values + [row[0]])
+                else:
+                    cur.execute(sql.SQL('INSERT INTO {} ({}) VALUES ({})').format(
+                        self.table, sql.SQL(',').join(map(sql.Identifier, ['id'] + columns)),
+                        sql.SQL(',').join([sql.SQL('%s')] + expressions)), [uuid1()] + values)
+                outcomes.append((encoded_key, None))
         self.db.commit()
         return outcomes
 

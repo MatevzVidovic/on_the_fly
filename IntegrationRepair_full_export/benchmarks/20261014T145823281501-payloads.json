@@ -1,0 +1,32 @@
+{
+  "at": "2026-10-14T14:58:11.360016+00:00",
+  "part": "payloads",
+  "requested_rows": 1000,
+  "remote_read_only": true,
+  "timeout_seconds": 15,
+  "implementation_sha256": "16c8d7701feb2c6a4a699c11956caf58c0f55505a5498b5ddba11bd9ea1fe74d",
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "connection_profile_sha256": "5d5c2884fbf433c3eb087e808d3fa479de8222d4db7cefe34a4e21efa4ebbfcd",
+  "sample_keys_sha256": "753f2c7b004b790bd139153af686b83db23c130c88c2a53066fcfc918fa89322",
+  "results": {
+    "configured": {
+      "at": "2026-10-14T14:58:19.488367+00:00",
+      "stage": "benchmark.oracle_payloads.configured",
+      "rows": 1000,
+      "status": "complete",
+      "seconds": 3.656672,
+      "returned_rows": 1000,
+      "requested_keys_match": true
+    }
+  },
+  "total_seconds": 11.921655
+}

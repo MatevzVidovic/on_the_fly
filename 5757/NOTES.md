@@ -3,6 +3,10 @@
 - User asks to learn slowly, starting with tables and the work required.
 - Previous roles visual and ten-question quiz are available, but no quiz responses have been supplied. Do not assume understanding from exposure.
 - Lesson 0001 teaches existing date → model selection → calculated unit value relationships only.
-- Next: use the learner's response to decide whether to revisit the chain or introduce EV source discovery and new final-comparison rows.
+- Lesson 0002 clarifies property snapshots. Next, after learner feedback, introduce EV dated inputs and a new final-comparison row.
 - Mission clarification asked: implement, review/plan, or explain. Working mission remains provisional.
-- No learning record yet: understanding has not been demonstrated.
+- Learning record 0001 captures recognition of the model/date chain. Transaction vs property-snapshot misconception is pending retrieval feedback.
+
+- User explicitly requests ongoing DB verification. test_njihov_access was reachable on 2026-10-14; test_nas_access timed out. Use read-only, bounded queries with statement timeouts and rollback, never display .env credentials.
+
+- Lesson 0003 answers the learner’s question about the ISAM result and EV versions. Current EV rows have id_model_ver; sampled STZ=1164 versus ISAM configured STZ version 44. No authoritative EV→ISAM version correspondence found. Do not present those numbers as equivalent. Some sampled ZPS versions are NULL; building-part history lacks the field.

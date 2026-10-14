@@ -1,0 +1,143 @@
+{
+  "at": "2026-10-14T14:58:23.453236+00:00",
+  "part": "compare",
+  "requested_rows": 10000,
+  "remote_read_only": true,
+  "timeout_seconds": 15,
+  "implementation_sha256": "16c8d7701feb2c6a4a699c11956caf58c0f55505a5498b5ddba11bd9ea1fe74d",
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "connection_profile_sha256": "5d5c2884fbf433c3eb087e808d3fa479de8222d4db7cefe34a4e21efa4ebbfcd",
+  "results": {
+    "sample_source_read": {
+      "at": "2026-10-14T14:58:24.358622+00:00",
+      "stage": "benchmark.sample_source_read",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.020669
+    },
+    "sample_target_read": {
+      "at": "2026-10-14T14:58:24.389776+00:00",
+      "stage": "benchmark.sample_target_read",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 4.687622
+    },
+    "legacy_source_copy": {
+      "at": "2026-10-14T14:58:29.084905+00:00",
+      "stage": "benchmark.sqlite_source_copy.legacy",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.015342
+    },
+    "legacy": {
+      "at": "2026-10-14T14:58:29.100367+00:00",
+      "stage": "benchmark.sqlite_compare.legacy",
+      "rows": 9994,
+      "status": "complete",
+      "seconds": 0.022868
+    },
+    "legacy_finalize": {
+      "at": "2026-10-14T14:58:29.123301+00:00",
+      "stage": "benchmark.sqlite_finalize.legacy",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.000587
+    },
+    "legacy_progress": {
+      "at": "2026-10-14T14:58:29.124013+00:00",
+      "stage": "benchmark.sqlite_progress.legacy",
+      "rows": 3,
+      "status": "complete",
+      "seconds": 0.000274
+    },
+    "joins_source_copy": {
+      "at": "2026-10-14T14:58:29.127403+00:00",
+      "stage": "benchmark.sqlite_source_copy.joins",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.01289
+    },
+    "joins": {
+      "at": "2026-10-14T14:58:29.140359+00:00",
+      "stage": "benchmark.sqlite_compare.joins",
+      "rows": 9994,
+      "status": "complete",
+      "seconds": 0.025829
+    },
+    "joins_finalize": {
+      "at": "2026-10-14T14:58:29.166263+00:00",
+      "stage": "benchmark.sqlite_finalize.joins",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.000611
+    },
+    "joins_progress": {
+      "at": "2026-10-14T14:58:29.166964+00:00",
+      "stage": "benchmark.sqlite_progress.joins",
+      "rows": 3,
+      "status": "complete",
+      "seconds": 0.000253
+    },
+    "results_equal": true,
+    "sample_source_rows": 10000,
+    "sample_lift_rows": 9994,
+    "duckdb_import": {
+      "at": "2026-10-14T14:58:29.181629+00:00",
+      "stage": "benchmark.duckdb_import",
+      "rows": 10000,
+      "status": "complete",
+      "seconds": 0.041282
+    },
+    "duckdb_joins_only": {
+      "at": "2026-10-14T14:58:29.223013+00:00",
+      "stage": "benchmark.duckdb_joins_only",
+      "rows": 9994,
+      "status": "complete",
+      "seconds": 0.002832
+    },
+    "duckdb_results_equal": true,
+    "duckdb_native_file": {
+      "source_import": {
+        "at": "2026-10-14T14:58:29.235635+00:00",
+        "stage": "benchmark.duckdb_file.source_import",
+        "rows": 10000,
+        "status": "complete",
+        "seconds": 0.024504
+      },
+      "lift_import": {
+        "at": "2026-10-14T14:58:29.260240+00:00",
+        "stage": "benchmark.duckdb_file.lift_import",
+        "rows": 9994,
+        "status": "complete",
+        "seconds": 0.031014
+      },
+      "compare_and_store": {
+        "at": "2026-10-14T14:58:29.291467+00:00",
+        "stage": "benchmark.duckdb_file.compare_and_store",
+        "rows": 9994,
+        "status": "complete",
+        "seconds": 0.003237
+      },
+      "progress_update": {
+        "at": "2026-10-14T14:58:29.294793+00:00",
+        "stage": "benchmark.duckdb_file.progress_update",
+        "status": "complete",
+        "seconds": 0.000832
+      },
+      "reopened_source_rows": 10000,
+      "reopened_progress_rows": 4,
+      "file_bytes": 3682304,
+      "results_equal": true
+    }
+  },
+  "total_seconds": 5.900584
+}

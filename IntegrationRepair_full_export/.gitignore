@@ -3,3 +3,5 @@
 *.sqlite*
 __pycache__/
 .pytest_cache/
+
+benchmarks/timings.jsonl

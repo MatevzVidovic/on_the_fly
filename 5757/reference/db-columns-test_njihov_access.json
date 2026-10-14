@@ -1,0 +1,4292 @@
+[
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "dst_sid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "err_msg",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "jn_del_st_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "dst_sid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "jn_del_st_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "dst_sid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "dst_pripis_podatki_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "dst_sid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "eid",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "error_msg",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "raven",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "d_dst",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "izmera",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "leto_izg_sta",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_dst",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "pov_leto_obn",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_obn",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "t_last",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_last",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_nk",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_zps",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 22
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_d_dst",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 23
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_zps_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 24
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_pri",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 25
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vplivi",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 26
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_odd",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 27
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "t_dp",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 28
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_dp",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 29
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "t_lege",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 30
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_lege",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 31
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_gar",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 32
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_ppp_p",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 33
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_ppl_p",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 34
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "faktor_p",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 35
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_lp",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 36
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_dp_p",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 37
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_dp_m2_p",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 38
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_ppl_l",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 39
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_ppp_l",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 40
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "faktor_l",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 41
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "f_pl",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 42
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_dp_l",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 43
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_dp_m2_l",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 44
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "povr_dp_tur",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 45
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vt_dp_m2_tur",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 46
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "jn_rev_num",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 47
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 48
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 49
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 50
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_dst_pripis_podatki_h",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 51
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "err_msg",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "jn_parcela_enota_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "id_parc_enota",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "delez_povrsine",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "raven",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "vpliv",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "faktor_po",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "posplosena_vrednost",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "id_model_ver",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "jn_status",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "parc_pripis_podatki_pk",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "pc_mid",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "eid",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "id_model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "error_msg",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "raven",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "cona_ime",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "izmera",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_hme",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_hme_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_vin",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_vin_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_sad",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_sad_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_olj",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_olj_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_z_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 22
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "boniteta",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 23
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "f_bon",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 24
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "rk",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 25
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "f_rk",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 26
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "odprtost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 27
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "f_odp",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 28
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "f_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 29
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_a",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 30
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_a_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 31
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_b",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 32
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_b_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 33
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_c",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 34
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_c_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 35
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_d",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 36
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_d_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 37
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_e",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 38
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_e_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 39
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_f",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 40
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_f_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 41
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_g",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 42
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_g_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 43
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_h",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 44
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_h_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 45
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_vod",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 46
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_vod_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 47
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "povr_poz",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 48
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vt_poz_m2",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 49
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "jn_rev_num",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 50
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "f_odd",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 51
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vplivi",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 52
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "vrednost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": 20,
+    "numeric_scale": 2,
+    "ordinal_position": 53
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "valid_from",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 54
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "valid_to",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 55
+  },
+  {
+    "table_schema": "public",
+    "table_name": "ev_parc_pripis_podatki_h",
+    "column_name": "date_change",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 56
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "id_rel_uredba",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "verzija",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "tip_verzije",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "datum_modela",
+    "data_type": "date",
+    "udt_name": "date",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "zaklenjena_verzija",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "delovna_coniranje",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "enacba_leva",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "enacba_desna",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "k",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "leto_akt",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "ezd",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "kopija_verzije",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "gid",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "__mod",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "filter",
+    "data_type": "jsonb",
+    "udt_name": "jsonb",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "pripisna",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 22
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "faktorji",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 23
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "spremenljivke",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 24
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "pasivni_modeli",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 25
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "id_rel_geo_verzija",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 26
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "enacba_ref_obj",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 27
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "enacba_ref_obj_m2",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 28
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "fiktivne",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 29
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "trans_podposli",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 30
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "posli_podposli",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 31
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "skupina",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 32
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "filter_sql",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 33
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "uporabi_za_porocilo_trg",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 34
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "analiza_napake_delna",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 35
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "analiza_napake_celotna",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 36
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "sql_filter",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 37
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "analiza_napake_barvna_shema",
+    "data_type": "jsonb",
+    "udt_name": "jsonb",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 38
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "opomba",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 39
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "prodaje_z_najemi",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 40
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "porocilo_uvoza",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 41
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "parametri_izjeme",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 42
+  },
+  {
+    "table_schema": "public",
+    "table_name": "md_verzije_modeli",
+    "column_name": "analiza_napake_filter",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 43
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "gid",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "geom",
+    "data_type": "USER-DEFINED",
+    "udt_name": "geometry",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "__mod",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "id_rel_pr_datum",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "parcela_id",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "del_parcele_id",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "dej_raba_parc",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "nam_raba_parc",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "vrsta_nasada",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "rk",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "odprtost",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "boniteta",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "podmodel_stz",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "zemlj_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "zemlj_vv_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "primerno_zgs",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 22
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "napaka",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 23
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "faktor_nivo",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 24
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_parcel",
+    "column_name": "delez",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 25
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "gid",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "geom",
+    "data_type": "USER-DEFINED",
+    "udt_name": "geometry",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "__mod",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_rel_pr_datum",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "del_stavbe_id",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "stavba_id",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "dej_raba_dst",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 12
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "model",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 13
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "tip_stavbe",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 14
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "upor_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 15
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "neto_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 16
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_elektrika",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 17
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "leto_obn_strehe",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 18
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "leto_obn_fasade",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 19
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "leto_obn_oken",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 20
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "leto_obn_inst",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 21
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_dvigalo",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 22
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_vodovod",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 23
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_kanalizacija",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 24
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_plin",
+    "data_type": "boolean",
+    "udt_name": "bool",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 25
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "leto_izg",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 26
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "zps_dst",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 27
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_lega",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 28
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "nadstropje",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 29
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "st_stanovanj",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 30
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "st_etaz",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 31
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "grad_faza",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 32
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "id_konstrukcije",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 33
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "neto_prost",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 34
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "visina_etaze_rzd",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 35
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "atr_povr",
+    "data_type": "numeric",
+    "udt_name": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 36
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_enote_deli_stavb",
+    "column_name": "napaka",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 37
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_presecni_datum",
+    "column_name": "datum",
+    "data_type": "date",
+    "udt_name": "date",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "id_rel_verzije_modeli",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vm_x_pd",
+    "column_name": "id_rel_pr_datum",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "id",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 1
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "created_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 2
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "updated_by",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 3
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 4
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone",
+    "udt_name": "timestamp",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 5
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "id_rel_vm_pd",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 6
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "id_rel_prip_enota",
+    "data_type": "uuid",
+    "udt_name": "uuid",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 7
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "vrednost_izr",
+    "data_type": "integer",
+    "udt_name": "int4",
+    "numeric_precision": 32,
+    "numeric_scale": 0,
+    "ordinal_position": 8
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "vrednost_zaokrozena",
+    "data_type": "bigint",
+    "udt_name": "int8",
+    "numeric_precision": 64,
+    "numeric_scale": 0,
+    "ordinal_position": 9
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "spremenljivke_vrednosti",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 10
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "faktorji_vrednosti",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 11
+  },
+  {
+    "table_schema": "public",
+    "table_name": "pripis_vmxpd_x_enote",
+    "column_name": "napaka_izracuna",
+    "data_type": "text",
+    "udt_name": "text",
+    "numeric_precision": null,
+    "numeric_scale": null,
+    "ordinal_position": 12
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "recorded_at": "2026-10-14T14:26:08.149934+00:00",
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "key_count": 1000,
+  "previous_apply_seconds": 528.97,
+  "previous_apply_processed": 0,
+  "results": {
+    "numeric_pair": {
+      "seconds": 0.138,
+      "rows": 1000,
+      "requested_keys_match": true,
+      "plan": [
+        "User has no SELECT privilege on V$SESSION"
+      ]
+    }
+  },
+  "previous_computed_string_probe": {
+    "seconds": 15.147,
+    "completed": false,
+    "error": "DPY-4011 / DPI-1080 / ORA-03113: connection closed during computed-string query; call_timeout was 15000 ms",
+    "note": "Observed during first probe; not a completed duration or a proven execution plan."
+  },
+  "verified_oracle_schema": {
+    "table": "EV.JN_PARCELA",
+    "primary_key": "JN_PARCELA_PK",
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "column_types": [
+      "NUMBER(12,0) NOT NULL",
+      "NUMBER(12,0) NOT NULL"
+    ],
+    "unique_index": "JN_PARCELA_PK_JNF_IX",
+    "index_status": "VALID"
+  }
+}

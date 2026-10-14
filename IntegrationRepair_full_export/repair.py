@@ -15,6 +15,7 @@ from definition import IntegrationDefinition
 from source import OracleSource, wall_time
 from store import RepairStore
 from target import LiftTarget
+from timings import measure
 
 
 def prepare(definition, source, target, store, run_id=None, only_src=False):
@@ -31,19 +32,24 @@ def prepare(definition, source, target, store, run_id=None, only_src=False):
     if not run['source_complete']:
         last_key = json.loads(run['source_last_key']) if run['source_last_key'] is not None else None
         # Keep newer source keys too: being outside cutoff does not mean deleted.
-        for page in source.inventory(None, after_key=last_key):
-            store.save_source(run_id, page)
-        store.finish_source(run_id)
+        with measure('prepare.oracle_export', run_id=run_id, resumed=last_key is not None, rows=0) as timing:
+            for page in source.inventory(None, after_key=last_key):
+                store.save_source(run_id, page)
+                timing['rows'] += len(page)
+            store.finish_source(run_id)
         run = store.resume_preparation(run_id)
     print(f"Oracle export complete: {run['source_count']:,} rows for run {run_id}", flush=True)
     if only_src:
         print('Stopped after Oracle export; resume without --only-src to compare LIFT', flush=True)
         return run_id
     last_key = json.loads(run['target_last_key']) if run['target_last_key'] is not None else None
-    for page in target.inventory(cutoff, after_key=last_key):
-        for key, warning in store.compare_target_page(run_id, page):
-            print(f'Warning key={key}: {warning}', flush=True)
-    store.finish_preparation(run_id)
+    with measure('prepare.lift_scan_and_compare', run_id=run_id, resumed=last_key is not None, rows=0) as timing:
+        for page in target.inventory(cutoff, after_key=last_key):
+            for key, warning in store.compare_target_page(run_id, page):
+                print(f'Warning key={key}: {warning}', flush=True)
+            timing['rows'] += len(page)
+    with measure('prepare.final_diff', run_id=run_id):
+        store.finish_preparation(run_id)
     store.summary(run_id)
     return run_id
 
@@ -56,7 +62,9 @@ def apply(run_id, definition, source, target, store):
     max_date = store.start_apply(run_id, wall_time(datetime.now(ZoneInfo(os.environ.get('APP_TIMEZONE', 'UTC')))), target.user_id)
     for rows in store.pending('addition_diff', run_id):
         keys = [json.loads(row['key']) for row in rows]
-        payloads = source.fetch_payloads(keys)
+        print(f'Fetching {len(keys)} Oracle payloads', flush=True)
+        with measure('apply.oracle_payloads', run_id=run_id, rows=len(keys)):
+            payloads = source.fetch_payloads(keys)
         outcomes, writes = [], []
         for entry, key in zip(rows, keys):
             payload = payloads.get(key)
@@ -72,14 +80,19 @@ def apply(run_id, definition, source, target, store):
                 print(f'Warning key={key}: {warning}', flush=True)
             outcomes.append((entry['key'], warning))
         # A crash after this commit safely replays before the SQLite markers.
-        outcomes.extend(target.upsert_batch(writes, max_date))
-        store.finish_additions(run_id, outcomes)
+        with measure('apply.postgres_upserts', run_id=run_id, rows=len(writes)):
+            outcomes.extend(target.upsert_batch(writes, max_date))
+        with measure('apply.sqlite_progress', run_id=run_id, rows=len(outcomes)):
+            store.finish_additions(run_id, outcomes)
         print(f'Committed {len(rows)} upsert entries', flush=True)
     for rows in store.pending('removal_diff', run_id):
-        target.delete_batch(rows)
-        store.finish_removals(run_id, rows)
+        with measure('apply.postgres_removals', run_id=run_id, rows=len(rows)):
+            target.delete_batch(rows)
+        with measure('apply.sqlite_progress', run_id=run_id, rows=len(rows)):
+            store.finish_removals(run_id, rows)
         print(f'Committed {len(rows)} removal entries', flush=True)
-    target.complete()
+    with measure('apply.completion', run_id=run_id):
+        target.complete()
     store.finish_application(run_id)
 
 

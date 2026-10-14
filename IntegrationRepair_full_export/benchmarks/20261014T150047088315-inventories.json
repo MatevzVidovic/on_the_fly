@@ -1,0 +1,30 @@
+{
+  "at": "2026-10-14T15:00:39.745446+00:00",
+  "part": "inventories",
+  "requested_rows": 10000,
+  "remote_read_only": true,
+  "timeout_seconds": 10,
+  "implementation_sha256": "16c8d7701feb2c6a4a699c11956caf58c0f55505a5498b5ddba11bd9ea1fe74d",
+  "run_id": "c73f9efd-9795-4aae-8d59-dc11937fbb9d",
+  "integration_id": "550a20ee-9d03-11ef-8c7b-0242ac120008",
+  "table": "kn_nep_etaze_h",
+  "oracle_key": null,
+  "connection_profile_sha256": "5d5c2884fbf433c3eb087e808d3fa479de8222d4db7cefe34a4e21efa4ebbfcd",
+  "results": {
+    "oracle": {
+      "at": "2026-10-14T15:00:41.980153+00:00",
+      "stage": "benchmark.inventory.oracle",
+      "status": "complete",
+      "seconds": 3.293684,
+      "rows": 10000
+    },
+    "lift": {
+      "at": "2026-10-14T15:00:45.275100+00:00",
+      "stage": "benchmark.inventory.lift",
+      "status": "complete",
+      "seconds": 1.576254,
+      "rows": 10000
+    }
+  },
+  "total_seconds": 7.342895
+}

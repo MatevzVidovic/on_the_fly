@@ -1,0 +1,157 @@
+{
+  "notes": [
+    "Observed bounded trials; caches and network conditions vary.",
+    "PostgreSQL timings are SELECTs, not actual writes.",
+    "Local samples exclude remote acquisition; native DuckDB materializes both tables."
+  ],
+  "scales": [
+    {
+      "part": "lookups",
+      "requested_rows": 100,
+      "report": "20261014T145430901086-lookups.json",
+      "sequential_seconds": 7.594642,
+      "batched_seconds": 0.073613,
+      "pipelined_select_seconds": 0.11398
+    },
+    {
+      "part": "lookups",
+      "requested_rows": 1000,
+      "report": "20261014T145553615390-lookups.json",
+      "sequential_seconds": 43.311757,
+      "batched_seconds": 0.219104,
+      "pipelined_select_seconds": 0.184387
+    },
+    {
+      "part": "payloads",
+      "requested_rows": 100,
+      "report": "20261014T145811186033-payloads.json",
+      "configured_seconds": 3.668678,
+      "returned_rows": 100
+    },
+    {
+      "part": "payloads",
+      "requested_rows": 1000,
+      "report": "20261014T145823281501-payloads.json",
+      "configured_seconds": 3.656672,
+      "returned_rows": 1000
+    },
+    {
+      "part": "compare",
+      "requested_rows": 10000,
+      "report": "20261014T145829353525-compare.json",
+      "actual_target_rows": 9994,
+      "sqlite_compare_seconds": 0.022868,
+      "sqlite_join_seconds": 0.025829,
+      "duckdb_import_seconds": 0.041282,
+      "duckdb_join_seconds": 0.002832,
+      "native_duckdb": {
+        "source_import": {
+          "at": "2026-10-14T14:58:29.235635+00:00",
+          "stage": "benchmark.duckdb_file.source_import",
+          "rows": 10000,
+          "status": "complete",
+          "seconds": 0.024504
+        },
+        "lift_import": {
+          "at": "2026-10-14T14:58:29.260240+00:00",
+          "stage": "benchmark.duckdb_file.lift_import",
+          "rows": 9994,
+          "status": "complete",
+          "seconds": 0.031014
+        },
+        "compare_and_store": {
+          "at": "2026-10-14T14:58:29.291467+00:00",
+          "stage": "benchmark.duckdb_file.compare_and_store",
+          "rows": 9994,
+          "status": "complete",
+          "seconds": 0.003237
+        },
+        "progress_update": {
+          "at": "2026-10-14T14:58:29.294793+00:00",
+          "stage": "benchmark.duckdb_file.progress_update",
+          "status": "complete",
+          "seconds": 0.000832
+        },
+        "reopened_source_rows": 10000,
+        "reopened_progress_rows": 4,
+        "file_bytes": 3682304,
+        "results_equal": true
+      }
+    },
+    {
+      "part": "compare",
+      "requested_rows": 100000,
+      "report": "20261014T144912025439-compare.json",
+      "actual_target_rows": 99910,
+      "sqlite_compare_seconds": 0.263189,
+      "sqlite_join_seconds": 0.314104,
+      "duckdb_import_seconds": 0.210253,
+      "duckdb_join_seconds": 0.022669,
+      "native_duckdb": {
+        "source_import": {
+          "at": "2026-10-14T14:49:11.174151+00:00",
+          "stage": "benchmark.duckdb_file.source_import",
+          "rows": 100000,
+          "status": "complete",
+          "seconds": 0.237575
+        },
+        "lift_import": {
+          "at": "2026-10-14T14:49:11.411931+00:00",
+          "stage": "benchmark.duckdb_file.lift_import",
+          "rows": 99910,
+          "status": "complete",
+          "seconds": 0.359029
+        },
+        "compare_and_store": {
+          "at": "2026-10-14T14:49:11.772281+00:00",
+          "stage": "benchmark.duckdb_file.compare_and_store",
+          "rows": 99910,
+          "status": "complete",
+          "seconds": 0.018792
+        },
+        "progress_update": {
+          "at": "2026-10-14T14:49:11.791258+00:00",
+          "stage": "benchmark.duckdb_file.progress_update",
+          "status": "complete",
+          "seconds": 0.001649
+        },
+        "reopened_source_rows": 100000,
+        "reopened_progress_rows": 4,
+        "file_bytes": 20197376,
+        "results_equal": true
+      }
+    },
+    {
+      "part": "pagination",
+      "requested_rows": 100,
+      "report": "20261014T145858705595-pagination.json",
+      "pages": 9,
+      "page_seconds_min": 0.118579,
+      "page_seconds_max": 0.200138,
+      "page_seconds_median": 0.138437
+    },
+    {
+      "part": "pagination",
+      "requested_rows": 1000,
+      "report": "20261014T150039568791-pagination.json",
+      "pages": 9,
+      "page_seconds_min": 0.109779,
+      "page_seconds_max": 0.243523,
+      "page_seconds_median": 0.145098
+    },
+    {
+      "part": "inventories",
+      "requested_rows": 10000,
+      "report": "20261014T150047088315-inventories.json",
+      "oracle_seconds": 3.293684,
+      "lift_seconds": 1.576254
+    },
+    {
+      "part": "inventories",
+      "requested_rows": 100000,
+      "report": "20261014T145919173441-inventories.json",
+      "oracle_seconds": 6.507529,
+      "lift_seconds": 11.559805
+    }
+  ]
+}

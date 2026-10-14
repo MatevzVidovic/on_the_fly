@@ -1,0 +1,175 @@
+{
+  "date_rows": [
+    {
+      "id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01"
+    },
+    {
+      "id": "7273d0e6-6b09-11f1-86b6-424abd3ca6bd",
+      "datum": "2025-01-01"
+    },
+    {
+      "id": "ff611d92-6bb8-11f1-b613-424abd3ca6bd",
+      "datum": "2026-06-18"
+    }
+  ],
+  "model_date_examples": [
+    {
+      "datum": "2026-01-01",
+      "model": "STZ",
+      "verzija": 44
+    },
+    {
+      "datum": "2026-01-01",
+      "model": "SDP",
+      "verzija": 33
+    },
+    {
+      "datum": "2026-01-01",
+      "model": "PPP",
+      "verzija": 225
+    },
+    {
+      "datum": "2026-01-01",
+      "model": "PPL",
+      "verzija": 192
+    },
+    {
+      "datum": "2026-01-01",
+      "model": "KME",
+      "verzija": 100
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "ev_del_stavbe_enota",
+      "indexname": "ev_del_stavbe_enota_dst_sid",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_dst_sid ON public.ev_del_stavbe_enota USING btree (dst_sid)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota",
+      "indexname": "ev_del_stavbe_enota_dst_sid_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_dst_sid_idx ON public.ev_del_stavbe_enota USING btree (dst_sid)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota",
+      "indexname": "ev_del_stavbe_enota_pkey",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_pkey ON public.ev_del_stavbe_enota USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_enota",
+      "indexname": "ev_parc_enota_vrednost_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_vrednost_idx ON public.ev_parc_enota USING btree (vrednost)"
+    },
+    {
+      "tablename": "ev_parc_enota",
+      "indexname": "ev_parc_enota_pkey",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_enota_pkey ON public.ev_parc_enota USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_enota",
+      "indexname": "ev_parc_enota_pc_mid_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_pc_mid_idx ON public.ev_parc_enota USING btree (pc_mid)"
+    },
+    {
+      "tablename": "ev_parc_enota",
+      "indexname": "ev_parc_enota_faktor_ix",
+      "indexdef": "CREATE INDEX ev_parc_enota_faktor_ix ON public.ev_parc_enota USING btree (faktor_po)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_date_change_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_date_change_idx ON public.ev_parc_enota_h_2025_danes USING btree (date_change)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_dst_sid_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_dst_sid_idx ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key ON public.ev_parc_enota_h_2025_danes USING btree (jn_parcela_enota_pk)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_pkey",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_pkey ON public.ev_parc_enota_h_2025_danes USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_valid_from_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_from_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_from)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_valid_to_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_to_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_to)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "ev_parc_enota_h_2025_danes_vrednost_idx",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_vrednost_idx ON public.ev_parc_enota_h_2025_danes USING btree (vrednost)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "idx_epe_model_valid",
+      "indexdef": "CREATE INDEX idx_epe_model_valid ON public.ev_parc_enota_h_2025_danes USING btree (id_model, valid_from, valid_to)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexname": "idx_epe_pc_mid",
+      "indexdef": "CREATE INDEX idx_epe_pc_mid ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_valid_to_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_to_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_to)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_dst_sid_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_dst_sid_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (dst_sid)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_vrednost_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_vrednost_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (vrednost)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key ON public.ev_del_stavbe_enota_h_2025_danes USING btree (jn_del_st_enota_pk)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_pkey",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_pkey ON public.ev_del_stavbe_enota_h_2025_danes USING btree (id)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_date_change_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_date_change_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (date_change)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexname": "ev_del_stavbe_enota_h_2025_danes_valid_from_idx",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_from_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_from)"
+    },
+    {
+      "tablename": "pripis_presecni_datum",
+      "indexname": "pripis_presecni_datum_pkey",
+      "indexdef": "CREATE UNIQUE INDEX pripis_presecni_datum_pkey ON public.pripis_presecni_datum USING btree (id)"
+    },
+    {
+      "tablename": "pripis_vm_x_pd",
+      "indexname": "pripis_vm_x_pd_pkey",
+      "indexdef": "CREATE UNIQUE INDEX pripis_vm_x_pd_pkey ON public.pripis_vm_x_pd USING btree (id)"
+    },
+    {
+      "tablename": "pripis_vmxpd_x_enote",
+      "indexname": "pripis_vmxpd_x_enote_pkey",
+      "indexdef": "CREATE UNIQUE INDEX pripis_vmxpd_x_enote_pkey ON public.pripis_vmxpd_x_enote USING btree (id)"
+    }
+  ]
+}

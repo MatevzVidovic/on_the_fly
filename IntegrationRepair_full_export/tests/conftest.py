@@ -56,6 +56,9 @@ class Database:
     def execute(self, query, params=None):
         return self.example_cursor.execute(query, params)
 
+    def pipeline(self):
+        return self
+
     def commit(self):
         self.commits += 1
 
@@ -93,3 +96,9 @@ def prepared_run(store, run_id):
     store.save_source(run_id, [(1, DATE)])
     store.finish_preparation(run_id)
     return run_id
+
+
+@pytest.fixture(autouse=True)
+def isolated_timings(tmp_path, monkeypatch):
+    import timings
+    monkeypatch.setattr(timings, 'LOG_PATH', tmp_path / 'timings.jsonl')

@@ -58,3 +58,33 @@ def test_unbounded_inventory_keeps_keys_past_cutoff(definition):
     future = '2099-01-01 00:00:00.000000'
     source = OracleSource(Database(Cursor([(1, future)])), definition)
     assert list(source.inventory(None)) == [[(1, future)]]
+
+
+def test_configured_payload_lookup_uses_integer_components(definition):
+    definition.key['field_type'] = 'plain-text-single-row'
+    definition.oracle_key = dict(columns=['PC_MID', 'JN_REV_NUM'], separator='-')
+    cursor = Cursor([('123-45', DATE)])
+    source = OracleSource(Database(cursor), definition)
+    assert source.fetch_payloads(['123-45'])['123-45']['KEY'] == '123-45'
+    query, binds = cursor.calls[-1]
+    assert '("PC_MID","JN_REV_NUM") IN ((:k0_0,:k0_1))' in query
+    assert binds == {'k0_0': 123, 'k0_1': 45}
+    source.fetch_payloads(['123-45'], use_key_columns=False)
+    query, binds = cursor.calls[-1]
+    assert '"KEY" IN (:k0)' in query
+    assert binds == {'k0': '123-45'}
+
+
+def test_configured_payload_lookup_rejects_wrong_key_shape(definition):
+    import pytest
+    definition.oracle_key = dict(columns=['PC_MID', 'JN_REV_NUM'], separator='-')
+    source = OracleSource(Database(Cursor()), definition)
+    with pytest.raises(ValueError, match='oracle_keys.json'):
+        source.fetch_payloads(['123-45-67'])
+
+
+def test_payload_lookup_rejects_unrequested_rows(definition):
+    import pytest
+    source = OracleSource(Database(Cursor([(2, DATE)])), definition)
+    with pytest.raises(ValueError, match='unrequested key'):
+        source.fetch_payloads([1])

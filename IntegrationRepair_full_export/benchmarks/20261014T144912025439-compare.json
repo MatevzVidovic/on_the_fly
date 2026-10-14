@@ -1,0 +1,110 @@
+{
+  "at": "2026-10-14T14:48:27.064570+00:00",
+  "part": "compare",
+  "requested_rows": 100000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "results": {
+    "legacy_source_copy": {
+      "at": "2026-10-14T14:49:09.854586+00:00",
+      "stage": "benchmark.sqlite_source_copy.legacy",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.153323
+    },
+    "legacy": {
+      "at": "2026-10-14T14:49:10.008129+00:00",
+      "stage": "benchmark.sqlite_compare.legacy",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.263189
+    },
+    "legacy_finalize": {
+      "at": "2026-10-14T14:49:10.271473+00:00",
+      "stage": "benchmark.sqlite_finalize.legacy",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.005717
+    },
+    "joins_source_copy": {
+      "at": "2026-10-14T14:49:10.280756+00:00",
+      "stage": "benchmark.sqlite_source_copy.joins",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.146854
+    },
+    "joins": {
+      "at": "2026-10-14T14:49:10.427785+00:00",
+      "stage": "benchmark.sqlite_compare.joins",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.314104
+    },
+    "joins_finalize": {
+      "at": "2026-10-14T14:49:10.742049+00:00",
+      "stage": "benchmark.sqlite_finalize.joins",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.005905
+    },
+    "results_equal": true,
+    "sample_source_rows": 100000,
+    "sample_lift_rows": 99910,
+    "duckdb_import": {
+      "at": "2026-10-14T14:49:10.900403+00:00",
+      "stage": "benchmark.duckdb_import",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.210253
+    },
+    "duckdb_joins_only": {
+      "at": "2026-10-14T14:49:11.110882+00:00",
+      "stage": "benchmark.duckdb_joins_only",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.022669
+    },
+    "duckdb_results_equal": true,
+    "duckdb_native_file": {
+      "source_import": {
+        "at": "2026-10-14T14:49:11.174151+00:00",
+        "stage": "benchmark.duckdb_file.source_import",
+        "rows": 100000,
+        "status": "complete",
+        "seconds": 0.237575
+      },
+      "lift_import": {
+        "at": "2026-10-14T14:49:11.411931+00:00",
+        "stage": "benchmark.duckdb_file.lift_import",
+        "rows": 99910,
+        "status": "complete",
+        "seconds": 0.359029
+      },
+      "compare_and_store": {
+        "at": "2026-10-14T14:49:11.772281+00:00",
+        "stage": "benchmark.duckdb_file.compare_and_store",
+        "rows": 99910,
+        "status": "complete",
+        "seconds": 0.018792
+      },
+      "progress_update": {
+        "at": "2026-10-14T14:49:11.791258+00:00",
+        "stage": "benchmark.duckdb_file.progress_update",
+        "status": "complete",
+        "seconds": 0.001649
+      },
+      "reopened_source_rows": 100000,
+      "reopened_progress_rows": 4,
+      "file_bytes": 20197376,
+      "results_equal": true
+    }
+  }
+}

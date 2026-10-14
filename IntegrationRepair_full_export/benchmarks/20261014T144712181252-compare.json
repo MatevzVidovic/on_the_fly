@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-14T14:45:48.858842+00:00",
+  "part": "compare",
+  "requested_rows": 1000000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "results": {
+    "legacy_source_copy": {
+      "at": "2026-10-14T14:46:58.961263+00:00",
+      "stage": "benchmark.sqlite_source_copy.legacy",
+      "rows": 1000000,
+      "status": "complete",
+      "seconds": 2.129614
+    },
+    "legacy": {
+      "at": "2026-10-14T14:47:01.094431+00:00",
+      "stage": "benchmark.sqlite_compare.legacy",
+      "rows": 998066,
+      "status": "complete",
+      "seconds": 2.448237
+    },
+    "legacy_finalize": {
+      "at": "2026-10-14T14:47:03.542850+00:00",
+      "stage": "benchmark.sqlite_finalize.legacy",
+      "rows": 1000000,
+      "status": "complete",
+      "seconds": 0.055018
+    },
+    "joins_source_copy": {
+      "at": "2026-10-14T14:47:03.602007+00:00",
+      "stage": "benchmark.sqlite_source_copy.joins",
+      "rows": 1000000,
+      "status": "complete",
+      "seconds": 2.226874
+    },
+    "joins": {
+      "at": "2026-10-14T14:47:05.829101+00:00",
+      "stage": "benchmark.sqlite_compare.joins",
+      "rows": 998066,
+      "status": "complete",
+      "seconds": 3.032186
+    },
+    "joins_finalize": {
+      "at": "2026-10-14T14:47:08.861446+00:00",
+      "stage": "benchmark.sqlite_finalize.joins",
+      "rows": 1000000,
+      "status": "complete",
+      "seconds": 0.054745
+    },
+    "results_equal": true,
+    "sample_source_rows": 1000000,
+    "sample_lift_rows": 998066,
+    "duckdb_import": {
+      "at": "2026-10-14T14:47:09.996479+00:00",
+      "stage": "benchmark.duckdb_import",
+      "rows": 1000000,
+      "status": "complete",
+      "seconds": 1.945602
+    },
+    "duckdb_joins_only": {
+      "at": "2026-10-14T14:47:11.942602+00:00",
+      "stage": "benchmark.duckdb_joins_only",
+      "rows": 998066,
+      "status": "complete",
+      "seconds": 0.070066
+    },
+    "duckdb_results_equal": true
+  }
+}

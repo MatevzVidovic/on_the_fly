@@ -1,0 +1,90 @@
+{
+  "at": "2026-10-14T14:47:57.616382+00:00",
+  "part": "pagination",
+  "requested_rows": 1000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "results": {
+    "results": [
+      {
+        "position": "start",
+        "anchor": null,
+        "order": "text",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection"
+      },
+      {
+        "position": "start",
+        "anchor": null,
+        "order": "numeric_pair",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection"
+      },
+      {
+        "position": "middle_of_text_order",
+        "anchor": "26747766-1354",
+        "order": "text",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection"
+      },
+      {
+        "position": "middle_of_text_order",
+        "anchor": "26747766-1354",
+        "order": "numeric_pair",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection"
+      },
+      {
+        "position": "late_in_text_order",
+        "anchor": "39878575-1354",
+        "order": "text",
+        "pages": [
+          {
+            "at": "2026-10-14T14:49:27.457312+00:00",
+            "stage": "benchmark.pagination.text",
+            "position": "late_in_text_order",
+            "page": 1,
+            "status": "complete",
+            "seconds": 6.042787,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:49:33.500562+00:00",
+            "stage": "benchmark.pagination.text",
+            "position": "late_in_text_order",
+            "page": 2,
+            "status": "complete",
+            "seconds": 0.519314,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:49:34.020340+00:00",
+            "stage": "benchmark.pagination.text",
+            "position": "late_in_text_order",
+            "page": 3,
+            "status": "complete",
+            "seconds": 0.313521,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      },
+      {
+        "position": "late_in_text_order",
+        "anchor": "39878575-1354",
+        "order": "numeric_pair",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection"
+      }
+    ],
+    "note": "Orders differ: anchors are chosen in text order; returned pages are not identical row sets. First page includes execute/sort; later pages reuse its cursor."
+  }
+}

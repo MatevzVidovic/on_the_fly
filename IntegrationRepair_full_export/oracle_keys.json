@@ -1,0 +1,6 @@
+{
+  "c469d91a-ae56-11f0-84be-169cd02558fe": {
+    "columns": ["PC_MID", "JN_REV_NUM"],
+    "separator": "-"
+  }
+}

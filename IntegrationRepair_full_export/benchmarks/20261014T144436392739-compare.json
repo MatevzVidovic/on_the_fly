@@ -1,0 +1,77 @@
+{
+  "at": "2026-10-14T14:44:28.332473+00:00",
+  "part": "compare",
+  "requested_rows": 100000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "results": {
+    "legacy_source_copy": {
+      "at": "2026-10-14T14:44:35.151771+00:00",
+      "stage": "benchmark.sqlite_source_copy.legacy",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.154319
+    },
+    "legacy": {
+      "at": "2026-10-14T14:44:35.307482+00:00",
+      "stage": "benchmark.sqlite_compare.legacy",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.246549
+    },
+    "legacy_finalize": {
+      "at": "2026-10-14T14:44:35.554197+00:00",
+      "stage": "benchmark.sqlite_finalize.legacy",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.005632
+    },
+    "joins_source_copy": {
+      "at": "2026-10-14T14:44:35.563379+00:00",
+      "stage": "benchmark.sqlite_source_copy.joins",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.14493
+    },
+    "joins": {
+      "at": "2026-10-14T14:44:35.708469+00:00",
+      "stage": "benchmark.sqlite_compare.joins",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.319132
+    },
+    "joins_finalize": {
+      "at": "2026-10-14T14:44:36.027766+00:00",
+      "stage": "benchmark.sqlite_finalize.joins",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.005934
+    },
+    "results_equal": true,
+    "sample_source_rows": 100000,
+    "sample_lift_rows": 99910,
+    "duckdb_import": {
+      "at": "2026-10-14T14:44:36.133703+00:00",
+      "stage": "benchmark.duckdb_import",
+      "rows": 100000,
+      "status": "complete",
+      "seconds": 0.207316
+    },
+    "duckdb_joins_only": {
+      "at": "2026-10-14T14:44:36.341257+00:00",
+      "stage": "benchmark.duckdb_joins_only",
+      "rows": 99910,
+      "status": "complete",
+      "seconds": 0.02294
+    },
+    "duckdb_results_equal": true
+  }
+}

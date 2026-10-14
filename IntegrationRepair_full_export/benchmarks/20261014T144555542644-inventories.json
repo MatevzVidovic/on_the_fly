@@ -1,0 +1,25 @@
+{
+  "at": "2026-10-14T14:45:49.945946+00:00",
+  "part": "inventories",
+  "requested_rows": 10000,
+  "run_id": "c73f9efd-9795-4aae-8d59-dc11937fbb9d",
+  "integration_id": "550a20ee-9d03-11ef-8c7b-0242ac120008",
+  "table": "kn_nep_etaze_h",
+  "oracle_key": null,
+  "results": {
+    "oracle": {
+      "at": "2026-10-14T14:45:50.722643+00:00",
+      "stage": "benchmark.inventory.oracle",
+      "status": "complete",
+      "seconds": 4.0121,
+      "rows": 10000
+    },
+    "lift": {
+      "at": "2026-10-14T14:45:54.735880+00:00",
+      "stage": "benchmark.inventory.lift",
+      "status": "complete",
+      "seconds": 0.750879,
+      "rows": 10000
+    }
+  }
+}

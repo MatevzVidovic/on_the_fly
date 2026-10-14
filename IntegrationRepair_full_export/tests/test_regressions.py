@@ -160,14 +160,15 @@ class Cursor:
 
 
 def test_target_retains_uuid_and_skips_newer():
-    cursor = Cursor(('existing-uuid', datetime(2025, 1, 1, 12)))
-    target = LiftTarget(SimpleNamespace(cursor=lambda: cursor), None, definition())
-    assert target.upsert(dict(KEY='001', CHANGED=NEW), NEW) is None
-    assert cursor.calls[1][0].startswith('UPDATE "records" SET')
+    from conftest import Cursor as FixedCursor, Database
+    cursor = FixedCursor([('001', 'existing-uuid', datetime(2025, 1, 1, 12))])
+    target = LiftTarget(Database(cursor), None, definition())
+    assert target.upsert_batch([('"001"', dict(KEY='001', CHANGED=NEW))], NEW) == [('"001"', None)]
+    assert cursor.calls[1][0].as_string().startswith('UPDATE "records" SET')
     assert cursor.calls[1][1][-1] == 'existing-uuid'
-    cursor = Cursor(('existing-uuid', datetime(2025, 1, 3)))
-    target.db = SimpleNamespace(cursor=lambda: cursor)
-    assert target.upsert(dict(KEY='001', CHANGED=NEW), NEW)
+    cursor = FixedCursor([('001', 'existing-uuid', datetime(2025, 1, 3))])
+    target.db = Database(cursor)
+    assert target.upsert_batch([('"001"', dict(KEY='001', CHANGED=NEW))], NEW)[0][1]
     assert len(cursor.calls) == 1
 
 

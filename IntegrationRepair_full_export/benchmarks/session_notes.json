@@ -1,0 +1,153 @@
+{
+  "recorded_at": "2026-10-14T15:01:52.507224+00:00",
+  "remote_access": {
+    "transaction_read_only": "on",
+    "ev_parcela_h_privileges": {
+      "SELECT": true,
+      "INSERT": false,
+      "UPDATE": false,
+      "DELETE": false
+    }
+  },
+  "original_ev_parcela_run": {
+    "id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+    "prepared": 1,
+    "applied": 0,
+    "warnings": 0,
+    "pending": 28621,
+    "processed": 0
+  },
+  "baseline_user_runs": [
+    {
+      "table": "ev_parcela_h",
+      "stage": "prepare_source_only",
+      "seconds": 183.74,
+      "rows": 26519797
+    },
+    {
+      "table": "ev_parcela_h",
+      "stage": "prepare_full",
+      "seconds": 464.62,
+      "rows": 26519797
+    },
+    {
+      "table": "ev_parcela_h",
+      "stage": "apply_interrupted_in_oracle_fetch",
+      "seconds": 528.97,
+      "processed": 0,
+      "pending": 28621
+    },
+    {
+      "table": "kn_nep_etaze_h",
+      "stage": "apply_legacy",
+      "seconds": 57.324,
+      "upserts": 3108
+    },
+    {
+      "table": "kn_nep_prostori_h",
+      "stage": "apply_legacy",
+      "seconds": 98.01,
+      "upserts": 4729,
+      "removals": 12
+    }
+  ],
+  "implementation_status": {
+    "oracle_payload_columns": "implemented; per-integration JSON, ev_parcela_h configured",
+    "postgres_apply_batched_lookup": "implemented",
+    "postgres_apply_pipelined_writes": "implemented; remote benchmark uses SELECT-only proxy, writes not executed",
+    "sqlite_prepare_comparison": "unchanged; SQL-join alternative was slower",
+    "numeric_oracle_inventory_order": "benchmark only; existing exports retain text ordering",
+    "native_duckdb_file": "benchmark prototype only; no replacement store"
+  },
+  "correctness_checks": [
+    {
+      "report": "20261014T144007005598-lookups.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144038197075-payloads.json",
+      "check": "requested_keys_match",
+      "passed": true
+    },
+    {
+      "report": "20261014T144436392739-compare.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144436392739-compare.json",
+      "check": "duckdb_results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144712181252-compare.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144712181252-compare.json",
+      "check": "duckdb_results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144912025439-compare.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144912025439-compare.json",
+      "check": "duckdb_results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T144912025439-compare.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T145430901086-lookups.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T145553615390-lookups.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T145811186033-payloads.json",
+      "check": "requested_keys_match",
+      "passed": true
+    },
+    {
+      "report": "20261014T145823281501-payloads.json",
+      "check": "requested_keys_match",
+      "passed": true
+    },
+    {
+      "report": "20261014T145829353525-compare.json",
+      "check": "results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T145829353525-compare.json",
+      "check": "duckdb_results_equal",
+      "passed": true
+    },
+    {
+      "report": "20261014T145829353525-compare.json",
+      "check": "results_equal",
+      "passed": true
+    }
+  ],
+  "limitations": [
+    "Trials are sequential and bounded, not repeated stress tests.",
+    "No shared database caches were flushed.",
+    "Read-only/network access changed during the session: compare cohorts and profile hashes.",
+    "Native numeric ordering differs from concatenated-text ordering.",
+    "Inventory times include initial execute/order and whole driver batches.",
+    "Temporary native DuckDB file materializes both source and LIFT; SQLite production streams LIFT.",
+    "No PostgreSQL INSERT/UPDATE/DELETE/DDL was executed by the benchmarks."
+  ]
+}

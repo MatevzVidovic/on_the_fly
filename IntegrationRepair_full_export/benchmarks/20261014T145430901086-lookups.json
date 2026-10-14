@@ -1,0 +1,41 @@
+{
+  "at": "2026-10-14T14:54:22.074293+00:00",
+  "part": "lookups",
+  "requested_rows": 100,
+  "implementation_sha256": "192dd5e39b7fee15945402cc8e3dac8e197ff5173a1950f09a2b70b398aa4cfa",
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "sample_keys_sha256": "3020dc1360a59c2c80463ba6ab628f9486de52f2ee787889be50549315baa7ba",
+  "results": {
+    "legacy": {
+      "at": "2026-10-14T14:54:23.067081+00:00",
+      "stage": "benchmark.postgres_lookup.legacy",
+      "rows": 100,
+      "status": "complete",
+      "seconds": 7.594642
+    },
+    "batched": {
+      "at": "2026-10-14T14:54:30.662523+00:00",
+      "stage": "benchmark.postgres_lookup.batched",
+      "rows": 100,
+      "status": "complete",
+      "seconds": 0.073613
+    },
+    "pipelined_selects": {
+      "at": "2026-10-14T14:54:30.737219+00:00",
+      "stage": "benchmark.postgres_lookup.pipelined_selects",
+      "rows": 100,
+      "status": "complete",
+      "seconds": 0.11398
+    },
+    "results_equal": true
+  }
+}

@@ -1,0 +1,1101 @@
+{
+  "isam_versions": [
+    {
+      "model": "STA",
+      "verzija": 223,
+      "gid": 356,
+      "datum_modela": "2025-01-01",
+      "tip_verzije": 1,
+      "kopija_verzije": null
+    },
+    {
+      "model": "STA",
+      "verzija": 150,
+      "gid": 402,
+      "datum_modela": "2020-01-01",
+      "tip_verzije": 1,
+      "kopija_verzije": null
+    },
+    {
+      "model": "STZ",
+      "verzija": 13,
+      "gid": 397,
+      "datum_modela": "2020-01-01",
+      "tip_verzije": 1,
+      "kopija_verzije": null
+    },
+    {
+      "model": "STZ",
+      "verzija": 44,
+      "gid": 348,
+      "datum_modela": "2025-01-01",
+      "tip_verzije": 1,
+      "kopija_verzije": null
+    },
+    {
+      "model": "STA",
+      "verzija": 224,
+      "gid": 357,
+      "datum_modela": "2025-01-01",
+      "tip_verzije": 1,
+      "kopija_verzije": null
+    }
+  ],
+  "candidate_version_columns": [
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "id_rel_uredba",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "verzija",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "tip_verzije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "datum_modela",
+      "data_type": "date"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "zaklenjena_verzija",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "delovna_coniranje",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "enacba_leva",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "enacba_desna",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "k",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "leto_akt",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "ezd",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "kopija_verzije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "filter",
+      "data_type": "jsonb"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "pripisna",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "faktorji",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "spremenljivke",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "pasivni_modeli",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "id_rel_geo_verzija",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "enacba_ref_obj",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "enacba_ref_obj_m2",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "fiktivne",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "trans_podposli",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "posli_podposli",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "skupina",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "filter_sql",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "uporabi_za_porocilo_trg",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "analiza_napake_delna",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "analiza_napake_celotna",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "sql_filter",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "analiza_napake_barvna_shema",
+      "data_type": "jsonb"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "opomba",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "prodaje_z_najemi",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "porocilo_uvoza",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "parametri_izjeme",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_verzije_modeli",
+      "column_name": "analiza_napake_filter",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2020",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2021",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2022",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2023",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2024",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "podmodel",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "verzija_model",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "obd_izr",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "kolicina",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "r_var",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "zaokr_pv",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "leto_zac_manj",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "prag_spr_moci",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "tip_fzd_blokov",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "korak",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "tip_inflacije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "zaklenjen_model",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "pripis_model",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "kopija_verzije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "datum_model",
+      "data_type": "date"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "zaokr_vt",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "__readonly",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli",
+      "column_name": "delovni_model",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "id_rel_verzija_model",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "verzija_izr",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "leto_izr",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "datum_izr",
+      "data_type": "date"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "indeks_datum_model",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "zaklenjen_izr",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "pripis_izr",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "kopija_verzije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "geom_izr",
+      "data_type": "date"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "pev_verzije_izracuni",
+      "column_name": "__readonly",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "id_rel_sifrant",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "f_pretvorbe",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "f_delitve",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "aktiven",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "uporabi_v_izracunu",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "vnos_stolpec",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "opomba",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli_produkti",
+      "column_name": "id_rel_verzija_model",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "podmodel",
+      "data_type": "text"
+    },
+    {
+      "table_name": "pev_verzije_modeli_seq",
+      "column_name": "verzija_model",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "model",
+      "data_type": "character varying"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "verzija",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "datum_od",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "datum_do",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "opomba",
+      "data_type": "text"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "kreirano",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "datum_na",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "zaklenjeno",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "varianta",
+      "data_type": "smallint"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "pripis",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "indeksiranje",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "datum_pripis",
+      "data_type": "date"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "datum_indeksiranje",
+      "data_type": "date"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "uredba",
+      "data_type": "smallint"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "rmodel_oid",
+      "data_type": "oid"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "porocila",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "verzija_pripis",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_gv_verzije",
+      "column_name": "kopija",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_impot_parc1",
+      "column_name": "id_model_ver",
+      "data_type": "text"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "model",
+      "data_type": "character varying"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "verzija",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "leto_izr",
+      "data_type": "smallint"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "obd_izr",
+      "data_type": "smallint"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "datum_izr",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "geom_izr",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "kolicina",
+      "data_type": "character varying"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "varna_st",
+      "data_type": "double precision"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "korak",
+      "data_type": "double precision"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "pogoj",
+      "data_type": "text"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "zaklenjeno",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "pripis",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "indeksiranje",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "datum_pripis",
+      "data_type": "date"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "datum_indeksiranje",
+      "data_type": "date"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "varianta",
+      "data_type": "smallint"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "porocila",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "opombe",
+      "data_type": "text"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "academa_status",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "leto_zac_manj",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "datum_modela",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "tip_inflacije",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "primoz_pev_verzije",
+      "column_name": "indeks_datum_modela",
+      "data_type": "double precision"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "ogc_fid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "dgn_level",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "ogc_fid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "h_slemena",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "h_kapi",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "h_stavbe",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "p_stavbe",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "st_etaz",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "bruto_tlor",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "tip_strehe",
+      "data_type": "character varying"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "max_zid_de",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "h_min",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "fme_featur",
+      "data_type": "character varying"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "ogc_fid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "h_slemena",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "h_kapi",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "h_stavbe",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "p_stavbe",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "st_etaz",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "bruto_tlor",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "tip_strehe",
+      "data_type": "text"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "max_zid_de",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "h_min",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "fme_basena",
+      "data_type": "text"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_geo_cona",
+      "column_name": "gv_id",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_geo_obm",
+      "column_name": "gv_id",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "verzija_obmocja",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "zaklenjena",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "modeli",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "delovna_geo_coniranje",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_geo_obm_verzije",
+      "column_name": "__readonly",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_strehe_verzija1",
+      "column_name": "geom",
+      "data_type": "USER-DEFINED"
+    },
+    {
+      "table_name": "tmp_vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1_65673326ed46",
+      "column_name": "geom",
+      "data_type": "USER-DEFINED"
+    },
+    {
+      "table_name": "vsa_obmocja_tlorisi_stavbe_z_atributi_verzija1",
+      "column_name": "geom",
+      "data_type": "USER-DEFINED"
+    }
+  ]
+}

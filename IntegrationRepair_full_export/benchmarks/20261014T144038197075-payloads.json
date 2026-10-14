@@ -1,0 +1,35 @@
+{
+  "at": "2026-10-14T14:40:26.699228+00:00",
+  "part": "payloads",
+  "requested_rows": 1000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "sample_keys_sha256": "753f2c7b004b790bd139153af686b83db23c130c88c2a53066fcfc918fa89322",
+  "results": {
+    "legacy": {
+      "at": "2026-10-14T14:40:27.395431+00:00",
+      "stage": "benchmark.oracle_payloads.legacy",
+      "rows": 1000,
+      "status": "failed",
+      "seconds": 10.180404,
+      "error": "DPY-4011: the database or network closed the connection"
+    },
+    "configured": {
+      "at": "2026-10-14T14:40:37.776302+00:00",
+      "stage": "benchmark.oracle_payloads.configured",
+      "rows": 1000,
+      "status": "complete",
+      "seconds": 0.393154,
+      "returned_rows": 1000,
+      "requested_keys_match": true
+    }
+  }
+}

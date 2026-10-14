@@ -1,0 +1,210 @@
+{
+  "at": "2026-10-14T14:51:23.285759+00:00",
+  "part": "pagination",
+  "requested_rows": 1000,
+  "run_id": "8190f417-bbd3-41f3-b727-b00b4d3065e4",
+  "integration_id": "c469d91a-ae56-11f0-84be-169cd02558fe",
+  "table": "ev_parcela_h",
+  "oracle_key": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "results": {
+    "results": [
+      {
+        "position": "start",
+        "anchor": null,
+        "order": "text_keyset",
+        "pages": [],
+        "error": "DPY-4011: the database or network closed the connection",
+        "failed_phase": {
+          "at": "2026-10-14T14:51:52.173698+00:00",
+          "stage": "benchmark.pagination.text_keyset",
+          "position": "start",
+          "page": 1,
+          "status": "failed",
+          "seconds": 12.413107
+        }
+      },
+      {
+        "position": "start",
+        "anchor": null,
+        "order": "numeric_pair_keyset",
+        "pages": [
+          {
+            "at": "2026-10-14T14:52:06.861969+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "start",
+            "page": 1,
+            "status": "complete",
+            "seconds": 0.521468,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:07.384692+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "start",
+            "page": 2,
+            "status": "complete",
+            "seconds": 0.567494,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:07.953316+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "start",
+            "page": 3,
+            "status": "complete",
+            "seconds": 0.687487,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      },
+      {
+        "position": "middle_of_text_order",
+        "anchor": "26747766-1354",
+        "order": "text_keyset",
+        "pages": [
+          {
+            "at": "2026-10-14T14:52:11.241996+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "middle_of_text_order",
+            "page": 1,
+            "status": "complete",
+            "seconds": 9.320044,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:20.562499+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "middle_of_text_order",
+            "page": 2,
+            "status": "complete",
+            "seconds": 8.926003,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:29.488930+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "middle_of_text_order",
+            "page": 3,
+            "status": "complete",
+            "seconds": 9.249135,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      },
+      {
+        "position": "middle_of_text_order",
+        "anchor": "26747766-1354",
+        "order": "numeric_pair_keyset",
+        "pages": [
+          {
+            "at": "2026-10-14T14:52:42.153461+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "middle_of_text_order",
+            "page": 1,
+            "status": "complete",
+            "seconds": 0.739685,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:42.894454+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "middle_of_text_order",
+            "page": 2,
+            "status": "complete",
+            "seconds": 0.27398,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:43.169956+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "middle_of_text_order",
+            "page": 3,
+            "status": "complete",
+            "seconds": 0.239037,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      },
+      {
+        "position": "late_in_text_order",
+        "anchor": "39878575-1354",
+        "order": "text_keyset",
+        "pages": [
+          {
+            "at": "2026-10-14T14:52:45.433248+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "late_in_text_order",
+            "page": 1,
+            "status": "complete",
+            "seconds": 2.572063,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:48.005855+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "late_in_text_order",
+            "page": 2,
+            "status": "complete",
+            "seconds": 2.30885,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:50.315091+00:00",
+            "stage": "benchmark.pagination.text_keyset",
+            "position": "late_in_text_order",
+            "page": 3,
+            "status": "complete",
+            "seconds": 3.345947,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      },
+      {
+        "position": "late_in_text_order",
+        "anchor": "39878575-1354",
+        "order": "numeric_pair_keyset",
+        "pages": [
+          {
+            "at": "2026-10-14T14:52:58.511994+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "late_in_text_order",
+            "page": 1,
+            "status": "complete",
+            "seconds": 1.005702,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:52:59.519037+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "late_in_text_order",
+            "page": 2,
+            "status": "complete",
+            "seconds": 0.872978,
+            "rows": 1000
+          },
+          {
+            "at": "2026-10-14T14:53:00.392760+00:00",
+            "stage": "benchmark.pagination.numeric_pair_keyset",
+            "position": "late_in_text_order",
+            "page": 3,
+            "status": "complete",
+            "seconds": 0.355331,
+            "rows": 1000
+          }
+        ],
+        "ordered": true
+      }
+    ],
+    "note": "Orders differ: anchors are chosen in text order; returned pages are not identical row sets. Stream mode reuses one cursor. Keyset mode runs a row-limited query per page. First page includes execute/sort."
+  }
+}
