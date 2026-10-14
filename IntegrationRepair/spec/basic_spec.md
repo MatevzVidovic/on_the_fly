@@ -88,7 +88,7 @@ Keep the originally requested four-table shape. These names and fields describe 
 
 | Table | Contents |
 | --- | --- |
-| `integration_transfer` | Repair UUID, integration UUID, cutoff, preparation/application completion state, first apply-start timestamp, and warning counts. |
+| `integration_transfer` | Repair UUID, integration UUID, creation timestamp (UTC), target attribute-table name, cutoff, preparation/application completion state, prepared upsert/delete counts, first apply-start timestamp, and warning counts. |
 | `remote_ids_and_date_changed` | Repair UUID, integration key, and source change time; a seen-in-LIFT marker can support streamed comparison. |
 | `addition_diff` | Repair UUID, integration key, prepared source change time, and processed marker. Covers inserts and updates. |
 | `removal_diff` | Repair UUID, target row UUID, integration key, prepared target change time, and processed marker. |

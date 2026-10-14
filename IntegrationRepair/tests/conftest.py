@@ -85,7 +85,7 @@ def store():
 
 @pytest.fixture
 def run_id(store):
-    return store.create_run('integration', DATE)
+    return store.create_run('integration', DATE, 'records')
 
 
 @pytest.fixture

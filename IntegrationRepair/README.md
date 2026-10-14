@@ -23,6 +23,13 @@ SELECT * FROM addition_diff WHERE run_id='REPAIR_UUID';
 SELECT * FROM removal_diff WHERE run_id='REPAIR_UUID';
 ```
 
+`integration_transfer` also stores `created_at` (UTC), `attribute_table_name`,
+`upsert_count`, and `delete_count`. The counts are saved when preparation finishes
+and remain the prepared totals after apply, including entries that are skipped.
+Existing SQLite files gain these columns automatically on opening; counts are
+filled for old prepared runs, while unavailable historical creation times and
+table names remain NULL.
+
 All warnings are printed with the business key. Apply warnings also remain on addition entries. Skips are terminal for this run. Rerun the same apply command after an execution failure; committed but unmarked batches safely replay. Failed prepare runs remain unprepared: start a fresh prepare instead.
 
 ## Where each role lives

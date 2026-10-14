@@ -140,7 +140,7 @@ def test_completion_failure_resumes_without_rewriting(tmp_path):
 
 def test_unfinished_prepare_cannot_apply(tmp_path):
     store = RepairStore(tmp_path / 'repair.sqlite')
-    run = store.create_run('integration', OLD)
+    run = store.create_run('integration', OLD, 'records')
     with pytest.raises(ValueError, match='prepared'):
         apply(run, definition(), Source(), Target(), store)
 
@@ -230,3 +230,24 @@ def test_pending_queries_use_partial_indexes(tmp_path):
         plan = store.db.execute(f'EXPLAIN QUERY PLAN SELECT * FROM {table} WHERE run_id=? AND processed=0 LIMIT ?',
                                ('run', 10000)).fetchall()
         assert any(index in row['detail'] for row in plan)
+
+
+def test_existing_store_gains_run_details_without_losing_diffs(tmp_path):
+    path = tmp_path / 'old.sqlite'
+    old = RepairStore(path)
+    run = old.create_run('integration', OLD, 'records')
+    old.save_source(run, [(1, OLD)])
+    old.compare_target_page(run, [('extra-uuid', 2, OLD)])
+    old.finish_preparation(run)
+    # Reproduce the old schema, which did not record these four details.
+    with old.db:
+        for column in ('created_at', 'attribute_table_name', 'upsert_count', 'delete_count'):
+            old.db.execute(f'ALTER TABLE integration_transfer DROP COLUMN {column}')
+    old.db.close()
+
+    updated = RepairStore(path)
+    row = updated.require_prepared_run(run)
+    assert row['upsert_count'] == 1 and row['delete_count'] == 1
+    assert row['created_at'] is None and row['attribute_table_name'] is None
+    assert updated.db.execute('SELECT target_id FROM removal_diff').fetchone()[0] == 'extra-uuid'
+    updated.db.close()

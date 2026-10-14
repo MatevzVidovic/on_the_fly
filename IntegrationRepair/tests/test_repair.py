@@ -15,6 +15,9 @@ def test_prepare(definition, store):
     run_id = repair.prepare(definition, source, target, store)
 
     assert store.require_prepared_run(run_id)['cutoff'] == DATE
+    assert store.require_prepared_run(run_id)['attribute_table_name'] == 'records'
+    assert store.require_prepared_run(run_id)['upsert_count'] == 1
+    assert store.require_prepared_run(run_id)['delete_count'] == 0
     assert store.db.execute('SELECT key FROM addition_diff').fetchone()['key'] == '1'
 
 

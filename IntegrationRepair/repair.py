@@ -19,7 +19,7 @@ from target import LiftTarget
 
 def prepare(definition, source, target, store):
     cutoff = wall_time(definition.cutoff)
-    run_id = store.create_run(definition.id, cutoff)
+    run_id = store.create_run(definition.id, cutoff, definition.table)
     print(f'Preparing run {run_id}, cutoff {cutoff}', flush=True)
     for page in source.inventory(cutoff):
         store.save_source(run_id, page)

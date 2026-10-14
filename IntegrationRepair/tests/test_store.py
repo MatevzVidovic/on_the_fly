@@ -1,4 +1,6 @@
 """Each test shows one SQLite operation on a real in-memory database."""
+from datetime import datetime, timezone
+
 from store import RepairStore, classify
 from conftest import DATE
 
@@ -19,11 +21,15 @@ def test_init():
 
 
 def test_create_run(store):
-    run_id = store.create_run('integration', DATE)
+    before = datetime.now(timezone.utc)
+    run_id = store.create_run('integration', DATE, 'records')
 
     row = store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
     assert row['integration_id'] == 'integration'
     assert row['cutoff'] == DATE
+    assert row['attribute_table_name'] == 'records'
+    assert before <= datetime.fromisoformat(row['created_at']) <= datetime.now(timezone.utc)
+    assert row['upsert_count'] is None and row['delete_count'] is None
 
 
 def test_require_prepared_run(store, prepared_run):
@@ -51,10 +57,13 @@ def test_compare_target_page(store, run_id):
 
 def test_finish_preparation(store, run_id):
     store.save_source(run_id, [(1, DATE)])
+    store.compare_target_page(run_id, [('extra-uuid', 2, DATE)])
 
     store.finish_preparation(run_id)
 
     assert store.require_prepared_run(run_id)['prepared'] == 1
+    assert store.require_prepared_run(run_id)['upsert_count'] == 1
+    assert store.require_prepared_run(run_id)['delete_count'] == 1
     assert store.db.execute('SELECT key FROM addition_diff').fetchone()['key'] == '1'
 
 
@@ -82,6 +91,7 @@ def test_finish_additions(store, prepared_run):
     row = store.db.execute('SELECT * FROM addition_diff').fetchone()
     assert row['processed'] == 1
     assert row['warning'] is None
+    assert store.require_prepared_run(prepared_run)['upsert_count'] == 1
 
 
 def test_finish_removals(store, run_id):
