@@ -50,4 +50,15 @@ Both inventories scan keys/dates and filter by cutoff in Python. This lets NULL 
 .venv/bin/python -m pytest -q
 ```
 
+Each production file has a matching `tests/test_<file>.py`, with one simple example for each declared function or method. `tests/test_regressions.py` retains the broader regression checks. The examples use real in-memory SQLite and tiny fixed Oracle/PostgreSQL stand-ins, so no credentials or servers are needed.
+
+Run a single file or step through one example:
+
+```sh
+.venv/bin/python -m pytest tests/test_source.py -q
+.venv/bin/python -m pytest tests/test_source.py::test_inventory --trace -s
+```
+
+In the debugger, `s` steps into a call, `n` runs the next line, and `c` continues. Set a breakpoint inside the production method to skip fixture setup. You can also debug an individual pytest test from your IDE.
+
 Tests cover comparison, mapping, actual generated SQL, stored progress, terminal skips, replay after commit and completion restart. Read-only test metadata was checked against real KN definitions: bigint/text keys, date-time values, WKT mappings, point layers and direct materialized subscriptions. Oracle was unavailable during development, so source SQL/driver execution has not been checked live. The read-only data DB successfully evaluated the configured PostGIS WKT expression and timestamp binding; generated INSERT/UPDATE/DELETE statements were PREPAREd and DEALLOCATEd without executing them. PostgreSQL writes and materialized refresh were not executed against the read-only test database. Verify those on a writable disposable copy before production use.
