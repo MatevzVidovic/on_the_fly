@@ -46,7 +46,7 @@ A source record within the repair cutoff whose LIFT counterpart has an older cha
 The number of current records at or before the repair cutoff, either in the Oracle integration query's result or in its LIFT target table.
 
 **Expected needed deletions**:
-A signed estimate of LIFT's surplus rows after planned repair inserts: LIFT's scoped row count plus planned inserts minus Oracle's scoped row count. A negative value signals an unexplained count gap; this estimate does not identify records or cause changes.
+A signed count gap: LIFT's scoped row count plus planned inserts minus Oracle's scoped row count. Negative values warn; positive values can include still-existing Oracle keys whose dates moved beyond the cutoff, so the estimate is not a confirmed deletion count.
 
 **Dependent materialized view**:
 A stored LIFT query result whose source configuration subscribes to changes in a repaired table. Its contents are separate from the repaired base-table records.

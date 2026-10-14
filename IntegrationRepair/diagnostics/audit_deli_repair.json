@@ -1,0 +1,327 @@
+{
+  "audited_at": "2026-10-14T12:34:13.766086+00:00",
+  "saved_runs": [
+    {
+      "id": "658cb459-9556-4f87-96cb-68b4d85c7f5f",
+      "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+      "attribute_table_name": "kn_nep_deli_stavb_h",
+      "created_at": "2026-10-14T12:09:03.233974+00:00",
+      "cutoff": "2026-10-14 13:57:49.000000",
+      "prepared": 1,
+      "applied": 1,
+      "max_date": "2026-10-14 12:11:15.866770",
+      "warnings": 0,
+      "oracle_count": 2739514,
+      "lift_count": 2739348,
+      "insert_count": 177,
+      "update_count": 7487,
+      "expected_needed_deletions": 11
+    },
+    {
+      "id": "3d6e5856-881c-437c-bc57-73bdcb3a31e7",
+      "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+      "attribute_table_name": "kn_nep_deli_stavb_h",
+      "created_at": "2026-10-14T12:23:22.066240+00:00",
+      "cutoff": "2026-10-14 13:57:49.000000",
+      "prepared": 1,
+      "applied": 0,
+      "max_date": null,
+      "warnings": 0,
+      "oracle_count": 2739500,
+      "lift_count": 2739525,
+      "insert_count": 0,
+      "update_count": 0,
+      "expected_needed_deletions": 25
+    }
+  ],
+  "mapped_fields": [
+    "uporabna_povrsina",
+    "del_stavbe_h_id",
+    "prostornina_cistern_silosov",
+    "del_stavbe_id",
+    "postopek_id_od",
+    "stavba_id",
+    "postopek_id_do",
+    "hisna_stevilka_id",
+    "upravnik_id",
+    "vrsta_dejanske_rabe_del_st_id",
+    "dvigalo",
+    "eid",
+    "leto_obnove_instalacij",
+    "nacin_dolocitve_povrsine_dela_stavbe_id",
+    "datum_do",
+    "leto_obnove_oken",
+    "upravnik_status",
+    "datum_sys",
+    "povrsina",
+    "omejitev_vpogleda",
+    "status",
+    "etazna_lastnina",
+    "st_dela_stavbe",
+    "skupni_del_etazna_lastnina",
+    "stanovanje_id",
+    "datum_od"
+  ],
+  "repaired": {
+    "planned": 7664,
+    "source_found": 7664,
+    "source_date_unchanged": 7664,
+    "source_date_changed": 0,
+    "stable_payload_mismatch_rows": [],
+    "null_source_preserved_fields": {},
+    "null_source_nonnull_on_inserts": [],
+    "metadata_mismatches": [],
+    "inserted_uuid_versions": {
+      "1": 177
+    }
+  },
+  "normal_integration_controls": {
+    "requested": 200,
+    "source_found": 200,
+    "same_date": 200,
+    "mismatches": [],
+    "created_equals_updated": 200,
+    "writer_ids": {
+      "7b87a13c-2c28-11f1-96ae-f649468e5bd6": 200
+    },
+    "timestamp_samples": [
+      "2026-10-14T12:06:23.135726"
+    ],
+    "null_source_preserved_fields": {}
+  },
+  "updated_uuid_check": {
+    "found_in_october7_snapshot": 7487,
+    "unchanged": 7487
+  },
+  "current_membership": {
+    "oracle_count": 2739497,
+    "lift_count": 2739525,
+    "source_only_keys": [],
+    "lift_only_keys": [
+      447298,
+      487941,
+      534385,
+      534386,
+      534387,
+      534388,
+      534389,
+      796178,
+      815949,
+      936293,
+      1346076,
+      1346078,
+      1349294,
+      1349295,
+      1349296,
+      1736463,
+      1813407,
+      1813413,
+      1875318,
+      1901745,
+      1901746,
+      1901747,
+      2788422,
+      2899570,
+      2912670,
+      2912671,
+      2912672,
+      2912673
+    ],
+    "lift_only_still_in_unbounded_oracle": 17,
+    "lift_only_source_dates_after_cutoff": [
+      {
+        "key": 487941,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534385,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534386,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534387,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534388,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534389,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 796178,
+        "source_date": "2026-10-14 14:28:49",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 815949,
+        "source_date": "2026-10-14 14:25:52",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 936293,
+        "source_date": "2026-10-14 14:17:54",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 1736463,
+        "source_date": "2026-10-14 14:17:44",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 1875318,
+        "source_date": "2026-10-14 14:18:25",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 2788422,
+        "source_date": "2026-10-14 14:25:47",
+        "target_date": "2025-08-21 10:33:55"
+      },
+      {
+        "key": 2899570,
+        "source_date": "2026-10-14 14:17:54",
+        "target_date": "2026-08-24 13:55:40"
+      },
+      {
+        "key": 2912670,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912671,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912672,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912673,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      }
+    ],
+    "lift_only_absent_from_unbounded_oracle": [
+      447298,
+      1346076,
+      1346078,
+      1349294,
+      1349295,
+      1349296,
+      1813407,
+      1813413,
+      1901745,
+      1901746,
+      1901747
+    ]
+  },
+  "count_change_explanation": {
+    "first_prepare_source_local": "2026-10-14 14:09:03.233974",
+    "second_prepare_source_local": "2026-10-14 14:23:22.066240",
+    "source_rows_dated_between_prepares": [
+      {
+        "key": 487941,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534385,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534386,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534387,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534388,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 534389,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 936293,
+        "source_date": "2026-10-14 14:17:54",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 1736463,
+        "source_date": "2026-10-14 14:17:44",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 1875318,
+        "source_date": "2026-10-14 14:18:25",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 2899570,
+        "source_date": "2026-10-14 14:17:54",
+        "target_date": "2026-08-24 13:55:40"
+      },
+      {
+        "key": 2912670,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912671,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912672,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      },
+      {
+        "key": 2912673,
+        "source_date": "2026-10-14 14:19:50",
+        "target_date": "2026-10-09 10:46:24"
+      }
+    ],
+    "source_rows_dated_after_second_prepare": [
+      {
+        "key": 796178,
+        "source_date": "2026-10-14 14:28:49",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 815949,
+        "source_date": "2026-10-14 14:25:52",
+        "target_date": "2022-06-01 13:25:59"
+      },
+      {
+        "key": 2788422,
+        "source_date": "2026-10-14 14:25:47",
+        "target_date": "2025-08-21 10:33:55"
+      }
+    ],
+    "changed_source_keys_repaired_by_this_run": 0,
+    "unbounded_source_absent_keys_equal_october7_snapshot": true
+  }
+}

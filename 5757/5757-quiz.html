@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>5757 · Learn by solving</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f3f6fa,#111922);--surface:light-dark(#fff,#1a2634);--text:light-dark(#172a40,#e6effb);--muted:light-dark(#52647a,#b1c1d5);--border:light-dark(#ccd7e5,#40516a);--blue:light-dark(#195cb8,#94bcff);--soft:light-dark(#eaf2ff,#263b56);--green:light-dark(#216144,#91d8b5)}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:16px/1.6 system-ui,sans-serif}main{max-width:880px;padding:28px 22px 50px;margin:auto}h1{font-size:30px;line-height:1.2;margin:8px 0 12px}h2{font-size:22px;line-height:1.35;margin:10px 0}h3{font-size:16px;margin:12px 0 4px}p{margin:8px 0}.small{font-size:13px;color:var(--muted)}.panel{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:22px;margin-top:18px}.nav,.actions{display:flex;flex-wrap:wrap;gap:8px;margin:16px 0}button{font:inherit;font-size:14px;border:1px solid var(--border);border-radius:8px;background:var(--surface);color:var(--text);padding:10px 14px;cursor:pointer}button:hover{background:var(--soft)}button:disabled{opacity:.45;cursor:default}button[aria-current="step"],.primary{background:var(--blue);color:light-dark(#fff,#122138);border-color:var(--blue)}.nav button{min-width:44px}.nav button.answered::after{content:' •';color:inherit}button:focus-visible,textarea:focus-visible{outline:3px solid var(--blue);outline-offset:3px}textarea{width:100%;min-height:150px;font:16px/1.5 system-ui,sans-serif;resize:vertical;background:var(--bg);color:var(--text);border:1px solid var(--border);border-radius:8px;padding:12px}label{display:block;font-weight:600;margin:16px 0 7px}.explanation{border-left:3px solid var(--green);padding:0 0 0 16px;margin-top:18px}.explanation p{font-size:14px}.prompt{white-space:pre-line}#report{min-height:230px;font:13px/1.5 ui-monospace,monospace}#feedback{min-height:24px}.pill{color:var(--blue);font-size:13px;font-weight:600}a{color:var(--blue)}[hidden]{display:none!important}@media(max-width:520px){main{padding:18px 12px 30px}.panel{padding:16px}h1{font-size:26px}.actions button{flex:1}}
+</style>
+</head><body><main>
+<div class="pill">5757 · 10 SCENARIOS · NO GUESSING FROM OPTIONS</div>
+<h1>Can you make this comparison trustworthy?</h1>
+<p>Answer in your own words, then reveal the explanation. “I don’t know” is a useful answer. Focus on what the code must do and why.</p>
+<p class="small">Your first answer is preserved when you reveal an explanation. You can then revise it. The report records both, so I can tell what you knew and what became clearer. No automatic scoring.</p>
+<nav class="nav" id="nav" aria-label="Questions"></nav>
+<p id="progress" class="small" aria-live="polite"></p>
+<section class="panel" aria-labelledby="title">
+<div class="pill" id="counter"></div><h2 id="title"></h2><p id="prompt" class="prompt"></p>
+<label for="answer" id="answer-label">Your answer</label><textarea id="answer" placeholder="Explain your decision and the work it requires…"></textarea>
+<div class="actions"><button type="button" id="reveal" class="primary">Reveal explanation</button><button type="button" id="previous">Previous</button><button type="button" id="next">Next</button></div>
+<div id="explanation" class="explanation" hidden><h3>What a strong answer covers</h3><p id="solution" class="prompt"></p><h3>What has to be built</h3><p id="build" class="prompt"></p><h3>Check your understanding</h3><p id="check"></p></div>
+</section>
+<section class="panel" aria-labelledby="report-title"><h2 id="report-title">Paste this back to me</h2><p class="small">This field updates as you answer. Copy it whenever you finish or want feedback on a partial attempt.</p><label for="report">Your answer report</label><textarea id="report" readonly spellcheck="false"></textarea><div class="actions"><button type="button" id="copy" class="primary">Copy answer report</button><button type="button" id="download">Download report</button></div><p id="feedback" class="small" role="status"></p><p class="small" id="save-note">Answers are saved in this browser when storage is available. Nothing is sent automatically.</p></section>
+<footer class="small"><p>Based on <a href="5757.md">5757 requirements</a> and the <a href="5757-roles.html">proposed roles</a>. Run publication/retry contracts are design proposals. EV field mappings, tolerance and business rules still require confirmation.</p></footer>
+<script id="questions" type="application/json">
+[
+  {
+    "title": "The totals look plausible. Can you trust them?",
+    "prompt": "A user starts a comparison for 2026-06-30. ISAM is read for that date, but the EV query takes the latest records because the property IDs match. The totals look plausible. Would you publish this comparison? Explain what must be checked, and which roles must check it.",
+    "solution": "No. Matching property IDs do not make different snapshots comparable. Resolve the selected date-row ID to its actual date and verify that both sources represent that cutoff, with corresponding models and versions. If historical EV data is unavailable, surface that limitation instead of substituting the latest records.",
+    "build": "The coordinator fixes the date and settings and checks upstream readiness. The source reader enforces each source’s date semantics and returns dated, traceable evidence. The comparator receives evidence for a common scope; it cannot repair a wrong snapshot after the fact.",
+    "check": "Could you explain the difference between the date-row ID and the actual cutoff date, and how you would prove EV represents that date?"
+  },
+  {
+    "title": "Decimals across the storage path",
+    "prompt": "A calculation produced 123.47, but the saved value is 123.00 after passing through an integer field. An engineer changes only the PostgreSQL column to numeric(20,2), then reruns the comparison using the saved records. What problems remain, and what work is needed before trusting the result?",
+    "solution": "Lift must also use Decimal Number for pripis_vmxpd_x_enote.vrednost_izr. A numeric database column does not reverse decimals already lost earlier. Recover the authoritative decimal values or rerun the calculation from reliable inputs, then verify the write/read path preserves them. numeric(20,2) is suggested; required precision still needs confirmation.",
+    "build": "Change the Lift metadata and PostgreSQL schema during setup, verify the calculation writer and reader, and restore affected input results. This is a prerequisite to comparison, not a conversion applied on every run.",
+    "check": "If your comparison reports ENAKO on values whose decimals were already lost, what exactly has it proved?"
+  },
+  {
+    "title": "Six joined rows from five parcel parts",
+    "prompt": "For the same date, parcel, model and version, ISAM has two parts valued at 60 and 40. EV has three parts valued at 30, 30 and 40. Joining the parts on that shared scope creates six rows. What should the final calculated-value comparison contain instead? Include the evidence you would keep for investigation.",
+    "solution": "Aggregate each source separately before joining: ISAM total 100, EV total 100, delta_izr = 0. The result has one row for date + parcel + model + version. Joining parts first duplicates contributions and corrupts the totals. Different source partitions do not necessarily mean different parcel values.",
+    "build": "The final-value comparator groups each side independently, then joins the aggregates while retaining unmatched scopes. Save part counts 2 and 3, IDs on both sides, available total area/share, and NIVO_PRIMERJAVE = PARCELA_MODEL_AGREGAT. Intermediate matching is a separate later problem.",
+    "check": "Would equal parcel totals prove that every part has a matching part in the other source?"
+  },
+  {
+    "title": "Which rows need a deeper investigation?",
+    "prompt": "The configured tolerance is 0.05. Values below are ISAM / EV.\nA: calculated 100.00 / 100.05; generalized 100 / 101.\nB: calculated 100 / 100; generalized 100 / 101.\nC: ISAM calculated 100; EV record absent.\nWhat should be saved for each row, and which rows should trigger intermediate comparison? Explain your reasoning.",
+    "solution": "Save all three final rows. A has delta_izr = −0.05 and delta_posplosena = −1; B has 0 and −1; C has a missing-EV status and no computable delta. None triggers intermediate comparison: A is exactly at the threshold, not strictly above it; B differs only in generalized value; C has no EV counterpart. Use decimal arithmetic for the threshold comparison.",
+    "build": "Keep the two values, deltas and statuses separate. The required detail gate is both sources having usable calculated values and abs(delta_izr) > tolerance. The requirements do not fully settle how tolerance affects the final calculated ENAKO/RAZLIKA status; confirm that policy separately. Generalized-only differences must remain visible (described as RAZLIKA_POSPLOSENA).",
+    "check": "If A’s EV calculated value becomes 100.06, what changes about the work to be performed?"
+  },
+  {
+    "title": "Interpreting an EV result",
+    "prompt": "ISAM has a valid calculated value. EV has a record, but its calculation failed and its value is NULL. Someone replaces the NULL with zero and reports a numerical mismatch. What should the user see instead, and where should this decision be made?",
+    "solution": "Show NAPAKA_EV for the affected comparison, with the error evidence. The record is present, so it is not MANJKA_EV; a failed calculation is not a genuine zero. Do not invent a numerical delta or send it through ordinary intermediate comparison. A generalized value, if independently valid, needs its own status.",
+    "build": "The source reader preserves existence, calculation outcome and value separately. The final-value comparator derives statuses and eligibility from that evidence. The result store saves it, and Lift displays it rather than recalculating or replacing NULLs.",
+    "check": "What evidence lets you distinguish a legitimate value of zero, a missing EV record and a failed EV calculation?"
+  },
+  {
+    "title": "Translating an EV component",
+    "prompt": "An EV field called area contains 0.8 hectares; ISAM’s area contains 8,000 square metres. An EV factor is NULL while ISAM’s is zero. For a newer model version, two EV fields together represent one ISAM component. A developer proposes renaming the EV columns and comparing the values directly. What would a reliable implementation need instead?",
+    "solution": "Translate EV into the canonical ISAM meaning before comparing. Convert the area units so 0.8 ha becomes 8,000 m². Establish the business meaning of NULL versus zero rather than assuming equivalence. Apply the correct model/version rule to combine fields; matching names are insufficient. Preserve source values and report any unmapped data explicitly.",
+    "build": "The intermediate explainer consumes shared translation rules. Put simple mappings in a configuration table; implement structural transformations as versioned SQL views/functions. Each translated component carries identity, model/version, canonical key/group, value, source EV field(s) and the rule used. Precision and units belong in the contract.",
+    "check": "If a translated component differs, could a user trace it back to the source fields and the exact rule used?"
+  },
+  {
+    "title": "Pairing parcel components",
+    "prompt": "A parcel has multiple parts of the same model on both sides. Two parts share all currently available business attributes and have equal areas. A developer sorts the parts by ID and pairs them using row_number(). It gives a tidy detail screen. Would you accept this? Explain what the system should produce if the data cannot support a unique match.",
+    "solution": "No. Source part IDs, row order and equal areas do not prove semantic correspondence. Define a model-specific component key from shared business attributes and check uniqueness. Area/share can help validate a match, but cannot serve as the primary identity. If that evidence is insufficient, report NEENOLICNA_STRUKTURA and show aggregate evidence at parcel + model level.",
+    "build": "Analyse multi-part parcels before fixing component keys. The intermediate explainer detects ambiguous structure and preserves the issue instead of silently dropping it or inventing pairings. Final parcel-total comparison still remains useful even when detailed matching is impossible.",
+    "check": "Which statement is justified by the data: “the parcel totals differ” or “this specific ISAM part caused the difference”?"
+  },
+  {
+    "title": "A run fails after writing half its output",
+    "prompt": "The workflow saves all final comparison rows, then crashes halfway through saving intermediate details. The user immediately retries and opens Lift. Propose a small design that prevents duplicate rows and misleading results. Explain what the coordinator, result store and screen each own.",
+    "solution": "Use a run identity and explicit state. Keep final and detail rows linked to the run and do not publish a partial set as completed. Choose a clear retry policy: resume/replace the same run idempotently, or create a separate run whose output is isolated. Either way, prevent duplicates for the logical keys and never mix outputs from different attempts.",
+    "build": "This is a proposed reliability contract, not a prescribed table layout in the requirements. The coordinator owns execution/progress/failure; the store owns run-scoped writes, detail links and completion publication; Lift distinguishes running/failed/complete and shows results accordingly. Mark completion only when required writes succeed; retain failure diagnostics.",
+    "check": "What would stop final rows from run 1 being displayed with only some detail rows from run 2?"
+  },
+  {
+    "title": "Correct logic, impossible workload",
+    "prompt": "The sources contain millions of records across many dates. A Python script loads all records and all intermediate fields, filters to the selected date in memory, compares parcel parts, then inserts results one row at a time. It works on a tiny sample. What would you change first, and what evidence would show the new approach is efficient?",
+    "solution": "Filter the selected date in the source queries before transferring or joining large data. Perform parcel aggregation and final comparisons in SQL. Fetch/translate intermediate data only for eligible calculated differences. Use suitable indexes on date and matching keys, bulk/run-scoped writes and paginated result reads. Keep Python focused on orchestration.",
+    "build": "Put query shaping in the reader, set-based aggregation/comparison in the comparator, candidate-scoped detail work in the explainer and bulk persistence in the store. Inspect query plans and representative volumes for scans, join cardinality, memory and runtime; check the output is unchanged. Index choices must follow the actual schema and queries.",
+    "check": "Why could adding more Python workers leave the biggest performance problem untouched?"
+  },
+  {
+    "title": "Turn the ticket into a concrete delivery plan",
+    "prompt": "You are asked to implement 5757 tomorrow. The exact EV fields have not been analysed, the semantic keys for multi-part parcels are unknown, and nobody has agreed how to round parcel totals. Give a short ordered plan from the user’s start action to inspectable results. Assign responsibility at each handoff and say what can be built now versus what requires an evidence-based decision.",
+    "solution": "First analyse EV date access, values, model/version correspondence and multi-part structure. Fix decimal storage and define required contracts. Confirm tolerance, translation rules and semantic keys; show both parcel rounding alternatives with clear labels until the rounding rule is agreed. Build the simple Python/SQL workflow, persistent Lift tables and SFC start/results flow around those contracts.",
+    "build": "SFC sends date ID → coordinator fixes scope/checks readiness → reader supplies dated evidence → comparator produces final rows and candidates → explainer translates and compares candidate details → store publishes linked results → Lift filters and opens evidence. Shared rules supply meaning across roles. Interfaces, run handling, schema scaffolding and UI can progress now; exact EV mapping and business decisions cannot be invented. These roles can live in one workflow, not seven deployments.",
+    "check": "Can you name the output of each role and the next role that consumes it, including the branch that skips intermediate work?"
+  }
+]
+</script>
+<script>
+'use strict';
+const questions=JSON.parse(document.getElementById('questions').textContent);
+const key='5757-knowledge-quiz-v1';
+let state={index:0,answers:questions.map(()=>({text:'',first:null,revealed:false}))};
+const el=id=>document.getElementById(id);
+try{const saved=JSON.parse(localStorage.getItem(key));if(saved&&saved.answers?.length===questions.length){state={index:Number.isInteger(saved.index)&&saved.index>=0&&saved.index<questions.length?saved.index:0,answers:saved.answers.map(a=>({text:typeof a.text==='string'?a.text:'',first:typeof a.first==='string'?a.first:null,revealed:a.revealed===true}))};}}catch{}
+function persist(){try{localStorage.setItem(key,JSON.stringify(state));}catch{el('save-note').textContent='Browser storage is unavailable. Copy or download the report before closing this page.';}}
+function report(){const answered=state.answers.filter(a=>a.text.trim()).length;const revealed=state.answers.filter(a=>a.revealed).length;return ['5757 KNOWLEDGE QUIZ — ANSWER REPORT',`Answered: ${answered}/10 | Explanations revealed: ${revealed}/10`,'Please assess my understanding, correct misconceptions, and suggest what I should learn next.','First attempt = captured before explanation. Current answer may include learning after reveal.','',...questions.flatMap((q,i)=>{const a=state.answers[i];return [`Q${i+1}. ${q.title}`,q.prompt,`Explanation revealed: ${a.revealed?'YES':'NO'}`,a.revealed?'FIRST ATTEMPT (before reveal):':'ANSWER (explanation not revealed):',a.revealed?(a.first?.trim()||'[No answer before reveal]'):(a.text.trim()||'[Not answered]'),...(a.revealed?['CURRENT ANSWER:',a.text.trim()||'[Not answered]']:[]),''];})].join('\n');}
+function update(){el('report').value=report();const answered=state.answers.filter(a=>a.text.trim()).length;const revealed=state.answers.filter(a=>a.revealed).length;el('progress').textContent=`${answered} of 10 answered · ${revealed} explanations revealed · Dots mark questions with an answer.`;Array.from(el('nav').children).forEach((b,i)=>{b.classList.toggle('answered',!!state.answers[i].text.trim());b.setAttribute('aria-current',i===state.index?'step':'false');b.setAttribute('aria-label',`Question ${i+1}${state.answers[i].text.trim()?', answered':''}${state.answers[i].revealed?', explanation revealed':''}`);});persist();}
+function render(){const q=questions[state.index],a=state.answers[state.index];el('counter').textContent=`QUESTION ${state.index+1} / 10`;el('title').textContent=q.title;el('prompt').textContent=q.prompt;el('answer').value=a.text;el('answer-label').textContent=a.revealed?'Your answer — revise after learning if useful':'Your answer';el('solution').textContent=q.solution;el('build').textContent=q.build;el('check').textContent=q.check;el('explanation').hidden=!a.revealed;el('reveal').disabled=a.revealed;el('reveal').textContent=a.revealed?'Explanation revealed':'Reveal explanation';el('previous').disabled=state.index===0;el('next').disabled=state.index===questions.length-1;update();}
+questions.forEach((q,i)=>{const b=document.createElement('button');b.type='button';b.textContent=String(i+1);b.addEventListener('click',()=>{state.index=i;render();el('title').scrollIntoView({block:'nearest'});});el('nav').appendChild(b);});
+el('answer').addEventListener('input',()=>{state.answers[state.index].text=el('answer').value;update();});
+el('reveal').addEventListener('click',()=>{const a=state.answers[state.index];if(!a.revealed){a.first=a.text;a.revealed=true;render();}});
+el('previous').addEventListener('click',()=>{if(state.index>0){state.index--;render();}});
+el('next').addEventListener('click',()=>{if(state.index<questions.length-1){state.index++;render();}});
+el('copy').addEventListener('click',async()=>{try{await navigator.clipboard.writeText(el('report').value);el('feedback').textContent='Copied. Paste the report into our conversation.';}catch{el('report').focus();el('report').select();el('feedback').textContent='Report selected. Press Ctrl+C or ⌘C, then paste it into our conversation.';}});
+el('download').addEventListener('click',()=>{const url=URL.createObjectURL(new Blob([el('report').value],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=url;a.download='5757-quiz-answers.txt';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);el('feedback').textContent='Answer report downloaded.';});
+render();
+</script></main></body></html>

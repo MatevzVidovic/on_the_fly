@@ -63,3 +63,23 @@ The user rejected adding MV indexes. Repair now leaves MVs untouched, keeps poin
 The observed prepare rate is roughly 115,000 source rows/second; the apply command's effective rate is roughly 57 upserts/second, including payload fetching/startup and the failed refresh attempt. These are one-run observations, not guaranteed rates. A comparable scalar workload of 100,000 upserts would be about 29 minutes at that effective rate, plus prepare and any separate application maintenance.
 
 The current implementation overlaps inventory fetching with comparisons during prepare. Apply fetches payloads and writes each batch sequentially. Geometry, row width, source joins, indexes, network latency, cache state, and load limit extrapolation. MV refresh time is no longer part of repair; point-layer sampling work still is.
+
+## Provisional larger-run estimates
+
+The completion retry took 0.971 seconds; the fresh verification prepare took 19.436 seconds for 2,739,500 source rows and found zero inserts/updates. Together with the first prepare, observed preparation throughput is about 115,000–141,000 source rows/second. Use 7,664 / 135.04 ≈ 56.75 upserts/second as the initial scalar apply baseline.
+
+Using the latest available October 7 comparison for each table (after-rerun summaries where present), estimates are:
+
+| Target | Historical planned inserts + updates | Approximate prepare | Approximate apply | Rounded total |
+| --- | ---: | ---: | ---: | ---: |
+| ev_parc_enota_h_2025_danes | 847,269 | 3–4 min | 4 h 9 min | 4 h 15 min |
+| ev_stavba_h | 679,160 | 23–28 sec | 3 h 19 min | 3 h 20 min |
+| ev_parc_del_h | 647,361 | 2–2.5 min | 3 h 10 min | 3 h 15 min |
+| ev_parc_pripis_podatki_h | 170,570 | 1–1.3 min | 50 min | 51 min |
+| ev_parcela_h | 28,645 | 3–4 min | 8.4 min | 12 min |
+
+Across all 16 captured tables, the historical scoped plan totals 2,389,504 upserts: approximately 11.7 hours applying plus 14–17 minutes preparing at these rates, or roughly 12 hours overall. The KN/NEP part is only 15,428 historical upserts, including the deli work already repaired; the large EV workloads dominate.
+
+These are baseline calculations, not fresh plans or an upper bound. The captured EV queries include revision joins and, for several large tables, concatenated text business keys. Their full-payload lookup cost may differ significantly from the simple numeric-key deli query. That is an inference from the saved SQL, not a measured execution plan. Geometry, point sampling, current differences, and load may also change runtime. Validate an EV payload/write rate before treating the total as a reliable schedule.
+
+Count sources: the table-specific `summary.json` files under [baseline captures](../../KN_deltas_reason/reconciliation/captures/staging_batch/20261007/) and [after-rerun captures](../../KN_deltas_reason/reconciliation/captures/staging_batch/20261007_after_rerun_094000/), using `missing_at_or_before_watermark + stale_at_or_before_watermark`. Source-query examples are preserved in each baseline `capture.sqlite3` metadata record.

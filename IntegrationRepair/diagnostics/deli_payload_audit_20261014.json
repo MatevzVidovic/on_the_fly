@@ -1,0 +1,76 @@
+{
+  "audit_started_at": "2026-10-14T12:38:49.459986+00:00",
+  "saved_runs": [
+    {
+      "id": "658cb459-9556-4f87-96cb-68b4d85c7f5f",
+      "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+      "attribute_table_name": "kn_nep_deli_stavb_h",
+      "created_at": "2026-10-14T12:09:03.233974+00:00",
+      "cutoff": "2026-10-14 13:57:49.000000",
+      "prepared": 1,
+      "applied": 1,
+      "max_date": "2026-10-14 12:11:15.866770",
+      "warnings": 0,
+      "oracle_count": 2739514,
+      "lift_count": 2739348,
+      "insert_count": 177,
+      "update_count": 7487,
+      "expected_needed_deletions": 11
+    },
+    {
+      "id": "3d6e5856-881c-437c-bc57-73bdcb3a31e7",
+      "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+      "attribute_table_name": "kn_nep_deli_stavb_h",
+      "created_at": "2026-10-14T12:23:22.066240+00:00",
+      "cutoff": "2026-10-14 13:57:49.000000",
+      "prepared": 1,
+      "applied": 0,
+      "max_date": null,
+      "warnings": 0,
+      "oracle_count": 2739500,
+      "lift_count": 2739525,
+      "insert_count": 0,
+      "update_count": 0,
+      "expected_needed_deletions": 25
+    }
+  ],
+  "repair_payloads": {
+    "prepared": 7664,
+    "fetched": 7664,
+    "mapped_fields": 26,
+    "source_missing": [],
+    "source_date_changed": [],
+    "stable_source_rows": 7664,
+    "mismatched_rows": 0,
+    "examples": [],
+    "null_source_nonnull_target_by_field": {}
+  },
+  "positive_control_detected": true,
+  "normal_lift_controls": {
+    "sampled": 200,
+    "fetched": 200,
+    "matching_dates": 200,
+    "mismatched_rows": 1,
+    "mismatch_examples": [
+      {
+        "key": 746811,
+        "oracle_date": "2024-11-15 09:41:48",
+        "lift_date": "2024-11-15 09:41:48",
+        "target_missing": false,
+        "differences": [
+          "postopek_id_do"
+        ],
+        "null_source_preserved": []
+      }
+    ]
+  },
+  "row_metadata": {
+    "timestamp_mismatches": 0,
+    "user_mismatches": 0,
+    "inserted_uuid_versions": {
+      "1": 177
+    },
+    "historical_update_uuids_checked": 7487,
+    "historical_update_uuids_changed": 0
+  }
+}

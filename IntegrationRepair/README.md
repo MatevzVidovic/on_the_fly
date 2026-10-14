@@ -33,6 +33,12 @@ expected_needed_deletions = lift_count + insert_count - oracle_count
 
 The estimate stays signed; negative values produce a warning. It provides visibility into expected surplus rows without identifying or changing them. All counts remain preparation totals, even if apply skips entries.
 
+The source is live: an Oracle row can acquire a date beyond the fixed cutoff while
+its older LIFT version remains within it. That decreases the scoped Oracle count
+and increases this estimate without a transfer error. Such rows still exist in
+Oracle, so a positive estimate is not a confirmed deletion count. See the
+[deli repair audit](diagnostics/DELI_REPAIR_AUDIT_20261014.md).
+
 ## Roles
 
 | File / function | Owns |
