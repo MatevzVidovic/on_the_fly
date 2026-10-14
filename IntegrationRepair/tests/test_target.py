@@ -21,14 +21,23 @@ def test_init(definition):
     assert target.table.as_string() == '"records"'
 
 
-def test_inventory(definition):
-    db = Database(Cursor([('target-uuid', 1, DATE)]))
+def test_count(definition):
+    db = Database(Cursor([(1,)]))
     target = LiftTarget(db, None, definition)
 
-    pages = list(target.inventory(DATE))
+    count = target.count(DATE)
 
-    assert pages == [[('target-uuid', 1, DATE)]]
-    assert db.commits == 1
+    assert count == 1
+    assert db.example_cursor.calls[0][1] == (DATE,)
+
+
+def test_lookup_pairs(definition):
+    target = LiftTarget(Database(Cursor([(1, DATE)])), None, definition)
+
+    dates = target.lookup_pairs([1], DATE)
+
+    assert dates == {1: DATE}
+    assert target.db.example_cursor.calls[0][1] == ([1], DATE)
 
 
 def test_upsert(definition):
@@ -52,19 +61,6 @@ def test_upsert_batch(definition):
     assert outcomes == [('1', None)]
     assert db.commits == 1
     assert db.example_cursor.calls[1][0].as_string().startswith('INSERT INTO "records"')
-
-
-def test_delete_batch(definition):
-    cursor = Cursor()
-    db = Database(cursor)
-    target = LiftTarget(db, None, definition)
-
-    target.delete_batch([dict(target_id='target-uuid')])
-
-    query, values = cursor.calls[0]
-    assert query.as_string() == 'DELETE FROM "records" WHERE id=%s'
-    assert values == [('target-uuid',)]
-    assert db.commits == 1
 
 
 def test_complete(definition):

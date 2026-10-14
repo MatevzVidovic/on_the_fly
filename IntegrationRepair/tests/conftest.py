@@ -25,9 +25,6 @@ class Cursor:
         self.calls.append((query, params))
         return self
 
-    def executemany(self, query, params):
-        self.calls.append((query, list(params)))
-
     def fetchone(self):
         return self.rows[0] if self.rows else None
 
@@ -90,6 +87,6 @@ def run_id(store):
 
 @pytest.fixture
 def prepared_run(store, run_id):
-    store.save_source(run_id, [(1, DATE)])
-    store.finish_preparation(run_id)
+    store.save_upsert_page(run_id, [(1, DATE, 'insert')], 0)
+    store.finish_preparation(run_id, oracle_count=1, lift_count=0)
     return run_id

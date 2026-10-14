@@ -11,16 +11,12 @@ This document records decisions and supporting evidence from the design intervie
 - A matching integration-key/change-time pair in LIFT is considered correct. Repair does not compare the remaining payload fields.
 - A run has two explicit steps: prepare the differences, then apply the prepared run.
 - Full source payloads are fetched during apply. Require the prepared key/date pair to match; a changed or missing source row is skipped, logged, and reported in the final warnings. Skips are finished for this run, with no retry scheduling; a later fresh run can reconcile again.
-- Missing keys and keys with an older LIFT change time belong in `addition_diff` and are upserted using FMP-equivalent behavior.
+- Missing keys and keys with an older LIFT change time belong in `upsert_diff` and are upserted using FMP-equivalent behavior.
 - Existing rows are updated in place. FMP normally retains their target UUID; the inspected KN integrations have no enabled mapping into `id`.
 - If LIFT's change time is newer than Oracle's, log and skip the record, then warn and report the count at process end.
-- Remote repair membership comes from the current integration query bounded inclusively by the run cutoff. Absence from this bounded membership permits removal, including a key whose current Oracle date is now beyond the cutoff.
 - LIFT rows are filtered to the same inclusive cutoff. Target rows beyond it are outside comparison and are left alone.
-- Apply saved removals directly, without an Oracle membership recheck.
-- This removal is accepted because normal LIFT integration is expected to restore the newer row later and normal integration is run immediately before repair, which is expected to prevent this case in practice. See ADR 0002.
 - No locking is needed. Integrations writing the target table are kept stopped throughout preparation, review, and application; the target is otherwise assumed unchanged. The rest of the system stays operational.
-- The initial spec requires a SQLite run record and remote key/date, removal-difference, and addition-difference child tables. The run stores its UUID, integration UUID, and cutoff taken from the integration's current high-water mark.
-- Missing key/date mappings, missing watermarks, duplicate keys, and null keys/dates fail preparation with a clear error.
+- Missing key/date mappings, missing watermarks, duplicate source/matched-target keys, and NULL source/matched-target dates fail preparation with a clear error.
 - The default page size is a code constant of 10,000. Apply commits batches, records completed entries in SQLite, stops on failure, and resumes remaining work when rerun. Committed work without saved completion markers may be replayed safely.
 - The normal integration's watermark and processing status are left untouched.
 - No separate audit-history writes are made. Target-row metadata follows FMP's system integration path: both timestamp fields use run `maxDate` and both user fields use the NIL UUID, including on updates. `maxDate` is the first apply-start timestamp stored on the run and reused on restarts.
@@ -32,9 +28,9 @@ This document records decisions and supporting evidence from the design intervie
 - Integration configuration is assumed unchanged across prepare/apply. No configuration-change detection or versioning is added.
 - Preserve FMP's source wall-clock timestamp representation for writes, pair comparisons, and cutoff filtering, including fractional seconds. Avoid implicit Python/PostgreSQL session-timezone conversion and follow any UTC projection in the saved SQL.
 
-## Review state
+## Current architecture
 
-All interview choices are settled, and the user authorized implementation. The tool implements the agreed four-table flow in five Python files, with the seven logical roles described in [README.md](../README.md). The worker/reviewer loop finished with no remaining actionable correctness or simplicity findings; 16 tests pass. Read-only PostgreSQL checks covered metadata, WKT conversion, timestamp binding, and preparation of generated write statements without execution. Oracle execution and live writes remain unverified.
+The user confirmed upsert-only repair, cutoff-bounded counts, separate planned insert/update counts, and a signed `expected_needed_deletions = lift_count + insert_count - oracle_count`. Negative estimates warn. The old SQLite file was explicitly discarded; the new schema has only `integration_transfer` and `upsert_diff`, with no compatibility layer. One Oracle worker fetches the next page while the main thread compares the current page against LIFT and saves only differences. The simple per-function examples and regression suite were updated; reviewer loops remain off at the user's request.
 
 ## Verified backend behavior
 
@@ -63,6 +59,6 @@ Primary implementation references: [integration payload handler](/Users/matevzvi
 - The three inspected target tables (`kn_nep_deli_stavb_h`, `kn_nep_etaze_h`, `kn_nep_hisne_stevilke_h`) have unique business-key indexes and UUID primary keys. UUID, `created_at`, and `created_by` require explicit values; they have no database defaults. Their `datum_sys` fields are nullable timestamps without time zone.
 - Catalog estimates put each of these tables above one million rows. Inventory reads and payload application should therefore be streamed and bounded in memory.
 - All inspected KN integrations have `is_full_sync=false`; `kn_nep_sifranti` still lacks the key/date/watermark shape required by this repair.
-- Current KN metadata contains configured create/update/delete events that refresh dependent materialized tables. Examples include `kn_nep_hisne_stevilke_h` feeding `kn_nep_naslovi_view` and `kn_nep_etaze_h` feeding `pp_kn_deli_stavb_mv`. Direct Python writes would not invoke these configured PHP events.
+- Current KN metadata contains configured row-write events that refresh dependent materialized tables. Examples include `kn_nep_hisne_stevilke_h` feeding `kn_nep_naslovi_view` and `kn_nep_etaze_h` feeding `pp_kn_deli_stavb_mv`. Direct Python writes would not invoke these configured PHP events.
 - Active `sql_related_table` source subscriptions confirm dependent materialized targets independently of the per-record event settings. Normal integration completion has a separate refresh listener for these subscriptions.
 - No configured KN `default_first_result` relationship fills, integration `after_sync_events`, or `prevent_materialized_view_refresh` flags were found in the current test metadata.

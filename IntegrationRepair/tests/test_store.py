@@ -8,7 +8,7 @@ from conftest import DATE
 def test_classify():
     result = classify(DATE, None)
 
-    assert result == 'upsert'
+    assert result == 'insert'
 
 
 def test_init():
@@ -16,7 +16,7 @@ def test_init():
 
     tables = store.db.execute("SELECT name FROM sqlite_master WHERE type='table'").fetchall()
 
-    assert len(tables) == 4
+    assert {row['name'] for row in tables} == {'integration_transfer', 'upsert_diff'}
     store.db.close()
 
 
@@ -29,7 +29,7 @@ def test_create_run(store):
     assert row['cutoff'] == DATE
     assert row['attribute_table_name'] == 'records'
     assert before <= datetime.fromisoformat(row['created_at']) <= datetime.now(timezone.utc)
-    assert row['upsert_count'] is None and row['delete_count'] is None
+    assert row['insert_count'] is None and row['update_count'] is None
 
 
 def test_require_prepared_run(store, prepared_run):
@@ -39,32 +39,23 @@ def test_require_prepared_run(store, prepared_run):
     assert result['prepared'] == 1
 
 
-def test_save_source(store, run_id):
-    store.save_source(run_id, [(1, DATE)])
+def test_save_upsert_page(store, run_id):
+    store.save_upsert_page(run_id, [(1, DATE, 'insert')], warnings=1)
 
-    row = store.db.execute('SELECT * FROM remote_ids_and_date_changed').fetchone()
-    assert row['key'] == '1'
-    assert row['date'] == DATE
-
-
-def test_compare_target_page(store, run_id):
-    warnings = store.compare_target_page(run_id, [('target-uuid', 1, DATE)])
-
-    row = store.db.execute('SELECT * FROM removal_diff').fetchone()
-    assert row['target_id'] == 'target-uuid'
-    assert warnings == []
+    row = store.db.execute('SELECT * FROM upsert_diff').fetchone()
+    assert (row['key'], row['date'], row['action']) == ('1', DATE, 'insert')
+    assert store.db.execute('SELECT warnings FROM integration_transfer').fetchone()[0] == 1
 
 
 def test_finish_preparation(store, run_id):
-    store.save_source(run_id, [(1, DATE)])
-    store.compare_target_page(run_id, [('extra-uuid', 2, DATE)])
+    store.save_upsert_page(run_id, [(1, DATE, 'insert'), (2, DATE, 'update')], 0)
 
-    store.finish_preparation(run_id)
+    store.finish_preparation(run_id, oracle_count=3, lift_count=4)
 
-    assert store.require_prepared_run(run_id)['prepared'] == 1
-    assert store.require_prepared_run(run_id)['upsert_count'] == 1
-    assert store.require_prepared_run(run_id)['delete_count'] == 1
-    assert store.db.execute('SELECT key FROM addition_diff').fetchone()['key'] == '1'
+    run = store.require_prepared_run(run_id)
+    assert run['insert_count'] == 1 and run['update_count'] == 1
+    assert run['oracle_count'] == 3 and run['lift_count'] == 4
+    assert run['expected_needed_deletions'] == 2
 
 
 def test_start_apply(store, prepared_run):
@@ -75,8 +66,8 @@ def test_start_apply(store, prepared_run):
 
 
 def test_pending(store, prepared_run):
-    # Read a single page: the caller marks it processed before asking for another.
-    pages = store.pending('addition_diff', prepared_run)
+    # The caller marks this page processed before requesting the next one.
+    pages = store.pending(prepared_run)
 
     page = next(pages)
 
@@ -85,22 +76,13 @@ def test_pending(store, prepared_run):
     pages.close()
 
 
-def test_finish_additions(store, prepared_run):
-    store.finish_additions(prepared_run, [('1', None)])
+def test_finish_upserts(store, prepared_run):
+    store.finish_upserts(prepared_run, [('1', None)])
 
-    row = store.db.execute('SELECT * FROM addition_diff').fetchone()
+    row = store.db.execute('SELECT * FROM upsert_diff').fetchone()
     assert row['processed'] == 1
     assert row['warning'] is None
-    assert store.require_prepared_run(prepared_run)['upsert_count'] == 1
-
-
-def test_finish_removals(store, run_id):
-    store.compare_target_page(run_id, [('target-uuid', 1, DATE)])
-    rows = store.db.execute('SELECT * FROM removal_diff').fetchall()
-
-    store.finish_removals(run_id, rows)
-
-    assert store.db.execute('SELECT processed FROM removal_diff').fetchone()[0] == 1
+    assert store.require_prepared_run(prepared_run)['insert_count'] == 1
 
 
 def test_finish_application(store, prepared_run):
@@ -112,4 +94,4 @@ def test_finish_application(store, prepared_run):
 def test_summary(store, prepared_run, capsys):
     store.summary(prepared_run)
 
-    assert '1 upserts, 0 removals, 0 warnings' in capsys.readouterr().out
+    assert '1 inserts, 0 updates, expected_needed_deletions=0' in capsys.readouterr().out

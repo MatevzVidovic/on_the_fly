@@ -22,8 +22,8 @@ def definition():
 
 
 @pytest.mark.parametrize('source,target,result', [
-    (OLD, OLD, 'equal'), (NEW, OLD, 'upsert'), (OLD, NEW, 'ahead'),
-    (OLD, None, 'upsert'), (None, OLD, 'remove')])
+    (OLD, OLD, 'equal'), (NEW, OLD, 'update'), (OLD, NEW, 'ahead'),
+    (OLD, None, 'insert')])
 def test_diff_rules(source, target, result):
     assert classify(source, target) == result
 
@@ -64,28 +64,23 @@ class Source:
 
 class Target:
     def __init__(self):
-        self.db = self
-        self.writes, self.deletes, self.commits = {}, set(), 0
+        self.writes, self.commits = {}, 0
         self.completed = False
 
-    def inventory(self, cutoff):
-        yield [('id-same', 'same', OLD), ('id-old', 'old', OLD),
-               ('id-ahead', 'ahead', NEW), ('id-remove', 'remove', OLD)]
+    def count(self, cutoff):
+        return 4
+
+    def lookup_pairs(self, keys, cutoff):
+        dates = {'same': OLD, 'old': OLD, 'ahead': NEW}
+        return {key: date for key, date in dates.items() if key in keys and date <= cutoff}
 
     def upsert(self, payload, max_date):
         self.writes[payload['KEY']] = (payload, max_date)
 
     def upsert_batch(self, writes, max_date):
         outcomes = [(key, self.upsert(payload, max_date)) for key, payload in writes]
-        self.commit()
-        return outcomes
-
-    def commit(self):
         self.commits += 1
-
-    def delete_batch(self, rows):
-        self.deletes.update(row['target_id'] for row in rows)
-        self.commit()
+        return outcomes
 
     def complete(self):
         self.completed = True
@@ -94,31 +89,29 @@ class Target:
 def test_prepare_apply_and_terminal_warnings(tmp_path):
     store, target, d = RepairStore(tmp_path / 'repair.sqlite'), Target(), definition()
     run = prepare(d, Source(), target, store)
-    assert store.db.execute('SELECT count(*) FROM addition_diff').fetchone()[0] == 2
-    assert store.db.execute('SELECT target_id FROM removal_diff').fetchone()[0] == 'id-remove'
+    assert store.db.execute('SELECT count(*) FROM upsert_diff').fetchone()[0] == 2
     apply(run, d, Source(), target, store)
     assert set(target.writes) == {'old'}
-    assert target.deletes == {'id-remove'}
     state = store.db.execute('SELECT * FROM integration_transfer').fetchone()
     assert state['warnings'] == 2 and state['applied'] == 1
     max_date = state['max_date']
     apply(run, d, Source(), target, store)
-    assert target.commits == 2 and target.writes['old'][1] == max_date
+    assert target.commits == 1 and target.writes['old'][1] == max_date
 
 
 def test_commit_before_markers_and_replay(tmp_path, monkeypatch):
     store, target, d = RepairStore(tmp_path / 'repair.sqlite'), Target(), definition()
     run = prepare(d, Source(), target, store)
-    original = store.finish_additions
+    original = store.finish_upserts
     def crash(*args):
         assert target.commits == 1
         raise RuntimeError('Crash after PG commit')
-    monkeypatch.setattr(store, 'finish_additions', crash)
+    monkeypatch.setattr(store, 'finish_upserts', crash)
     with pytest.raises(RuntimeError):
         apply(run, d, Source(), target, store)
     first_date = store.db.execute('SELECT max_date FROM integration_transfer').fetchone()[0]
-    assert all(not row['processed'] for row in store.db.execute('SELECT * FROM addition_diff'))
-    monkeypatch.setattr(store, 'finish_additions', original)
+    assert all(not row['processed'] for row in store.db.execute('SELECT * FROM upsert_diff'))
+    monkeypatch.setattr(store, 'finish_upserts', original)
     apply(run, d, Source(), target, store)
     assert target.writes['old'][1] == first_date
     assert store.db.execute('SELECT warnings FROM integration_transfer').fetchone()[0] == 2
@@ -135,7 +128,7 @@ def test_completion_failure_resumes_without_rewriting(tmp_path):
     assert not store.db.execute('SELECT applied FROM integration_transfer').fetchone()[0]
     target.complete = lambda: None
     apply(run, d, Source(), target, store)
-    assert target.commits == 2
+    assert target.commits == 1
 
 
 def test_unfinished_prepare_cannot_apply(tmp_path):
@@ -215,7 +208,7 @@ def test_changed_source_and_newer_target_are_terminal_skips(tmp_path):
     store, target, d = RepairStore(tmp_path / 'repair.sqlite'), NewerTarget(), definition()
     run = prepare(d, Source(), target, store)
     apply(run, d, ChangedSource(), target, store)
-    entries = store.db.execute('SELECT key,processed,warning FROM addition_diff').fetchall()
+    entries = store.db.execute('SELECT key,processed,warning FROM upsert_diff').fetchall()
     assert {json.loads(row['key']): row['warning'] for row in entries} == {
         'old': 'LIFT date is newer than Oracle date',
         'missing': 'Oracle change time changed since prepare'}
@@ -224,30 +217,80 @@ def test_changed_source_and_newer_target_are_terminal_skips(tmp_path):
     assert store.require_prepared_run(run)['warnings'] == 3
 
 
-def test_pending_queries_use_partial_indexes(tmp_path):
+def test_pending_query_uses_partial_index(tmp_path):
     store = RepairStore(tmp_path / 'repair.sqlite')
-    for table, index in [('addition_diff', 'pending_additions'), ('removal_diff', 'pending_removals')]:
-        plan = store.db.execute(f'EXPLAIN QUERY PLAN SELECT * FROM {table} WHERE run_id=? AND processed=0 LIMIT ?',
-                               ('run', 10000)).fetchall()
-        assert any(index in row['detail'] for row in plan)
+    plan = store.db.execute('EXPLAIN QUERY PLAN SELECT * FROM upsert_diff WHERE run_id=? AND processed=0 LIMIT ?',
+                            ('run', 10000)).fetchall()
+    assert any('pending_upserts' in row['detail'] for row in plan)
 
 
-def test_existing_store_gains_run_details_without_losing_diffs(tmp_path):
-    path = tmp_path / 'old.sqlite'
-    old = RepairStore(path)
-    run = old.create_run('integration', OLD, 'records')
-    old.save_source(run, [(1, OLD)])
-    old.compare_target_page(run, [('extra-uuid', 2, OLD)])
-    old.finish_preparation(run)
-    # Reproduce the old schema, which did not record these four details.
-    with old.db:
-        for column in ('created_at', 'attribute_table_name', 'upsert_count', 'delete_count'):
-            old.db.execute(f'ALTER TABLE integration_transfer DROP COLUMN {column}')
-    old.db.close()
+def test_signed_count_estimate_warns_when_negative(tmp_path, capsys):
+    store = RepairStore(tmp_path / 'repair.sqlite')
+    run = store.create_run('integration', OLD, 'records')
+    store.save_upsert_page(run, [('missing', OLD, 'insert')], warnings=0)
+    store.finish_preparation(run, oracle_count=3, lift_count=0)
+    store.summary(run)
+    state = store.require_prepared_run(run)
+    assert state['expected_needed_deletions'] == -2
+    assert state['warnings'] == 1
+    assert 'Warning: negative expected_needed_deletions' in capsys.readouterr().out
 
-    updated = RepairStore(path)
-    row = updated.require_prepared_run(run)
-    assert row['upsert_count'] == 1 and row['delete_count'] == 1
-    assert row['created_at'] is None and row['attribute_table_name'] is None
-    assert updated.db.execute('SELECT target_id FROM removal_diff').fetchone()[0] == 'extra-uuid'
-    updated.db.close()
+
+def test_empty_source_pages_do_not_finish_prepare_early(tmp_path):
+    class EmptyPages(Source):
+        def inventory(self, cutoff):
+            yield []
+            yield from super().inventory(cutoff)
+            yield []
+    store = RepairStore(tmp_path / 'repair.sqlite')
+    run = prepare(definition(), EmptyPages(), Target(), store)
+    state = store.require_prepared_run(run)
+    assert state['oracle_count'] == 4
+    assert state['insert_count'] == 1 and state['update_count'] == 1
+    assert state['expected_needed_deletions'] == 1
+
+
+def test_next_page_is_fetched_during_current_page_comparison(tmp_path):
+    from threading import Event
+    prefetched, third_page = Event(), Event()
+    class Pages(Source):
+        def inventory(self, cutoff):
+            yield [('first', OLD)]
+            prefetched.set()
+            yield [('second', OLD)]
+            third_page.set()
+            yield [('third', OLD)]
+    class Comparing(Target):
+        def count(self, cutoff):
+            return 0
+        def lookup_pairs(self, keys, cutoff):
+            if keys == ['first']:
+                assert prefetched.wait(2), 'Next page was not fetched during comparison'
+                assert not third_page.is_set(), 'More than one page fetched ahead'
+            return {}
+    store = RepairStore(tmp_path / 'repair.sqlite')
+    run = prepare(definition(), Pages(), Comparing(), store)
+    assert store.require_prepared_run(run)['insert_count'] == 3
+
+
+def test_reader_failure_leaves_run_unprepared(tmp_path):
+    class Broken(Source):
+        def inventory(self, cutoff):
+            yield [('first', OLD)]
+            raise RuntimeError('Oracle fetch failed')
+    store = RepairStore(tmp_path / 'repair.sqlite')
+    with pytest.raises(RuntimeError, match='Oracle fetch failed'):
+        prepare(definition(), Broken(), Target(), store)
+    state = store.db.execute('SELECT * FROM integration_transfer').fetchone()
+    assert state['prepared'] == 0
+    assert state['oracle_count'] is None
+
+
+def test_target_lookup_rejects_duplicate_and_null_dates(definition):
+    from conftest import Cursor as ExampleCursor, Database
+    target = LiftTarget(Database(ExampleCursor([(1, OLD), (1, OLD)])), None, definition)
+    with pytest.raises(ValueError, match='Duplicate LIFT key'):
+        target.lookup_pairs([1], NEW)
+    target.db = Database(ExampleCursor([(1, None)]))
+    with pytest.raises(ValueError, match='NULL change time'):
+        target.lookup_pairs([1], NEW)

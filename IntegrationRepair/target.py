@@ -2,7 +2,7 @@
 from uuid import uuid1
 from psycopg import sql
 
-from source import PAGE_SIZE, wall_time
+from source import wall_time
 
 NIL_USER = '00000000-0000-0000-0000-000000000000'
 
@@ -40,23 +40,23 @@ class LiftTarget:
         self.key = sql.Identifier(definition.key['target'])
         self.date = sql.Identifier(definition.date['target'])
 
-    def inventory(self, cutoff):
-        with self.db.cursor(name='repair_inventory') as cur:
-            cur.itersize = PAGE_SIZE
-            cur.execute(sql.SQL('SELECT id, {}, {} FROM {} ORDER BY {}').format(
-                self.key, self.date, self.table, self.key))
-            previous = None
-            while rows := cur.fetchmany(PAGE_SIZE):
-                page = []
-                for target_id, key, date in rows:
-                    key, date = self.d.key_value(key), wall_time(date)
-                    if key == previous:
-                        raise ValueError(f'Duplicate LIFT key: {key}')
-                    previous = key
-                    if date <= cutoff:
-                        page.append((str(target_id), key, date))
-                yield page
-        self.db.commit()
+    def count(self, cutoff):
+        with self.db.cursor() as cur:
+            cur.execute(sql.SQL('SELECT count(*) FROM {} WHERE {}<=%s').format(self.table, self.date),
+                        (cutoff,))
+            return cur.fetchone()[0]
+
+    def lookup_pairs(self, keys, cutoff):
+        with self.db.cursor() as cur:
+            cur.execute(sql.SQL('SELECT {}, {} FROM {} WHERE {}=ANY(%s) AND ({}<=%s OR {} IS NULL)').format(
+                self.key, self.date, self.table, self.key, self.date, self.date), (keys, cutoff))
+            dates = {}
+            for key, date in cur:
+                key, date = self.d.key_value(key), wall_time(date)
+                if key in dates:
+                    raise ValueError(f'Duplicate LIFT key: {key}')
+                dates[key] = date
+            return dates
 
     def upsert(self, payload, max_date):
         key = self.d.key_value(payload[self.d.key['api_name']])
@@ -87,12 +87,6 @@ class LiftTarget:
             outcomes.append((key, warning))
         self.db.commit()
         return outcomes
-
-    def delete_batch(self, rows):
-        with self.db.cursor() as cur:
-            cur.executemany(sql.SQL('DELETE FROM {} WHERE id=%s').format(self.table),
-                            [(row['target_id'],) for row in rows])
-        self.db.commit()
 
     def complete(self):
         if self.d.point_layer:

@@ -1,6 +1,6 @@
 # Integration Repair
 
-Integration Repair reconciles records provided by a LIFT integration with the records held in LIFT.
+Integration Repair restores missing and outdated LIFT records from an integration's source.
 
 ## Language
 
@@ -35,6 +35,18 @@ The integration keys returned by the current source query with change times at o
 
 **Ahead record**:
 A record whose LIFT change time is newer than its Oracle counterpart's change time. This is an unexpected condition, distinct from a source record newer than the repair cutoff.
+
+**Repair insert**:
+A source record within the repair cutoff whose integration key has no LIFT counterpart within the same cutoff. It is planned as a new LIFT record.
+
+**Repair update**:
+A source record within the repair cutoff whose LIFT counterpart has an older change time. It is planned as an update to that existing record.
+
+**Scoped row count**:
+The number of current records at or before the repair cutoff, either in the Oracle integration query's result or in its LIFT target table.
+
+**Expected needed deletions**:
+A signed estimate of LIFT's surplus rows after planned repair inserts: LIFT's scoped row count plus planned inserts minus Oracle's scoped row count. A negative value signals an unexplained count gap; this estimate does not identify records or cause changes.
 
 **Dependent materialized view**:
 A stored LIFT query result whose source configuration subscribes to changes in a repaired table. Its contents are separate from the repaired base-table records.

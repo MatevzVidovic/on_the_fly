@@ -11,14 +11,15 @@ from target import LiftTarget
 def test_prepare(definition, store):
     source = OracleSource(Database(Cursor([(1, DATE)])), definition)
     target = LiftTarget(Database(Cursor()), Database(Cursor()), definition)
+    target.count = lambda cutoff: 0
 
     run_id = repair.prepare(definition, source, target, store)
 
     assert store.require_prepared_run(run_id)['cutoff'] == DATE
     assert store.require_prepared_run(run_id)['attribute_table_name'] == 'records'
-    assert store.require_prepared_run(run_id)['upsert_count'] == 1
-    assert store.require_prepared_run(run_id)['delete_count'] == 0
-    assert store.db.execute('SELECT key FROM addition_diff').fetchone()['key'] == '1'
+    assert store.require_prepared_run(run_id)['insert_count'] == 1
+    assert store.require_prepared_run(run_id)['update_count'] == 0
+    assert store.db.execute('SELECT key FROM upsert_diff').fetchone()['key'] == '1'
 
 
 def test_apply(definition, store, prepared_run):
@@ -29,7 +30,7 @@ def test_apply(definition, store, prepared_run):
     repair.apply(prepared_run, definition, source, target, store)
 
     assert store.require_prepared_run(prepared_run)['applied'] == 1
-    assert store.db.execute('SELECT processed FROM addition_diff').fetchone()[0] == 1
+    assert store.db.execute('SELECT processed FROM upsert_diff').fetchone()[0] == 1
     assert db.example_cursor.calls[1][0].as_string().startswith('INSERT INTO "records"')
 
 
@@ -42,11 +43,13 @@ def test_main(definition, tmp_path, monkeypatch):
         monkeypatch.setenv(name, 'example')
     monkeypatch.delenv('KN_ORACLE_CLIENT_LIB_DIR', raising=False)
     monkeypatch.setattr(repair.IntegrationDefinition, 'load', lambda db, integration_id: definition)
-    monkeypatch.setattr(repair.psycopg, 'connect', lambda **settings: Database(Cursor()))
+    connections = iter([Database(Cursor()), Database(Cursor([(0,)]))])
+    monkeypatch.setattr(repair.psycopg, 'connect', lambda **settings: next(connections))
+    monkeypatch.setattr(repair.LiftTarget, 'lookup_pairs', lambda self, keys, cutoff: {})
     monkeypatch.setattr(repair.oracledb, 'connect', lambda **settings: Database(Cursor([(1, DATE)])))
 
     repair.main()
 
     with sqlite3.connect(path) as db:
         assert db.execute('SELECT prepared FROM integration_transfer').fetchone()[0] == 1
-        assert db.execute('SELECT key FROM addition_diff').fetchone()[0] == '1'
+        assert db.execute('SELECT key FROM upsert_diff').fetchone()[0] == '1'

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""Prepare the membership diff; apply its saved entries with resumable batches."""
+"""Compare source pages with LIFT; apply only the saved upsert differences."""
 import argparse
+from concurrent.futures import ThreadPoolExecutor
 from contextlib import ExitStack
 from datetime import datetime
 import json
@@ -13,7 +14,7 @@ import psycopg
 
 from definition import IntegrationDefinition
 from source import OracleSource, wall_time
-from store import RepairStore
+from store import RepairStore, classify
 from target import LiftTarget
 
 
@@ -21,12 +22,34 @@ def prepare(definition, source, target, store):
     cutoff = wall_time(definition.cutoff)
     run_id = store.create_run(definition.id, cutoff, definition.table)
     print(f'Preparing run {run_id}, cutoff {cutoff}', flush=True)
-    for page in source.inventory(cutoff):
-        store.save_source(run_id, page)
-    for page in target.inventory(cutoff):
-        for key, warning in store.compare_target_page(run_id, page):
-            print(f'Warning key={key}: {warning}', flush=True)
-    store.finish_preparation(run_id)
+    lift_count, oracle_count = target.count(cutoff), 0
+    pages = source.inventory(cutoff)
+    # One Oracle fetch runs ahead; PostgreSQL and SQLite stay on this thread.
+    with ThreadPoolExecutor(max_workers=1) as reader:
+        next_page = reader.submit(next, pages, None)
+        try:
+            while True:
+                page = next_page.result()
+                if page is None:
+                    break
+                next_page = reader.submit(next, pages, None)
+                oracle_count += len(page)
+                if not page:
+                    continue
+                dates = target.lookup_pairs([key for key, _ in page], cutoff)
+                entries, warnings = [], 0
+                for key, date in page:
+                    action = classify(date, dates.get(key))
+                    if action in ('insert', 'update'):
+                        entries.append((key, date, action))
+                    elif action == 'ahead':
+                        print(f'Warning key={key}: LIFT {dates[key]} is newer than Oracle {date}', flush=True)
+                        warnings += 1
+                if entries or warnings:
+                    store.save_upsert_page(run_id, entries, warnings)
+        finally:
+            reader.submit(pages.close).result()
+    store.finish_preparation(run_id, oracle_count, lift_count)
     store.summary(run_id)
     return run_id
 
@@ -37,7 +60,7 @@ def apply(run_id, definition, source, target, store):
         store.summary(run_id)
         return
     max_date = store.start_apply(run_id, wall_time(datetime.now(ZoneInfo(os.environ.get('APP_TIMEZONE', 'UTC')))))
-    for rows in store.pending('addition_diff', run_id):
+    for rows in store.pending(run_id):
         keys = [json.loads(row['key']) for row in rows]
         payloads = source.fetch_payloads(keys)
         outcomes, writes = [], []
@@ -56,12 +79,8 @@ def apply(run_id, definition, source, target, store):
             outcomes.append((entry['key'], warning))
         # A crash after this commit safely replays before the SQLite markers.
         outcomes.extend(target.upsert_batch(writes, max_date))
-        store.finish_additions(run_id, outcomes)
+        store.finish_upserts(run_id, outcomes)
         print(f'Committed {len(rows)} upsert entries', flush=True)
-    for rows in store.pending('removal_diff', run_id):
-        target.delete_batch(rows)
-        store.finish_removals(run_id, rows)
-        print(f'Committed {len(rows)} removal entries', flush=True)
     target.complete()
     store.finish_application(run_id)
 

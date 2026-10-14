@@ -1,100 +1,75 @@
 # Integration Repair
 
-Build a small standalone Python tool in this directory to repair existing KN Oracle delta integrations in LIFT. Keep the implementation straightforward, read the integration definition from LIFT, and use SQLite to prepare and apply one repair run at a time. Full-sync integrations are outside scope because they do not need this repair.
+A small standalone Python tool repairs missing and outdated records from KN Oracle delta integrations in LIFT. Full-sync integrations are outside scope. Records present only in LIFT remain untouched.
 
 ## Run flow
 
-1. Run the regular LIFT integration immediately before repair.
-2. Prepare a repair run for its integration UUID. Capture the current `last_changed_datetime` as the fixed cutoff and assign the repair run its own UUID.
-3. Review the prepared additions, removals, and warning counts in SQLite.
-4. Apply that saved run.
-5. Run the normal integration later; its completion handling will clear map caches.
+1. Run the regular integration, then keep integrations writing this table stopped through prepare, review, and apply.
+2. Prepare for an integration UUID. Capture its current `last_changed_datetime` as the fixed inclusive cutoff and create a repair UUID.
+3. Review the run counts and planned inserts/updates in SQLite.
+4. Apply the saved run.
+5. Run the normal integration later to clear map caches.
 
-Normal integrations writing this table stay stopped during preparation, review, and application. The target table otherwise remains unchanged except for this tool's writes. Other parts of the system continue working. The integration SQL, mappings, and configuration also stay unchanged throughout the run.
-
-These are operational assumptions. Do not implement table locking, configuration-change detection, or configuration versioning. Do not change the normal integration's watermark or processing status.
+The target otherwise stays unchanged, and integration SQL/configuration stays fixed. No locks, configuration tracking, or normal integration watermark/status updates are added.
 
 ## Prepare
 
-Read the existing integration metadata as FMP does: target table, saved source SQL, and enabled field mappings. Use the mapping marked `api_id` for the source record key and the mapping marked `api_last_sync_field` for the change time. Source keys retain their defined meaning and type; they are distinct from the integration UUID and the LIFT row UUID. Column names need not literally be `id` or `date_changed`.
+Read LIFT's target table, saved Oracle SQL, and enabled field mappings. Use exactly one `api_id` mapping and one `api_last_sync_field` mapping. Preserve the business key's type; it is distinct from integration and target-row UUIDs.
 
-Execute the saved Oracle integration query and inventory its keys/change times. Inventory LIFT using the corresponding mapped fields. Both sides are bounded inclusively by the captured cutoff: `change_time <= cutoff`. Rows beyond the cutoff are outside repair scope.
+Count LIFT rows with mapped change time at or before the cutoff. Stream the saved Oracle query's keys/change times, validating and counting the eligible rows as they arrive. The Oracle count is the integration query's result within the cutoff, not its underlying raw tables.
 
-Compare by integration key:
+Use 10,000-row pages. One background Oracle reader fetches the next page while the main thread looks up the current page's keys in PostgreSQL and saves differences in SQLite. At most one fetch is outstanding. Empty eligible pages do not end the stream. The cursor is read and closed on its worker; PostgreSQL and SQLite remain on the main thread.
 
-| Source and LIFT within the cutoff | Action |
+Look up LIFT pairs for the current keys within the same cutoff. Include matching NULL dates so they fail visibly.
+
+| Pair comparison | Result |
 | --- | --- |
-| Same key and same change time | Correct; do nothing. Do not compare other payload fields. |
-| Source key missing from LIFT | Add to `addition_diff` for upsert. |
-| Same key, LIFT change time older | Add to `addition_diff` for upsert. |
-| Same key, LIFT change time newer | Log, skip, and count a warning. |
-| LIFT key absent from bounded source membership | Add to `removal_diff`. |
+| LIFT key missing within cutoff | Save an insert. |
+| LIFT change time older | Save an update. |
+| Same key/date | Correct; compare no other fields and save nothing. |
+| LIFT change time newer | Warn and skip. |
 
-An older LIFT row may be removed when its Oracle counterpart now has a change time beyond the cutoff and therefore falls outside source membership. This behavior is intentional for two reasons:
+Only differences are persisted. No source inventory or full target inventory is stored. Source keys/dates are checked for NULLs and duplicate keys across pages, including rows beyond the cutoff. Matching LIFT keys are checked for duplicates/NULL dates; unrelated LIFT keys are not scanned for validation.
 
-1. The normal LIFT integration is expected to bring the newer Oracle row into LIFT later.
-2. The normal integration runs immediately before repair, which is expected to prevent this case in practice.
+Missing/ambiguous mappings, missing watermark, unsupported transforms, and unsupported custom hooks/decorators fail preparation. Failed preparation stays unfinished and is replaced by a fresh run rather than resumed. Reader errors propagate to the coordinator.
 
-The cutoff defines a boundary on the current query result; it is not an Oracle historical snapshot. LIFT rows beyond the cutoff are left alone. A date mismatch on an existing key is repaired by upsert, not by independently deleting its previous pair.
+## Run counts
 
-Stop preparation with a clear error for missing or ambiguous key/change-time mappings, a missing watermark, duplicate keys, or NULL keys/change times. NULL values must not disappear silently through the cutoff predicate. Stop for unsupported location transformations, payload decorators, or custom hooks beyond the behavior explicitly supported or deliberately deferred here.
+Save creation time in UTC, attribute-table name, cutoff, and these preparation totals:
 
-Inventory reads are streamed with bounded memory. Apply must refuse an unfinished preparation. There is no requirement to resume preparation after a failure; a fresh preparation creates a fresh run.
+- `oracle_count`: source query rows at or before cutoff.
+- `lift_count`: target rows at or before cutoff.
+- `insert_count`: planned missing-key inserts.
+- `update_count`: planned older-row updates.
+- `expected_needed_deletions = lift_count + insert_count - oracle_count`.
+
+Keep the estimate signed. A negative value is saved, printed as a warning, and included in the warning count. The metric is diagnostic: it assumes planned inserts succeed and does not identify surplus keys or cause row changes. Counts remain the prepared totals after apply; source changes and terminal skips can make actual writes differ.
 
 ## Apply
 
-Use a default page size of **10,000**, defined in code.
+Read pending `upsert_diff` entries in 10,000-row batches. Fetch full source payloads using the saved SQL and require the prepared key/date pair to still match. Changed or disappeared rows are warned, marked processed, and skipped permanently for this run.
 
-For each pending addition, fetch the full source payload using the saved integration SQL. Require its key/change-time pair to match the prepared pair. If the row disappeared or its date changed, log and skip it, mark the entry processed, and count a warning.
+Upsert by mapped key, retaining an existing target UUID or generating UUID v1 for a new record. Check the current target date again; newer rows, including same-key rows beyond cutoff, are warned and skipped.
 
-Upsert by the integration's mapped key. Update an existing row in place, retaining its LIFT UUID; generate a UUID v1 for a new row, as FMP does. An existing LIFT row with a newer date is logged and skipped. This also prevents an upsert candidate from overwriting a same-key row outside the target cutoff.
+Commit the PostgreSQL batch before saving completion markers and warnings in SQLite. Committed-but-unmarked upserts replay safely. Stop on an execution error; rerunning apply resumes pending entries. Print record-specific warnings and the run summary.
 
-Apply saved removals directly, without rechecking Oracle membership. Store the target row UUID on removal entries so deletion addresses the prepared target row.
+## Match FMP
 
-Commit PostgreSQL batches before recording their completion in SQLite. If a destination batch committed but its completion markers were not saved, it may be replayed. Upserts and deleting an already-absent row must be safe to replay.
+Omit NULL/missing scalar mapped values so existing values are preserved. Preserve source wall-clock timestamp fields and fractional seconds in the PostgreSQL representation; do not shift them through a session timezone. Follow the saved query's output, including explicit UTC projections.
 
-On an execution error, stop. Running apply again resumes the remaining entries of that run. Skipped entries are finished for the run and have no retry or reconsideration workflow. A later fresh prepare/apply run is how to reconcile again.
+Write no separate audit history. Set both row timestamps to the persisted first apply-start `maxDate` and both row-user fields to the NIL UUID, including updates. Use the backend's `APP_TIMEZONE` (default UTC) for that first apply time.
 
-Print record-specific warning reasons and a final warning summary. A run may finish with warnings. Repair progress belongs to its own UUID, not the normal integration's metadata.
+For WKT mappings, bind values through `ST_Transform(ST_GeomFromText(value, source_srid), target_srid)`. Wrap with `ST_Multi` for MULTI destination types.
 
-## Match FMP's row-write behavior
+After upserts, fill point-layer sampling fields as FMP does and refresh directly subscribed materialized views concurrently. Respect `prevent_materialized_view_refresh`; resolve active `sql_related_table` subscriptions into `sql_view` destinations, deduplicate, and use no recursive traversal. Completion failures leave the run unfinished so apply can repeat completion. Map caches are refreshed by a later normal integration.
 
-**Mappings and NULLs.** Apply enabled source-to-target mappings. Omit NULL or missing source values, preserving existing values during updates as FMP does.
+## SQLite and roles
 
-**Dates.** Preserve the source query's wall-clock timestamp values exactly as FMP stores them in timezone-less target fields, including fractional seconds. Compare the source date, LIFT date, and captured cutoff in that stored representation. Do not introduce implicit Python/PostgreSQL session-timezone conversion. Follow the saved query's output; some queries explicitly return UTC, so there is no blanket conversion of all dates to Ljubljana time or UTC.
-
-**Audit history and row metadata.** Do not write separate audit-history records, matching `ignore_audit=true`. Populate row metadata like FMP's system integration path: overwrite both `created_at` and `updated_at` with the run's `maxDate`, and both `created_by` and `updated_by` with the NIL system-user UUID (`00000000-0000-0000-0000-000000000000`), including on updates. Capture `maxDate` as the first apply-start timestamp, persist it in SQLite, and reuse it across batches and restarts.
-
-**WKT geometry.** Running the saved Oracle SQL produces the source geometry representation. Reproduce FMP's target-side WKT conversion with `ST_Transform(ST_GeomFromText(value, source_srid), target_srid)`, using the configured source and destination SRIDs. Wrap that expression in `ST_Multi` when the destination geometry type contains MULTI. Bind source values as parameters.
-
-## Completion work
-
-After applying entries, perform FMP's point-layer sampling fill so missing `__mod` values are populated from `gid % 1000`.
-
-Resolve materialized views exactly as FMP does:
-
-1. Respect the target's `prevent_materialized_view_refresh` setting.
-2. Find active `sql_related_table` subscriptions whose destination is the repaired table name.
-3. Resolve their attribute-table IDs to `sql_view` source destinations.
-4. Deduplicate the names and run `REFRESH MATERIALIZED VIEW CONCURRENTLY` for those directly subscribed views.
-
-Do not add recursive dependency traversal. If completion work fails, keep the run unfinished; rerunning apply can repeat completion work after already-processed entries.
-
-Do not clear map caches. The later normal integration handles this. Temporarily stale cached map displays are accepted until that integration completes.
-
-## Minimal SQLite shape
-
-Keep the originally requested four-table shape. These names and fields describe the implementation to review; small bookkeeping columns may support streaming and batch completion.
+Use a fresh SQLite file; there is no old-schema migration.
 
 | Table | Contents |
 | --- | --- |
-| `integration_transfer` | Repair UUID, integration UUID, creation timestamp (UTC), target attribute-table name, cutoff, preparation/application completion state, prepared upsert/delete counts, first apply-start timestamp, and warning counts. |
-| `remote_ids_and_date_changed` | Repair UUID, integration key, and source change time; a seen-in-LIFT marker can support streamed comparison. |
-| `addition_diff` | Repair UUID, integration key, prepared source change time, and processed marker. Covers inserts and updates. |
-| `removal_diff` | Repair UUID, target row UUID, integration key, prepared target change time, and processed marker. |
+| `integration_transfer` | Run/integration UUIDs, table name, creation time, cutoff, preparation/application state, preparation counts, first apply time, warnings. |
+| `upsert_diff` | Run UUID, encoded business key, source change time, planned action (insert/update), processed marker, warning. |
 
-All child rows belong to their repair UUID. Do not store full source payloads or create a second persistent LIFT inventory table.
-
-## Implementation shape
-
-A small `repair.py` provides `prepare <integration_uuid>` and `apply <repair_uuid>` commands. Use direct Oracle/PostgreSQL access and SQLite, with environment-based connection settings. Keep the integration discovery, comparison, mapping, and batch handling easy to follow. The implemented roles and setup instructions are in [README.md](../README.md).
+`repair.py` coordinates the flow; `definition.py` reads metadata; `source.py` reads Oracle; `target.py` maps payloads and reads/writes PostgreSQL; `store.py` owns SQLite and the pure comparison rule. Setup and debugger examples are in [README.md](../README.md).
