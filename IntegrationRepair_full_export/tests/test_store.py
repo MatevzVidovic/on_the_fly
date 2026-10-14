@@ -117,8 +117,8 @@ def test_summary(store, prepared_run, capsys):
 
 def test_resume_keeps_initiating_user(store, prepared_run):
     import pytest
-    store.start_apply(prepared_run, DATE, 'user-one')
-    assert store.require_prepared_run(prepared_run)['user_id'] == 'user-one'
+    store.start_apply(prepared_run, DATE)
+    assert store.require_prepared_run(prepared_run)['user_id'] == '955ee6d4-d98e-11f0-bd04-de28270b37c5'
     with pytest.raises(ValueError, match='same user'):
         store.start_apply(prepared_run, DATE, 'user-two')
 
@@ -130,3 +130,14 @@ def test_source_beyond_cutoff_is_neither_deleted_nor_upserted(store, run_id):
     store.finish_preparation(run_id)
     assert store.db.execute('SELECT count(*) FROM addition_diff').fetchone()[0] == 0
     assert [row['target_id'] for row in store.db.execute('SELECT * FROM removal_diff')] == ['absent']
+
+
+def test_preparation_records_repair_user(store, run_id):
+    row = store.db.execute('SELECT user_id FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+    assert row['user_id'] == '955ee6d4-d98e-11f0-bd04-de28270b37c5'
+
+
+def test_older_prepared_run_gets_repair_user_on_apply(store, prepared_run):
+    store.db.execute('UPDATE integration_transfer SET user_id=NULL WHERE id=?', (prepared_run,))
+    store.start_apply(prepared_run, DATE)
+    assert store.require_prepared_run(prepared_run)['user_id'] == '955ee6d4-d98e-11f0-bd04-de28270b37c5'

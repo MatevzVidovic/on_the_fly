@@ -4,10 +4,10 @@ from psycopg import sql
 
 from source import PAGE_SIZE, wall_time
 
-NIL_USER = '00000000-0000-0000-0000-000000000000'
+from definition import REPAIR_USER_ID
 
 
-def map_row(payload, definition, max_date, user_id=NIL_USER):
+def map_row(payload, definition, max_date, user_id=REPAIR_USER_ID):
     """Return columns, SQL value expressions and binds. NULL mappings are omitted."""
     columns, expressions, values = [], [], []
     for field in definition.fields:
@@ -34,7 +34,7 @@ def map_row(payload, definition, max_date, user_id=NIL_USER):
 
 
 class LiftTarget:
-    def __init__(self, db, metadata, definition, user_id=NIL_USER):
+    def __init__(self, db, metadata, definition, user_id=REPAIR_USER_ID):
         self.db, self.metadata, self.d = db, metadata, definition
         self.user_id = user_id
         self.table = sql.Identifier(definition.table)

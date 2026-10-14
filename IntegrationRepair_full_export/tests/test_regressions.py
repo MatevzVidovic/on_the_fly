@@ -8,7 +8,7 @@ from repair import apply, prepare
 from store import classify
 from source import wall_time
 from store import RepairStore
-from target import LiftTarget, map_row, NIL_USER
+from target import LiftTarget, map_row, REPAIR_USER_ID
 
 OLD = '2025-01-01 12:00:00.000000'
 NEW = '2025-01-02 12:00:00.000000'
@@ -47,7 +47,7 @@ def test_mapping_nulls_geometry_and_metadata():
                                                WKT='POLYGON EMPTY'), d, NEW)
     assert 'optional' not in columns
     assert columns[-4:] == ['created_at', 'updated_at', 'created_by', 'updated_by']
-    assert values[-4:] == [NEW, NEW, NIL_USER, NIL_USER]
+    assert values[-4:] == [NEW, NEW, REPAIR_USER_ID, REPAIR_USER_ID]
     assert expressions[2].as_string() == 'ST_Multi(ST_Transform(ST_GeomFromText(%s, %s), %s))'
     assert values[0] == '001'
     assert values[2:5] == ['POLYGON EMPTY', 3794, 4326]
@@ -63,7 +63,7 @@ class Source:
 
 
 class Target:
-    user_id = NIL_USER
+    user_id = REPAIR_USER_ID
     def __init__(self):
         self.db = self
         self.writes, self.deletes, self.commits = {}, set(), 0

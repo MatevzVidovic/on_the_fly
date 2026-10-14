@@ -50,3 +50,40 @@ def test_main(definition, tmp_path, monkeypatch):
     with sqlite3.connect(path) as db:
         assert db.execute('SELECT prepared FROM integration_transfer').fetchone()[0] == 1
         assert db.execute('SELECT key FROM addition_diff').fetchone()[0] == '1'
+
+
+def test_main_defaults_to_latest_run(tmp_path, monkeypatch, capsys):
+    from store import RepairStore
+    path = tmp_path / 'latest.sqlite'
+    store = RepairStore(path)
+    for integration in ('older', 'newer'):
+        run_id = store.create_run(integration, DATE, 'records')
+        store.finish_preparation(run_id)
+        store.finish_application(run_id)
+    store.db.close()
+    capsys.readouterr()
+    monkeypatch.setattr(sys, 'argv', ['repair.py', '--store', str(path), 'apply'])
+    repair.main()
+    assert f'Using latest run {run_id}' in capsys.readouterr().out
+
+
+def test_main_does_not_skip_unfinished_latest_run(tmp_path, monkeypatch):
+    import pytest
+    from store import RepairStore
+    path = tmp_path / 'unfinished.sqlite'
+    store = RepairStore(path)
+    earlier = store.create_run('older', DATE, 'records')
+    store.finish_preparation(earlier)
+    store.create_run('newer', DATE, 'records')
+    store.db.close()
+    monkeypatch.setattr(sys, 'argv', ['repair.py', '--store', str(path), 'apply'])
+    with pytest.raises(ValueError, match='prepared run'):
+        repair.main()
+
+
+def test_main_prepare_requires_integration_id(monkeypatch):
+    import pytest
+    monkeypatch.setattr(sys, 'argv', ['repair.py', 'prepare'])
+    with pytest.raises(SystemExit) as error:
+        repair.main()
+    assert error.value.code == 2

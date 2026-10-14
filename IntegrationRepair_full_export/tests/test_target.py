@@ -1,5 +1,5 @@
 """Inspect PostgreSQL statements and supplied values without a server."""
-from target import LiftTarget, map_row, NIL_USER
+from target import LiftTarget, map_row, REPAIR_USER_ID
 from conftest import Cursor, Database, DATE
 
 
@@ -7,7 +7,7 @@ def test_map_row(definition):
     columns, expressions, values = map_row(dict(KEY=1, CHANGED=DATE), definition, DATE)
 
     assert columns == ['key', 'changed', 'created_at', 'updated_at', 'created_by', 'updated_by']
-    assert values == [1, DATE, DATE, DATE, NIL_USER, NIL_USER]
+    assert values == [1, DATE, DATE, DATE, REPAIR_USER_ID, REPAIR_USER_ID]
     assert [expression.as_string() for expression in expressions] == ['%s'] * 6
 
 

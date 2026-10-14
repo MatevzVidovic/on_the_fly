@@ -10,7 +10,7 @@ cp .env.example .env
 # Fill in credentials: PostgreSQL system metadata and data DB, KN Oracle.
 .venv/bin/python repair.py prepare INTEGRATION_UUID
 sqlite3 repair.sqlite
-.venv/bin/python repair.py --user-id YOUR_LIFT_USER_UUID apply REPAIR_UUID
+.venv/bin/python repair.py apply REPAIR_UUID
 ```
 
 Use `--env /path/to/.env` and `--store /path/to/repair.sqlite` before the command to override paths. Applying writes PostgreSQL. The provided test account is read-only and cannot apply repairs.
@@ -72,7 +72,7 @@ Tests cover comparison, mapping, actual generated SQL, stored progress, terminal
 
 ## Corrections to the saved export (2026-10-14)
 
-- Apply requires `--user-id` or `REPAIR_USER_ID`: FMP's data manager overwrites both row user fields with the authenticated initiating user, even though its lower-level integration handler supplies NIL. The repair persists this UUID in SQLite and rejects a different UUID on resume. Both creation/update timestamps still follow FMP UPSERT behavior, including updates; separate audit history remains disabled.
+- The repair user is hardcoded as `REPAIR_USER_ID` in `definition.py`: `955ee6d4-d98e-11f0-bd04-de28270b37c5` (`mvidovic`). Prepare saves it in SQLite immediately; apply reuses this identity. Older runs with NULL user receive it when apply starts. Runs already started as another user cannot silently switch identity. No shell variable or CLI user argument is needed.
 - Materialized views are left alone. No unique MV indexes are created. Point sampling completion remains. A later normal integration attempts its usual refresh; the repair does not fix any existing MV index prerequisite.
 - Keys present in Oracle after the cutoff are retained locally as existence evidence, never scheduled for removal or upsert. This corrects the earlier assumption that they would not occur: 17 such keys were observed during the Deli audit. Only target rows within cutoff whose keys are absent from the complete saved Oracle query result become removals.
 - Oracle NUMBER values are fetched as exact numeric text, avoiding Python float rounding before PostgreSQL casts them to their mapped column types.
@@ -80,3 +80,13 @@ Tests cover comparison, mapping, actual generated SQL, stored progress, terminal
 Start fresh prepare runs after these fixes. Old prepared removal lists are not recalculated automatically. Keep integrations writing each target table stopped until apply finishes. Oracle remains live; prepare is not a historical snapshot. This version stores the full Oracle key inventory in SQLite, so expect more disk space and slower preparation than the upserts-only version.
 
 Timed commands for the verified integrations are in [RUN_COMMANDS.md](RUN_COMMANDS.md).
+
+## Default apply run
+
+`repair.py --store TABLE.sqlite apply` uses the newest run in that store's
+`integration_transfer` table (creation timestamp, then insertion order). An explicit
+repair UUID still selects that run. If the newest run is unprepared, apply refuses;
+it does not select an older run. Applied runs are reported without repeating writes.
+
+Apply resumes committed progress after failure. Prepare always starts a fresh run;
+interrupted preparation does not resume.

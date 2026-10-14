@@ -6,7 +6,6 @@ from datetime import datetime
 import json
 import os
 from zoneinfo import ZoneInfo
-from uuid import UUID
 
 from dotenv import load_dotenv
 import oracledb
@@ -72,17 +71,21 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--env', default='.env')
     parser.add_argument('--store', default='repair.sqlite')
-    parser.add_argument('--user-id', help='LIFT user UUID initiating this repair (required for apply)')
     parser.add_argument('command', choices=('prepare', 'apply'))
-    parser.add_argument('id', help='integration UUID for prepare; repair UUID for apply')
+    parser.add_argument('id', nargs='?', help='integration UUID for prepare; repair UUID for apply (default: latest run)')
     args = parser.parse_args()
+    if args.command == 'prepare' and args.id is None:
+        parser.error('prepare requires an integration UUID')
     load_dotenv(args.env)
-    user_id = args.user_id or os.environ.get('REPAIR_USER_ID')
-    if args.command == 'apply':
-        if not user_id:
-            parser.error('apply requires --user-id or REPAIR_USER_ID, matching the LIFT initiating user')
-        user_id = str(UUID(user_id))
     store = RepairStore(args.store)
+    if args.command == 'apply' and args.id is None:
+        latest = store.db.execute(
+            'SELECT id FROM integration_transfer ORDER BY created_at DESC, rowid DESC LIMIT 1').fetchone()
+        if latest is None:
+            store.db.close()
+            parser.error('no repair runs in this SQLite store; run prepare first')
+        args.id = latest['id']
+        print(f'Using latest run {args.id}', flush=True)
     integration_id = args.id
     if args.command == 'apply':
         run = store.require_prepared_run(args.id)
@@ -102,7 +105,7 @@ def main():
             oracledb.init_oracle_client(lib_dir=os.environ['KN_ORACLE_CLIENT_LIB_DIR'])
         oracle = connections.enter_context(oracledb.connect(user=os.environ['KN_ORACLE_USER'],
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
-        source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition, user_id)
+        source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
         if args.command == 'prepare':
             prepare(definition, source, target, store)
         else:

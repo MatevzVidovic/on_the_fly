@@ -5,6 +5,7 @@ from datetime import datetime, timezone
 from uuid import uuid4
 
 from source import PAGE_SIZE
+from definition import REPAIR_USER_ID
 
 
 def classify(source_date, target_date):
@@ -59,8 +60,8 @@ class RepairStore:
         created_at = datetime.now(timezone.utc).isoformat(timespec='microseconds')
         with self.db:
             self.db.execute('''INSERT INTO integration_transfer
-                (id,integration_id,cutoff,created_at,attribute_table_name) VALUES (?,?,?,?,?)''',
-                (run_id, integration_id, cutoff, created_at, table_name))
+                (id,integration_id,cutoff,created_at,attribute_table_name,user_id) VALUES (?,?,?,?,?,?)''',
+                (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID))
         return run_id
 
     def require_prepared_run(self, run_id):
@@ -112,7 +113,7 @@ class RepairStore:
                 delete_count=(SELECT count(*) FROM removal_diff WHERE run_id=?) WHERE id=?''',
                 (run_id, run_id, run_id))
 
-    def start_apply(self, run_id, first_apply_time, user_id=None):
+    def start_apply(self, run_id, first_apply_time, user_id=REPAIR_USER_ID):
         run = self.require_prepared_run(run_id)
         if run['user_id'] is not None and run['user_id'] != user_id:
             raise ValueError('Resume apply with the same user UUID')

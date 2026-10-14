@@ -2,6 +2,8 @@
 from dataclasses import dataclass
 from psycopg.rows import dict_row
 
+REPAIR_USER_ID = '955ee6d4-d98e-11f0-bd04-de28270b37c5'
+
 
 @dataclass
 class IntegrationDefinition:
