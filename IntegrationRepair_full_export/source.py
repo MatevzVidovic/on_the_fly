@@ -32,10 +32,14 @@ class OracleSource:
             cur.execute("ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'")
             cur.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS.FF9'")
             cur.execute("ALTER SESSION SET NLS_TIMESTAMP_TZ_FORMAT='YYYY-MM-DD HH24:MI:SS.FF9 TZH:TZM'")
+            cur.execute("ALTER SESSION SET NLS_NUMERIC_CHARACTERS='.,'")
         db.outputtypehandler = self.timestamp_text
 
     @staticmethod
     def timestamp_text(cursor, metadata):
+        # Preserve Oracle NUMBER precision instead of converting decimals to float.
+        if metadata.type_code == oracledb.DB_TYPE_NUMBER:
+            return cursor.var(oracledb.DB_TYPE_VARCHAR, size=100, arraysize=cursor.arraysize)
         if metadata.type_code in (oracledb.DB_TYPE_DATE, oracledb.DB_TYPE_TIMESTAMP,
                                   oracledb.DB_TYPE_TIMESTAMP_TZ, oracledb.DB_TYPE_TIMESTAMP_LTZ):
             return cursor.var(oracledb.DB_TYPE_VARCHAR, size=80, arraysize=cursor.arraysize)
@@ -53,7 +57,7 @@ class OracleSource:
                     if key == previous:
                         raise ValueError(f'Duplicate Oracle key: {key}')
                     previous = key
-                    if date <= cutoff:
+                    if cutoff is None or date <= cutoff:
                         page.append((key, date))
                 yield page
 

@@ -3,14 +3,14 @@
 A standalone Python tool for the agreed KN Oracle delta repair. Run the regular integration first, then keep integrations writing the target table stopped through prepare, review and apply. Configuration must stay unchanged. Run the regular integration again later to clear map caches.
 
 ```sh
-cd IntegrationRepair
+cd /Users/matevzvidovic/on_the_fly/IntegrationRepair_full_export
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env
 # Fill in credentials: PostgreSQL system metadata and data DB, KN Oracle.
 .venv/bin/python repair.py prepare INTEGRATION_UUID
 sqlite3 repair.sqlite
-.venv/bin/python repair.py apply REPAIR_UUID
+.venv/bin/python repair.py --user-id YOUR_LIFT_USER_UUID apply REPAIR_UUID
 ```
 
 Use `--env /path/to/.env` and `--store /path/to/repair.sqlite` before the command to override paths. Applying writes PostgreSQL. The provided test account is read-only and cannot apply repairs.
@@ -42,11 +42,11 @@ All warnings are printed with the business key. Apply warnings also remain on ad
 | `source.py`: OracleSource | Wrap saved Oracle SQL, stream pairs, fetch payload pages |
 | `store.py`: RepairStore | Four SQLite tables, local diff construction and durable run progress |
 | `target.py`: map_row | FMP field mapping, NULL omission, WKT SQL and row metadata |
-| `target.py`: LiftTarget | PostgreSQL inventory, writes, sampling fill and direct view refresh |
+| `target.py`: LiftTarget | PostgreSQL inventory, writes, sampling fill; materialized views are deferred |
 
 No framework, repository interfaces, audit writes, locks or normal integration metadata updates. Unknown custom hooks/decorators and non-WKT transforms are rejected. This tool assumes the inspected FMP global event/decorator configs remain empty; it cannot discover PHP config from PostgreSQL.
 
-Both inventories scan keys/dates and filter by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Timestamps use source wall-clock fields, with six fractional digits matching PostgreSQL; no offset conversion. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
+Oracle inventory keeps all keys so rows newer than the cutoff cannot be mistaken for deletions. Only source rows at or below the cutoff can become upserts. LIFT inventory filters by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Timestamps use source wall-clock fields, with six fractional digits matching PostgreSQL; no offset conversion. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
 
 **Performance:** sorting full inventories and per-row SQLite lookups/PostgreSQL upserts favor clear code. Millions of repairs will be slow, especially over a network. Improve these specific loops with bulk joins/writes later if needed. Payload memory is bounded by one 10,000-row page, but large WKT values can make that page substantial.
 
@@ -68,4 +68,15 @@ Run a single file or step through one example:
 
 In the debugger, `s` steps into a call, `n` runs the next line, and `c` continues. Set a breakpoint inside the production method to skip fixture setup. You can also debug an individual pytest test from your IDE.
 
-Tests cover comparison, mapping, actual generated SQL, stored progress, terminal skips, replay after commit and completion restart. Read-only test metadata was checked against real KN definitions: bigint/text keys, date-time values, WKT mappings, point layers and direct materialized subscriptions. Oracle was unavailable during development, so source SQL/driver execution has not been checked live. The read-only data DB successfully evaluated the configured PostGIS WKT expression and timestamp binding; generated INSERT/UPDATE/DELETE statements were PREPAREd and DEALLOCATEd without executing them. PostgreSQL writes and materialized refresh were not executed against the read-only test database. Verify those on a writable disposable copy before production use.
+Tests cover comparison, mapping, actual generated SQL, stored progress, terminal skips, replay after commit and completion restart. Read-only test metadata was checked against real KN definitions: bigint/text keys, date-time values, WKT mappings, point layers and direct materialized subscriptions. Oracle was unavailable during development, so source SQL/driver execution has not been checked live. The read-only data DB successfully evaluated the configured PostGIS WKT expression and timestamp binding; generated INSERT/UPDATE/DELETE statements were PREPAREd and DEALLOCATEd without executing them. PostgreSQL writes were not executed during this check. Materialized view refresh is deliberately omitted. Verify those on a writable disposable copy before production use.
+
+## Corrections to the saved export (2026-10-14)
+
+- Apply requires `--user-id` or `REPAIR_USER_ID`: FMP's data manager overwrites both row user fields with the authenticated initiating user, even though its lower-level integration handler supplies NIL. The repair persists this UUID in SQLite and rejects a different UUID on resume. Both creation/update timestamps still follow FMP UPSERT behavior, including updates; separate audit history remains disabled.
+- Materialized views are left alone. No unique MV indexes are created. Point sampling completion remains. A later normal integration attempts its usual refresh; the repair does not fix any existing MV index prerequisite.
+- Keys present in Oracle after the cutoff are retained locally as existence evidence, never scheduled for removal or upsert. This corrects the earlier assumption that they would not occur: 17 such keys were observed during the Deli audit. Only target rows within cutoff whose keys are absent from the complete saved Oracle query result become removals.
+- Oracle NUMBER values are fetched as exact numeric text, avoiding Python float rounding before PostgreSQL casts them to their mapped column types.
+
+Start fresh prepare runs after these fixes. Old prepared removal lists are not recalculated automatically. Keep integrations writing each target table stopped until apply finishes. Oracle remains live; prepare is not a historical snapshot. This version stores the full Oracle key inventory in SQLite, so expect more disk space and slower preparation than the upserts-only version.
+
+Timed commands for the verified integrations are in [RUN_COMMANDS.md](RUN_COMMANDS.md).

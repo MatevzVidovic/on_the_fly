@@ -7,7 +7,7 @@ from source import PAGE_SIZE, wall_time
 NIL_USER = '00000000-0000-0000-0000-000000000000'
 
 
-def map_row(payload, definition, max_date):
+def map_row(payload, definition, max_date, user_id=NIL_USER):
     """Return columns, SQL value expressions and binds. NULL mappings are omitted."""
     columns, expressions, values = [], [], []
     for field in definition.fields:
@@ -29,13 +29,14 @@ def map_row(payload, definition, max_date):
         expressions.append(expression)
     columns.extend(('created_at', 'updated_at', 'created_by', 'updated_by'))
     expressions.extend([sql.SQL('%s')] * 4)
-    values.extend((max_date, max_date, NIL_USER, NIL_USER))
+    values.extend((max_date, max_date, user_id, user_id))
     return columns, expressions, values
 
 
 class LiftTarget:
-    def __init__(self, db, metadata, definition):
+    def __init__(self, db, metadata, definition, user_id=NIL_USER):
         self.db, self.metadata, self.d = db, metadata, definition
+        self.user_id = user_id
         self.table = sql.Identifier(definition.table)
         self.key = sql.Identifier(definition.key['target'])
         self.date = sql.Identifier(definition.date['target'])
@@ -66,7 +67,7 @@ class LiftTarget:
             existing = cur.fetchone()
             if existing and wall_time(existing[1]) > source_date:
                 return 'LIFT date is newer than Oracle date'
-            columns, expressions, values = map_row(payload, self.d, max_date)
+            columns, expressions, values = map_row(payload, self.d, max_date, self.user_id)
             if existing:
                 assignments = sql.SQL(',').join(sql.SQL('{}={}').format(sql.Identifier(c), e)
                                                for c, e in zip(columns, expressions))
@@ -108,13 +109,3 @@ class LiftTarget:
                             sql.Identifier(f'{self.d.table}_{column}_idx'), self.table, sql.Identifier(column)))
                 cur.execute(sql.SQL('UPDATE {} SET __mod=gid % 1000 WHERE __mod IS NULL').format(self.table))
             self.db.commit()
-        if not self.d.table_params.get('prevent_materialized_view_refresh'):
-            views = self.metadata.execute("""SELECT DISTINCT v.source_destination
-                FROM attribute_table_sources r JOIN attribute_table_sources v
-                  ON v.attribute_table_id=r.attribute_table_id
-                WHERE r.source_type='sql_related_table' AND r.source_destination=%s
-                  AND NOT r.is_archived AND v.source_type='sql_view' AND NOT v.is_archived
-                  AND v.source_destination IS NOT NULL""", (self.d.table,)).fetchall()
-            for (view,) in views:
-                self.db.execute(sql.SQL('REFRESH MATERIALIZED VIEW CONCURRENTLY {}').format(sql.Identifier(view)))
-                self.db.commit()

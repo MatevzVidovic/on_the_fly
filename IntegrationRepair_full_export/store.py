@@ -45,7 +45,7 @@ class RepairStore:
         columns = {row['name'] for row in self.db.execute('PRAGMA table_info(integration_transfer)')}
         with self.db:
             for name, kind in (('created_at', 'TEXT'), ('attribute_table_name', 'TEXT'),
-                               ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER')):
+                               ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER'), ('user_id', 'TEXT')):
                 if name not in columns:
                     self.db.execute(f'ALTER TABLE integration_transfer ADD COLUMN {name} {kind}')
             if 'upsert_count' not in columns or 'delete_count' not in columns:
@@ -76,6 +76,7 @@ class RepairStore:
 
     def compare_target_page(self, run_id, page):
         warnings = []
+        cutoff = self.db.execute('SELECT cutoff FROM integration_transfer WHERE id=?', (run_id,)).fetchone()[0]
         with self.db:
             for target_id, key, date in page:
                 encoded = json.dumps(key)
@@ -86,6 +87,9 @@ class RepairStore:
                 if row:
                     self.db.execute('UPDATE remote_ids_and_date_changed SET seen=1 WHERE run_id=? AND key=?',
                                     (run_id, encoded))
+                # Source rows beyond the cutoff still prove the key exists.
+                if source_date is not None and source_date > cutoff:
+                    continue
                 if decision == 'remove':
                     self.db.execute('INSERT INTO removal_diff(run_id,target_id,key,date) VALUES (?,?,?,?)',
                                     (run_id, target_id, encoded, date))
@@ -101,14 +105,19 @@ class RepairStore:
     def finish_preparation(self, run_id):
         with self.db:
             self.db.execute('''INSERT INTO addition_diff(run_id,key,date)
-                SELECT run_id,key,date FROM remote_ids_and_date_changed WHERE run_id=? AND NOT seen''', (run_id,))
+                SELECT run_id,key,date FROM remote_ids_and_date_changed WHERE run_id=? AND NOT seen
+                AND date <= (SELECT cutoff FROM integration_transfer WHERE id=?)''', (run_id, run_id))
             self.db.execute('''UPDATE integration_transfer SET prepared=1,
                 upsert_count=(SELECT count(*) FROM addition_diff WHERE run_id=?),
                 delete_count=(SELECT count(*) FROM removal_diff WHERE run_id=?) WHERE id=?''',
                 (run_id, run_id, run_id))
 
-    def start_apply(self, run_id, first_apply_time):
+    def start_apply(self, run_id, first_apply_time, user_id=None):
+        run = self.require_prepared_run(run_id)
+        if run['user_id'] is not None and run['user_id'] != user_id:
+            raise ValueError('Resume apply with the same user UUID')
         with self.db:
+            self.db.execute('UPDATE integration_transfer SET user_id=coalesce(user_id,?) WHERE id=?', (user_id, run_id))
             self.db.execute('UPDATE integration_transfer SET max_date=coalesce(max_date,?) WHERE id=?',
                             (first_apply_time, run_id))
         return self.require_prepared_run(run_id)['max_date']

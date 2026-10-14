@@ -20,7 +20,7 @@ def test_init(definition):
     source = OracleSource(db, definition)
 
     assert source.key == '"KEY"'
-    assert len(cursor.calls) == 3
+    assert len(cursor.calls) == 4
     assert db.outputtypehandler == source.timestamp_text
 
 
@@ -47,3 +47,14 @@ def test_fetch_payloads(definition):
     payloads = source.fetch_payloads([1])
 
     assert payloads == {1: dict(KEY=1, CHANGED=DATE)}
+
+
+def test_number_is_fetched_as_exact_text():
+    result = OracleSource.timestamp_text(Cursor(), SimpleNamespace(type_code=oracledb.DB_TYPE_NUMBER))
+    assert result == (oracledb.DB_TYPE_VARCHAR, dict(size=100, arraysize=1))
+
+
+def test_unbounded_inventory_keeps_keys_past_cutoff(definition):
+    future = '2099-01-01 00:00:00.000000'
+    source = OracleSource(Database(Cursor([(1, future)])), definition)
+    assert list(source.inventory(None)) == [[(1, future)]]

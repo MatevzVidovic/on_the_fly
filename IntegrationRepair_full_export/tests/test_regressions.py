@@ -63,6 +63,7 @@ class Source:
 
 
 class Target:
+    user_id = NIL_USER
     def __init__(self):
         self.db = self
         self.writes, self.deletes, self.commits = {}, set(), 0

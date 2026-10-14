@@ -76,6 +76,12 @@ def test_complete(definition):
     target.complete()
 
     queries = [query.as_string() for query, _ in db.example_cursor.calls[1:]]
-    assert queries == ['UPDATE "records" SET __mod=gid % 1000 WHERE __mod IS NULL',
-                       'REFRESH MATERIALIZED VIEW CONCURRENTLY "related_view"']
-    assert db.commits == 2
+    assert queries == ['UPDATE "records" SET __mod=gid % 1000 WHERE __mod IS NULL']
+    assert metadata.example_cursor.calls == []
+    assert db.commits == 1
+
+
+def test_map_row_uses_initiating_user(definition):
+    user_id = '7b87a13c-2c28-11f1-96ae-f649468e5bd6'
+    _, _, values = map_row(dict(KEY=1, CHANGED=DATE), definition, DATE, user_id)
+    assert values[-2:] == [user_id, user_id]

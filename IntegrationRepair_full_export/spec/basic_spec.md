@@ -18,7 +18,7 @@ These are operational assumptions. Do not implement table locking, configuration
 
 Read the existing integration metadata as FMP does: target table, saved source SQL, and enabled field mappings. Use the mapping marked `api_id` for the source record key and the mapping marked `api_last_sync_field` for the change time. Source keys retain their defined meaning and type; they are distinct from the integration UUID and the LIFT row UUID. Column names need not literally be `id` or `date_changed`.
 
-Execute the saved Oracle integration query and inventory its keys/change times. Inventory LIFT using the corresponding mapped fields. Both sides are bounded inclusively by the captured cutoff: `change_time <= cutoff`. Rows beyond the cutoff are outside repair scope.
+Execute the saved Oracle integration query and inventory its keys/change times. Inventory LIFT using the corresponding mapped fields. Upserts and LIFT inventory are bounded inclusively by `change_time <= cutoff`. Keep the complete Oracle key inventory to distinguish absent keys from existing keys newer than the cutoff.
 
 Compare by integration key:
 
@@ -28,12 +28,9 @@ Compare by integration key:
 | Source key missing from LIFT | Add to `addition_diff` for upsert. |
 | Same key, LIFT change time older | Add to `addition_diff` for upsert. |
 | Same key, LIFT change time newer | Log, skip, and count a warning. |
-| LIFT key absent from bounded source membership | Add to `removal_diff`. |
+| LIFT key absent from the complete Oracle query result | Add to `removal_diff`. |
 
-An older LIFT row may be removed when its Oracle counterpart now has a change time beyond the cutoff and therefore falls outside source membership. This behavior is intentional for two reasons:
-
-1. The normal LIFT integration is expected to bring the newer Oracle row into LIFT later.
-2. The normal integration runs immediately before repair, which is expected to prevent this case in practice.
+A source key beyond the cutoff proves existence: leave its LIFT row alone and do not upsert it. Such rows were observed during the Deli audit, so the earlier assumption that running normal integration first prevents this case does not hold.
 
 The cutoff defines a boundary on the current query result; it is not an Oracle historical snapshot. LIFT rows beyond the cutoff are left alone. A date mismatch on an existing key is repaired by upsert, not by independently deleting its previous pair.
 
@@ -63,7 +60,7 @@ Print record-specific warning reasons and a final warning summary. A run may fin
 
 **Dates.** Preserve the source query's wall-clock timestamp values exactly as FMP stores them in timezone-less target fields, including fractional seconds. Compare the source date, LIFT date, and captured cutoff in that stored representation. Do not introduce implicit Python/PostgreSQL session-timezone conversion. Follow the saved query's output; some queries explicitly return UTC, so there is no blanket conversion of all dates to Ljubljana time or UTC.
 
-**Audit history and row metadata.** Do not write separate audit-history records, matching `ignore_audit=true`. Populate row metadata like FMP's system integration path: overwrite both `created_at` and `updated_at` with the run's `maxDate`, and both `created_by` and `updated_by` with the NIL system-user UUID (`00000000-0000-0000-0000-000000000000`), including on updates. Capture `maxDate` as the first apply-start timestamp, persist it in SQLite, and reuse it across batches and restarts.
+**Audit history and row metadata.** Do not write separate audit-history records, matching `ignore_audit=true`. Populate row metadata like FMP's UPSERT path: overwrite both `created_at` and `updated_at` with the run's `maxDate`, and both `created_by` and `updated_by` with the initiating LIFT user UUID supplied through `--user-id` or `REPAIR_USER_ID` (FMP’s data manager replaces the lower-level NIL placeholder with its authenticated user), including on updates. Capture `maxDate` as the first apply-start timestamp, persist it and the user UUID in SQLite, and reuse them across batches and restarts. Reject a different user UUID on resume.
 
 **WKT geometry.** Running the saved Oracle SQL produces the source geometry representation. Reproduce FMP's target-side WKT conversion with `ST_Transform(ST_GeomFromText(value, source_srid), target_srid)`, using the configured source and destination SRIDs. Wrap that expression in `ST_Multi` when the destination geometry type contains MULTI. Bind source values as parameters.
 
@@ -71,12 +68,7 @@ Print record-specific warning reasons and a final warning summary. A run may fin
 
 After applying entries, perform FMP's point-layer sampling fill so missing `__mod` values are populated from `gid % 1000`.
 
-Resolve materialized views exactly as FMP does:
-
-1. Respect the target's `prevent_materialized_view_refresh` setting.
-2. Find active `sql_related_table` subscriptions whose destination is the repaired table name.
-3. Resolve their attribute-table IDs to `sql_view` source destinations.
-4. Deduplicate the names and run `REFRESH MATERIALIZED VIEW CONCURRENTLY` for those directly subscribed views.
+Leave materialized views alone; do not refresh them or create unique indexes. Later normal integrations perform their usual refresh work.
 
 Do not add recursive dependency traversal. If completion work fails, keep the run unfinished; rerunning apply can repeat completion work after already-processed entries.
 

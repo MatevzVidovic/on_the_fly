@@ -113,3 +113,20 @@ def test_summary(store, prepared_run, capsys):
     store.summary(prepared_run)
 
     assert '1 upserts, 0 removals, 0 warnings' in capsys.readouterr().out
+
+
+def test_resume_keeps_initiating_user(store, prepared_run):
+    import pytest
+    store.start_apply(prepared_run, DATE, 'user-one')
+    assert store.require_prepared_run(prepared_run)['user_id'] == 'user-one'
+    with pytest.raises(ValueError, match='same user'):
+        store.start_apply(prepared_run, DATE, 'user-two')
+
+
+def test_source_beyond_cutoff_is_neither_deleted_nor_upserted(store, run_id):
+    future = '2099-01-01 00:00:00.000000'
+    store.save_source(run_id, [(1, future), (2, future)])
+    store.compare_target_page(run_id, [('existing', 1, DATE), ('absent', 3, DATE)])
+    store.finish_preparation(run_id)
+    assert store.db.execute('SELECT count(*) FROM addition_diff').fetchone()[0] == 0
+    assert [row['target_id'] for row in store.db.execute('SELECT * FROM removal_diff')] == ['absent']
