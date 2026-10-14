@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Integration repair · Module proposal</title>
+  <style>
+    :root { color-scheme: light; --ink:#17352e; --muted:#5b6c65; --paper:#f5f5ed; --line:#d6ddd2; --accent:#225c47; }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--paper); color:var(--ink); font:16px/1.5 system-ui,sans-serif; }
+    main { max-width:1060px; margin:auto; padding:46px 30px 60px; }
+    .eyebrow { color:var(--accent); font-size:12px; letter-spacing:.12em; text-transform:uppercase; font-weight:750; }
+    h1 { font-size:clamp(30px,5vw,48px); line-height:1.12; letter-spacing:-.035em; margin:12px 0 18px; }
+    h2 { font-size:23px; margin:32px 0 12px; letter-spacing:-.02em; }
+    p { margin:8px 0 16px; }
+    .intro { max-width:790px; font-size:18px; color:var(--muted); }
+    .note { border-left:3px solid var(--accent); padding:9px 16px; background:#e9eee3; font-size:14px; }
+    .table-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:12px; background:#fffef9; }
+    table { width:100%; border-collapse:collapse; text-align:left; }
+    th { background:#e9eee3; font-size:12px; text-transform:uppercase; letter-spacing:.06em; }
+    th,td { padding:13px 16px; vertical-align:top; border-bottom:1px solid var(--line); }
+    tr:last-child td { border-bottom:0; }
+    td:first-child { width:22%; }
+    td:nth-child(2) { width:44%; }
+    .label { display:block; font-weight:750; white-space:nowrap; }
+    .detail { display:block; font-size:13px; color:var(--muted); margin-top:3px; }
+    code { font:13px/1.5 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .phases { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .phase { background:#fffef9; border:1px solid var(--line); border-radius:12px; padding:20px; }
+    .phase h3 { margin:0 0 13px; font-size:18px; }
+    ol { padding-left:22px; margin:0; }
+    li { padding:3px 0; }
+    .gate { text-align:center; padding:13px; color:var(--accent); font-weight:700; border:1px dashed #a1b4a6; border-radius:10px; margin:14px 0; }
+    details { margin-top:14px; border:1px solid var(--line); border-radius:12px; overflow:hidden; background:#fffef9; }
+    summary { padding:16px 20px; cursor:pointer; font-weight:700; }
+    pre { margin:0; padding:20px; background:#17352e; color:#e7f0df; overflow:auto; font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; tab-size:4; }
+    .rules { display:grid; grid-template-columns:1fr 1fr; gap:14px; font-size:14px; }
+    .rules p { margin:0; padding:14px 16px; background:#e9eee3; border-radius:9px; }
+    footer { color:var(--muted); font-size:13px; margin-top:28px; }
+    a { color:var(--accent); }
+    @media(max-width:720px) { main { padding:28px 16px 40px; } .phases,.rules { grid-template-columns:1fr; } th,td { padding:11px; } table { min-width:650px; } }
+    @media print { body { background:white; } main { padding:0; } details pre { display:block; } .phase, tr { break-inside:avoid; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">Integration repair / design proposal</div>
+  <h1>Seven clear roles.<br>Two explicit phases.</h1>
+  <p class="intro">Keep your SQLite handler and diff creator. Combine the remote SQL builder, key/date puller, and payload batch puller into one <strong>OracleSource</strong> module. Add a coordinator and an FMP row mapper so database reads, repair decisions, and write rules each have one home.</p>
+  <p class="note">These are logical modules: named function groups in <code>repair.py</code> are enough to start. Each has a small interface; separate classes or files can come later if they help.</p>
+
+  <h2>Who owns what?</h2>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Module</th><th>Owns</th><th>Small interface &amp; reason</th></tr></thead>
+      <tbody>
+        <tr><td><span class="label">RepairFlow</span><span class="detail">Coordinator</span></td><td>Prepare/apply order, page loops, source-pair rechecks, warning summaries, and PostgreSQL-before-SQLite progress ordering.</td><td><code>prepare(integration_uuid)</code><br><code>apply(repair_uuid)</code><span class="detail">One place to read the whole workflow.</span></td></tr>
+        <tr><td><span class="label">IntegrationDefinition</span><span class="detail">LIFT metadata reader</span></td><td>Read and validate delta configuration, saved SQL, key/date mappings, target fields, geometry settings, supported hooks, and cutoff.</td><td><code>load(integration_uuid)</code><span class="detail">All FMP metadata interpretation stays together.</span></td></tr>
+        <tr><td><span class="label">OracleSource</span><span class="detail">Source reader + SQL builder</span></td><td>Wrap the saved SQL, stream bounded key/date inventory, fetch full payloads by requested keys, and handle Oracle paging, binds, and driver values.</td><td><code>inventory(cutoff)</code><br><code>fetch_payloads(keys)</code><span class="detail">Both read paths use the same source query and key semantics.</span></td></tr>
+        <tr><td><span class="label">RepairStore</span><span class="detail">SQLite handler</span></td><td>Persist the run, source pairs, seen markers, diffs, outcomes, warnings, and resume progress in the agreed four tables.</td><td><code>save / lookup / pending / finish</code><span class="detail">Owns persistence. Receives decisions rather than inventing them.</span></td></tr>
+        <tr><td><span class="label">DiffPlanner</span><span class="detail">Pure comparison</span></td><td>Compare one source/LIFT pair: equal → nothing; missing/older LIFT → upsert; newer LIFT → warning; missing source → removal.</td><td><code>classify(source_pair, lift_pair)</code><span class="detail">One rule set for additions and deletions; no database access.</span></td></tr>
+        <tr><td><span class="label">FmpRowMapper</span><span class="detail">Pure payload mapping</span></td><td>Enabled field mapping, NULL omission, wall-clock dates, WKT expressions/SRIDs/MULTI, and NIL-user/maxDate row metadata.</td><td><code>map(payload, definition, max_date)</code><span class="detail">FMP write behavior can be checked without running a repair.</span></td></tr>
+        <tr><td><span class="label">LiftTarget</span><span class="detail">PostgreSQL reader + writer</span></td><td>Stream target pairs; upsert by mapped key; skip newer rows; retain existing UUIDs or generate UUID v1; delete by saved UUID; commit; fill sampling fields and refresh direct materialized views.</td><td><code>inventory(cutoff)</code><br><code>commit_batch(writes)</code><br><code>complete(definition)</code><span class="detail">Target SQL and transaction behavior stay in one place.</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>The final sequence</h2>
+  <p>Run the regular integration first, then keep integrations writing this table stopped until repair finishes. RepairFlow drives both phases.</p>
+  <div class="phases">
+    <section class="phase">
+      <h3>01 · Prepare</h3>
+      <ol>
+        <li><strong>Definition → Store:</strong> validate configuration; create run with the captured cutoff.</li>
+        <li><strong>OracleSource → Store:</strong> stream source keys/dates at or below cutoff.</li>
+        <li><strong>LiftTarget → DiffPlanner:</strong> stream bounded LIFT pairs; compare against SQLite source membership.</li>
+        <li><strong>DiffPlanner → Store:</strong> save removals, older-row upserts, and warnings; mark matched source keys seen.</li>
+        <li>Unseen source keys become upserts. Mark preparation finished.</li>
+      </ol>
+    </section>
+    <section class="phase">
+      <h3>02 · Apply the reviewed run</h3>
+      <ol>
+        <li>Load the prepared run; persist first apply time once.</li>
+        <li><strong>Store → OracleSource:</strong> fetch pending upsert payloads in pages of 10,000.</li>
+        <li>Recheck saved pairs; changed/missing source rows become terminal warnings.</li>
+        <li><strong>Mapper → LiftTarget → Store:</strong> map, commit upserts, then mark outcomes processed.</li>
+        <li>Commit saved UUID deletions, then mark processed.</li>
+        <li>Fill point sampling fields; refresh direct views; finish the run and print warnings.</li>
+      </ol>
+    </section>
+  </div>
+  <div class="gate">Prepare → Review saved diffs in SQLite → Apply</div>
+
+  <details>
+    <summary>Prepare pseudocode — inventory, compare, save</summary>
+    <pre>prepare(integration_uuid):
+    definition = IntegrationDefinition.load(integration_uuid)
+    run = store.create_run(definition.uuid, cutoff=definition.watermark)
+    source, target = readers_for(definition)
+
+    # Readers validate keys/dates; NULLs must not vanish in cutoff filters.
+    # Store rejects duplicate source keys; target reader rejects target duplicates.
+    for page in source.inventory(run.cutoff, page_size=10_000):
+        store.save_source_pairs(run, page)
+
+    for page in target.inventory(run.cutoff, page_size=10_000):
+        for lift_pair in page:
+            source_pair = store.lookup_source(run, lift_pair.key)
+            decision = DiffPlanner.classify(source_pair, lift_pair)
+            store.save_decision_and_mark_seen(run, decision, source_pair)
+
+    for page in store.unseen_source_pairs(run, page_size=10_000):
+        for source_pair in page:
+            store.save_decision(run, DiffPlanner.classify(source_pair, None))
+
+    store.finish_preparation(run)
+    print_review_summary(run)  # failures leave the run unprepared</pre>
+  </details>
+  <details>
+    <summary>Apply pseudocode — recheck, commit, record progress</summary>
+    <pre>apply(repair_uuid):
+    run = store.require_prepared_run(repair_uuid)
+    definition = IntegrationDefinition.load(run.integration_uuid)
+    max_date = store.get_or_set_first_apply_time(run)
+    source, target = readers_for(definition)
+
+    for batch in store.pending_additions(run, page_size=10_000):
+        payloads = source.fetch_payloads(batch.keys)
+        writes, skipped = recheck_prepared_pairs(batch, payloads)
+        mapped = [FmpRowMapper.map(row, definition, max_date) for row in writes]
+        outcomes = target.commit_batch(mapped)  # includes skip-newer checks
+        store.finish_entries(run, outcomes + skipped)
+
+    for batch in store.pending_removals(run, page_size=10_000):
+        outcomes = target.commit_batch(delete_by_uuid(batch))
+        store.finish_entries(run, outcomes)
+
+    target.complete(definition)  # sampling fill + direct view refresh
+    store.finish_application(run)
+    print_warning_summary(run)
+
+    # On an execution error: stop. Rerun apply to resume pending entries.
+    # Committed-but-unmarked writes replay safely; skipped entries stay finished.
+    # If completion fails, the run stays unfinished and completion runs again.</pre>
+  </details>
+
+  <h2>Rules that cross the interfaces</h2>
+  <div class="rules">
+    <p><strong>Same value contract.</strong> Preserve the configured key type and FMP’s timestamp wall-clock fields, including fractions. OracleSource and LiftTarget return comparable pairs; RepairStore encodes them without losing meaning.</p>
+    <p><strong>Bounded membership.</strong> Both inventories use <code>date ≤ cutoff</code>. Missing bounded source membership permits removal even if a newer source row exists. Saved removals have no Oracle recheck.</p>
+    <p><strong>Commit before progress.</strong> LiftTarget returns outcomes after PostgreSQL commits. RepairStore then saves outcomes and warning counts. Upserts and absent-row deletions tolerate replay.</p>
+    <p><strong>Existing agreements.</strong> No separate audit writes, locks, watermark changes, or configuration tracking. Configuration stays fixed. A later normal integration clears map caches.</p>
+  </div>
+  <footer>Proposal based on the agreed <a href="basic_spec.md">repair spec</a>. The SQLite table shape and repair rules stay the same; this proposal clarifies where each responsibility lives.</footer>
+</main>
+</body>
+</html>

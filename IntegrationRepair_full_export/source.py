@@ -1,0 +1,79 @@
+"""Oracle SQL and driver values. Both reads wrap the same saved query."""
+from datetime import datetime
+import re
+import oracledb
+
+PAGE_SIZE = 10_000
+
+
+def wall_time(value):
+    """Canonical wall-clock text; timezone offsets never shift the clock."""
+    if value is None:
+        raise ValueError('NULL change time')
+    if isinstance(value, datetime):
+        return value.replace(tzinfo=None).strftime('%Y-%m-%d %H:%M:%S.%f')
+    match = re.fullmatch(r'(\d{4}-\d{2}-\d{2})[ T](\d{2}:\d{2}:\d{2})(?:\.(\d+))?(?:\s*[+-]\d{2}:\d{2})?', value)
+    if not match:
+        raise ValueError(f'Unexpected Oracle timestamp: {value!r}')
+    # PostgreSQL timestamp stores six fractional digits. Oracle KN values use six.
+    fraction = (match[3] or '').ljust(6, '0')
+    if len(fraction) > 6 and fraction[6:].strip('0'):
+        raise ValueError('Source timestamp exceeds PostgreSQL microsecond precision')
+    return f'{match[1]} {match[2]}.{fraction[:6]}'
+
+
+class OracleSource:
+    def __init__(self, db, definition):
+        self.db, self.d = db, definition
+        self.key = '"' + definition.key['api_name'].replace('"', '""') + '"'
+        self.date = '"' + definition.date['api_name'].replace('"', '""') + '"'
+        # Fetch timestamps as FMP PDO text: preserve wall fields, not session timezone.
+        with db.cursor() as cur:
+            cur.execute("ALTER SESSION SET NLS_DATE_FORMAT='YYYY-MM-DD HH24:MI:SS'")
+            cur.execute("ALTER SESSION SET NLS_TIMESTAMP_FORMAT='YYYY-MM-DD HH24:MI:SS.FF9'")
+            cur.execute("ALTER SESSION SET NLS_TIMESTAMP_TZ_FORMAT='YYYY-MM-DD HH24:MI:SS.FF9 TZH:TZM'")
+        db.outputtypehandler = self.timestamp_text
+
+    @staticmethod
+    def timestamp_text(cursor, metadata):
+        if metadata.type_code in (oracledb.DB_TYPE_DATE, oracledb.DB_TYPE_TIMESTAMP,
+                                  oracledb.DB_TYPE_TIMESTAMP_TZ, oracledb.DB_TYPE_TIMESTAMP_LTZ):
+            return cursor.var(oracledb.DB_TYPE_VARCHAR, size=80, arraysize=cursor.arraysize)
+
+    def inventory(self, cutoff):
+        # Scan all pairs so NULLs and duplicate keys cannot hide beyond the cutoff.
+        with self.db.cursor() as cur:
+            cur.arraysize = PAGE_SIZE
+            cur.execute(f'SELECT {self.key}, {self.date} FROM ({self.d.query}) ORDER BY {self.key}')
+            previous = None
+            while rows := cur.fetchmany(PAGE_SIZE):
+                page = []
+                for key, date in rows:
+                    key, date = self.d.key_value(key), wall_time(date)
+                    if key == previous:
+                        raise ValueError(f'Duplicate Oracle key: {key}')
+                    previous = key
+                    if date <= cutoff:
+                        page.append((key, date))
+                yield page
+
+    def fetch_payloads(self, keys):
+        payloads = {}
+        # Oracle 19c limits IN to 1000 expressions.
+        for start in range(0, len(keys), 1000):
+            subset = keys[start:start + 1000]
+            binds = {f'k{i}': key for i, key in enumerate(subset)}
+            placeholders = ','.join(':' + name for name in binds)
+            with self.db.cursor() as cur:
+                cur.arraysize = len(subset)
+                cur.execute(f'SELECT * FROM ({self.d.query}) WHERE {self.key} IN ({placeholders})', binds)
+                names = [c[0] for c in cur.description]
+                for values in cur:
+                    row = dict(zip(names, (v.read() if isinstance(v, oracledb.LOB) else v for v in values)))
+                    key = self.d.key_value(row[self.d.key['api_name']])
+                    if key in payloads:
+                        raise ValueError(f'Duplicate Oracle key: {key}')
+                    if row.get('__OPERATION', 'UPSERT') != 'UPSERT':
+                        raise ValueError('Operation feeds are unsupported; repair requires current rows')
+                    payloads[key] = row
+        return payloads

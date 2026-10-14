@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Repair proposal · Compare each page, save only upserts</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; background:#f5f5ed; color:#17352e; font:16px/1.55 system-ui,sans-serif; }
+    main { max-width:990px; margin:auto; padding:36px 24px 48px; }
+    .tag { color:#225c47; font-size:12px; font-weight:750; letter-spacing:.1em; text-transform:uppercase; }
+    h1 { font-size:clamp(28px,5vw,42px); letter-spacing:-.035em; line-height:1.15; margin:10px 0 16px; }
+    h2 { font-size:21px; margin:28px 0 12px; }
+    p { margin:8px 0 14px; }
+    .note { padding:14px 18px; background:#e7eee1; border-left:3px solid #225c47; border-radius:4px; }
+    .flow { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .card { padding:18px; border:1px solid #d6ddd2; border-radius:12px; background:#fffef9; }
+    .card h3 { margin:0 0 8px; font-size:17px; }
+    .join { text-align:center; font-weight:700; padding:12px; color:#225c47; }
+    .scroll { overflow:auto; border:1px solid #d6ddd2; border-radius:12px; }
+    table { width:100%; border-collapse:collapse; background:#fffef9; text-align:left; }
+    th,td { padding:12px 15px; vertical-align:top; border-bottom:1px solid #d6ddd2; }
+    th { background:#e7eee1; font-size:13px; }
+    tr:last-child td { border-bottom:0; }
+    td:first-child { white-space:nowrap; font-weight:650; }
+    code { font:13px/1.6 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    details { border:1px solid #d6ddd2; border-radius:12px; overflow:hidden; margin-top:20px; background:#fffef9; }
+    summary { padding:15px 18px; font-weight:700; cursor:pointer; }
+    pre { margin:0; padding:18px; background:#17352e; color:#e7f0df; overflow:auto; font:13px/1.65 ui-monospace,SFMono-Regular,Consolas,monospace; }
+    ol { padding-left:22px; }
+    li { margin:6px 0; }
+    footer { margin-top:25px; color:#5b6c65; font-size:13px; }
+    @media(max-width:650px) { .flow { grid-template-columns:1fr; } table { min-width:570px; } main { padding:24px 16px; } }
+  </style>
+</head>
+<body>
+<main>
+  <div class="tag">Proposal for agreement · Python implementation unchanged</div>
+  <h1>Compare each page.<br>Save only the upsert differences.</h1>
+  <p>Prepare becomes a source-driven loop: fetch 10,000 Oracle key/date pairs, look up those keys in LIFT, and save only missing or older rows to SQLite. While we compare the current page, one background reader fetches the next page.</p>
+  <p class="note"><strong>What gets smaller:</strong> SQLite storage and writes. Current RAM use is already page-bounded; it does not hold the entire inventory in memory. We still transfer every source key/date pair to compare it. Full payloads are fetched only for saved upserts during apply.</p>
+
+  <h2>The new sequence</h2>
+  <div class="flow">
+    <section class="card">
+      <h3>Oracle reader · page N + 1</h3>
+      <p>One worker owns the inventory cursor and fetches the next page. Only one fetch can be outstanding; it waits once that page is ready.</p>
+    </section>
+    <section class="card">
+      <h3>Main thread · page N</h3>
+      <p>One PostgreSQL lookup for the page’s keys → compare dates → commit the upsert differences and warning count to SQLite → discard the page.</p>
+    </section>
+  </div>
+  <div class="join">Repeat → Finish preparation → Review SQLite → Apply upserts → Completion work</div>
+  <p>Use one <code>ThreadPoolExecutor(max_workers=1)</code> and one future. PostgreSQL and SQLite stay on the main thread. There is no async framework, worker pool, or unbounded queue.</p>
+
+  <h2>What changes in each file</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>File / role</th><th>Change</th></tr></thead>
+      <tbody>
+        <tr><td>repair.py · coordinator</td><td>Replace “save all source pairs, then scan LIFT” with the overlapping page loop. Stop calling the removal loop in <code>apply</code>, including for older runs.</td></tr>
+        <tr><td>source.py · Oracle reader</td><td>Reuse the existing inventory generator, saved SQL, cutoff, and key/date normalization. Run its cursor reads on the single worker; retain streamed source NULL/duplicate checks.</td></tr>
+        <tr><td>target.py · LIFT reader</td><td>Add <code>lookup_pairs(keys, cutoff)</code>: a single parameterized <code>WHERE key = ANY(%s)</code> lookup per page. Return key/date pairs for comparison; stop calling the full target inventory.</td></tr>
+        <tr><td>store.py · SQLite handler</td><td>Save already-decided upsert pairs and warning counts. Stop calling <code>save_source</code> and <code>compare_target_page</code>. Finish preparation by counting <code>addition_diff</code> and setting <code>delete_count = 0</code>; remove its source-inventory dependency.</td></tr>
+        <tr><td>Comparison + mapping</td><td>Keep the pure date rules and FMP payload mapping. Missing LIFT key or older LIFT date → upsert; equal → nothing; newer → warn and skip. The removal rule remains present but unused.</td></tr>
+        <tr><td>definition.py + apply</td><td>Metadata discovery, source-pair rechecks, terminal skips, restart behavior, PostgreSQL-before-SQLite commits, and completion work continue as agreed.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Deletion is off, without a cleanup rewrite</h2>
+  <p>Keep the existing deletion functions and tables. New runs leave <code>remote_ids_and_date_changed</code> and <code>removal_diff</code> empty and report <code>delete_count = 0</code>. No dummy rows are needed. LIFT-only keys are never visited, so the three extra test rows will remain.</p>
+  <p>Start a fresh prepared run for this mode. Old runs keep their historical differences; disabling deletion must also stop old saved removals from being executed. Use a fresh SQLite file, such as <code>ev-upserts.sqlite</code>, to see the storage reduction: existing inventory data does not disappear or shrink automatically.</p>
+
+  <details>
+    <summary>Short prepare pseudocode</summary>
+    <pre>run = store.create_run(integration_id, cutoff, table_name)
+pages = source.inventory(cutoff)
+
+with ThreadPoolExecutor(max_workers=1) as reader:
+    next_page = reader.submit(next, pages, None)
+    while True:
+        page = next_page.result()  # Oracle errors propagate here
+        if page is None:          # An empty page is not the end
+            break
+        next_page = reader.submit(next, pages, None)
+
+        lift_pairs = target.lookup_pairs(keys_from(page), cutoff)
+        additions, warnings = compare_page(page, lift_pairs)
+        store.save_upsert_page(run, additions, warnings)
+
+store.finish_preparation(run)     # prepared totals; delete_count = 0
+# Apply later fetches payloads for addition_diff only.</pre>
+  </details>
+
+  <h2>Recommended implementation steps</h2>
+  <ol>
+    <li><strong>First, change the data flow:</strong> page lookup → compare → save differences. Disable deletion calls. Check this sequentially before adding threading.</li>
+    <li><strong>Then overlap the reads:</strong> add exactly one next-page future. The page comparison and SQLite writes remain sequential.</li>
+    <li><strong>Update the examples and regression tests:</strong> missing/equal/older/newer pairs, multiple and empty pages, reader errors, replay, and proof that deletion is never called.</li>
+  </ol>
+  <p class="note"><strong>Details to agree:</strong> keep the inclusive source and LIFT cutoff as before. A LIFT row beyond the cutoff can still appear missing during prepare; apply’s existing newer-date check leaves it alone. Validate NULL/duplicate values on source and matched LIFT keys; unrelated LIFT rows are no longer scanned. Preparation is finished only after every page succeeds.</p>
+  <footer>Up to two source pages plus the current lookup/diff data are held locally. Source scanning/sorting and total key/date traffic remain; prefetch helps when Oracle fetch time can overlap LIFT comparison time. A target key index matters for the page lookups.</footer>
+</main>
+</body>
+</html>

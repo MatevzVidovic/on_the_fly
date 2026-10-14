@@ -1,0 +1,3 @@
+# Run repair as a standalone Python tool
+
+Repair runs in a standalone Python tool in IntegrationRepair, using LIFT's existing integration configuration as its source of integration definitions. A backend command would make direct reuse of PHP mapping and payload processing easier, but the chosen operational boundary is a separate Python tool that reproduces the agreed row-write behavior, WKT conversion, materialized-view resolution, and point sampling fill. Unsupported PHP behavior stops preparation; map-cache clearing is deliberately left to a later normal integration.
