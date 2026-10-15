@@ -1,5 +1,5 @@
 -- Run AFTER the simplified CREATE-only statement succeeds and is committed.
--- Restores saved owner/effective permissions, then populates the MV.
+-- Restores saved owner/grants, then populates the MV. Existing extra grants are not removed.
 -- No DROP or CREATE commands. Prepared only, not executed.
 
 BEGIN;
