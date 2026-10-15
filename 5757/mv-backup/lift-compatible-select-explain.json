@@ -1,0 +1,260 @@
+[
+  {
+    "Plan": {
+      "Node Type": "Aggregate",
+      "Strategy": "Sorted",
+      "Partial Mode": "Simple",
+      "Parallel Aware": false,
+      "Async Capable": false,
+      "Startup Cost": 3844929.64,
+      "Total Cost": 7391596.96,
+      "Plan Rows": 15835706,
+      "Plan Width": 412,
+      "Group Key": [
+        "p.id_rel_pr_datum",
+        "pd.datum",
+        "p.model",
+        "('DEL_PARC'::text)",
+        "x.id_rel_verzije_modeli",
+        "vm.verzija"
+      ],
+      "Plans": [
+        {
+          "Node Type": "Gather Merge",
+          "Parent Relationship": "Outer",
+          "Parallel Aware": false,
+          "Async Capable": false,
+          "Startup Cost": 3844929.64,
+          "Total Cost": 5689258.56,
+          "Plan Rows": 15835706,
+          "Plan Width": 176,
+          "Workers Planned": 2,
+          "Plans": [
+            {
+              "Node Type": "Sort",
+              "Parent Relationship": "Outer",
+              "Parallel Aware": false,
+              "Async Capable": false,
+              "Startup Cost": 3843929.62,
+              "Total Cost": 3860425.14,
+              "Plan Rows": 6598211,
+              "Plan Width": 176,
+              "Sort Key": [
+                "p.id_rel_pr_datum",
+                "pd.datum",
+                "p.model",
+                "('DEL_PARC'::text)",
+                "x.id_rel_verzije_modeli",
+                "vm.verzija"
+              ],
+              "Plans": [
+                {
+                  "Node Type": "Hash Join",
+                  "Parent Relationship": "Outer",
+                  "Parallel Aware": true,
+                  "Async Capable": false,
+                  "Join Type": "Left",
+                  "Startup Cost": 459462.47,
+                  "Total Cost": 1405117.02,
+                  "Plan Rows": 6598211,
+                  "Plan Width": 176,
+                  "Inner Unique": false,
+                  "Hash Cond": "((x.id = r.id_rel_vm_pd) AND (p.id = r.id_rel_prip_enota))",
+                  "Plans": [
+                    {
+                      "Node Type": "Hash Join",
+                      "Parent Relationship": "Outer",
+                      "Parallel Aware": false,
+                      "Async Capable": false,
+                      "Join Type": "Left",
+                      "Startup Cost": 20.32,
+                      "Total Cost": 508871.86,
+                      "Plan Rows": 6598211,
+                      "Plan Width": 152,
+                      "Inner Unique": true,
+                      "Hash Cond": "(p.id_rel_pr_datum = pd.id)",
+                      "Plans": [
+                        {
+                          "Node Type": "Hash Join",
+                          "Parent Relationship": "Outer",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Join Type": "Left",
+                          "Startup Cost": 19.25,
+                          "Total Cost": 491183.46,
+                          "Plan Rows": 6598211,
+                          "Plan Width": 148,
+                          "Inner Unique": false,
+                          "Hash Cond": "((p.id_rel_pr_datum = x.id_rel_pr_datum) AND (p.model = vm.model))",
+                          "Plans": [
+                            {
+                              "Node Type": "Append",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": true,
+                              "Async Capable": false,
+                              "Startup Cost": 0.0,
+                              "Total Cost": 441654.16,
+                              "Plan Rows": 6598211,
+                              "Plan Width": 112,
+                              "Subplans Removed": 0,
+                              "Plans": [
+                                {
+                                  "Node Type": "Seq Scan",
+                                  "Parent Relationship": "Member",
+                                  "Parallel Aware": true,
+                                  "Async Capable": false,
+                                  "Relation Name": "pripis_enote_deli_parcel",
+                                  "Alias": "p",
+                                  "Startup Cost": 0.0,
+                                  "Total Cost": 348710.97,
+                                  "Plan Rows": 5797798,
+                                  "Plan Width": 100
+                                },
+                                {
+                                  "Node Type": "Seq Scan",
+                                  "Parent Relationship": "Member",
+                                  "Parallel Aware": true,
+                                  "Async Capable": false,
+                                  "Relation Name": "pripis_enote_deli_stavb",
+                                  "Alias": "d",
+                                  "Startup Cost": 0.0,
+                                  "Total Cost": 59952.13,
+                                  "Plan Rows": 800413,
+                                  "Plan Width": 195
+                                }
+                              ]
+                            },
+                            {
+                              "Node Type": "Hash",
+                              "Parent Relationship": "Inner",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Startup Cost": 19.02,
+                              "Total Cost": 19.02,
+                              "Plan Rows": 15,
+                              "Plan Width": 56,
+                              "Plans": [
+                                {
+                                  "Node Type": "Hash Join",
+                                  "Parent Relationship": "Outer",
+                                  "Parallel Aware": false,
+                                  "Async Capable": false,
+                                  "Join Type": "Inner",
+                                  "Startup Cost": 1.34,
+                                  "Total Cost": 19.02,
+                                  "Plan Rows": 15,
+                                  "Plan Width": 56,
+                                  "Inner Unique": false,
+                                  "Hash Cond": "(vm.id = x.id_rel_verzije_modeli)",
+                                  "Plans": [
+                                    {
+                                      "Node Type": "Seq Scan",
+                                      "Parent Relationship": "Outer",
+                                      "Parallel Aware": false,
+                                      "Async Capable": false,
+                                      "Relation Name": "md_verzije_modeli",
+                                      "Alias": "vm",
+                                      "Startup Cost": 0.0,
+                                      "Total Cost": 17.39,
+                                      "Plan Rows": 39,
+                                      "Plan Width": 24
+                                    },
+                                    {
+                                      "Node Type": "Hash",
+                                      "Parent Relationship": "Inner",
+                                      "Parallel Aware": false,
+                                      "Async Capable": false,
+                                      "Startup Cost": 1.15,
+                                      "Total Cost": 1.15,
+                                      "Plan Rows": 15,
+                                      "Plan Width": 48,
+                                      "Plans": [
+                                        {
+                                          "Node Type": "Seq Scan",
+                                          "Parent Relationship": "Outer",
+                                          "Parallel Aware": false,
+                                          "Async Capable": false,
+                                          "Relation Name": "pripis_vm_x_pd",
+                                          "Alias": "x",
+                                          "Startup Cost": 0.0,
+                                          "Total Cost": 1.15,
+                                          "Plan Rows": 15,
+                                          "Plan Width": 48
+                                        }
+                                      ]
+                                    }
+                                  ]
+                                }
+                              ]
+                            }
+                          ]
+                        },
+                        {
+                          "Node Type": "Hash",
+                          "Parent Relationship": "Inner",
+                          "Parallel Aware": false,
+                          "Async Capable": false,
+                          "Startup Cost": 1.03,
+                          "Total Cost": 1.03,
+                          "Plan Rows": 3,
+                          "Plan Width": 20,
+                          "Plans": [
+                            {
+                              "Node Type": "Seq Scan",
+                              "Parent Relationship": "Outer",
+                              "Parallel Aware": false,
+                              "Async Capable": false,
+                              "Relation Name": "pripis_presecni_datum",
+                              "Alias": "pd",
+                              "Startup Cost": 0.0,
+                              "Total Cost": 1.03,
+                              "Plan Rows": 3,
+                              "Plan Width": 20
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "Node Type": "Hash",
+                      "Parent Relationship": "Inner",
+                      "Parallel Aware": true,
+                      "Async Capable": false,
+                      "Startup Cost": 339790.66,
+                      "Total Cost": 339790.66,
+                      "Plan Rows": 4478166,
+                      "Plan Width": 72,
+                      "Plans": [
+                        {
+                          "Node Type": "Seq Scan",
+                          "Parent Relationship": "Outer",
+                          "Parallel Aware": true,
+                          "Async Capable": false,
+                          "Relation Name": "pripis_vmxpd_x_enote",
+                          "Alias": "r",
+                          "Startup Cost": 0.0,
+                          "Total Cost": 339790.66,
+                          "Plan Rows": 4478166,
+                          "Plan Width": 72
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "JIT": {
+      "Functions": 49,
+      "Options": {
+        "Inlining": true,
+        "Optimization": true,
+        "Expressions": true,
+        "Deforming": true
+      }
+    }
+  }
+]

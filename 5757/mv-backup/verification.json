@@ -1,0 +1,10 @@
+{
+  "validation": "PostgreSQL grammar via pglast; no database writes",
+  "full_script_parses": true,
+  "statement_count": 16,
+  "create_only_statement_count": 1,
+  "prefix_length_before_select": 729,
+  "end_of_input_position": 730,
+  "prefix_error": "syntax error at end of input",
+  "limitation": "Grammar validation, not execution against staging. Procedural-body execution and permissions are not validated."
+}

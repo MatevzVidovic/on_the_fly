@@ -1,0 +1,272 @@
+[
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "id",
+    "lift_type": "uuid",
+    "scale": null,
+    "virtual": false,
+    "ord": 1,
+    "updated_at": "2026-06-18T12:54:34"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "id_rel_pr_datum",
+    "lift_type": "uuid",
+    "scale": null,
+    "virtual": false,
+    "ord": 2,
+    "updated_at": "2026-06-18T13:03:34"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "presecni_datum",
+    "lift_type": "date",
+    "scale": null,
+    "virtual": false,
+    "ord": 3,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "model",
+    "lift_type": "plain-text-single-row",
+    "scale": null,
+    "virtual": false,
+    "ord": 4,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "tip_enote",
+    "lift_type": "plain-text-single-row",
+    "scale": null,
+    "virtual": false,
+    "ord": 5,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "id_rel_verzije_modeli",
+    "lift_type": "uuid",
+    "scale": null,
+    "virtual": false,
+    "ord": 6,
+    "updated_at": "2026-06-18T13:03:32"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "verzija",
+    "lift_type": "integer",
+    "scale": null,
+    "virtual": false,
+    "ord": 7,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_enot",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 8,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_brez_presecnega_datuma",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 9,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_brez_konfiguracije_modela",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 10,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_brez_izracunane_vrednosti",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 11,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_izracunanih_vrednosti",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 12,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "st_napak_priprave",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 13,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "delez_brez_vrednosti_pct",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 14,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "vsota_vrednost_izr",
+    "lift_type": "bigint",
+    "scale": null,
+    "virtual": false,
+    "ord": 15,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "vsota_vrednost_zaokrozena",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 16,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "min_vrednost_izr",
+    "lift_type": "integer",
+    "scale": null,
+    "virtual": false,
+    "ord": 17,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "max_vrednost_izr",
+    "lift_type": "integer",
+    "scale": null,
+    "virtual": false,
+    "ord": 18,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "avg_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 19,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "p05_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 20,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "p25_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 21,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "mediana_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 22,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "p75_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 23,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "p95_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 24,
+    "updated_at": "2026-06-18T12:55:46"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "stddev_vrednost_izr",
+    "lift_type": "decimal",
+    "scale": null,
+    "virtual": false,
+    "ord": 25,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_standardne_statistike_napak",
+    "table_type": "lookup",
+    "field_name": "refreshed_at",
+    "lift_type": "date-time",
+    "scale": null,
+    "virtual": false,
+    "ord": 26,
+    "updated_at": "2026-06-18T12:55:45"
+  },
+  {
+    "table_name": "pripis_vmxpd_x_enote",
+    "table_type": "lookup",
+    "field_name": "vrednost_izr",
+    "lift_type": "decimal",
+    "scale": 2,
+    "virtual": false,
+    "ord": 6,
+    "updated_at": "2026-10-15T09:20:26"
+  }
+]

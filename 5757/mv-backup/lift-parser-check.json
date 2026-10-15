@@ -1,0 +1,66 @@
+{
+    "ordinary_joins": {
+        "parsed": true,
+        "info": {
+            "table_names": [
+                "pripis_presecni_datum",
+                "pripis_vm_x_pd",
+                "md_verzije_modeli",
+                "pripis_vmxpd_x_enote"
+            ],
+            "has_id_column": true,
+            "has_geom_column": false,
+            "has_gid_column": false,
+            "has___mod_column": false,
+            "has_wildcard_character": false
+        }
+    },
+    "postgres_export": {
+        "parsed": true,
+        "info": {
+            "table_names": [
+                "pripis_presecni_datum",
+                "pripis_vm_x_pd",
+                "md_verzije_modeli",
+                "pripis_vmxpd_x_enote"
+            ],
+            "has_id_column": true,
+            "has_geom_column": false,
+            "has_gid_column": false,
+            "has___mod_column": false,
+            "has_wildcard_character": false
+        }
+    },
+    "lift_original": {
+        "parsed": true,
+        "info": {
+            "table_names": [
+                "pripis_presecni_datum",
+                "pripis_vm_x_pd",
+                "md_verzije_modeli",
+                "pripis_vmxpd_x_enote"
+            ],
+            "has_id_column": true,
+            "has_geom_column": false,
+            "has_gid_column": false,
+            "has___mod_column": false,
+            "has_wildcard_character": false
+        }
+    },
+    "create_statement": {
+        "parsed": true,
+        "info": {
+            "table_names": [
+                "pripis_presecni_datum",
+                "pripis_vm_x_pd",
+                "md_verzije_modeli",
+                "pripis_vmxpd_x_enote"
+            ],
+            "has_id_column": true,
+            "has_geom_column": false,
+            "has_gid_column": false,
+            "has___mod_column": false,
+            "has_wildcard_character": false
+        }
+    }
+}

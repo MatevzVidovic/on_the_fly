@@ -1,0 +1,314 @@
+[
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "name",
+    "data_type": "character varying"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "type",
+    "data_type": "character varying"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "type_params",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_detail_report",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_table",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_single",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "ord",
+    "data_type": "integer"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "id",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "attribute_table_id",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "created_by",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "updated_by",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "attribute_field_group_id",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "virtual",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "privacy",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "privacy_property",
+    "data_type": "text"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_pivot",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "restricted_access",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "is_locked",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "conditional_formatting",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_single_offline",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_table_offline",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_offline",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "required_lift_filter",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_if_lift_filter",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_add_online",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_edit_online",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_add_offline",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_edit_offline",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "id",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "company_id",
+    "data_type": "integer"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "name",
+    "data_type": "character varying"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "type",
+    "data_type": "character varying"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "created_at",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "updated_at",
+    "data_type": "timestamp without time zone"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "created_by",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "updated_by",
+    "data_type": "uuid"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_create",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_update",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_delete",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "restricted_access",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "sync_job",
+    "data_type": "text"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_cstore",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_render_distinct",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "type_params",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_locked",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "custom_renderers",
+    "data_type": "jsonb"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "sql_query",
+    "data_type": "character varying"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_notes",
+    "data_type": "boolean"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "display_globally",
+    "data_type": "boolean"
+  }
+]

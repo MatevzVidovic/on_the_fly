@@ -1,0 +1,105 @@
+{
+  "checked_at": "2026-10-15T09:40:11.720227+00:00",
+  "postmaster_started": "2026-08-05T06:06:56.310974+00:00",
+  "base_column": {
+    "data_type": "numeric",
+    "numeric_precision": null,
+    "numeric_scale": null
+  },
+  "mv": {
+    "matviewname": "pripis_standardne_statistike_napak",
+    "matviewowner": "gurs_readwrite",
+    "ispopulated": true
+  },
+  "mv_columns": [
+    {
+      "attname": "vsota_vrednost_izr",
+      "type": "numeric"
+    },
+    {
+      "attname": "min_vrednost_izr",
+      "type": "numeric"
+    },
+    {
+      "attname": "max_vrednost_izr",
+      "type": "numeric"
+    }
+  ],
+  "related_activity": [],
+  "lift": {
+    "fields": [
+      {
+        "table_id": "d9cf7488-6b14-11f1-8536-424abd3ca6bd",
+        "table_name": "pripis_standardne_statistike_napak",
+        "field_id": "dee6917c-6b14-11f1-8888-d6261f68fb06",
+        "name": "max_vrednost_izr",
+        "type": "integer",
+        "scale": null,
+        "is_locked": true,
+        "updated_at": "2026-06-18T12:55:45"
+      },
+      {
+        "table_id": "d9cf7488-6b14-11f1-8536-424abd3ca6bd",
+        "table_name": "pripis_standardne_statistike_napak",
+        "field_id": "dea818d4-6b14-11f1-add4-d6261f68fb06",
+        "name": "min_vrednost_izr",
+        "type": "integer",
+        "scale": null,
+        "is_locked": true,
+        "updated_at": "2026-06-18T12:55:45"
+      },
+      {
+        "table_id": "d9cf7488-6b14-11f1-8536-424abd3ca6bd",
+        "table_name": "pripis_standardne_statistike_napak",
+        "field_id": "de250da4-6b14-11f1-9c4d-d6261f68fb06",
+        "name": "vsota_vrednost_izr",
+        "type": "decimal",
+        "scale": null,
+        "is_locked": true,
+        "updated_at": "2026-10-15T09:38:53"
+      }
+    ],
+    "source_columns": [
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "attribute_table_source_id"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "attribute_table_id"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "source_type"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "source_destination"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "status_key"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "is_archived"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "created_at"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "updated_at"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "created_by"
+      },
+      {
+        "table_name": "attribute_table_sources",
+        "column_name": "updated_by"
+      }
+    ]
+  }
+}
