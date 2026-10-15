@@ -1,0 +1,66 @@
+{
+  "scope": {
+    "unit": 29974237,
+    "date": "2026-01-01",
+    "model": "IND",
+    "isam_version": 66,
+    "ev_version": 1150
+  },
+  "comparability": "NOT_YET_PROVEN",
+  "assumptions": [
+    "IND 66 → EV IND 1150 is a provisional hardcoded mapping.",
+    "EV uses the current table; correspondence to the requested date is not established.",
+    "Deltas are exploratory arithmetic, not proof of a valuation discrepancy.",
+    "ISAM storage is integer: old fractional results may be lost."
+  ],
+  "sources": {
+    "configurations": [
+      {
+        "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+        "id_rel_pr_datum": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+        "model_version_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+        "datum": "2026-01-01"
+      }
+    ],
+    "isam": [
+      {
+        "prepared_unit_id": "4113d846-2f37-45c5-8573-caa160056487",
+        "configuration_id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+        "model_version_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+        "result_id": "e0113d9b-8ddf-4b96-a99b-436da1f31e9e",
+        "del_stavbe_id": 29974237,
+        "preparation_error": null,
+        "calculation_error": null,
+        "calculated": "15310",
+        "generalized": "15300"
+      }
+    ],
+    "ev": [
+      {
+        "source_id": "9a282005-7b9c-40fb-ad91-b12620732289",
+        "dst_sid": 29974237,
+        "id_model_ver": 1150,
+        "calculated": "7232.88",
+        "generalized": "7230",
+        "error": null
+      }
+    ],
+    "isam_storage_type": "integer"
+  },
+  "calculated": {
+    "isam": "15310",
+    "ev": "7232.88",
+    "delta": "8077.12",
+    "status": [
+      "RAZLIKA"
+    ]
+  },
+  "generalized": {
+    "isam": "15300",
+    "ev": "7230",
+    "delta": "8070",
+    "status": [
+      "RAZLIKA"
+    ]
+  }
+}

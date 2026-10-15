@@ -1,0 +1,276 @@
+{
+  "gv": [
+    {
+      "model": "IND",
+      "verzija": 51,
+      "datum_na": 20200101,
+      "datum_pripis": "2020-01-01",
+      "verzija_pripis": null,
+      "opomba": "DATUM VREDNOTENJA 01.01.2020,  VERZIJA ZA PRIPIS"
+    },
+    {
+      "model": "IND",
+      "verzija": 66,
+      "datum_na": 20250101,
+      "datum_pripis": null,
+      "verzija_pripis": null,
+      "opomba": "VERZIJA ZA PRIPIS NA 1. 1. 2025"
+    },
+    {
+      "model": "TUR",
+      "verzija": 26,
+      "datum_na": 20200101,
+      "datum_pripis": "2020-01-01",
+      "verzija_pripis": null,
+      "opomba": "kopija verzije 25, strukturi brez definicije izmere (za dodati definicijo glej verzijo 25),spremenjene meje in VR con, spremenjen Frp, cone popravljene glede na pripombe obrazca JRMV-1, verzija za PRIPIS 1.4.2020 - TEST A, topolo\u0161ko urejene cone, iz razlage pojmov potrebno izbrisati minimalne povr\u0161ine"
+    },
+    {
+      "model": "TUR",
+      "verzija": 27,
+      "datum_na": 20200101,
+      "datum_pripis": null,
+      "verzija_pripis": null,
+      "opomba": "kopija ver 26, za kreiranje Poro\u010dila o kakovosti modela, v strukturi brez definicije izmere (za dodati definicijo glej verzijo 25), iz razlage pojmov izbrisane minimalne povr\u0161ine, verzija za PRIPIS 1.4.2020 (datum vrednotenja 1.1.2020)."
+    },
+    {
+      "model": "TUR",
+      "verzija": 42,
+      "datum_na": 20250101,
+      "datum_pripis": null,
+      "verzija_pripis": null,
+      "opomba": "verzija ZA PRIPIS, EV na 1.1.2025,  ZA UREDBO, TOPOLO\u0160KO UREJENO, spremenjeni faktorji obnov."
+    }
+  ],
+  "isam_models": [
+    {
+      "model": "DRZ",
+      "verzija": 16,
+      "datum_modela": "2024-01-01"
+    },
+    {
+      "model": "GAR",
+      "verzija": 90,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "GOZ",
+      "verzija": 36,
+      "datum_modela": "2010-06-30"
+    },
+    {
+      "model": "GOZ",
+      "verzija": 96,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 161,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 286,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 287,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 288,
+      "datum_modela": "2026-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 289,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "HIS",
+      "verzija": 290,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "IND",
+      "verzija": 51,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "IND",
+      "verzija": 66,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "IND",
+      "verzija": 67,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "IND",
+      "verzija": 68,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "INP",
+      "verzija": 36,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "INP",
+      "verzija": 49,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "KDS",
+      "verzija": 26,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "KDS",
+      "verzija": 46,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "KME",
+      "verzija": 81,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "KME",
+      "verzija": 100,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "KME",
+      "verzija": 101,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "PPL",
+      "verzija": 151,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "PPL",
+      "verzija": 192,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "PPP",
+      "verzija": 185,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "PPP",
+      "verzija": 225,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "SDP",
+      "verzija": 18,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "SDP",
+      "verzija": 33,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "STA",
+      "verzija": 150,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "STA",
+      "verzija": 223,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "STA",
+      "verzija": 224,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "STZ",
+      "verzija": 13,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "STZ",
+      "verzija": 44,
+      "datum_modela": "2025-01-01"
+    },
+    {
+      "model": "TUR",
+      "verzija": 26,
+      "datum_modela": "2020-01-01"
+    },
+    {
+      "model": "TUR",
+      "verzija": 42,
+      "datum_modela": "2025-01-01"
+    }
+  ],
+  "current_unit": [
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1150,
+      "vrednost": 7232.88,
+      "posplosena_vrednost": 7230
+    }
+  ],
+  "history_unit": [
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "vrednost": 14824.32,
+      "valid_from": "2025-05-13T23:59:59",
+      "valid_to": "2025-11-02T23:59:59.999",
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "vrednost": 14824.32,
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null,
+      "jn_status": "A"
+    }
+  ],
+  "old_unit": [
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "vrednost": 7232.88,
+      "valid_from": null,
+      "valid_to": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "vrednost": 7232.88,
+      "valid_from": null,
+      "valid_to": null,
+      "jn_status": "A"
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "vrednost": 7232.88,
+      "valid_from": null,
+      "valid_to": null,
+      "jn_status": "H"
+    }
+  ],
+  "configurations": [
+    {
+      "datum": "2026-01-01",
+      "model": "IND",
+      "verzija": 66
+    }
+  ]
+}

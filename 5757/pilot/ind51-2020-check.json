@@ -1,0 +1,95 @@
+{
+  "models": [
+    {
+      "id": "3fe8eff5-3803-4482-9260-075722c64d0a",
+      "verzija": 51,
+      "datum_modela": "2020-01-01",
+      "opomba": null,
+      "configuration_id": null,
+      "datum": null
+    },
+    {
+      "id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "verzija": 66,
+      "datum_modela": "2025-01-01",
+      "opomba": null,
+      "configuration_id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+      "datum": "2026-01-01"
+    }
+  ],
+  "cutoff": null,
+  "old_history_sample": [
+    {
+      "dst_sid": 32076143,
+      "id_model": "IND",
+      "vrednost": 5760.31,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 32076144,
+      "id_model": "IND",
+      "vrednost": 20912.81,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 32076145,
+      "id_model": "IND",
+      "vrednost": 1578.46,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 32076165,
+      "id_model": "IND",
+      "vrednost": 18702.25,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 32076147,
+      "id_model": "IND",
+      "vrednost": 5641.86,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 37334745,
+      "id_model": "IND",
+      "vrednost": 346894.59,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 29303010,
+      "id_model": "IND",
+      "vrednost": 45136.54,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    },
+    {
+      "dst_sid": 33927804,
+      "id_model": "IND",
+      "vrednost": 84816.63,
+      "valid_from": null,
+      "valid_to": null,
+      "date_change": null,
+      "jn_status": "H"
+    }
+  ]
+}

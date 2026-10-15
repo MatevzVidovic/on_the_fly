@@ -1,0 +1,484 @@
+{
+  "run_at_utc": "2026-10-15T11:06:15.459435+00:00",
+  "scope": {
+    "model": "IND",
+    "isam_version": 66,
+    "ev_version": 1173,
+    "cutoff": "2026-01-01",
+    "cutoff_timezone": "Europe/Ljubljana",
+    "units": [
+      29974237,
+      34797757,
+      35484785,
+      29843044,
+      29893278,
+      35811761,
+      37105777,
+      29348451,
+      100000028216,
+      37336741
+    ],
+    "selection": "ISAM convenience sample"
+  },
+  "mapping_export_at": "2026-10-15T11:06:06.404143+00:00",
+  "configuration": {
+    "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+    "id_rel_pr_datum": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+    "model_version_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40"
+  },
+  "isam_storage_type": "numeric(20,2)",
+  "notes": [
+    "Identity mapping and EV record validity checked; input equivalence not yet checked.",
+    "Exact decimal equality; no tolerance policy applied to final statuses.",
+    "Old ISAM values may need recalculation after the decimal schema migration.",
+    "ISAM-led convenience sample does not measure missing-ISAM population coverage."
+  ],
+  "summary": {
+    "calculated:RAZLIKA": 6,
+    "generalized:RAZLIKA": 6,
+    "calculated:NAPAKA_ISAM": 4,
+    "calculated:BREZ_VREDNOSTI_ISAM": 4,
+    "generalized:NAPAKA_ISAM": 4,
+    "generalized:BREZ_VREDNOSTI_ISAM": 4
+  },
+  "rows": [
+    {
+      "unit": 29974237,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "4113d846-2f37-45c5-8573-caa160056487",
+          "result_id": "e0113d9b-8ddf-4b96-a99b-436da1f31e9e",
+          "calculated": "15310.00",
+          "generalized": "15300",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 29974237,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "14824.32",
+          "generalized": "14800",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "15310.00",
+        "ev": "14824.32",
+        "delta": "485.68",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "15300",
+        "ev": "14800",
+        "delta": "500",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 34797757,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "f734e106-5901-45ec-915f-ce906be5647e",
+          "result_id": "30d73082-31ec-4abe-9565-76736d83950b",
+          "calculated": "136122.00",
+          "generalized": "136100",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 34797757,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "155374.8",
+          "generalized": "155400",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "136122.00",
+        "ev": "155374.8",
+        "delta": "-19252.80",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "136100",
+        "ev": "155400",
+        "delta": "-19300",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 35484785,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "5469ede5-74bb-4cdd-9254-27740b65b477",
+          "result_id": "fd40fa27-d47c-4229-8362-d74bbefcf49f",
+          "calculated": null,
+          "generalized": null,
+          "preparation_error": null,
+          "calculation_error": "pogoji_neustrezeni (id_konstrukcije=0): f_nk; manjka: f_nk"
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 35484785,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "67449.6",
+          "generalized": "67400",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": null,
+        "ev": "67449.6",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      },
+      "generalized": {
+        "isam": null,
+        "ev": "67400",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      }
+    },
+    {
+      "unit": 29843044,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "2d30b1fb-ee7e-4bab-91c9-b21b98bd8b5f",
+          "result_id": "7ddca088-a835-4c91-b6af-379748e7a983",
+          "calculated": "15589.00",
+          "generalized": "15600",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 29843044,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "16301.4",
+          "generalized": "16300",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "15589.00",
+        "ev": "16301.4",
+        "delta": "-712.40",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "15600",
+        "ev": "16300",
+        "delta": "-700",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 29893278,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "f13b9a2e-03af-4258-8ad6-6095ea036d97",
+          "result_id": "52e335b9-9cc9-4ff7-a1eb-83cd855459e7",
+          "calculated": "16864.00",
+          "generalized": "16900",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 29893278,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "17676.25",
+          "generalized": "17700",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "16864.00",
+        "ev": "17676.25",
+        "delta": "-812.25",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "16900",
+        "ev": "17700",
+        "delta": "-800",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 35811761,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "25afd6ef-be8a-407c-802c-9c734720e923",
+          "result_id": "95da9a3c-b0c6-442a-a2a2-c209dd8b2c6f",
+          "calculated": null,
+          "generalized": null,
+          "preparation_error": null,
+          "calculation_error": "pogoji_neustrezeni (id_konstrukcije=0): f_nk; manjka: f_nk"
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 35811761,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": "2443",
+          "calculated": "94528",
+          "generalized": "94500",
+          "error": null,
+          "jn_status": "H",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": "2026-09-28 23:59:59.999000"
+        }
+      ],
+      "calculated": {
+        "isam": null,
+        "ev": "94528",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      },
+      "generalized": {
+        "isam": null,
+        "ev": "94500",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      }
+    },
+    {
+      "unit": 37105777,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "966262cd-159c-469e-a4f4-d84a0ce66a4e",
+          "result_id": "1f2acd81-93f5-44d7-9f99-2215d9607011",
+          "calculated": null,
+          "generalized": null,
+          "preparation_error": null,
+          "calculation_error": "pogoji_neustrezeni (id_konstrukcije=0): f_nk; manjka: f_nk"
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 37105777,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "242654.4",
+          "generalized": "242700",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": null,
+        "ev": "242654.4",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      },
+      "generalized": {
+        "isam": null,
+        "ev": "242700",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      }
+    },
+    {
+      "unit": 29348451,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "131d8f9a-db21-48f5-a134-47d317da1f4a",
+          "result_id": "6295fea4-6627-438a-87af-f941627f4923",
+          "calculated": "137221.00",
+          "generalized": "137200",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 29348451,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "150045.58",
+          "generalized": "150000",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "137221.00",
+        "ev": "150045.58",
+        "delta": "-12824.58",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "137200",
+        "ev": "150000",
+        "delta": "-12800",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 100000028216,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "6844214a-c284-4b32-90e1-500793151c39",
+          "result_id": "31e97bed-8abd-4f97-beb5-a08647e053f6",
+          "calculated": "243282.00",
+          "generalized": "243300",
+          "preparation_error": null,
+          "calculation_error": null
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 100000028216,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "283358.05",
+          "generalized": "283400",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": "243282.00",
+        "ev": "283358.05",
+        "delta": "-40076.05",
+        "status": [
+          "RAZLIKA"
+        ]
+      },
+      "generalized": {
+        "isam": "243300",
+        "ev": "283400",
+        "delta": "-40100",
+        "status": [
+          "RAZLIKA"
+        ]
+      }
+    },
+    {
+      "unit": 37336741,
+      "isam_sources": [
+        {
+          "prepared_unit_id": "e6be1f5f-ad88-4017-869c-7684678274c8",
+          "result_id": "1b935244-8868-4f84-a869-8b5aed8a789d",
+          "calculated": null,
+          "generalized": null,
+          "preparation_error": null,
+          "calculation_error": "pogoji_neustrezeni (id_konstrukcije=0): f_nk; manjka: f_nk"
+        }
+      ],
+      "ev_sources": [
+        {
+          "dst_sid": 37336741,
+          "id_model_ver": 1173,
+          "source_revision": "2185",
+          "closing_revision": null,
+          "calculated": "370818.43",
+          "generalized": "370800",
+          "error": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ],
+      "calculated": {
+        "isam": null,
+        "ev": "370818.43",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      },
+      "generalized": {
+        "isam": null,
+        "ev": "370800",
+        "delta": null,
+        "status": [
+          "NAPAKA_ISAM",
+          "BREZ_VREDNOSTI_ISAM"
+        ]
+      }
+    }
+  ]
+}

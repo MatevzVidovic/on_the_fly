@@ -1,0 +1,29 @@
+{
+  "rows": [
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_PARCELA"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_STAVBA"
+    },
+    {
+      "owner": "EV",
+      "table_name": "PARCELA"
+    },
+    {
+      "owner": "EV",
+      "table_name": "STAVBA"
+    }
+  ],
+  "truncated": false
+}

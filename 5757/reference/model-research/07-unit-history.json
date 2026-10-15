@@ -1,0 +1,70 @@
+{
+  "rows": [
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1150,
+      "vrednost": 7232.88,
+      "posplosena_vrednost": 7230,
+      "jn_status": "H",
+      "jn_rev_num": 1,
+      "jn_rev_num_to": 686,
+      "valid_from": "2020-04-01 12:00:00",
+      "valid_to": "2020-06-16 04:00:03.420767",
+      "revision_description": null
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1150,
+      "vrednost": 7232.88,
+      "posplosena_vrednost": 7230,
+      "jn_status": "H",
+      "jn_rev_num": 686,
+      "jn_rev_num_to": 1354,
+      "valid_from": "2020-06-16 04:00:03.420767",
+      "valid_to": "2022-12-27 00:00:00",
+      "revision_description": null
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1150,
+      "vrednost": 7232.88,
+      "posplosena_vrednost": 7230,
+      "jn_status": "H",
+      "jn_rev_num": 1354,
+      "jn_rev_num_to": 2040,
+      "valid_from": "2022-12-27 00:00:00",
+      "valid_to": "2025-05-13 23:59:59",
+      "revision_description": null
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1173,
+      "vrednost": 14824.32,
+      "posplosena_vrednost": 14800,
+      "jn_status": "H",
+      "jn_rev_num": 2040,
+      "jn_rev_num_to": 2185,
+      "valid_from": "2025-05-13 23:59:59",
+      "valid_to": "2025-11-02 23:59:59.999000",
+      "revision_description": null
+    },
+    {
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1173,
+      "vrednost": 14824.32,
+      "posplosena_vrednost": 14800,
+      "jn_status": "A",
+      "jn_rev_num": 2185,
+      "jn_rev_num_to": null,
+      "valid_from": "2025-11-02 23:59:59.999000",
+      "valid_to": null,
+      "revision_description": null
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,41 @@
+{
+  "rows": [
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_SIF_MODEL"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_SIF_VPLIV_MODEL"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML"
+    },
+    {
+      "owner": "EV",
+      "table_name": "PVN_MODEL_SORTER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_VPLIV_MODEL"
+    }
+  ],
+  "truncated": false
+}

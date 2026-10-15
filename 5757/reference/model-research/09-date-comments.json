@@ -1,0 +1,53 @@
+{
+  "rows": [
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_OD",
+      "comments": "Datum za\u010detka veljavnosti skupine modelov."
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_DO",
+      "comments": "Datum konca veljavnosti skupine modelov."
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_TRGA",
+      "comments": "Datum stanja trga nepremi\u010dnin, na katerega se nana\u0161a vrednotenje modelov v skupini."
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "ID_MODEL_VER",
+      "comments": "Identifikator model ver"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_OD",
+      "comments": "Datum za\u010detka veljavnosti verzije modela."
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_DO",
+      "comments": "Datum konca veljavnosti verzije modela."
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_MODELA",
+      "comments": "Datum, na katerega se nana\u0161a verzija modela."
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "CREATED",
+      "comments": "Datum kreiranja revizijske \u0161tevilke"
+    }
+  ],
+  "truncated": false
+}

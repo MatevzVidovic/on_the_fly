@@ -1,0 +1,349 @@
+[
+  {
+    "model": "DRZ",
+    "verzija": 16,
+    "datum_modela": "2024-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1169,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "GAR",
+    "verzija": 90,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1170,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "GOZ",
+    "verzija": 36,
+    "datum_modela": "2010-06-30",
+    "ev_candidates": []
+  },
+  {
+    "model": "GOZ",
+    "verzija": 96,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1171,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "HIS",
+    "verzija": 161,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1149,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "HIS",
+    "verzija": 286,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "HIS",
+    "verzija": 287,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "HIS",
+    "verzija": 288,
+    "datum_modela": "2026-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "HIS",
+    "verzija": 289,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "HIS",
+    "verzija": 290,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "IND",
+    "verzija": 51,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1150,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "IND",
+    "verzija": 66,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1173,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "IND",
+    "verzija": 67,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "IND",
+    "verzija": 68,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "INP",
+    "verzija": 36,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1151,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "INP",
+    "verzija": 49,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1174,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "KDS",
+    "verzija": 26,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1157,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      },
+      {
+        "ev_id": 1165,
+        "ev_model_date": "1.1.2019",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "KDS",
+    "verzija": 46,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1175,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "KME",
+    "verzija": 81,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1161,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "KME",
+    "verzija": 100,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1176,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "KME",
+    "verzija": 101,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "PPL",
+    "verzija": 151,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1152,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "PPL",
+    "verzija": 192,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1177,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "PPP",
+    "verzija": 185,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1153,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "PPP",
+    "verzija": 225,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1178,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "SDP",
+    "verzija": 18,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1154,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "SDP",
+    "verzija": 33,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1179,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "STA",
+    "verzija": 150,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1148,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "STA",
+    "verzija": 223,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1180,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "STA",
+    "verzija": 224,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "STZ",
+    "verzija": 13,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1164,
+        "ev_model_date": "1.1.2020",
+        "group": 2
+      }
+    ]
+  },
+  {
+    "model": "STZ",
+    "verzija": 44,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1181,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  },
+  {
+    "model": "TUR",
+    "verzija": 26,
+    "datum_modela": "2020-01-01",
+    "ev_candidates": []
+  },
+  {
+    "model": "TUR",
+    "verzija": 42,
+    "datum_modela": "2025-01-01",
+    "ev_candidates": [
+      {
+        "ev_id": 1182,
+        "ev_model_date": "1.1.2025",
+        "group": 3
+      }
+    ]
+  }
+]

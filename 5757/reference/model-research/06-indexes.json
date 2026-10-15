@@ -1,0 +1,209 @@
+{
+  "rows": [
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "index_name": "DEL_STAVBE_ENOTA_PK",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "index_name": "DEL_STAVBE_ENOTA_2_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IDX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IX",
+      "column_name": "SYS_NC00016$",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "ID_MODEL",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 4
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "ID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "SYS_C0034942",
+      "column_name": "ID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "SYS_C0034942",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "IDX_MODELI_GRAFIKA_1",
+      "column_name": "TIP",
+      "column_position": 1
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "IDX_MODELI_GRAFIKA_1",
+      "column_name": "ID_MODEL_VER",
+      "column_position": 2
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "IDX_MODELI_GRAFIKA_1",
+      "column_name": "ID_MODEL",
+      "column_position": 3
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_GRUPA_GRUPAID_IX",
+      "column_name": "ID_GRUPA",
+      "column_position": 1
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_INDEX_IME",
+      "column_name": "ID_MODEL",
+      "column_position": 1
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_MODEL_DATUMDO_IX",
+      "column_name": "ID_MODEL",
+      "column_position": 1
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_MODEL_DATUMDO_IX",
+      "column_name": "ID_GRUPA",
+      "column_position": 2
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_MODEL_DATUMDO_IX",
+      "column_name": "DATUM_DO",
+      "column_position": 3
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_PK",
+      "column_name": "ID_MODEL_VER",
+      "column_position": 1
+    },
+    {
+      "table_name": "MODELI_XML",
+      "index_name": "MODELI_XML_TIP_IDX",
+      "column_name": "TIP",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "index_name": "REVISION_CREATED_ID",
+      "column_name": "SYS_NC00008$",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "index_name": "REVISION_NUM_DATE_IX",
+      "column_name": "REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "index_name": "REVISION_NUM_DATE_IX",
+      "column_name": "SYS_NC00008$",
+      "column_position": 2
+    },
+    {
+      "table_name": "REVISION",
+      "index_name": "REVISION_PK",
+      "column_name": "REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "index_name": "REVISION_USER_ID_IDX",
+      "column_name": "ID_USER",
+      "column_position": 1
+    }
+  ],
+  "truncated": false
+}

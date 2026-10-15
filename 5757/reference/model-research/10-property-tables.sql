@@ -1,0 +1,3 @@
+SELECT owner,table_name FROM all_tables
+WHERE table_name IN ('DEL_STAVBE','JN_DEL_STAVBE','STAVBA','JN_STAVBA','PARCELA','JN_PARCELA')
+ORDER BY owner,table_name FETCH FIRST 40 ROWS ONLY

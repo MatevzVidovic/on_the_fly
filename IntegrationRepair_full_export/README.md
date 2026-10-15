@@ -193,3 +193,26 @@ Expect a full LIFT scan, similar to prepare's LIFT phase. This checks against th
 saved source inventory, not Oracle changes since the export. It does not create a
 new apply plan; use a fresh prepare for that. Keep normal integrations stopped if
 you need counts for the same unchanged target state.
+
+## Count all twelve EV tables
+
+```sh
+time .venv/bin/python count_ev.py
+```
+
+The read-only script counts each saved Oracle integration query and its LIFT target,
+then prints totals, `LIFT minus Oracle`, and the difference when both sides are
+restricted to the integration's current change-date cutoff. Full Oracle counts
+respect the integration's status/year filters; they are not raw physical-table
+counts. Cutoff comparisons preserve source wall-clock timestamps, as prepare does.
+Both database sessions use stable read-only snapshots, but the two systems do not
+share one atomic snapshot. Rows newer than the cutoff can explain total differences.
+Even cutoff differences need key-level investigation when a key's source date has
+advanced beyond the cutoff while its older LIFT version remains within it.
+
+Counts run sequentially on the servers without exporting rows to SQLite. The JSON
+report, including cutoffs and per-database timings, is saved after each table to
+`reports/ev_counts.json`; `finished_at` is added only when all selected counts finish.
+Use `--table ev_stavba_h` for one table, `--env PATH` for another environment, or
+`--output PATH` to retain a separate report. Equal counts do not verify matching keys,
+change dates or payload values; use the previous verification/audits for that.

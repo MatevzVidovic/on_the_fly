@@ -1,0 +1,35 @@
+{
+  "rows": [
+    {
+      "cutoff": "2020-01-01 00:00:00",
+      "dst_sid": null,
+      "id_model": null,
+      "id_model_ver": null,
+      "vrednost": null,
+      "posplosena_vrednost": null,
+      "valid_from": null,
+      "valid_to": null
+    },
+    {
+      "cutoff": "2025-01-01 00:00:00",
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1150,
+      "vrednost": 7232.88,
+      "posplosena_vrednost": 7230,
+      "valid_from": "2022-12-27 00:00:00",
+      "valid_to": "2025-05-13 23:59:59"
+    },
+    {
+      "cutoff": "2026-01-01 00:00:00",
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "id_model_ver": 1173,
+      "vrednost": 14824.32,
+      "posplosena_vrednost": 14800,
+      "valid_from": "2025-11-02 23:59:59.999000",
+      "valid_to": null
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,995 @@
+{
+  "rows": [
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "DST_SID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "RAVEN",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "VPLIV",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "VREDNOST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "CONA_IME",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "FAKTOR_PO",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "POSPLOSENA_VREDNOST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "PODATKI",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ERR_MSG",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "ID",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "CREATED_AT",
+      "data_type": "TIMESTAMP(6)"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "DST_SID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "EID",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "ERROR_MSG",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "RAVEN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "CONA_IME",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "D_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "IZMERA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "LETO_IZG_STA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POV_LETO_OBN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_OBN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "T_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_NK",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_ZPS",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_D_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_ZPS_M2",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_PRI",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VPLIVI",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_ODD",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "T_DP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_DP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "T_LEGE",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_LEGE",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_GAR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPP_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPL_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "FAKTOR_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_LP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPL_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPP_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "FAKTOR_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_PL",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_TUR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_TUR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "JN_REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VREDNOST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "NO_UNIT_ALL",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "VALUE_ALL",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "NO_UNIT_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "VALUE_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "OB_MID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "EVALUATION_MODEL_STAT",
+      "column_name": "KO_ID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "DST_SID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "RAVEN",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "VPLIV",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "VREDNOST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "CONA_IME",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM_TO",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM_PREV",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_STATUS",
+      "data_type": "CHAR"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "FAKTOR_PO",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "POSPLOSENA_VREDNOST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "PODATKI",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ERR_MSG",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "ID",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "CREATED_AT",
+      "data_type": "TIMESTAMP(6)"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "DST_SID",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "EID",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "ERROR_MSG",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "RAVEN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "CONA_IME",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "D_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "IZMERA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "LETO_IZG_STA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POV_LETO_OBN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_OBN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "T_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_LAST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_NK",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_ZPS",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_D_DST",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_ZPS_M2",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_PRI",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VPLIVI",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_ODD",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "T_DP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_DP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "T_LEGE",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_LEGE",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_GAR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPP_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPL_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "FAKTOR_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_LP",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_P",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPL_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_PPP_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "FAKTOR_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_PL",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_L",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_DP_TUR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_DP_M2_TUR",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "JN_REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "JN_REV_NUM_TO",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "JN_REV_NUM_PREV",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "JN_STATUS",
+      "data_type": "CHAR"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "ID_GRUPA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "OPIS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "OPIS_KRATEK",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_OD",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_DO",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "AKTIVEN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "VRSTNI_RED",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_TRGA",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_KREIRANJA",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "ID_USER",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "UREJANJE",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_TRGA_PEV",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "ID_MODEL_VER",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "XML",
+      "data_type": "CLOB"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_OD",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_DO",
+      "data_type": "DATE"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "TIP",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "MREZA",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "TEH_ZIV_DOBA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_MODELA",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "XML_ORIGINALNI",
+      "data_type": "CLOB"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "MAX_RAVEN",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "ID_GRUPA",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "MODELI_XML",
+      "column_name": "DOKUMENTI_POPOLNI",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "ID_MODULE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "ID_USER",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "CREATED",
+      "data_type": "TIMESTAMP(6)"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "DESCRIPTION",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "APL_USERENV",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "REVISION",
+      "column_name": "DATABASE_USERENV",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "ID_MODEL",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "NAZIV",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "VRSTNI_RED",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "JN_REV_NUM",
+      "data_type": "NUMBER"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "OPIS",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "TIP_NEPREMICNINE",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "NAZIV_IT",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "owner": "EV",
+      "table_name": "SIF_MODEL",
+      "column_name": "NAZIV_HU",
+      "data_type": "VARCHAR2"
+    }
+  ],
+  "truncated": false
+}
