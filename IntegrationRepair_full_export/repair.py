@@ -68,7 +68,6 @@ def apply(run_id, definition, source, target, store):
         outcomes, writes = [], []
         for entry, key in zip(rows, keys):
             payload = payloads.get(key)
-            warning = None
             if payload is None:
                 warning = 'Oracle row disappeared'
             elif wall_time(payload[definition.date['api_name']]) != entry['date']:
@@ -76,8 +75,7 @@ def apply(run_id, definition, source, target, store):
             else:
                 writes.append((entry['key'], payload))
                 continue
-            if warning:
-                print(f'Warning key={key}: {warning}', flush=True)
+            print(f'Warning key={key}: {warning}', flush=True)
             outcomes.append((entry['key'], warning))
         # A crash after this commit safely replays before the SQLite markers.
         with measure('apply.postgres_upserts', run_id=run_id, rows=len(writes)):

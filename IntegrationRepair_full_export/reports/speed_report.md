@@ -2,6 +2,8 @@
 
 14 October 2026 · staging · Python 3.14 · DuckDB 1.5.6 · SQLite 3.50.4
 
+> Configuration update, 15 October: all ten EV composite keys are now configured and sample-checked. See [current key coverage](oracle_key_coverage.md). Configuration prerequisites below describe the original benchmark date; throughput estimates remain unvalidated write scenarios.
+
 ## Outcome
 
 Keep SQLite for the current resumable repair store. The biggest verified improvements are fetching Oracle payloads by their original numeric key columns and batching PostgreSQL apply lookups. Pipelined PostgreSQL writes are implemented, but write throughput has not been measured with the read-only account.

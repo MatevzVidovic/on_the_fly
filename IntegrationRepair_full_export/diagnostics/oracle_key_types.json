@@ -1,0 +1,72 @@
+[
+  {
+    "table": "ev_pe_dst_h",
+    "types": {
+      "ID_PE_DST": "VARCHAR2",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_posebna_enota_h",
+    "types": {
+      "ID_PE": "VARCHAR2",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_parc_enota_h_2025_danes",
+    "types": {
+      "ID_PARC_ENOTA": "VARCHAR2",
+      "__REPAIR_REV": "NUMBER (revision alias)"
+    }
+  },
+  {
+    "table": "ev_prostor_h",
+    "types": {
+      "PRO_ID": "NUMBER",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_stavba_h",
+    "types": {
+      "STA_SID": "NUMBER",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_parc_del_h",
+    "types": {
+      "ID_PARC_DEL": "VARCHAR2",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_parcela_h",
+    "types": {
+      "PC_MID": "NUMBER",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_pe_parc_h",
+    "types": {
+      "ID_PE_PARC": "VARCHAR2",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_del_stavbe_h",
+    "types": {
+      "DST_SID": "NUMBER",
+      "JN_REV_NUM": "NUMBER"
+    }
+  },
+  {
+    "table": "ev_del_stavbe_enota_h_2025_danes",
+    "types": {
+      "DST_SID": "NUMBER",
+      "__REPAIR_REV": "NUMBER (revision alias)"
+    }
+  }
+]

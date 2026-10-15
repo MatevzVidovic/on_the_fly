@@ -76,16 +76,22 @@ class OracleSource:
             subset = keys[start:start + 1000]
             requested = set(subset)
             config = self.d.oracle_key if use_key_columns else None
+            query = self.d.query
             if config:
+                # Two EV queries omit the revision column; expose it for filtering only.
+                if config.get('extra_select'):
+                    query = re.sub(r'^SELECT\b', lambda m: m[0] + ' ' + config['extra_select'] + ',',
+                                   query, count=1, flags=re.IGNORECASE)
                 columns = ['"' + column.replace('"', '""') + '"' for column in config['columns']]
                 predicate = '(' + ','.join(columns) + ')'
                 binds, tuples = {}, []
                 for i, key in enumerate(subset):
-                    parts = str(key).split(config['separator'])
+                    parts = str(key).rsplit(config['separator'], len(columns) - 1)
                     if len(parts) != len(columns):
                         raise ValueError(f'Key does not match oracle_keys.json: {key}')
                     names = [f'k{i}_{j}' for j in range(len(columns))]
-                    binds.update((name, int(part)) for name, part in zip(names, parts))
+                    binds.update((name, part if column in config.get('text_columns', []) else int(part))
+                                 for name, part, column in zip(names, parts, config['columns']))
                     tuples.append('(' + ','.join(':' + name for name in names) + ')')
                 placeholders = ','.join(tuples)
             else:
@@ -94,7 +100,7 @@ class OracleSource:
                 placeholders = ','.join(':' + name for name in binds)
             with self.db.cursor() as cur:
                 cur.arraysize = len(subset)
-                cur.execute(f'SELECT * FROM ({self.d.query}) WHERE {predicate} IN ({placeholders})', binds)
+                cur.execute(f'SELECT * FROM ({query}) WHERE {predicate} IN ({placeholders})', binds)
                 names = [c[0] for c in cur.description]
                 for values in cur:
                     row = dict(zip(names, (v.read() if isinstance(v, oracledb.LOB) else v for v in values)))

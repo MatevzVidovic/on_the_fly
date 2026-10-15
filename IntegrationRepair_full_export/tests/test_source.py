@@ -80,7 +80,7 @@ def test_configured_payload_lookup_rejects_wrong_key_shape(definition):
     definition.oracle_key = dict(columns=['PC_MID', 'JN_REV_NUM'], separator='-')
     source = OracleSource(Database(Cursor()), definition)
     with pytest.raises(ValueError, match='oracle_keys.json'):
-        source.fetch_payloads(['123-45-67'])
+        source.fetch_payloads(['123'])
 
 
 def test_payload_lookup_rejects_unrequested_rows(definition):
@@ -88,3 +88,30 @@ def test_payload_lookup_rejects_unrequested_rows(definition):
     source = OracleSource(Database(Cursor([(2, DATE)])), definition)
     with pytest.raises(ValueError, match='unrequested key'):
         source.fetch_payloads([1])
+
+
+def test_payload_extra_projection_keeps_saved_query_and_inventory_unchanged(definition):
+    definition.key['field_type'] = 'plain-text-single-row'
+    definition.query = 'SELECT KEY, CHANGED FROM EV.JN_PARC_ENOTA j'
+    definition.oracle_key = dict(columns=['ID_PARC_ENOTA', '__REPAIR_REV'], separator='-',
+                                 extra_select='j."JN_REV_NUM" AS "__REPAIR_REV"')
+    cursor = Cursor([('123-45', DATE)])
+    source = OracleSource(Database(cursor), definition)
+    assert source.fetch_payloads(['123-45'])['123-45']['KEY'] == '123-45'
+    query, binds = cursor.calls[-1]
+    assert 'SELECT j."JN_REV_NUM" AS "__REPAIR_REV", KEY, CHANGED' in query
+    assert '("ID_PARC_ENOTA","__REPAIR_REV") IN ((:k0_0,:k0_1))' in query
+    assert binds == {'k0_0': 123, 'k0_1': 45}
+    assert definition.query == 'SELECT KEY, CHANGED FROM EV.JN_PARC_ENOTA j'
+    list(source.inventory(None))
+    assert '__REPAIR_REV' not in cursor.calls[-1][0]
+
+
+def test_text_component_preserves_letters_zeroes_and_separator(definition):
+    definition.key['field_type'] = 'plain-text-single-row'
+    definition.oracle_key = dict(columns=['ID_PARC_DEL', 'JN_REV_NUM'], separator='-',
+                                 text_columns=['ID_PARC_DEL'])
+    cursor = Cursor([('001-ABC-45', DATE)])
+    source = OracleSource(Database(cursor), definition)
+    assert source.fetch_payloads(['001-ABC-45'])['001-ABC-45']['KEY'] == '001-ABC-45'
+    assert cursor.calls[-1][1] == {'k0_0': '001-ABC', 'k0_1': 45}

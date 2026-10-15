@@ -48,7 +48,7 @@ No framework, repository interfaces, audit writes, locks or normal integration m
 
 Oracle inventory keeps all keys so rows newer than the cutoff cannot be mistaken for deletions. Only source rows at or below the cutoff can become upserts. LIFT inventory filters by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Timestamps use source wall-clock fields, with six fractional digits matching PostgreSQL; no offset conversion. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
 
-**Performance:** sorting full inventories and per-row SQLite lookups/PostgreSQL upserts favor clear code. Millions of repairs will be slow, especially over a network. Improve these specific loops with bulk joins/writes later if needed. Payload memory is bounded by one 10,000-row page, but large WKT values can make that page substantial.
+**Performance:** inventories stream into SQLite; apply looks up target UUIDs/dates once per page and pipelines row writes before committing. Configured Oracle composite keys use numeric component predicates; unconfigured integrations retain the saved text-key lookup, which can be very slow. Sorting full inventories and local per-row SQLite comparisons remain costs at large scale. Payload memory is bounded by one 10,000-row page, but large WKT values can make that page substantial.
 
 ## Verification
 
@@ -159,3 +159,19 @@ and use read-only transactions; local DuckDB/SQLite trials use disposable files.
 The matched SQLite/DuckDB/RAM commit experiments and conditional large-table
 runtime estimates are in [reports/speed_report.md](reports/speed_report.md),
 with a [short interactive HTML report](reports/speed_report.html).
+
+SQLite is the only repair-state backend. DuckDB, RAM snapshots and alternate
+pagination live in standalone benchmark scripts; normal repair runs never import
+them and need no DuckDB dependency. The measured alternatives did not justify
+adding another storage implementation. Resume checkpoints and old SQLite schema
+migrations are retained so existing runs remain usable.
+
+All ten supported EV composite-key integrations now have configured payload fast
+paths in `oracle_keys.json`. `text_columns` identifies components that must stay
+text; other components bind as integers. Two enota queries use `extra_select` to
+expose a missing revision column for payload filtering only. The other 21 supported
+integrations already use direct keys and need no split mapping. See the current
+[key coverage audit](reports/oracle_key_coverage.md). The earlier speed reports
+retain their dated measurements; their EV-parcela-only configuration status is
+superseded by this audit. PostgreSQL write throughput remains unmeasured with the
+read-only account.

@@ -1,6 +1,89 @@
 {
-  "c469d91a-ae56-11f0-84be-169cd02558fe": {
-    "columns": ["PC_MID", "JN_REV_NUM"],
+  "f5519202-ae65-11f0-adb7-169cd02558fe": {
+    "columns": [
+      "ID_PE_DST",
+      "JN_REV_NUM"
+    ],
+    "separator": "-",
+    "text_columns": [
+      "ID_PE_DST"
+    ]
+  },
+  "a75bfb06-ae69-11f0-941e-169cd02558fe": {
+    "columns": [
+      "ID_PE",
+      "JN_REV_NUM"
+    ],
+    "separator": "-",
+    "text_columns": [
+      "ID_PE"
+    ]
+  },
+  "1e57d002-f69c-11f0-9f2c-02420a000266": {
+    "columns": [
+      "ID_PARC_ENOTA",
+      "__REPAIR_REV"
+    ],
+    "separator": "-",
+    "extra_select": "j.\"JN_REV_NUM\" AS \"__REPAIR_REV\"",
+    "text_columns": [
+      "ID_PARC_ENOTA"
+    ]
+  },
+  "3d6e03ec-ae6e-11f0-bc34-169cd02558fe": {
+    "columns": [
+      "PRO_ID",
+      "JN_REV_NUM"
+    ],
     "separator": "-"
+  },
+  "39aa410c-beff-11f0-a601-5212cffe39ac": {
+    "columns": [
+      "STA_SID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "8a9ed9a4-ae58-11f0-9f8c-169cd02558fe": {
+    "columns": [
+      "ID_PARC_DEL",
+      "JN_REV_NUM"
+    ],
+    "separator": "-",
+    "text_columns": [
+      "ID_PARC_DEL"
+    ]
+  },
+  "c469d91a-ae56-11f0-84be-169cd02558fe": {
+    "columns": [
+      "PC_MID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "26856cbc-ae67-11f0-8b08-169cd02558fe": {
+    "columns": [
+      "ID_PE_PARC",
+      "JN_REV_NUM"
+    ],
+    "separator": "-",
+    "text_columns": [
+      "ID_PE_PARC"
+    ]
+  },
+  "b867296c-ab2a-11f0-a252-169cd02558fe": {
+    "columns": [
+      "DST_SID",
+      "JN_REV_NUM"
+    ],
+    "separator": "-"
+  },
+  "726fc9e4-b684-11f1-b953-02420a00027f": {
+    "columns": [
+      "DST_SID",
+      "__REPAIR_REV"
+    ],
+    "separator": "-",
+    "extra_select": "j.\"JN_REV_NUM\" AS \"__REPAIR_REV\""
   }
 }
