@@ -1,0 +1,309 @@
+{
+  "columns": [
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_rel_razred_podr1",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_rel_razred_podr2",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_rel_razred_podr3",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_rel_razred_podr4",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_rel_razred_podr5",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "vrednost_enacba",
+      "data_type": "text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "enacba_v_vrednosti",
+      "data_type": "boolean",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "id_umerjanje_cpt_integration",
+      "data_type": "text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_faktor_vrednost",
+      "column_name": "__readonly",
+      "data_type": "boolean",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "id",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "id_rel_faktor",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "razred",
+      "data_type": "text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "referenca",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "gid",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "__mod",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "st_razred",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi",
+      "column_name": "__readonly",
+      "data_type": "boolean",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "id",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "id_rel_razredi",
+      "data_type": "uuid",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "opis",
+      "data_type": "text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "pogoj",
+      "data_type": "text",
+      "numeric_precision": null,
+      "numeric_scale": null
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "gid",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "__mod",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "sek_razreda",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    },
+    {
+      "table_name": "md_razredi_podr",
+      "column_name": "__readonly",
+      "data_type": "boolean",
+      "numeric_precision": null,
+      "numeric_scale": null
+    }
+  ],
+  "factor_ids": [
+    {
+      "id": "caae98c8-e5da-470a-9745-d911feab5989",
+      "faktor": "f_cpt"
+    },
+    {
+      "id": "33187b31-bc75-4de9-ab03-4585bd8de16a",
+      "faktor": "v_dst"
+    },
+    {
+      "id": "147d5094-54ac-4f90-b2f1-a3dddf555de3",
+      "faktor": "f_rt_osnova"
+    },
+    {
+      "id": "f1281084-5934-4352-8fee-597f64f49097",
+      "faktor": "f_rt_m2"
+    },
+    {
+      "id": "03725ed3-a601-4c9e-b202-6fdc8a227f9c",
+      "faktor": "f_obn"
+    },
+    {
+      "id": "bee1d33f-1690-47fc-a7d2-4557cc5b0fa5",
+      "faktor": "f_last"
+    },
+    {
+      "id": "c3655888-30ae-4756-a361-52aedf29460f",
+      "faktor": "f_nk"
+    },
+    {
+      "id": "3d6bc782-32e0-4316-9d6d-e81dbfb286c1",
+      "faktor": "v_zps"
+    }
+  ],
+  "other_tables": [
+    "md_spremenljivke",
+    "md_spremenljivke_podatki",
+    "md_faktorji"
+  ]
+}

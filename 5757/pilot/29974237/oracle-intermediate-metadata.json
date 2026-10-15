@@ -1,0 +1,41 @@
+{
+  "rows": [
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "index_name": "SYS_C00102666",
+      "column_name": "ID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "ID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "JN_DST_PRIPIS_PODATKI_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "SYS_C0034942",
+      "column_name": "ID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "index_name": "SYS_C0034942",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    }
+  ],
+  "truncated": false
+}

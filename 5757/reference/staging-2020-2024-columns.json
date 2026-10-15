@@ -1,0 +1,27 @@
+[
+  {
+    "table_schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "has_id_model_ver": false,
+    "columns": [
+      "id",
+      "created_by",
+      "updated_by",
+      "created_at",
+      "updated_at",
+      "jn_del_st_enota_pk",
+      "dst_sid",
+      "id_model",
+      "raven",
+      "vpliv",
+      "vrednost",
+      "cona_ime",
+      "faktor_po",
+      "posplosena_vrednost",
+      "jn_status",
+      "valid_from",
+      "valid_to",
+      "date_change"
+    ]
+  }
+]

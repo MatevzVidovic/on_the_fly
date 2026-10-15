@@ -1,0 +1,345 @@
+{
+  "rows": [
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 193565,
+      "endpoint_actual_value": "GAR",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 748282,
+      "endpoint_actual_value": "HIS",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 783263,
+      "endpoint_actual_value": "IND",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 786241,
+      "endpoint_actual_value": "INP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1455011,
+      "endpoint_actual_value": "KDS",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1457902,
+      "endpoint_actual_value": "NAPAKA",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1493216,
+      "endpoint_actual_value": "PPL",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1543298,
+      "endpoint_actual_value": "PPP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1561427,
+      "endpoint_actual_value": "SDP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1917711,
+      "endpoint_actual_value": "STA",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1924829,
+      "endpoint_actual_value": "TUR",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24",
+      "table_estimated_rows": 1924829
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 1316365,
+      "endpoint_actual_value": "GAR",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 4596042,
+      "endpoint_actual_value": "HIS",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 4818130,
+      "endpoint_actual_value": "IND",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 4833624,
+      "endpoint_actual_value": "INP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 8447381,
+      "endpoint_actual_value": "KDS",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 8529005,
+      "endpoint_actual_value": "NAPAKA",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 8797169,
+      "endpoint_actual_value": "PPL",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 9192538,
+      "endpoint_actual_value": "PPP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 9301980,
+      "endpoint_actual_value": "SDP",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 11637821,
+      "endpoint_actual_value": "STA",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 11673062,
+      "endpoint_actual_value": "TUR",
+      "num_distinct": 11,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46",
+      "table_estimated_rows": 11673062
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 9013515,
+      "endpoint_actual_value": "DRZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 25931688,
+      "endpoint_actual_value": "GOZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 57653447,
+      "endpoint_actual_value": "KME",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 59271616,
+      "endpoint_actual_value": "NAPAKA",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 83364803,
+      "endpoint_actual_value": "STZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 94442718,
+      "endpoint_actual_value": "ZPS",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26",
+      "table_estimated_rows": 94442718
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 900312,
+      "endpoint_actual_value": "DRZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 2597611,
+      "endpoint_actual_value": "GOZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 5460214,
+      "endpoint_actual_value": "KME",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 5460407,
+      "endpoint_actual_value": "NAPAKA",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 7415231,
+      "endpoint_actual_value": "STZ",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "endpoint_number": 8344872,
+      "endpoint_actual_value": "ZPS",
+      "num_distinct": 6,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37",
+      "table_estimated_rows": 8344872
+    }
+  ],
+  "truncated": false
+}

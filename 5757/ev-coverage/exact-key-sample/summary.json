@@ -1,0 +1,246 @@
+[
+  {
+    "estimated_population_rows": 6902079.0,
+    "sample_percent": 0.02173258231324214,
+    "seed": 5757,
+    "sample_size": 100,
+    "sample_pool_rows": 1217,
+    "version_column_present": false,
+    "table": "ev_del_stavbe_enota_h_2020_2024",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "older group 2": 98,
+      "unmapped / special": 2
+    },
+    "first_source_start": "2020-04-01 12:00:00",
+    "last_source_start": "2024-08-05 00:30:01",
+    "source_start_years": {
+      "2023": 9,
+      "2024": 23,
+      "2022": 34,
+      "2020": 34
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 100,
+    "date_differences": {
+      "valid_from": 100,
+      "valid_to": 100
+    },
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 4877667.0,
+    "sample_percent": 0.030752406837121108,
+    "seed": 5758,
+    "sample_size": 100,
+    "sample_pool_rows": 1598,
+    "version_column_present": false,
+    "table": "ev_del_stavbe_enota_h_2025_danes",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "newer group 3": 94,
+      "older group 2": 6
+    },
+    "first_source_start": "2025-01-10 00:30:01",
+    "last_source_start": "2025-11-02 23:59:59.999000",
+    "source_start_years": {
+      "2025": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {},
+    "source_statuses": {
+      "H": 67,
+      "A": 32,
+      "X": 1
+    },
+    "open_rows": 33
+  },
+  {
+    "estimated_population_rows": 17228166.0,
+    "sample_percent": 0.008706672550055531,
+    "seed": 5759,
+    "sample_size": 100,
+    "sample_pool_rows": 1257,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2020",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "older group 2": 83,
+      "unmapped / special": 17
+    },
+    "first_source_start": "2020-04-01 12:00:00",
+    "last_source_start": "2020-11-10 03:00:02.007464",
+    "source_start_years": {
+      "2020": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {},
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 8397585.0,
+    "sample_percent": 0.017862278262143223,
+    "seed": 5760,
+    "sample_size": 100,
+    "sample_pool_rows": 1608,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2021",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "older group 2": 81,
+      "unmapped / special": 19
+    },
+    "first_source_start": "2021-03-06 12:00:01.364723",
+    "last_source_start": "2021-12-27 04:00:01.489987",
+    "source_start_years": {
+      "2021": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {},
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 12332600.0,
+    "sample_percent": 0.01216288536075118,
+    "seed": 5761,
+    "sample_size": 100,
+    "sample_pool_rows": 1352,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2022",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "older group 2": 88,
+      "unmapped / special": 12
+    },
+    "first_source_start": "2022-05-14 14:00:01.608108",
+    "last_source_start": "2022-12-27 00:00:00",
+    "source_start_years": {
+      "2022": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {
+      "valid_to": 6
+    },
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 12572742.0,
+    "sample_percent": 0.011930571708224029,
+    "seed": 5762,
+    "sample_size": 100,
+    "sample_pool_rows": 1478,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2023",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "unmapped / special": 23,
+      "older group 2": 77
+    },
+    "first_source_start": "2023-04-13 13:21:29",
+    "last_source_start": "2023-12-27 00:30:01",
+    "source_start_years": {
+      "2023": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {
+      "valid_to": 25
+    },
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 14671040.0,
+    "sample_percent": 0.010224224049556132,
+    "seed": 5763,
+    "sample_size": 100,
+    "sample_pool_rows": 1707,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2024",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "unmapped / special": 6,
+      "older group 2": 94
+    },
+    "first_source_start": "2024-01-03 00:30:01",
+    "last_source_start": "2024-12-23 00:30:00",
+    "source_start_years": {
+      "2024": 100
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {
+      "valid_to": 16
+    },
+    "source_statuses": {
+      "H": 100
+    },
+    "open_rows": 0
+  },
+  {
+    "estimated_population_rows": 25544474.0,
+    "sample_percent": 0.005872111518131084,
+    "seed": 5764,
+    "sample_size": 100,
+    "sample_pool_rows": 1540,
+    "version_column_present": true,
+    "table": "ev_parc_enota_h_2025_danes",
+    "match_status": {
+      "MATCHED": 100
+    },
+    "generation": {
+      "newer group 3": 90,
+      "unmapped / special": 4,
+      "older group 2": 6
+    },
+    "first_source_start": "2025-01-08 00:30:01",
+    "last_source_start": "2026-10-04 23:59:59.999000",
+    "source_start_years": {
+      "2025": 81,
+      "2026": 19
+    },
+    "payload_mismatches": 0,
+    "recovered_missing_local_start": 0,
+    "date_differences": {
+      "valid_to": 2
+    },
+    "source_statuses": {
+      "H": 63,
+      "A": 35,
+      "X": 2
+    },
+    "open_rows": 37
+  }
+]

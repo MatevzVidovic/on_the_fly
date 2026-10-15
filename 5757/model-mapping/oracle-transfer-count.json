@@ -1,0 +1,13 @@
+{
+  "rows": [
+    {
+      "model_version_rows": 211,
+      "model_codes": 19,
+      "distinct_version_ids": 211,
+      "rows_with_runtime_xml": 211,
+      "rows_with_original_xml": 194,
+      "integration_result_rows": 211
+    }
+  ],
+  "truncated": false
+}

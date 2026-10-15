@@ -1,0 +1,3600 @@
+{
+  "indexes": [
+    {
+      "table_name": "ev_del_stavbe",
+      "index_name": "ev_del_stavbe_dst_sid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_dst_sid ON public.ev_del_stavbe USING btree (dst_sid)",
+      "key_columns": [
+        "dst_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe",
+      "index_name": "ev_del_stavbe_id_model",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_id_model ON public.ev_del_stavbe USING btree (id_model)",
+      "key_columns": [
+        "id_model"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe",
+      "index_name": "ev_del_stavbe_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_geom_idx ON public.ev_del_stavbe USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe",
+      "index_name": "ev_del_stavbe_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_pkey ON public.ev_del_stavbe USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe",
+      "index_name": "ev_del_stavbe_sta_sid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_sta_sid ON public.ev_del_stavbe USING btree (sta_sid)",
+      "key_columns": [
+        "sta_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_cona_h",
+      "index_name": "ev_del_stavbe_cona_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_cona_h_pkey ON public.ev_del_stavbe_cona_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "index_name": "ev_del_stavbe_enota_dst_sid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_dst_sid ON public.ev_del_stavbe_enota USING btree (dst_sid)",
+      "key_columns": [
+        "dst_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "index_name": "ev_del_stavbe_enota_dst_sid_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_dst_sid_idx ON public.ev_del_stavbe_enota USING btree (dst_sid)",
+      "key_columns": [
+        "dst_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "index_name": "ev_del_stavbe_enota_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_enota_pkey ON public.ev_del_stavbe_enota USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_valid_from_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_h_valid_from_idx ON public.ev_del_stavbe_h USING btree (valid_from)",
+      "key_columns": [
+        "valid_from"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_date_change_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_h_date_change_idx ON public.ev_del_stavbe_h USING btree (date_change)",
+      "key_columns": [
+        "date_change"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_dst_sid_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_h_dst_sid_idx ON public.ev_del_stavbe_h USING btree (dst_sid)",
+      "key_columns": [
+        "dst_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_valid_to_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_h_valid_to_idx ON public.ev_del_stavbe_h USING btree (valid_to)",
+      "key_columns": [
+        "valid_to"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_jn_del_stavbe_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_h_jn_del_stavbe_pk_key ON public.ev_del_stavbe_h USING btree (jn_del_stavbe_pk)",
+      "key_columns": [
+        "jn_del_stavbe_pk"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "index_name": "ev_del_stavbe_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_h_pkey ON public.ev_del_stavbe_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "index_name": "dst_pripis_podatki_pk_uk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX dst_pripis_podatki_pk_uk ON public.ev_dst_pripis_podatki_h USING btree (dst_pripis_podatki_pk)",
+      "key_columns": [
+        "dst_pripis_podatki_pk"
+      ]
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "index_name": "ev_dst_pripis_podatki_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_dst_pripis_podatki_h_pkey ON public.ev_dst_pripis_podatki_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_g_ceste_l_h",
+      "index_name": "ev_g_ceste_l_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_g_ceste_l_h_pkey ON public.ev_g_ceste_l_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_g_el_energija_l_h",
+      "index_name": "ev_g_el_energija_l_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_g_el_energija_l_h_pkey ON public.ev_g_el_energija_l_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_g_zeleznice_l_h",
+      "index_name": "ev_g_zeleznice_l_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_g_zeleznice_l_h_pkey ON public.ev_g_zeleznice_l_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_gurs_oseba_h",
+      "index_name": "ev_gurs_oseba_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_gurs_oseba_h_pkey ON public.ev_gurs_oseba_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_obcina_h",
+      "index_name": "ev_obcina_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_obcina_h_pkey ON public.ev_obcina_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_oseba_h",
+      "index_name": "ev_oseba_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_oseba_h_pkey ON public.ev_oseba_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_oseba_pe_h",
+      "index_name": "ev_oseba_pe_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_oseba_pe_h_pkey ON public.ev_oseba_pe_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_del_cona_h",
+      "index_name": "ev_parc_del_cona_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_del_cona_h_pkey ON public.ev_parc_del_cona_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "index_name": "ev_parc_del_enota_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_del_enota_pkey ON public.ev_parc_del_enota USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "index_name": "ev_parc_del_h_jn_parcela_del_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_del_h_jn_parcela_del_pk_key ON public.ev_parc_del_h USING btree (jn_parcela_del_pk)",
+      "key_columns": [
+        "jn_parcela_del_pk"
+      ]
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "index_name": "ev_parc_del_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_del_h_pkey ON public.ev_parc_del_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "index_name": "ev_parc_enota_vrednost_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_vrednost_idx ON public.ev_parc_enota USING btree (vrednost)",
+      "key_columns": [
+        "vrednost"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "index_name": "ev_parc_enota_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_enota_pkey ON public.ev_parc_enota USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "index_name": "ev_parc_enota_pc_mid_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_pc_mid_idx ON public.ev_parc_enota USING btree (pc_mid)",
+      "key_columns": [
+        "pc_mid"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "index_name": "ev_parc_enota_faktor_ix",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_faktor_ix ON public.ev_parc_enota USING btree (faktor_po)",
+      "key_columns": [
+        "faktor_po"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_date_change_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_h_2025_danes_date_change_idx ON public.ev_parc_enota_h_2025_danes USING btree (date_change)",
+      "key_columns": [
+        "date_change"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_dst_sid_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_h_2025_danes_dst_sid_idx ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)",
+      "key_columns": [
+        "pc_mid"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key ON public.ev_parc_enota_h_2025_danes USING btree (jn_parcela_enota_pk)",
+      "key_columns": [
+        "jn_parcela_enota_pk"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_pkey ON public.ev_parc_enota_h_2025_danes USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_valid_from_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_from_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_from)",
+      "key_columns": [
+        "valid_from"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_valid_to_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_to_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_to)",
+      "key_columns": [
+        "valid_to"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "ev_parc_enota_h_2025_danes_vrednost_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parc_enota_h_2025_danes_vrednost_idx ON public.ev_parc_enota_h_2025_danes USING btree (vrednost)",
+      "key_columns": [
+        "vrednost"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "idx_epe_model_valid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX idx_epe_model_valid ON public.ev_parc_enota_h_2025_danes USING btree (id_model, valid_from, valid_to)",
+      "key_columns": [
+        "id_model",
+        "valid_from",
+        "valid_to"
+      ]
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "index_name": "idx_epe_pc_mid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX idx_epe_pc_mid ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)",
+      "key_columns": [
+        "pc_mid"
+      ]
+    },
+    {
+      "table_name": "ev_parc_pripis_podatki_h",
+      "index_name": "ev_parc_pripis_podatki_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_pkey ON public.ev_parc_pripis_podatki_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_parc_pripis_podatki_h",
+      "index_name": "ev_parc_pripis_podatki_h_uk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_uk ON public.ev_parc_pripis_podatki_h USING btree (parc_pripis_podatki_pk)",
+      "key_columns": [
+        "parc_pripis_podatki_pk"
+      ]
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "index_name": "ev_parcela_h_geom_gix",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_parcela_h_geom_gix ON public.ev_parcela_h USING gist (st_setsrid(st_point((ceny)::double precision, (cenx)::double precision), 3794))",
+      "key_columns": [
+        null
+      ]
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "index_name": "idx_ep_pc_mid_valid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX idx_ep_pc_mid_valid ON public.ev_parcela_h USING btree (pc_mid, valid_from, valid_to)",
+      "key_columns": [
+        "pc_mid",
+        "valid_from",
+        "valid_to"
+      ]
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "index_name": "ev_parcela_h_jn_parcela_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parcela_h_jn_parcela_pk_key ON public.ev_parcela_h USING btree (jn_parcela_pk)",
+      "key_columns": [
+        "jn_parcela_pk"
+      ]
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "index_name": "ev_parcela_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_parcela_h_pkey ON public.ev_parcela_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_pe_dst_h",
+      "index_name": "ev_pe_dst_h_jn_pe_dst_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_pe_dst_h_jn_pe_dst_pk_key ON public.ev_pe_dst_h USING btree (jn_pe_dst_pk)",
+      "key_columns": [
+        "jn_pe_dst_pk"
+      ]
+    },
+    {
+      "table_name": "ev_pe_dst_h",
+      "index_name": "ev_pe_dst_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_pe_dst_h_pkey ON public.ev_pe_dst_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_pe_parc_h",
+      "index_name": "ev_pe_parc_h_jn_pe_parc_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_pe_parc_h_jn_pe_parc_pk_key ON public.ev_pe_parc_h USING btree (jn_pe_parc_pk)",
+      "key_columns": [
+        "jn_pe_parc_pk"
+      ]
+    },
+    {
+      "table_name": "ev_pe_parc_h",
+      "index_name": "ev_pe_parc_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_pe_parc_h_pkey ON public.ev_pe_parc_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "index_name": "ev_posebna_enota___mod_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_posebna_enota___mod_index ON public.ev_posebna_enota USING btree (__mod)",
+      "key_columns": [
+        "__mod"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "index_name": "ev_posebna_enota_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_posebna_enota_geom_idx ON public.ev_posebna_enota USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "index_name": "ev_posebna_enota_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_posebna_enota_pkey ON public.ev_posebna_enota USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "index_name": "ev_posebna_enota_h_jn_posebna_enota_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_posebna_enota_h_jn_posebna_enota_pk_key ON public.ev_posebna_enota_h USING btree (jn_posebna_enota_pk)",
+      "key_columns": [
+        "jn_posebna_enota_pk"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "index_name": "ev_posebna_enota_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_posebna_enota_h_pkey ON public.ev_posebna_enota_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_posebna_enota_pod_h",
+      "index_name": "ev_posebna_enota_pod_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_posebna_enota_pod_h_pkey ON public.ev_posebna_enota_pod_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_prostor_h",
+      "index_name": "ev_prostor_h_jn_prostor_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_prostor_h_jn_prostor_pk_key ON public.ev_prostor_h USING btree (jn_prostor_pk)",
+      "key_columns": [
+        "jn_prostor_pk"
+      ]
+    },
+    {
+      "table_name": "ev_prostor_h",
+      "index_name": "ev_prostor_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_prostor_h_pkey ON public.ev_prostor_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_dr_dst_h",
+      "index_name": "ev_sif_dr_dst_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_dr_dst_h_pkey ON public.ev_sif_dr_dst_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_dr_pros_h",
+      "index_name": "ev_sif_dr_pros_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_dr_pros_h_pkey ON public.ev_sif_dr_pros_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_kontrukcija_h",
+      "index_name": "ev_sif_kontrukcija_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_kontrukcija_h_pkey ON public.ev_sif_kontrukcija_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_lega_h",
+      "index_name": "ev_sif_lega_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_lega_h_pkey ON public.ev_sif_lega_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_valid_to_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_to_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_to)",
+      "key_columns": [
+        "valid_to"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_dst_sid_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_dst_sid_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (dst_sid)",
+      "key_columns": [
+        "dst_sid"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_vrednost_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_vrednost_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (vrednost)",
+      "key_columns": [
+        "vrednost"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key ON public.ev_del_stavbe_enota_h_2025_danes USING btree (jn_del_st_enota_pk)",
+      "key_columns": [
+        "jn_del_st_enota_pk"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_pkey ON public.ev_del_stavbe_enota_h_2025_danes USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_date_change_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_date_change_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (date_change)",
+      "key_columns": [
+        "date_change"
+      ]
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "index_name": "ev_del_stavbe_enota_h_2025_danes_valid_from_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_from_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_from)",
+      "key_columns": [
+        "valid_from"
+      ]
+    },
+    {
+      "table_name": "ev_nrp_parc_h",
+      "index_name": "ev_nrp_parc_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_nrp_parc_h_pkey ON public.ev_nrp_parc_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_dr_parc_h",
+      "index_name": "ev_sif_dr_parc_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_dr_parc_h_pkey ON public.ev_sif_dr_parc_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "index_name": "ev_sif_model_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_model_h_pkey ON public.ev_sif_model_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_vpliv_h",
+      "index_name": "ev_sif_vpliv_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_vpliv_h_pkey ON public.ev_sif_vpliv_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "index_name": "ev_sif_vpliv_model_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sif_vpliv_model_h_pkey ON public.ev_sif_vpliv_model_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_sta_par_h",
+      "index_name": "ev_sta_par_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_sta_par_h_pkey ON public.ev_sta_par_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_stavba",
+      "index_name": "ev_stavba_geom_gist",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_stavba_geom_gist ON public.ev_stavba USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "ev_stavba",
+      "index_name": "ev_stavba_id_tip_stavbe",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_stavba_id_tip_stavbe ON public.ev_stavba USING btree (id_tip_stavbe)",
+      "key_columns": [
+        "id_tip_stavbe"
+      ]
+    },
+    {
+      "table_name": "ev_stavba",
+      "index_name": "ev_stavba_sta_sid",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_stavba_sta_sid ON public.ev_stavba USING btree (sta_sid)",
+      "key_columns": [
+        "sta_sid"
+      ]
+    },
+    {
+      "table_name": "ev_stavba",
+      "index_name": "ev_stavba_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_stavba_pkey ON public.ev_stavba USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_stavba",
+      "index_name": "ev_stavba_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_stavba_geom_idx ON public.ev_stavba USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "ev_stavba_h",
+      "index_name": "ev_stavba_h_geom_gix",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX ev_stavba_h_geom_gix ON public.ev_stavba_h USING gist (st_setsrid(st_point((ceny)::double precision, (cenx)::double precision), 3794))",
+      "key_columns": [
+        null
+      ]
+    },
+    {
+      "table_name": "ev_stavba_h",
+      "index_name": "ev_stavba_h_jn_sta_pk_key",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_stavba_h_jn_sta_pk_key ON public.ev_stavba_h USING btree (jn_sta_pk)",
+      "key_columns": [
+        "jn_sta_pk"
+      ]
+    },
+    {
+      "table_name": "ev_stavba_h",
+      "index_name": "ev_stavba_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_stavba_h_pkey ON public.ev_stavba_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_upravljalec_dst_h",
+      "index_name": "ev_upravljalec_dst_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_upravljalec_dst_h_pkey ON public.ev_upravljalec_dst_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "ev_upravljalec_parc_h",
+      "index_name": "ev_upravljalec_parc_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX ev_upravljalec_parc_h_pkey ON public.ev_upravljalec_parc_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_do_idx ON public.kn_nep_deli_stavb_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_sys_idx ON public.kn_nep_deli_stavb_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_id_idx ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_id)",
+      "key_columns": [
+        "del_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_deli_stavb_h_pk ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_h_id)",
+      "key_columns": [
+        "del_stavbe_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_stavba_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_stavba_id_idx ON public.kn_nep_deli_stavb_h USING btree (stavba_id)",
+      "key_columns": [
+        "stavba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_od_idx ON public.kn_nep_deli_stavb_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_del_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_del_stavbe_id_idx ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_id)",
+      "key_columns": [
+        "del_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_idx01",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_idx01 ON public.kn_nep_deli_stavb_h USING btree (vrsta_dejanske_rabe_del_st_id)",
+      "key_columns": [
+        "vrsta_dejanske_rabe_del_st_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_stavba_del_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_stavba_del_idx ON public.kn_nep_deli_stavb_h USING btree (stavba_id, st_dela_stavbe)",
+      "key_columns": [
+        "stavba_id",
+        "st_dela_stavbe"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_vrsta_dejanske_rabe_del_st_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_deli_stavb_h_vrsta_dejanske_rabe_del_st_id_idx ON public.kn_nep_deli_stavb_h USING btree (vrsta_dejanske_rabe_del_st_id)",
+      "key_columns": [
+        "vrsta_dejanske_rabe_del_st_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "index_name": "kn_nep_deli_stavb_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_deli_stavb_h_pkey ON public.kn_nep_deli_stavb_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_etaze_h_pk ON public.kn_nep_etaze_h USING btree (etaza_h_id)",
+      "key_columns": [
+        "etaza_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_stavba_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_stavba_id_idx ON public.kn_nep_etaze_h USING btree (stavba_id)",
+      "key_columns": [
+        "stavba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_etaze_h_pkey ON public.kn_nep_etaze_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_datum_sys_idx ON public.kn_nep_etaze_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_geom_idx ON public.kn_nep_etaze_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_datum_do_idx ON public.kn_nep_etaze_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_datum_od_idx ON public.kn_nep_etaze_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_etaza_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_etaza_id_idx ON public.kn_nep_etaze_h USING btree (etaza_id)",
+      "key_columns": [
+        "etaza_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "index_name": "kn_nep_etaze_h_stavba_etaza_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_h_stavba_etaza_idx ON public.kn_nep_etaze_h USING btree (stavba_id, stevilka_etaze)",
+      "key_columns": [
+        "stavba_id",
+        "stevilka_etaze"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_do_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_od_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_sys_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_etaza_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_etaza_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (etaza_id)",
+      "key_columns": [
+        "etaza_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_geom_idx ON public.kn_nep_etaze_x_deli_stavb_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_etaze_x_deli_stavb_h_pkey ON public.kn_nep_etaze_x_deli_stavb_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_del_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_del_stavbe_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (del_stavbe_id)",
+      "key_columns": [
+        "del_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "index_name": "kn_nep_etaze_x_deli_stavb_h_etaza_x_del_stavbe_h_id_idx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_etaze_x_deli_stavb_h_etaza_x_del_stavbe_h_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (etaza_x_del_stavbe_h_id)",
+      "key_columns": [
+        "etaza_x_del_stavbe_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "index_name": "kn_nep_hisne_stevilke_h_hisna_stevilka_h_id_idx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_hisne_stevilke_h_hisna_stevilka_h_id_idx ON public.kn_nep_hisne_stevilke_h USING btree (hisna_stevilka_h_id)",
+      "key_columns": [
+        "hisna_stevilka_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "index_name": "kn_nep_hisne_stevilke_h___mod_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_hisne_stevilke_h___mod_index ON public.kn_nep_hisne_stevilke_h USING btree (__mod)",
+      "key_columns": [
+        "__mod"
+      ]
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "index_name": "kn_nep_hisne_stevilke_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_hisne_stevilke_h_geom_idx ON public.kn_nep_hisne_stevilke_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "index_name": "kn_nep_hisne_stevilke_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_hisne_stevilke_h_pkey ON public.kn_nep_hisne_stevilke_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "index_name": "kn_nep_hisne_stevilke_h_gid_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_hisne_stevilke_h_gid_index ON public.kn_nep_hisne_stevilke_h USING btree (gid)",
+      "key_columns": [
+        "gid"
+      ]
+    },
+    {
+      "table_name": "kn_nep_katastrske_obcine_h",
+      "index_name": "katastrske_obcine_h_ko_id_h_uidx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX katastrske_obcine_h_ko_id_h_uidx ON public.kn_nep_katastrske_obcine_h USING btree (ko_id_h)",
+      "key_columns": [
+        "ko_id_h"
+      ]
+    },
+    {
+      "table_name": "kn_nep_katastrske_obcine_h",
+      "index_name": "katastrske_obcine_h_ko_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX katastrske_obcine_h_ko_id_idx ON public.kn_nep_katastrske_obcine_h USING btree (ko_id)",
+      "key_columns": [
+        "ko_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_katastrske_obcine_h",
+      "index_name": "kn_nep_katastrske_obcine_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_katastrske_obcine_h_geom_idx ON public.kn_nep_katastrske_obcine_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_katastrske_obcine_h",
+      "index_name": "kn_nep_katastrske_obcine_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_katastrske_obcine_h_pkey ON public.kn_nep_katastrske_obcine_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_prostori_h_datum_do_idx ON public.kn_nep_prostori_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_del_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_prostori_h_del_stavbe_id_idx ON public.kn_nep_prostori_h USING btree (del_stavbe_id)",
+      "key_columns": [
+        "del_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_prostori_h_pkey ON public.kn_nep_prostori_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_prostori_h_datum_od_idx ON public.kn_nep_prostori_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_prostori_h_pk ON public.kn_nep_prostori_h USING btree (prostor_h_id)",
+      "key_columns": [
+        "prostor_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "index_name": "kn_nep_prostori_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_prostori_h_datum_sys_idx ON public.kn_nep_prostori_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_centroid_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_centroid_h_pk ON public.kn_nep_stavbe_centroidi_h USING btree (stavba_h_id)",
+      "key_columns": [
+        "stavba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_do_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_sys_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_gid_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_gid_index ON public.kn_nep_stavbe_centroidi_h USING btree (gid)",
+      "key_columns": [
+        "gid"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_stavba_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_stavba_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (stavba_id)",
+      "key_columns": [
+        "stavba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_nosilna_konstrukcija_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_nosilna_konstrukcija_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (nosilna_konstrukcija_id)",
+      "key_columns": [
+        "nosilna_konstrukcija_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_tip_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_tip_stavbe_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (tip_stavbe_id)",
+      "key_columns": [
+        "tip_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h___mod_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h___mod_index ON public.kn_nep_stavbe_centroidi_h USING btree (__mod)",
+      "key_columns": [
+        "__mod"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_od_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_geom_idx ON public.kn_nep_stavbe_centroidi_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "index_name": "kn_nep_stavbe_centroidi_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_centroidi_h_pkey ON public.kn_nep_stavbe_centroidi_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_obcine_h",
+      "index_name": "kn_nep_rpe_obcine_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_obcine_h_geom_idx ON public.kn_nep_rpe_obcine_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_obcine_h",
+      "index_name": "kn_nep_rpe_obcine_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_rpe_obcine_h_pkey ON public.kn_nep_rpe_obcine_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "index_name": "kn_nep_rpe_ulice_h_datum_order_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_ulice_h_datum_order_idx ON public.kn_nep_rpe_ulice_h USING btree (datum_do DESC, datum_sys DESC)",
+      "key_columns": [
+        "datum_do",
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "index_name": "kn_nep_rpe_ulice_h_datum_range_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_ulice_h_datum_range_idx ON public.kn_nep_rpe_ulice_h USING btree (datum_od, datum_do)",
+      "key_columns": [
+        "datum_od",
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "index_name": "kn_nep_rpe_ulice_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_ulice_h_geom_idx ON public.kn_nep_rpe_ulice_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "index_name": "kn_nep_rpe_ulice_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_rpe_ulice_h_pkey ON public.kn_nep_rpe_ulice_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "index_name": "kn_nep_rpe_ulice_h_ulica_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_ulice_h_ulica_id_idx ON public.kn_nep_rpe_ulice_h USING btree (ulica_id)",
+      "key_columns": [
+        "ulica_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sifranti",
+      "index_name": "kn_nep_sifranti_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_sifranti_pkey ON public.kn_nep_sifranti USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_do_idx ON public.kn_nep_stanovanja_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_sys_idx ON public.kn_nep_stanovanja_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stanovanja_h_pk ON public.kn_nep_stanovanja_h USING btree (stanovanje_h_id)",
+      "key_columns": [
+        "stanovanje_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_stanovanje_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stanovanja_h_stanovanje_id_idx ON public.kn_nep_stanovanja_h USING btree (stanovanje_id)",
+      "key_columns": [
+        "stanovanje_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_od_idx ON public.kn_nep_stanovanja_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stanovanja_h_id_idx ON public.kn_nep_stanovanja_h USING btree (stanovanje_id)",
+      "key_columns": [
+        "stanovanje_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "index_name": "kn_nep_stanovanja_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stanovanja_h_pkey ON public.kn_nep_stanovanja_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_do_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_od_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_sys_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_geom_idx ON public.kn_nep_stavbe_obrisi_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_obrisi_h_pkey ON public.kn_nep_stavbe_obrisi_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_stavba_h_id_idx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_obrisi_h_stavba_h_id_idx ON public.kn_nep_stavbe_obrisi_h USING btree (stavba_h_id)",
+      "key_columns": [
+        "stavba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "index_name": "kn_nep_stavbe_obrisi_h_stavba_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_stavba_id_idx ON public.kn_nep_stavbe_obrisi_h USING btree (stavba_id)",
+      "key_columns": [
+        "stavba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_h_pk ON public.kn_nep_stavbe_zps_h USING btree (stavba_h_id)",
+      "key_columns": [
+        "stavba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_sys_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_zps_h_geom_idx ON public.kn_nep_stavbe_zps_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_zps_h_pkey ON public.kn_nep_stavbe_zps_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_do_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_od_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "index_name": "kn_nep_stavbe_zps_h_stavba_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_zps_h_stavba_id_idx ON public.kn_nep_stavbe_zps_h USING btree (stavba_id)",
+      "key_columns": [
+        "stavba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_do_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_od_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_sys_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_h_id_idx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_h_id_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (dejanska_raba_h_id)",
+      "key_columns": [
+        "dejanska_raba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_id_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_id_index ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (dejanska_raba_id)",
+      "key_columns": [
+        "dejanska_raba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_geom_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "index_name": "kn_nep_ostalo_dejanske_rabe_parcel_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_pkey ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "index_name": "kn_nep_ostalo_gozdno_gosp_obm_six",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_gozdno_gosp_obm_six ON public.kn_nep_ostalo_gozdno_gosp_obm USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "index_name": "kn_nep_ostalo_gozdno_gosp_obm_uk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_uk ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (ggo, odsek)",
+      "key_columns": [
+        "ggo",
+        "odsek"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "index_name": "kn_nep_ostalo_gozdno_gosp_obm_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_pkey ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "index_name": "kn_nep_ostalo_gozdno_gosp_obm_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_pk ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (gozdno_gosp_obm_id)",
+      "key_columns": [
+        "gozdno_gosp_obm_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "index_name": "kn_nep_ostalo_gozdno_gosp_obm_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_gozdno_gosp_obm_geom_idx ON public.kn_nep_ostalo_gozdno_gosp_obm USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_namenske_rabe",
+      "index_name": "kn_nep_ostalo_namenske_rabe_namenska_raba_id_idx",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_namenske_rabe_namenska_raba_id_idx ON public.kn_nep_ostalo_namenske_rabe USING btree (namenska_raba_id)",
+      "key_columns": [
+        "namenska_raba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_namenske_rabe",
+      "index_name": "kn_nep_ostalo_namenske_rabe_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_namenske_rabe_datum_sys_idx ON public.kn_nep_ostalo_namenske_rabe USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_namenske_rabe",
+      "index_name": "kn_nep_ostalo_namenske_rabe_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_namenske_rabe_geom_idx ON public.kn_nep_ostalo_namenske_rabe USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_namenske_rabe",
+      "index_name": "kn_nep_ostalo_namenske_rabe_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_namenske_rabe_pkey ON public.kn_nep_ostalo_namenske_rabe USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_parcela_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_id)",
+      "key_columns": [
+        "parcela_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_nam_rabe_h_parc_x_nam_raba_id_index",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_nam_rabe_h_parc_x_nam_raba_id_index ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_x_namenska_raba_id)",
+      "key_columns": [
+        "parcela_x_namenska_raba_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_pk ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_x_namenska_raba_h_id)",
+      "key_columns": [
+        "parcela_x_namenska_raba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_delez_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_delez_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (delez)",
+      "key_columns": [
+        "delez"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_vr_nam_rabe_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_vr_nam_rabe_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (vrsta_namenske_rabe_id)",
+      "key_columns": [
+        "vrsta_namenske_rabe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_datum_do_idx ON public.kn_nep_parcele_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_datum_od_idx ON public.kn_nep_parcele_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_datum_sys_idx ON public.kn_nep_parcele_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_geom_idx ON public.kn_nep_parcele_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_idx01",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_idx01 ON public.kn_nep_parcele_h USING btree (upravni_status_id)",
+      "key_columns": [
+        "upravni_status_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_ko_st_parcele_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_ko_st_parcele_idx ON public.kn_nep_parcele_h USING btree (ko_id, st_parcele)",
+      "key_columns": [
+        "ko_id",
+        "st_parcele"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_parcela_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_parcele_h_parcela_id_idx ON public.kn_nep_parcele_h USING btree (parcela_id)",
+      "key_columns": [
+        "parcela_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_parcele_h_pk ON public.kn_nep_parcele_h USING btree (parcela_h_id)",
+      "key_columns": [
+        "parcela_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "index_name": "kn_nep_parcele_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_parcele_h_pkey ON public.kn_nep_parcele_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_naselja_h",
+      "index_name": "kn_nep_rpe_naselja_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_rpe_naselja_h_geom_idx ON public.kn_nep_rpe_naselja_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_rpe_naselja_h",
+      "index_name": "kn_nep_rpe_naselja_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_rpe_naselja_h_pkey ON public.kn_nep_rpe_naselja_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "index_name": "kn_nep_stavbe_parcele_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_geom_idx ON public.kn_nep_stavbe_parcele_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "index_name": "kn_nep_stavbe_parcele_h_geom_six",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_geom_six ON public.kn_nep_stavbe_parcele_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "index_name": "kn_nep_stavbe_parcele_h_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_id_idx ON public.kn_nep_stavbe_parcele_h USING btree (stavba_parcela_id)",
+      "key_columns": [
+        "stavba_parcela_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "index_name": "kn_nep_stavbe_parcele_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_parcele_h_pk ON public.kn_nep_stavbe_parcele_h USING btree (stavba_parcela_h_id)",
+      "key_columns": [
+        "stavba_parcela_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "index_name": "kn_nep_stavbe_parcele_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_parcele_h_pkey ON public.kn_nep_stavbe_parcele_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_datum_do_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_del_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_del_stavbe_id_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (del_stavbe_id)",
+      "key_columns": [
+        "del_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_geom_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_geom_idx ON public.kn_nep_sestavine_delov_stavb_h USING gist (geom)",
+      "key_columns": [
+        "geom"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_sestavine_delov_stavb_h_pkey ON public.kn_nep_sestavine_delov_stavb_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_datum_sys_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_vrsta_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_vrsta_id_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (vrsta_id)",
+      "key_columns": [
+        "vrsta_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_datum_od_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "index_name": "kn_nep_sestavine_delov_stavb_h_sestavina_dela_stavbe_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_sestavine_delov_stavb_h_sestavina_dela_stavbe_id_idx ON public.kn_nep_sestavine_delov_stavb_h USING btree (sestavina_dela_stavbe_id)",
+      "key_columns": [
+        "sestavina_dela_stavbe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_delez_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_delez_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (delez)",
+      "key_columns": [
+        "delez"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_kg_vr_dej_rabe_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_kg_vr_dej_rabe_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (kg_vrsta_dejanske_rabe_id)",
+      "key_columns": [
+        "kg_vrsta_dejanske_rabe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_parcela_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (parcela_id)",
+      "key_columns": [
+        "parcela_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_posoddokg_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_posoddokg_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (postopek_id_od, postopek_id_do, kg_vrsta_dejanske_rabe_id)",
+      "key_columns": [
+        "postopek_id_od",
+        "postopek_id_do",
+        "kg_vrsta_dejanske_rabe_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "index_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_pk ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (parcela_x_dejanska_raba_h_id)",
+      "key_columns": [
+        "parcela_x_dejanska_raba_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_od_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_od)",
+      "key_columns": [
+        "datum_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_parcela_id_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcela_id)",
+      "key_columns": [
+        "parcela_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcele_x_gozdno_gosp_obm_h_id)",
+      "key_columns": [
+        "parcele_x_gozdno_gosp_obm_h_id"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_do_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_do)",
+      "key_columns": [
+        "datum_do"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_idposd_uk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_idposd_uk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcele_x_gozdno_gosp_obm_id, postopek_id_od)",
+      "key_columns": [
+        "parcele_x_gozdno_gosp_obm_id",
+        "postopek_id_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_sys_idx",
+      "indisunique": false,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_sys)",
+      "key_columns": [
+        "datum_sys"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pcidposod_uk",
+      "indisunique": true,
+      "indisprimary": false,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pcidposod_uk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcela_id, postopek_id_od)",
+      "key_columns": [
+        "parcela_id",
+        "postopek_id_od"
+      ]
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "index_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey",
+      "indisunique": true,
+      "indisprimary": true,
+      "indisvalid": true,
+      "indisready": true,
+      "partial": false,
+      "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (id)",
+      "key_columns": [
+        "id"
+      ]
+    }
+  ],
+  "constraints": [
+    {
+      "table_name": "ev_del_stavbe",
+      "conname": "ev_del_stavbe_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_del_stavbe_cona_h",
+      "conname": "ev_del_stavbe_cona_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota",
+      "conname": "ev_del_stavbe_enota_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "conname": "ev_del_stavbe_h_jn_del_stavbe_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_del_stavbe_pk)"
+    },
+    {
+      "table_name": "ev_del_stavbe_h",
+      "conname": "ev_del_stavbe_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "conname": "dst_pripis_podatki_pk_uk",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (dst_pripis_podatki_pk)"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "conname": "ev_dst_pripis_podatki_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_g_ceste_l_h",
+      "conname": "ev_g_ceste_l_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_g_el_energija_l_h",
+      "conname": "ev_g_el_energija_l_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_g_zeleznice_l_h",
+      "conname": "ev_g_zeleznice_l_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_gurs_oseba_h",
+      "conname": "ev_gurs_oseba_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_obcina_h",
+      "conname": "ev_obcina_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_oseba_h",
+      "conname": "ev_oseba_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_oseba_pe_h",
+      "conname": "ev_oseba_pe_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_del_cona_h",
+      "conname": "ev_parc_del_cona_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "conname": "ev_parc_del_enota_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "conname": "ev_parc_del_h_jn_parcela_del_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_parcela_del_pk)"
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "conname": "ev_parc_del_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "conname": "ev_parc_enota_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "conname": "ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_parcela_enota_pk)"
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "conname": "ev_parc_enota_h_2025_danes_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_pripis_podatki_h",
+      "conname": "ev_parc_pripis_podatki_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_parc_pripis_podatki_h",
+      "conname": "ev_parc_pripis_podatki_h_uk",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (parc_pripis_podatki_pk)"
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "conname": "ev_parcela_h_jn_parcela_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_parcela_pk)"
+    },
+    {
+      "table_name": "ev_parcela_h",
+      "conname": "ev_parcela_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_pe_dst_h",
+      "conname": "ev_pe_dst_h_jn_pe_dst_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_pe_dst_pk)"
+    },
+    {
+      "table_name": "ev_pe_dst_h",
+      "conname": "ev_pe_dst_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_pe_parc_h",
+      "conname": "ev_pe_parc_h_jn_pe_parc_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_pe_parc_pk)"
+    },
+    {
+      "table_name": "ev_pe_parc_h",
+      "conname": "ev_pe_parc_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_posebna_enota",
+      "conname": "ev_posebna_enota_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "conname": "ev_posebna_enota_h_jn_posebna_enota_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_posebna_enota_pk)"
+    },
+    {
+      "table_name": "ev_posebna_enota_h",
+      "conname": "ev_posebna_enota_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_posebna_enota_pod_h",
+      "conname": "ev_posebna_enota_pod_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_prostor_h",
+      "conname": "ev_prostor_h_jn_prostor_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_prostor_pk)"
+    },
+    {
+      "table_name": "ev_prostor_h",
+      "conname": "ev_prostor_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_dr_dst_h",
+      "conname": "ev_sif_dr_dst_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_dr_pros_h",
+      "conname": "ev_sif_dr_pros_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_kontrukcija_h",
+      "conname": "ev_sif_kontrukcija_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_lega_h",
+      "conname": "ev_sif_lega_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "conname": "ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_del_st_enota_pk)"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "conname": "ev_del_stavbe_enota_h_2025_danes_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_nrp_parc_h",
+      "conname": "ev_nrp_parc_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_dr_parc_h",
+      "conname": "ev_sif_dr_parc_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_model_h",
+      "conname": "ev_sif_model_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_vpliv_h",
+      "conname": "ev_sif_vpliv_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sif_vpliv_model_h",
+      "conname": "ev_sif_vpliv_model_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_sta_par_h",
+      "conname": "ev_sta_par_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_stavba",
+      "conname": "ev_stavba_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_stavba_h",
+      "conname": "ev_stavba_h_jn_sta_pk_key",
+      "contype": "u",
+      "convalidated": true,
+      "definition": "UNIQUE (jn_sta_pk)"
+    },
+    {
+      "table_name": "ev_stavba_h",
+      "conname": "ev_stavba_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_upravljalec_dst_h",
+      "conname": "ev_upravljalec_dst_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "ev_upravljalec_parc_h",
+      "conname": "ev_upravljalec_parc_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_deli_stavb_h",
+      "conname": "kn_nep_deli_stavb_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_etaze_h",
+      "conname": "kn_nep_etaze_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_etaze_x_deli_stavb_h",
+      "conname": "kn_nep_etaze_x_deli_stavb_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_hisne_stevilke_h",
+      "conname": "kn_nep_hisne_stevilke_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_katastrske_obcine_h",
+      "conname": "kn_nep_katastrske_obcine_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_prostori_h",
+      "conname": "kn_nep_prostori_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_stavbe_centroidi_h",
+      "conname": "kn_nep_stavbe_centroidi_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_rpe_obcine_h",
+      "conname": "kn_nep_rpe_obcine_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_rpe_ulice_h",
+      "conname": "kn_nep_rpe_ulice_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_sifranti",
+      "conname": "kn_nep_sifranti_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_stanovanja_h",
+      "conname": "kn_nep_stanovanja_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_stavbe_obrisi_h",
+      "conname": "kn_nep_stavbe_obrisi_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_stavbe_zps_h",
+      "conname": "kn_nep_stavbe_zps_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "conname": "kn_nep_ostalo_dejanske_rabe_parcel_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_gozdno_gosp_obm",
+      "conname": "kn_nep_ostalo_gozdno_gosp_obm_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_namenske_rabe",
+      "conname": "kn_nep_ostalo_namenske_rabe_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "conname": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_parcele_h",
+      "conname": "kn_nep_parcele_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_rpe_naselja_h",
+      "conname": "kn_nep_rpe_naselja_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_stavbe_parcele_h",
+      "conname": "kn_nep_stavbe_parcele_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_sestavine_delov_stavb_h",
+      "conname": "kn_nep_sestavine_delov_stavb_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "conname": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    },
+    {
+      "table_name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "conname": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey",
+      "contype": "p",
+      "convalidated": true,
+      "definition": "PRIMARY KEY (id)"
+    }
+  ]
+}

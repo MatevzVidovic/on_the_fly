@@ -1,0 +1,282 @@
+[
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "company_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "name"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "type"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "created_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "updated_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "created_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "updated_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_create"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_update"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_delete"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "restricted_access"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "sync_job"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_cstore"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_render_distinct"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "type_params"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "is_locked"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "custom_renderers"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "sql_query"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "allow_notes"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "attribute_tables",
+    "column_name": "display_globally"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "sfc_item_attribute_table_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "sfc_item_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "attribute_table_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "layer_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "position_key"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "order"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "var_mapping"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "created_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "updated_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "created_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "updated_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "attribute_field_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "sfc_tool_position"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_item_attribute_table",
+    "column_name": "sfc_tool_content_position"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "sfc_item_id"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "css"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "js"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "html"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "position_keys"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "vars"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "created_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "updated_at"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "created_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "updated_by"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "title"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "description"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_html"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_js"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_css"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "css_path"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "html_path"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "js_path"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_css_path"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_js_path"
+  },
+  {
+    "table_schema": "public",
+    "table_name": "sfc_items",
+    "column_name": "button_html_path"
+  }
+]

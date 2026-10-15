@@ -1,0 +1,57 @@
+[
+  {
+    "schema": "public",
+    "table_name": "ev_del_stavbe_enota",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2020_2024",
+    "has_id_model_ver": false
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_del_stavbe_enota_h_2025_danes",
+    "has_id_model_ver": false
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2020",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2021",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2022",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2023",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2024",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_parc_enota_h_2025_danes",
+    "has_id_model_ver": true
+  },
+  {
+    "schema": "public",
+    "table_name": "ev_posebna_enota",
+    "has_id_model_ver": true
+  }
+]

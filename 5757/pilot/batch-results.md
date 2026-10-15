@@ -28,3 +28,5 @@ Errors remain errors: no difference is calculated from a missing ISAM amount.
 For building part **29974237**, the corrected difference is **485.68**, not the old 8077.12 obtained with different model generations. This remains a candidate for input/intermediate investigation, not proof that the ISAM formula is wrong. Existing ISAM values may predate the decimal migration.
 
 [Full source IDs, revision numbers, validity intervals and errors](latest-comparison.json) · [CSV](latest-comparison.csv) · [How to run](README.md) · [Exported model mappings](../model-mapping/README.md)
+
+The first unit now has a [detailed arithmetic investigation](29974237/README.md): the main discrepancy is coefficient `0.04` versus source `0.036`, plus a smaller size difference and stored-total rounding residual.

@@ -1,0 +1,543 @@
+<!-- verzija: 66 -->
+<model model="IND">
+<formula><![CDATA[vtds * f_rel * f_obn * f_last * f_nk + zemljisce * vtz1]]></formula>
+
+<referencni_objekt ccsi_klasifikacija="ccsi-17" izmera="500" starost_od="2025" starost_do="2025" zemljisce="650" pribitek="false"/>
+<relacijske_tabele>
+<relacijska_tabela id="rel-26">
+<osnova izmera_od="0" izmera_do="249" starost_od="1000" starost_do="1945" osnova="0" m2="0.036"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1946" starost_do="1954" osnova="0" m2="0.048"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1955" starost_do="1964" osnova="0" m2="0.06"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1965" starost_do="1974" osnova="0" m2="0.084"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1975" starost_do="1979" osnova="0" m2="0.104"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1980" starost_do="1984" osnova="0" m2="0.124"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1985" starost_do="1989" osnova="0" m2="0.14"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1990" starost_do="1994" osnova="0" m2="0.156"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="1995" starost_do="1999" osnova="0" m2="0.168"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2000" starost_do="2004" osnova="0" m2="0.184"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2005" starost_do="2009" osnova="0" m2="0.2"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2010" starost_do="2014" osnova="0" m2="0.22"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2015" starost_do="2019" osnova="0" m2="0.228"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2020" starost_do="2024" osnova="0" m2="0.236"/>
+<osnova izmera_od="0" izmera_do="249" starost_od="2025" starost_do="3000" osnova="0" m2="0.236"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1000" starost_do="1945" osnova="9" m2="0.028"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1946" starost_do="1954" osnova="12" m2="0.036"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1955" starost_do="1964" osnova="15" m2="0.04"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1965" starost_do="1974" osnova="21" m2="0.056"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1975" starost_do="1979" osnova="26" m2="0.072"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1980" starost_do="1984" osnova="31" m2="0.088"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1985" starost_do="1989" osnova="35" m2="0.1"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1990" starost_do="1994" osnova="39" m2="0.108"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="1995" starost_do="1999" osnova="42" m2="0.116"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2000" starost_do="2004" osnova="46" m2="0.128"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2005" starost_do="2009" osnova="50" m2="0.14"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2010" starost_do="2014" osnova="55" m2="0.152"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2015" starost_do="2019" osnova="57" m2="0.16"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2020" starost_do="2024" osnova="59" m2="0.164"/>
+<osnova izmera_od="250" izmera_do="499" starost_od="2025" starost_do="3000" osnova="59" m2="0.164"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1000" starost_do="1945" osnova="16" m2="0.024"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1946" starost_do="1954" osnova="21" m2="0.032"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1955" starost_do="1964" osnova="25" m2="0.038"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1965" starost_do="1974" osnova="35" m2="0.052"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1975" starost_do="1979" osnova="44" m2="0.066"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1980" starost_do="1984" osnova="53" m2="0.08"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1985" starost_do="1989" osnova="60" m2="0.09"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1990" starost_do="1994" osnova="66" m2="0.1"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="1995" starost_do="1999" osnova="71" m2="0.106"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2000" starost_do="2004" osnova="78" m2="0.118"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2005" starost_do="2009" osnova="85" m2="0.128"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2010" starost_do="2014" osnova="93" m2="0.14"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2015" starost_do="2019" osnova="97" m2="0.146"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2020" starost_do="2024" osnova="100" m2="0.15"/>
+<osnova izmera_od="500" izmera_do="999" starost_od="2025" starost_do="3000" osnova="100" m2="0.15"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1000" starost_do="1945" osnova="28" m2="0.022"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1946" starost_do="1954" osnova="37" m2="0.029"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1955" starost_do="1964" osnova="44" m2="0.035"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1965" starost_do="1974" osnova="61" m2="0.049"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1975" starost_do="1979" osnova="77" m2="0.062"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1980" starost_do="1984" osnova="93" m2="0.074"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1985" starost_do="1989" osnova="105" m2="0.084"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1990" starost_do="1994" osnova="116" m2="0.092"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="1995" starost_do="1999" osnova="124" m2="0.1"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2000" starost_do="2004" osnova="137" m2="0.109"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2005" starost_do="2009" osnova="149" m2="0.119"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2010" starost_do="2014" osnova="163" m2="0.13"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2015" starost_do="2019" osnova="170" m2="0.136"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2020" starost_do="2024" osnova="175" m2="0.14"/>
+<osnova izmera_od="1000" izmera_do="1999" starost_od="2025" starost_do="3000" osnova="175" m2="0.14"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1000" starost_do="1945" osnova="50" m2="0.0213"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1946" starost_do="1954" osnova="66" m2="0.0277"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1955" starost_do="1964" osnova="79" m2="0.033"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1965" starost_do="1974" osnova="110" m2="0.0463"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1975" starost_do="1979" osnova="139" m2="0.0577"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1980" starost_do="1984" osnova="167" m2="0.0697"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1985" starost_do="1989" osnova="189" m2="0.079"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1990" starost_do="1994" osnova="208" m2="0.087"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="1995" starost_do="1999" osnova="224" m2="0.0933"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2000" starost_do="2004" osnova="246" m2="0.1027"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2005" starost_do="2009" osnova="268" m2="0.112"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2010" starost_do="2014" osnova="293" m2="0.1223"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2015" starost_do="2019" osnova="306" m2="0.1277"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2020" starost_do="2024" osnova="315" m2="0.1317"/>
+<osnova izmera_od="2000" izmera_do="4999" starost_od="2025" starost_do="3000" osnova="315" m2="0.1317"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1000" starost_do="1945" osnova="114" m2="0.019"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1946" starost_do="1954" osnova="149" m2="0.025"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1955" starost_do="1964" osnova="178" m2="0.0296"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1965" starost_do="1974" osnova="249" m2="0.0416"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1975" starost_do="1979" osnova="312" m2="0.0524"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1980" starost_do="1984" osnova="376" m2="0.0632"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1985" starost_do="1989" osnova="426" m2="0.0714"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1990" starost_do="1994" osnova="469" m2="0.0784"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="1995" starost_do="1999" osnova="504" m2="0.0846"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2000" starost_do="2004" osnova="554" m2="0.0928"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2005" starost_do="2009" osnova="604" m2="0.101"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2010" starost_do="2014" osnova="660" m2="0.1108"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2015" starost_do="2019" osnova="689" m2="0.1154"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2020" starost_do="2024" osnova="710" m2="0.119"/>
+<osnova izmera_od="5000" izmera_do="9999" starost_od="2025" starost_do="3000" osnova="710" m2="0.119"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1000" starost_do="1945" osnova="209" m2="0.0127"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1946" starost_do="1954" osnova="274" m2="0.0167"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1955" starost_do="1964" osnova="326" m2="0.0199"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1965" starost_do="1974" osnova="457" m2="0.0278"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1975" starost_do="1979" osnova="574" m2="0.035"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1980" starost_do="1984" osnova="692" m2="0.0421"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1985" starost_do="1989" osnova="783" m2="0.0477"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1990" starost_do="1994" osnova="861" m2="0.0525"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="1995" starost_do="1999" osnova="927" m2="0.0564"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2000" starost_do="2004" osnova="1018" m2="0.062"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2005" starost_do="2009" osnova="1109" m2="0.0676"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2010" starost_do="2014" osnova="1214" m2="0.0739"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2015" starost_do="2019" osnova="1266" m2="0.0771"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2020" starost_do="2024" osnova="1305" m2="0.0795"/>
+<osnova izmera_od="10000" izmera_do="19999" starost_od="2025" starost_do="3000" osnova="1305" m2="0.0795"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1000" starost_do="1945" osnova="336" m2="0.0104"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1946" starost_do="1954" osnova="441" m2="0.0137"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1955" starost_do="1964" osnova="525" m2="0.0163"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1965" starost_do="1974" osnova="735" m2="0.0228"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1975" starost_do="1979" osnova="924" m2="0.0286"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1980" starost_do="1984" osnova="1113" m2="0.0345"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1985" starost_do="1989" osnova="1260" m2="0.039"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1990" starost_do="1994" osnova="1386" m2="0.0429"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="1995" starost_do="1999" osnova="1491" m2="0.0462"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2000" starost_do="2004" osnova="1638" m2="0.0507"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2005" starost_do="2009" osnova="1785" m2="0.0553"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2010" starost_do="2014" osnova="1953" m2="0.0605"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2015" starost_do="2019" osnova="2037" m2="0.0631"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2020" starost_do="2024" osnova="2100" m2="0.065"/>
+<osnova izmera_od="20000" izmera_do="999999" starost_od="2025" starost_do="3000" osnova="2100" m2="0.065"/>
+</relacijska_tabela>
+</relacijske_tabele>
+<faktorji_obnov>
+<faktorji_obnove id="fobn-1" aktivno_leto="2025" tzd="80" ponder_obnove_fasade="0.3" ponder_obnove_strehe="0.3" ponder_obnove_oken="0.25" ponder_obnove_instalacij="0.15">
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1946" obnova_do="1954" faktor="1.23"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1955" obnova_do="1964" faktor="1.33"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1965" obnova_do="1974" faktor="1.44"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1975" obnova_do="1979" faktor="1.54"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1980" obnova_do="1984" faktor="1.64"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1985" obnova_do="1989" faktor="1.74"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1990" obnova_do="1994" faktor="1.84"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="1995" obnova_do="1999" faktor="1.9"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2000" obnova_do="2004" faktor="2.02"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2005" obnova_do="2009" faktor="2.08"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2010" obnova_do="2014" faktor="2.13"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2015" obnova_do="2019" faktor="2.17"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2020" obnova_do="2024" faktor="2.19"/>
+<faktor_obnove starost_od="1000" starost_do="1945" obnova_od="2025" obnova_do="3000" faktor="2.22"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1955" obnova_do="1964" faktor="1.19"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1965" obnova_do="1974" faktor="1.3"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1975" obnova_do="1979" faktor="1.37"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1980" obnova_do="1984" faktor="1.49"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1985" obnova_do="1989" faktor="1.57"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1990" obnova_do="1994" faktor="1.68"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="1995" obnova_do="1999" faktor="1.78"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2000" obnova_do="2004" faktor="1.86"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2005" obnova_do="2009" faktor="1.94"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2010" obnova_do="2014" faktor="1.99"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2015" obnova_do="2019" faktor="2"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2020" obnova_do="2024" faktor="2.02"/>
+<faktor_obnove starost_od="1946" starost_do="1954" obnova_od="2025" obnova_do="3000" faktor="2.05"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1965" obnova_do="1974" faktor="1.16"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1975" obnova_do="1979" faktor="1.26"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1980" obnova_do="1984" faktor="1.36"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1985" obnova_do="1989" faktor="1.42"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1990" obnova_do="1994" faktor="1.54"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="1995" obnova_do="1999" faktor="1.56"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2000" obnova_do="2004" faktor="1.63"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2005" obnova_do="2009" faktor="1.68"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2010" obnova_do="2014" faktor="1.73"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2015" obnova_do="2019" faktor="1.83"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2020" obnova_do="2024" faktor="1.85"/>
+<faktor_obnove starost_od="1955" starost_do="1964" obnova_od="2025" obnova_do="3000" faktor="1.88"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1975" obnova_do="1979" faktor="1.14"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1980" obnova_do="1984" faktor="1.28"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1985" obnova_do="1989" faktor="1.35"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1990" obnova_do="1994" faktor="1.45"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="1995" obnova_do="1999" faktor="1.49"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2000" obnova_do="2004" faktor="1.54"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2005" obnova_do="2009" faktor="1.61"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2010" obnova_do="2014" faktor="1.65"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2015" obnova_do="2019" faktor="1.69"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2020" obnova_do="2024" faktor="1.71"/>
+<faktor_obnove starost_od="1965" starost_do="1974" obnova_od="2025" obnova_do="3000" faktor="1.74"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1980" obnova_do="1984" faktor="1.12"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1985" obnova_do="1989" faktor="1.24"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1990" obnova_do="1994" faktor="1.33"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="1995" obnova_do="1999" faktor="1.41"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2000" obnova_do="2004" faktor="1.47"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2005" obnova_do="2009" faktor="1.52"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2010" obnova_do="2014" faktor="1.59"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2015" obnova_do="2019" faktor="1.62"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2020" obnova_do="2024" faktor="1.64"/>
+<faktor_obnove starost_od="1975" starost_do="1979" obnova_od="2025" obnova_do="3000" faktor="1.67"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1985" obnova_do="1989" faktor="1.1"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1990" obnova_do="1994" faktor="1.18"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="1995" obnova_do="1999" faktor="1.31"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2000" obnova_do="2004" faktor="1.37"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2005" obnova_do="2009" faktor="1.43"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2010" obnova_do="2014" faktor="1.48"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2015" obnova_do="2019" faktor="1.51"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2020" obnova_do="2024" faktor="1.54"/>
+<faktor_obnove starost_od="1980" starost_do="1984" obnova_od="2025" obnova_do="3000" faktor="1.57"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1990" obnova_do="1994" faktor="1.07"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="1995" obnova_do="1999" faktor="1.15"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2000" obnova_do="2004" faktor="1.23"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2005" obnova_do="2009" faktor="1.27"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2010" obnova_do="2014" faktor="1.35"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2015" obnova_do="2019" faktor="1.39"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2020" obnova_do="2024" faktor="1.41"/>
+<faktor_obnove starost_od="1985" starost_do="1989" obnova_od="2025" obnova_do="3000" faktor="1.44"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="1995" obnova_do="1999" faktor="1.05"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2000" obnova_do="2004" faktor="1.13"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2005" obnova_do="2009" faktor="1.15"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2010" obnova_do="2014" faktor="1.22"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2015" obnova_do="2019" faktor="1.26"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2020" obnova_do="2024" faktor="1.28"/>
+<faktor_obnove starost_od="1990" starost_do="1994" obnova_od="2025" obnova_do="3000" faktor="1.31"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2000" obnova_do="2004" faktor="1.04"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2005" obnova_do="2009" faktor="1.07"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2010" obnova_do="2014" faktor="1.12"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2015" obnova_do="2019" faktor="1.16"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2020" obnova_do="2024" faktor="1.17"/>
+<faktor_obnove starost_od="1995" starost_do="1999" obnova_od="2025" obnova_do="3000" faktor="1.2"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2005" obnova_do="2009" faktor="1.03"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2010" obnova_do="2014" faktor="1.06"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2015" obnova_do="2019" faktor="1.1"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2020" obnova_do="2024" faktor="1.11"/>
+<faktor_obnove starost_od="2000" starost_do="2004" obnova_od="2025" obnova_do="3000" faktor="1.14"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2005" obnova_do="2009" faktor="1"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2010" obnova_do="2014" faktor="1.02"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2015" obnova_do="2019" faktor="1.04"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2020" obnova_do="2024" faktor="1.06"/>
+<faktor_obnove starost_od="2005" starost_do="2009" obnova_od="2025" obnova_do="3000" faktor="1.09"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2005" obnova_do="2009" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2010" obnova_do="2014" faktor="1"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2015" obnova_do="2019" faktor="1.01"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2020" obnova_do="2024" faktor="1.03"/>
+<faktor_obnove starost_od="2010" starost_do="2014" obnova_od="2025" obnova_do="3000" faktor="1.05"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2005" obnova_do="2009" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2010" obnova_do="2014" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2015" obnova_do="2019" faktor="1"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2020" obnova_do="2024" faktor="1.01"/>
+<faktor_obnove starost_od="2015" starost_do="2019" obnova_od="2025" obnova_do="3000" faktor="1.02"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2005" obnova_do="2009" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2010" obnova_do="2014" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2015" obnova_do="2019" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2020" obnova_do="2024" faktor="1"/>
+<faktor_obnove starost_od="2020" starost_do="2024" obnova_od="2025" obnova_do="3000" faktor="1.01"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1000" obnova_do="1945" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1946" obnova_do="1954" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1955" obnova_do="1964" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1965" obnova_do="1974" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1975" obnova_do="1979" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1980" obnova_do="1984" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1985" obnova_do="1989" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1990" obnova_do="1994" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="1995" obnova_do="1999" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2000" obnova_do="2004" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2005" obnova_do="2009" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2010" obnova_do="2014" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2015" obnova_do="2019" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2020" obnova_do="2024" faktor="1"/>
+<faktor_obnove starost_od="2025" starost_do="3000" obnova_od="2025" obnova_do="3000" faktor="1"/>
+</faktorji_obnove>
+</faktorji_obnov>
+<vrednostne_ravni>
+<vrednostna_raven id="rvn-1" st_ravni="1" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="290000" vtz1="25"/>
+<vrednostna_raven id="rvn-2" st_ravni="2" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="310000" vtz1="40"/>
+<vrednostna_raven id="rvn-3" st_ravni="3" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="330000" vtz1="60"/>
+<vrednostna_raven id="rvn-4" st_ravni="4" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="360000" vtz1="90"/>
+<vrednostna_raven id="rvn-5" st_ravni="5" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="390000" vtz1="145"/>
+<vrednostna_raven id="rvn-6" st_ravni="6" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="420000" vtz1="210"/>
+<vrednostna_raven id="rvn-7" st_ravni="7" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="450000" vtz1="290"/>
+<vrednostna_raven id="rvn-8" st_ravni="8" faktorji_obnove="fobn-1" relacijska_tabela="rel-26" vtds="480000" vtz1="380"/>
+</vrednostne_ravni>
+
+<faktorji>
+<faktor ime="f_last" privzeto="1">
+<opis><![CDATA[Lastnosti objekta]]></opis>
+<izracun_tock>
+<tockovnik ccsi_klasifikacija="ccsi-17 ccsi-19 ccsi-21 ccsi-54" tocke_min="0" tocke_max="100">
+<kategorija tocke="80" aditivno="false">
+<opis><![CDATA[Osnova - dejanska raba nepremiÄŤnine po CC_SI klasifikaciji]]></opis>
+<grupa tocke="80" aditivno="false">
+<opis><![CDATA[CC_SI klasifikacija]]></opis>
+<postavka tocke="50" privzeto="true">
+<opis><![CDATA[17]]></opis>
+<pogoj><![CDATA[ccsi=17]]></pogoj>
+</postavka>
+<postavka tocke="80" privzeto="false">
+<opis><![CDATA[19]]></opis>
+<pogoj><![CDATA[ccsi=19]]></pogoj>
+</postavka>
+<postavka tocke="40" privzeto="false">
+<opis><![CDATA[21]]></opis>
+<pogoj><![CDATA[ccsi=21]]></pogoj>
+</postavka>
+<postavka tocke="40" privzeto="false">
+<opis><![CDATA[54]]></opis>
+<pogoj><![CDATA[ccsi=54]]></pogoj>
+</postavka>
+</grupa>
+</kategorija>
+<kategorija tocke="20" aditivno="true">
+<opis><![CDATA[Ostale lastnosti nepremiÄŤnine]]></opis>
+<grupa tocke="10" aditivno="false">
+<opis><![CDATA[svetla viĹˇina etaĹľe]]></opis>
+<postavka tocke="0" privzeto="false">
+<opis><![CDATA[h < 3.5 m]]></opis>
+<pogoj><![CDATA[svetla_visina_etaze < 3.5]]></pogoj>
+</postavka>
+<postavka tocke="3" privzeto="true">
+<opis><![CDATA[3.5 m <= h <= 6.0 m]]></opis>
+<pogoj><![CDATA[(svetla_visina_etaze >= 3.5 AND svetla_visina_etaze <= 6.0) OR svetla_visina_etaze IS NULL]]></pogoj>
+</postavka>
+<postavka tocke="5" privzeto="false">
+<opis><![CDATA[6.0 m < h <= 12.0 m]]></opis>
+<pogoj><![CDATA[(svetla_visina_etaze > 6.0 AND svetla_visina_etaze <= 12.0)]]></pogoj>
+</postavka>
+<postavka tocke="7" privzeto="false">
+<opis><![CDATA[12.0 m < h <= 20.0 m]]></opis>
+<pogoj><![CDATA[(svetla_visina_etaze > 12.0 AND svetla_visina_etaze <= 20.0)]]></pogoj>
+</postavka>
+<postavka tocke="10" privzeto="false">
+<opis><![CDATA[h > 20.0 m]]></opis>
+<pogoj><![CDATA[svetla_visina_etaze > 20.0]]></pogoj>
+</postavka>
+</grupa>
+<grupa tocke="8" aditivno="true">
+<opis><![CDATA[InĹˇtalacije]]></opis>
+<postavka tocke="3" privzeto="false">
+<opis><![CDATA[vodovod]]></opis>
+<pogoj><![CDATA[id_vodovod = 1 OR id_vodovod IS NULL]]></pogoj>
+</postavka>
+<postavka tocke="3" privzeto="false">
+<opis><![CDATA[elektrika]]></opis>
+<pogoj><![CDATA[id_elektrika = 1 OR id_elektrika IS NULL]]></pogoj>
+</postavka>
+<postavka tocke="1" privzeto="false">
+<opis><![CDATA[kanalizacija]]></opis>
+<pogoj><![CDATA[id_kanalizacija = 1]]></pogoj>
+</postavka>
+<postavka tocke="1" privzeto="false">
+<opis><![CDATA[plin]]></opis>
+<pogoj><![CDATA[id_plin = 1]]></pogoj>
+</postavka>
+</grupa>
+<grupa tocke="2" aditivno="false">
+<opis><![CDATA[Lega v stavbi]]></opis>
+<postavka tocke="0" privzeto="false">
+<opis><![CDATA[klet]]></opis>
+<pogoj><![CDATA[id_lega = 1]]></pogoj>
+</postavka>
+<postavka tocke="2" privzeto="true">
+<opis><![CDATA[pritliÄŤje]]></opis>
+<pogoj><![CDATA[id_lega = 2 OR id_lega IS NULL]]></pogoj>
+</postavka>
+<postavka tocke="0" privzeto="false">
+<opis><![CDATA[nadstropje]]></opis>
+<pogoj><![CDATA[id_lega =3]]></pogoj>
+</postavka>
+<postavka tocke="0" privzeto="false">
+<opis><![CDATA[drugo]]></opis>
+<pogoj><![CDATA[id_lega>3]]></pogoj>
+</postavka>
+</grupa>
+</kategorija>
+<izracun><![CDATA[CASE WHEN (ccsi=17) THEN 50 WHEN (ccsi=19) THEN 80 WHEN (ccsi=21) THEN 40 WHEN (ccsi=54) THEN 40 ELSE 0 END + CASE WHEN (svetla_visina_etaze < 3.5) THEN 0 WHEN ((svetla_visina_etaze >= 3.5 AND svetla_visina_etaze <= 6.0) OR svetla_visina_etaze IS NULL) THEN 3 WHEN ((svetla_visina_etaze > 6.0 AND svetla_visina_etaze <= 12.0)) THEN 5 WHEN ((svetla_visina_etaze > 12.0 AND svetla_visina_etaze <= 20.0)) THEN 7 WHEN (svetla_visina_etaze > 20.0) THEN 10 ELSE 0 END + CASE WHEN (id_vodovod = 1 OR id_vodovod IS NULL) THEN 3 ELSE 0 END + CASE WHEN (id_elektrika = 1 OR id_elektrika IS NULL) THEN 3 ELSE 0 END + CASE WHEN (id_kanalizacija = 1) THEN 1 ELSE 0 END + CASE WHEN (id_plin = 1) THEN 1 ELSE 0 END + CASE WHEN (id_lega = 1) THEN 0 WHEN (id_lega = 2 OR id_lega IS NULL) THEN 2 WHEN (id_lega =3) THEN 0 WHEN (id_lega>3) THEN 0 ELSE 0 END]]></izracun>
+</tockovnik>
+</izracun_tock>
+<izracun_faktorja>
+<razredi>
+<razred razred="1" tocke_od="0" tocke_do="40" faktor="0.68"/>
+<razred razred="2" tocke_od="41" tocke_do="44" faktor="0.72"/>
+<razred razred="3" tocke_od="45" tocke_do="52" faktor="0.82"/>
+<razred razred="4" tocke_od="53" tocke_do="61" faktor="1"/>
+<razred razred="5" tocke_od="62" tocke_do="65" faktor="1.05"/>
+<razred razred="6" tocke_od="66" tocke_do="69" faktor="1.13"/>
+<razred razred="7" tocke_od="70" tocke_do="78" faktor="1.2"/>
+<razred razred="8" tocke_od="79" tocke_do="94" faktor="3.3"/>
+<razred razred="9" tocke_od="95" tocke_do="100" faktor="3.5"/>
+<izracun><![CDATA[CASE WHEN tocke BETWEEN 0 AND 40 THEN 0.68 WHEN tocke BETWEEN 41 AND 44 THEN 0.72 WHEN tocke BETWEEN 45 AND 52 THEN 0.82 WHEN tocke BETWEEN 53 AND 61 THEN 1 WHEN tocke BETWEEN 62 AND 65 THEN 1.05 WHEN tocke BETWEEN 66 AND 69 THEN 1.13 WHEN tocke BETWEEN 70 AND 78 THEN 1.2 WHEN tocke BETWEEN 79 AND 94 THEN 3.3 WHEN tocke BETWEEN 95 AND 100 THEN 3.5 ELSE NULL END]]></izracun>
+</razredi>
+</izracun_faktorja>
+</faktor>
+<faktor ime="f_nk" privzeto="1">
+<opis><![CDATA[Nosilna konstrukcija]]></opis>
+<izracun_tock>
+<tockovnik tocke_min="0" tocke_max="100">
+<kategorija tocke="100" aditivno="false">
+<opis><![CDATA[Nosilna konstrukcija]]></opis>
+<grupa tocke="100" aditivno="false">
+<opis><![CDATA[Material nosilne konstrukcije]]></opis>
+<postavka tocke="100" privzeto="false">
+<opis><![CDATA[opeka]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 1]]></pogoj>
+</postavka>
+<postavka tocke="100" privzeto="true">
+<opis><![CDATA[beton, Ĺľelezobeton]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 2 OR id_konstrukcije IS NULL]]></pogoj>
+</postavka>
+<postavka tocke="50" privzeto="false">
+<opis><![CDATA[kamen]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 3]]></pogoj>
+</postavka>
+<postavka tocke="50" privzeto="false">
+<opis><![CDATA[les]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 4]]></pogoj>
+</postavka>
+<postavka tocke="90" privzeto="false">
+<opis><![CDATA[kombinacija razliÄŤnih materialov]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 5]]></pogoj>
+</postavka>
+<postavka tocke="100" privzeto="false">
+<opis><![CDATA[kovinska konstrukcija]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 6]]></pogoj>
+</postavka>
+<postavka tocke="90" privzeto="false">
+<opis><![CDATA[montaĹľna gradnja]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 7]]></pogoj>
+</postavka>
+<postavka tocke="90" privzeto="false">
+<opis><![CDATA[drug material]]></opis>
+<pogoj><![CDATA[id_konstrukcije = 8]]></pogoj>
+</postavka>
+</grupa>
+</kategorija>
+<izracun><![CDATA[CASE WHEN (id_konstrukcije = 1) THEN 100 WHEN (id_konstrukcije = 2 OR id_konstrukcije IS NULL) THEN 100 WHEN (id_konstrukcije = 3) THEN 50 WHEN (id_konstrukcije = 4) THEN 50 WHEN (id_konstrukcije = 5) THEN 90 WHEN (id_konstrukcije = 6) THEN 100 WHEN (id_konstrukcije = 7) THEN 90 WHEN (id_konstrukcije = 8) THEN 90 ELSE 0 END]]></izracun>
+</tockovnik>
+</izracun_tock>
+<izracun_faktorja>
+<razredi>
+<razred razred="1" tocke_od="0" tocke_do="50" faktor="0.5"/>
+<razred razred="2" tocke_od="51" tocke_do="70" faktor="0.7"/>
+<razred razred="3" tocke_od="71" tocke_do="90" faktor="0.9"/>
+<razred razred="4" tocke_od="91" tocke_do="100" faktor="1"/>
+<izracun><![CDATA[CASE WHEN tocke BETWEEN 0 AND 50 THEN 0.5 WHEN tocke BETWEEN 51 AND 70 THEN 0.7 WHEN tocke BETWEEN 71 AND 90 THEN 0.9 WHEN tocke BETWEEN 91 AND 100 THEN 1 ELSE NULL END]]></izracun>
+</razredi>
+</izracun_faktorja>
+</faktor>
+</faktorji>
+<razlaga_pojmov>
+<pojem pojem="izmera">
+<definicija><![CDATA[izmera]]></definicija>
+<opis><![CDATA[velikost (povrĹˇina za vrednostno tabelo) = izmera; 
+izmera = neto tlorisna povrĹˇina dela stavbe - 30% povrĹˇine dela stavbe (17 - nedokonÄŤan prostor) 
+Ĺ ifra prostorov (prenova REN): 17 (nedokonÄŤan prostor).]]></opis>
+</pojem>
+</razlaga_pojmov>
+</model>

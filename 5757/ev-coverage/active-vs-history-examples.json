@@ -1,0 +1,354 @@
+{
+  "building": [
+    {
+      "model": "GAR",
+      "unit": 28888343,
+      "active_rows": [
+        {
+          "unit": 28888343,
+          "id_model": "GAR",
+          "id_model_ver": 1170,
+          "jn_rev_num": 2185,
+          "vrednost": "22560",
+          "last_record_revision_date": "2025-11-02 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 28888343,
+          "id_model": "GAR",
+          "id_model_ver": 1170,
+          "jn_rev_num": 2185,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "HIS",
+      "unit": 28686586,
+      "active_rows": [
+        {
+          "unit": 28686586,
+          "id_model": "HIS",
+          "id_model_ver": 1172,
+          "jn_rev_num": 2336,
+          "vrednost": "469081.99",
+          "last_record_revision_date": "2026-05-12 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 28686586,
+          "id_model": "HIS",
+          "id_model_ver": 1172,
+          "jn_rev_num": 2336,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2026-05-12 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "IND",
+      "unit": 29765975,
+      "active_rows": [
+        {
+          "unit": 29765975,
+          "id_model": "IND",
+          "id_model_ver": 1173,
+          "jn_rev_num": 2185,
+          "vrednost": "76178.12",
+          "last_record_revision_date": "2025-11-02 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 29765975,
+          "id_model": "IND",
+          "id_model_ver": 1173,
+          "jn_rev_num": 2185,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "INP",
+      "unit": 29884004,
+      "active_rows": [
+        {
+          "unit": 29884004,
+          "id_model": "INP",
+          "id_model_ver": 1174,
+          "jn_rev_num": 2185,
+          "vrednost": "38313.06",
+          "last_record_revision_date": "2025-11-02 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 29884004,
+          "id_model": "INP",
+          "id_model_ver": 1174,
+          "jn_rev_num": 2185,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "KDS",
+      "unit": 28602100,
+      "active_rows": [
+        {
+          "unit": 28602100,
+          "id_model": "KDS",
+          "id_model_ver": 1175,
+          "jn_rev_num": 2336,
+          "vrednost": "8022.28",
+          "last_record_revision_date": "2026-05-12 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 28602100,
+          "id_model": "KDS",
+          "id_model_ver": 1175,
+          "jn_rev_num": 2336,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2026-05-12 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "PPL",
+      "unit": 28737054,
+      "active_rows": [],
+      "open_history_rows": []
+    },
+    {
+      "model": "PPP",
+      "unit": 28592902,
+      "active_rows": [
+        {
+          "unit": 28592902,
+          "id_model": "PPP",
+          "id_model_ver": 1178,
+          "jn_rev_num": 2264,
+          "vrednost": "39259.03",
+          "last_record_revision_date": "2026-02-03 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 28592902,
+          "id_model": "PPP",
+          "id_model_ver": 1178,
+          "jn_rev_num": 2264,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2026-02-03 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "SDP",
+      "unit": 29890117,
+      "active_rows": [
+        {
+          "unit": 29890117,
+          "id_model": "SDP",
+          "id_model_ver": 1179,
+          "jn_rev_num": 2377,
+          "vrednost": "204182.89",
+          "last_record_revision_date": "2026-07-07 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 29890117,
+          "id_model": "SDP",
+          "id_model_ver": 1179,
+          "jn_rev_num": 2377,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2026-07-07 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "STA",
+      "unit": 28482262,
+      "active_rows": [
+        {
+          "unit": 28482262,
+          "id_model": "STA",
+          "id_model_ver": 1180,
+          "jn_rev_num": 2185,
+          "vrednost": "88429.82",
+          "last_record_revision_date": "2025-11-02 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 28482262,
+          "id_model": "STA",
+          "id_model_ver": 1180,
+          "jn_rev_num": 2185,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "TUR",
+      "unit": 100000058998,
+      "active_rows": [
+        {
+          "unit": 100000058998,
+          "id_model": "TUR",
+          "id_model_ver": 1182,
+          "jn_rev_num": 2185,
+          "vrednost": "110477.37",
+          "last_record_revision_date": "2025-11-02 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "dst_sid": 100000058998,
+          "id_model": "TUR",
+          "id_model_ver": 1182,
+          "jn_rev_num": 2185,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-11-02 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    }
+  ],
+  "parcel": [
+    {
+      "model": "DRZ",
+      "unit": "100000003802.DRZ",
+      "active_rows": [
+        {
+          "unit": "100000003802.DRZ",
+          "id_model": "DRZ",
+          "id_model_ver": 1169,
+          "jn_rev_num": 2212,
+          "vrednost": "5930.15",
+          "last_record_revision_date": "2025-12-09 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "id_parc_enota": "100000003802.DRZ",
+          "pc_mid": 100000003802,
+          "id_model": "DRZ",
+          "id_model_ver": 1169,
+          "jn_rev_num": 2212,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-12-09 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "GOZ",
+      "unit": "100000003802.GOZ",
+      "active_rows": [
+        {
+          "unit": "100000003802.GOZ",
+          "id_model": "GOZ",
+          "id_model_ver": 1171,
+          "jn_rev_num": 2212,
+          "vrednost": "1966.59",
+          "last_record_revision_date": "2025-12-09 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "id_parc_enota": "100000003802.GOZ",
+          "pc_mid": 100000003802,
+          "id_model": "GOZ",
+          "id_model_ver": 1171,
+          "jn_rev_num": 2212,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-12-09 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "KME",
+      "unit": "100000003802.KME",
+      "active_rows": [
+        {
+          "unit": "100000003802.KME",
+          "id_model": "KME",
+          "id_model_ver": 1176,
+          "jn_rev_num": 2212,
+          "vrednost": "350.99",
+          "last_record_revision_date": "2025-12-09 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "id_parc_enota": "100000003802.KME",
+          "pc_mid": 100000003802,
+          "id_model": "KME",
+          "id_model_ver": 1176,
+          "jn_rev_num": 2212,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-12-09 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    },
+    {
+      "model": "STZ",
+      "unit": "100000003802.STZ",
+      "active_rows": [
+        {
+          "unit": "100000003802.STZ",
+          "id_model": "STZ",
+          "id_model_ver": 1181,
+          "jn_rev_num": 2212,
+          "vrednost": "2950.16",
+          "last_record_revision_date": "2025-12-09 23:59:59.999000"
+        }
+      ],
+      "open_history_rows": [
+        {
+          "id_parc_enota": "100000003802.STZ",
+          "pc_mid": 100000003802,
+          "id_model": "STZ",
+          "id_model_ver": 1181,
+          "jn_rev_num": 2212,
+          "jn_rev_num_to": null,
+          "jn_status": "A",
+          "valid_from": "2025-12-09 23:59:59.999000",
+          "valid_to": null
+        }
+      ]
+    }
+  ]
+}

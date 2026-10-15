@@ -1,0 +1,1046 @@
+{
+  "building_examples": {
+    "GAR": [
+      {
+        "dst_sid": 28888343,
+        "id_model": "GAR",
+        "id_model_ver": 1155,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28888343,
+        "id_model": "GAR",
+        "id_model_ver": 1155,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28888343,
+        "id_model": "GAR",
+        "id_model_ver": 1170,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28888343,
+        "id_model": "GAR",
+        "id_model_ver": 1170,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "HIS": [
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1149,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1149,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1818,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-01-07 00:30:00"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1149,
+        "jn_rev_num": 1818,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-07 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1172,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2103,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-07-17 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1172,
+        "jn_rev_num": 2103,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-07-17 23:59:59.999000",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1172,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2336,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2026-05-12 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28686586,
+        "id_model": "HIS",
+        "id_model_ver": 1172,
+        "jn_rev_num": 2336,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2026-05-12 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "IND": [
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 686,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2020-06-16 04:00:03.420767"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 686,
+        "jn_rev_num_to": 780,
+        "jn_status": "H",
+        "valid_from": "2020-06-16 04:00:03.420767",
+        "valid_to": "2020-10-01 04:00:01.998832"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 780,
+        "jn_rev_num_to": 813,
+        "jn_status": "H",
+        "valid_from": "2020-10-01 04:00:01.998832",
+        "valid_to": "2020-11-04 03:00:02.229192"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 813,
+        "jn_rev_num_to": 1147,
+        "jn_status": "H",
+        "valid_from": "2020-11-04 03:00:02.229192",
+        "valid_to": "2021-11-06 14:00:02.430958"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1147,
+        "jn_rev_num_to": 1152,
+        "jn_status": "H",
+        "valid_from": "2021-11-06 14:00:02.430958",
+        "valid_to": "2021-11-10 04:00:02.573693"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1152,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2021-11-10 04:00:02.573693",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1355,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2023-04-13 13:21:29"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1355,
+        "jn_rev_num_to": 1497,
+        "jn_status": "H",
+        "valid_from": "2023-04-13 13:21:29",
+        "valid_to": "2023-10-26 00:30:01"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1497,
+        "jn_rev_num_to": 1704,
+        "jn_status": "H",
+        "valid_from": "2023-10-26 00:30:01",
+        "valid_to": "2024-08-05 00:30:01"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "jn_rev_num": 1704,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2024-08-05 00:30:01",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1173,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2103,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-07-17 23:59:59.999000"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1173,
+        "jn_rev_num": 2103,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-07-17 23:59:59.999000",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 29765975,
+        "id_model": "IND",
+        "id_model_ver": 1173,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "INP": [
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1151,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 855,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2020-12-19 12:00:02.061174"
+      },
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1151,
+        "jn_rev_num": 855,
+        "jn_rev_num_to": 1225,
+        "jn_status": "H",
+        "valid_from": "2020-12-19 12:00:02.061174",
+        "valid_to": "2022-01-28 04:00:02.206397"
+      },
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1151,
+        "jn_rev_num": 1225,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2022-01-28 04:00:02.206397",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1151,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1174,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 29884004,
+        "id_model": "INP",
+        "id_model_ver": 1174,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "KDS": [
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1165,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 813,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2020-11-04 03:00:02.229192"
+      },
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1165,
+        "jn_rev_num": 813,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-11-04 03:00:02.229192",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1165,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1175,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1175,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2336,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2026-05-12 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28602100,
+        "id_model": "KDS",
+        "id_model_ver": 1175,
+        "jn_rev_num": 2336,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2026-05-12 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "PPL": [
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1152,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1152,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1821,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-01-10 00:30:01"
+      },
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1152,
+        "jn_rev_num": 1821,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-10 00:30:01",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1177,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2157,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-09-29 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1177,
+        "jn_rev_num": 2157,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-09-29 23:59:59.999000",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28737054,
+        "id_model": "PPL",
+        "id_model_ver": 1177,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2303,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2026-03-29 23:59:59.999000"
+      }
+    ],
+    "PPP": [
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1153,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1153,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1871,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-03-21 00:30:00"
+      },
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1153,
+        "jn_rev_num": 1871,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-03-21 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1178,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1178,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2264,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2026-02-03 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28592902,
+        "id_model": "PPP",
+        "id_model_ver": 1178,
+        "jn_rev_num": 2264,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2026-02-03 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "SDP": [
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 686,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2020-06-16 04:00:03.420767"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "jn_rev_num": 686,
+        "jn_rev_num_to": 791,
+        "jn_status": "H",
+        "valid_from": "2020-06-16 04:00:03.420767",
+        "valid_to": "2020-10-13 04:00:01.338031"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "jn_rev_num": 791,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-10-13 04:00:01.338031",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1871,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-03-21 00:30:00"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "jn_rev_num": 1871,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-03-21 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1179,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1179,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2377,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2026-07-07 23:59:59.999000"
+      },
+      {
+        "dst_sid": 29890117,
+        "id_model": "SDP",
+        "id_model_ver": 1179,
+        "jn_rev_num": 2377,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2026-07-07 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "STA": [
+      {
+        "dst_sid": 28482262,
+        "id_model": "STA",
+        "id_model_ver": 1148,
+        "jn_rev_num": 1,
+        "jn_rev_num_to": 1354,
+        "jn_status": "H",
+        "valid_from": "2020-04-01 12:00:00",
+        "valid_to": "2022-12-27 00:00:00"
+      },
+      {
+        "dst_sid": 28482262,
+        "id_model": "STA",
+        "id_model_ver": 1148,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 28482262,
+        "id_model": "STA",
+        "id_model_ver": 1180,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2156,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-09-28 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28482262,
+        "id_model": "STA",
+        "id_model_ver": 1180,
+        "jn_rev_num": 2156,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-09-28 23:59:59.999000",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 28482262,
+        "id_model": "STA",
+        "id_model_ver": 1180,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "TUR": [
+      {
+        "dst_sid": 100000058998,
+        "id_model": "TUR",
+        "id_model_ver": 1156,
+        "jn_rev_num": 1748,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2024-10-04 00:30:01",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "dst_sid": 100000058998,
+        "id_model": "TUR",
+        "id_model_ver": 1182,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2133,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-08-28 23:59:59.999000"
+      },
+      {
+        "dst_sid": 100000058998,
+        "id_model": "TUR",
+        "id_model_ver": 1182,
+        "jn_rev_num": 2133,
+        "jn_rev_num_to": 2139,
+        "jn_status": "H",
+        "valid_from": "2025-08-28 23:59:59.999000",
+        "valid_to": "2025-09-07 23:59:59.999000"
+      },
+      {
+        "dst_sid": 100000058998,
+        "id_model": "TUR",
+        "id_model_ver": 1182,
+        "jn_rev_num": 2139,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-09-07 23:59:59.999000",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "dst_sid": 100000058998,
+        "id_model": "TUR",
+        "id_model_ver": 1182,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": null
+      }
+    ]
+  },
+  "parcel_examples": {
+    "DRZ": [
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1355,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2023-04-13 13:21:29"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "jn_rev_num": 1355,
+        "jn_rev_num_to": 1436,
+        "jn_status": "H",
+        "valid_from": "2023-04-13 13:21:29",
+        "valid_to": "2023-08-03 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "jn_rev_num": 1436,
+        "jn_rev_num_to": 1813,
+        "jn_status": "H",
+        "valid_from": "2023-08-03 00:30:01",
+        "valid_to": "2024-12-31 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "jn_rev_num": 1813,
+        "jn_rev_num_to": 1832,
+        "jn_status": "H",
+        "valid_from": "2024-12-31 00:30:01",
+        "valid_to": "2025-01-27 00:30:00"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "jn_rev_num": 1832,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-27 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1169,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1169,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2212,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2025-12-09 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.DRZ",
+        "pc_mid": 100000003802,
+        "id_model": "DRZ",
+        "id_model_ver": 1169,
+        "jn_rev_num": 2212,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-12-09 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "GOZ": [
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1355,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2023-04-13 13:21:29"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "jn_rev_num": 1355,
+        "jn_rev_num_to": 1436,
+        "jn_status": "H",
+        "valid_from": "2023-04-13 13:21:29",
+        "valid_to": "2023-08-03 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "jn_rev_num": 1436,
+        "jn_rev_num_to": 1813,
+        "jn_status": "H",
+        "valid_from": "2023-08-03 00:30:01",
+        "valid_to": "2024-12-31 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "jn_rev_num": 1813,
+        "jn_rev_num_to": 1832,
+        "jn_status": "H",
+        "valid_from": "2024-12-31 00:30:01",
+        "valid_to": "2025-01-27 00:30:00"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "jn_rev_num": 1832,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-27 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1171,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1171,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2212,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2025-12-09 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.GOZ",
+        "pc_mid": 100000003802,
+        "id_model": "GOZ",
+        "id_model_ver": 1171,
+        "jn_rev_num": 2212,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-12-09 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "KME": [
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1355,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2023-04-13 13:21:29"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "jn_rev_num": 1355,
+        "jn_rev_num_to": 1436,
+        "jn_status": "H",
+        "valid_from": "2023-04-13 13:21:29",
+        "valid_to": "2023-08-03 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "jn_rev_num": 1436,
+        "jn_rev_num_to": 1813,
+        "jn_status": "H",
+        "valid_from": "2023-08-03 00:30:01",
+        "valid_to": "2024-12-31 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "jn_rev_num": 1813,
+        "jn_rev_num_to": 1832,
+        "jn_status": "H",
+        "valid_from": "2024-12-31 00:30:01",
+        "valid_to": "2025-01-27 00:30:00"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "jn_rev_num": 1832,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-27 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1176,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1176,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2212,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2025-12-09 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.KME",
+        "pc_mid": 100000003802,
+        "id_model": "KME",
+        "id_model_ver": 1176,
+        "jn_rev_num": 2212,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-12-09 23:59:59.999000",
+        "valid_to": null
+      }
+    ],
+    "STZ": [
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "jn_rev_num": 1354,
+        "jn_rev_num_to": 1355,
+        "jn_status": "H",
+        "valid_from": "2022-12-27 00:00:00",
+        "valid_to": "2023-04-13 13:21:29"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "jn_rev_num": 1355,
+        "jn_rev_num_to": 1436,
+        "jn_status": "H",
+        "valid_from": "2023-04-13 13:21:29",
+        "valid_to": "2023-08-03 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "jn_rev_num": 1436,
+        "jn_rev_num_to": 1813,
+        "jn_status": "H",
+        "valid_from": "2023-08-03 00:30:01",
+        "valid_to": "2024-12-31 00:30:01"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "jn_rev_num": 1813,
+        "jn_rev_num_to": 1832,
+        "jn_status": "H",
+        "valid_from": "2024-12-31 00:30:01",
+        "valid_to": "2025-01-27 00:30:00"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "jn_rev_num": 1832,
+        "jn_rev_num_to": 2040,
+        "jn_status": "H",
+        "valid_from": "2025-01-27 00:30:00",
+        "valid_to": "2025-05-13 23:59:59"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1181,
+        "jn_rev_num": 2040,
+        "jn_rev_num_to": 2185,
+        "jn_status": "H",
+        "valid_from": "2025-05-13 23:59:59",
+        "valid_to": "2025-11-02 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1181,
+        "jn_rev_num": 2185,
+        "jn_rev_num_to": 2212,
+        "jn_status": "H",
+        "valid_from": "2025-11-02 23:59:59.999000",
+        "valid_to": "2025-12-09 23:59:59.999000"
+      },
+      {
+        "id_parc_enota": "100000003802.STZ",
+        "pc_mid": 100000003802,
+        "id_model": "STZ",
+        "id_model_ver": 1181,
+        "jn_rev_num": 2212,
+        "jn_rev_num_to": null,
+        "jn_status": "A",
+        "valid_from": "2025-12-09 23:59:59.999000",
+        "valid_to": null
+      }
+    ]
+  }
+}

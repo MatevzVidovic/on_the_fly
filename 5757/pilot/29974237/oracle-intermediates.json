@@ -1,0 +1,30 @@
+{
+  "rows": [
+    {
+      "id": "29974237.IND",
+      "dst_sid": 29974237,
+      "id_model": "IND",
+      "jn_rev_num": 2185,
+      "jn_rev_num_to": null,
+      "jn_status": "A",
+      "valid_from": "2025-11-02 23:59:59.999000",
+      "valid_to": null,
+      "error_msg": null,
+      "raven": 6,
+      "cona_ime": "IND_1491066",
+      "d_dst": 1.0,
+      "izmera": 28.6,
+      "leto_izg_sta": 1900,
+      "vt_dst": 4324.32,
+      "pov_leto_obn": 1945,
+      "f_obn": 1.0,
+      "t_last": 55.0,
+      "f_last": 1.0,
+      "f_nk": 1.0,
+      "povr_zps": 50.0,
+      "f_d_dst": null,
+      "vt_zps_m2": 210.0
+    }
+  ],
+  "truncated": false
+}

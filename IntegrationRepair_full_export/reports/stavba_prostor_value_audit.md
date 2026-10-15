@@ -1,4 +1,6 @@
-# Staging value audit: EV stavba and prostor
+# Production value audit: EV stavba and prostor
+
+Environment correction: the current `.env` was switched to the production endpoint before this audit. Its earlier staging label was incorrect; see `parcela_environment_diagnosis.md`. The comparisons below remain valid for the endpoint actually queried.
 
 15 October 2026. All remote database access was read-only. SQLite repair files were opened with `mode=ro`. No business rows, metadata, schema, or repair plans were changed.
 

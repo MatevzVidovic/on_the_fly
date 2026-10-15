@@ -1,0 +1,15 @@
+type,model,example_unit,at_2025_01_01,at_2026_01_01
+building_examples,GAR,28888343,1155 / GV 74,1170 / GV 90
+building_examples,HIS,28686586,1149 / GV 161,1172 / GV 282
+building_examples,IND,29765975,1150 / GV 51,1173 / GV 66
+building_examples,INP,29884004,1151 / GV 36,1174 / GV 49
+building_examples,KDS,28602100,1165 / GV 26,1175 / GV 46
+building_examples,PPL,28737054,1152 / GV 151,1177 / GV 192
+building_examples,PPP,28592902,1153 / GV 185,1178 / GV 225
+building_examples,SDP,29890117,1154 / GV 18,1179 / GV 33
+building_examples,STA,28482262,1148 / GV 150,1180 / GV 223
+building_examples,TUR,100000058998,1156 / GV 27,1182 / GV 42
+parcel_examples,DRZ,100000003802.DRZ,1163 / GV 9,1169 / GV 16
+parcel_examples,GOZ,100000003802.GOZ,1162 / GV 73,1171 / GV 96
+parcel_examples,KME,100000003802.KME,1161 / GV 81,1176 / GV 100
+parcel_examples,STZ,100000003802.STZ,1164 / GV 13,1181 / GV 44

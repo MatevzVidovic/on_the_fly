@@ -1,0 +1,3905 @@
+{
+  "environment": "production",
+  "checked_at": "2026-10-15T13:13:00.983441+00:00",
+  "tables": [
+    {
+      "table": "kn_nep_deli_stavb_h",
+      "integration_id": "bfe62b52-9aaf-11ef-9c54-0242ac120008",
+      "source": "NEP.DELI_STAVB_H",
+      "source_key": "DEL_STAVBE_H_ID",
+      "target_key": "del_stavbe_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_deli_stavb_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_deli_stavb_h_pkey ON public.kn_nep_deli_stavb_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_do_idx ON public.kn_nep_deli_stavb_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_od_idx ON public.kn_nep_deli_stavb_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_datum_sys_idx ON public.kn_nep_deli_stavb_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_del_stavbe_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_del_stavbe_id_idx ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_id)",
+          "columns": [
+            "del_stavbe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_id_idx ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_id)",
+          "columns": [
+            "del_stavbe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_deli_stavb_h_pk ON public.kn_nep_deli_stavb_h USING btree (del_stavbe_h_id)",
+          "columns": [
+            "del_stavbe_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_stavba_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_stavba_id_idx ON public.kn_nep_deli_stavb_h USING btree (stavba_id)",
+          "columns": [
+            "stavba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_stavba_del_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_stavba_del_idx ON public.kn_nep_deli_stavb_h USING btree (stavba_id, st_dela_stavbe)",
+          "columns": [
+            "stavba_id",
+            "st_dela_stavbe"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_idx01",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_idx01 ON public.kn_nep_deli_stavb_h USING btree (vrsta_dejanske_rabe_del_st_id)",
+          "columns": [
+            "vrsta_dejanske_rabe_del_st_id"
+          ]
+        },
+        {
+          "name": "kn_nep_deli_stavb_h_vrsta_dejanske_rabe_del_st_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_deli_stavb_h_vrsta_dejanske_rabe_del_st_id_idx ON public.kn_nep_deli_stavb_h USING btree (vrsta_dejanske_rabe_del_st_id)",
+          "columns": [
+            "vrsta_dejanske_rabe_del_st_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_deli_stavb_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "DELI_STAVB_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "DELI_STAVB_H_PK",
+          "columns": [
+            "DEL_STAVBE_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "DELI_STAVB_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEL_STAVBE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "DELI_STAVB_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "VRSTA_DEJANSKE_RABE_DEL_ST_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "DELI_STAVB_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEL_STAVBE_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "DELI_STAVB_H_STAVBA_DEL_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID",
+            "ST_DELA_STAVBE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "IDX_DELI_STAVB_H_HISNA_STEVILKA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "HISNA_STEVILKA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "IDX_DELI_STAVB_H_STANOVANJE_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STANOVANJE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "IDX_DELI_STAVB_H_STAVBA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_etaze_h",
+      "integration_id": "550a20ee-9d03-11ef-8c7b-0242ac120008",
+      "source": "NEP.ETAZE_H",
+      "source_key": "ETAZA_H_ID",
+      "target_key": "etaza_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_etaze_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_etaze_h_pkey ON public.kn_nep_etaze_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_datum_do_idx ON public.kn_nep_etaze_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_datum_od_idx ON public.kn_nep_etaze_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_datum_sys_idx ON public.kn_nep_etaze_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_etaza_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_etaza_id_idx ON public.kn_nep_etaze_h USING btree (etaza_id)",
+          "columns": [
+            "etaza_id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_geom_idx ON public.kn_nep_etaze_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_etaze_h_pk ON public.kn_nep_etaze_h USING btree (etaza_h_id)",
+          "columns": [
+            "etaza_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_stavba_etaza_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_stavba_etaza_idx ON public.kn_nep_etaze_h USING btree (stavba_id, stevilka_etaze)",
+          "columns": [
+            "stavba_id",
+            "stevilka_etaze"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_h_stavba_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_h_stavba_id_idx ON public.kn_nep_etaze_h USING btree (stavba_id)",
+          "columns": [
+            "stavba_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_etaze_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "ETAZE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "ETAZE_H_PK",
+          "columns": [
+            "ETAZA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "ETAZE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ETAZA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "ETAZE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ETAZA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "ETAZE_H_STAVBA_ETAZA_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID",
+            "STEVILKA_ETAZE"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_etaze_x_deli_stavb_h",
+      "integration_id": "fb72d988-b94d-11ef-bb81-0242ac120008",
+      "source": "NEP.ETAZE_X_DELI_STAVB_H",
+      "source_key": "ETAZA_X_DEL_STAVBE_H_ID",
+      "target_key": "etaza_x_del_stavbe_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_etaze_x_deli_stavb_h_pkey ON public.kn_nep_etaze_x_deli_stavb_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_do_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_od_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_datum_sys_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_del_stavbe_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_del_stavbe_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (del_stavbe_id)",
+          "columns": [
+            "del_stavbe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_etaza_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_etaza_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (etaza_id)",
+          "columns": [
+            "etaza_id"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_etaze_x_deli_stavb_h_geom_idx ON public.kn_nep_etaze_x_deli_stavb_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_etaza_x_del_stavbe_h_id_idx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_etaze_x_deli_stavb_h_etaza_x_del_stavbe_h_id_idx ON public.kn_nep_etaze_x_deli_stavb_h USING btree (etaza_x_del_stavbe_h_id)",
+          "columns": [
+            "etaza_x_del_stavbe_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_etaze_x_deli_stavb_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "ETAZE_X_DELI_STAVB_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "ETAZE_X_DELI_STAVB_H_PK",
+          "columns": [
+            "ETAZA_X_DEL_STAVBE_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "ETAZE_X_DELI_STAVB_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ETAZA_ID",
+            "DEL_STAVBE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "ETAZE_X_DELI_STAVB_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ETAZA_X_DEL_STAVBE_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_hisne_stevilke_h",
+      "integration_id": "736ac43c-b60b-11ef-a0fc-0242ac120008",
+      "source": "NEP.HISNE_STEVILKE_H",
+      "source_key": "HISNA_STEVILKA_H_ID",
+      "target_key": "hisna_stevilka_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_hisne_stevilke_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_hisne_stevilke_h_pkey ON public.kn_nep_hisne_stevilke_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_hisne_stevilke_h___mod_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_hisne_stevilke_h___mod_index ON public.kn_nep_hisne_stevilke_h USING btree (__mod)",
+          "columns": [
+            "__mod"
+          ]
+        },
+        {
+          "name": "kn_nep_hisne_stevilke_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_hisne_stevilke_h_geom_idx ON public.kn_nep_hisne_stevilke_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_hisne_stevilke_h_gid_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_hisne_stevilke_h_gid_index ON public.kn_nep_hisne_stevilke_h USING btree (gid)",
+          "columns": [
+            "gid"
+          ]
+        },
+        {
+          "name": "kn_nep_hisne_stevilke_h_hisna_stevilka_h_id_idx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_hisne_stevilke_h_hisna_stevilka_h_id_idx ON public.kn_nep_hisne_stevilke_h USING btree (hisna_stevilka_h_id)",
+          "columns": [
+            "hisna_stevilka_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_hisne_stevilke_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "HISNE_STEVILKE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "HISNE_STEVILKE_H_PK",
+          "columns": [
+            "HISNA_STEVILKA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "HISNA_STEVILKA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_NAS_UL_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "NASELJE_ID",
+            "ULICA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "HISNA_STEVILKA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_POS_DO_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_DO"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_POS_OD_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_STAVBA_HS_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID",
+            "HS_STEVILKA",
+            "HS_DODATEK"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "HISNE_STEVILKE_H_ULICA_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ULICA_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_katastrske_obcine_h",
+      "integration_id": "f6c3a090-8638-11ef-8275-0242ac120007",
+      "source": "NEP.KATASTRSKE_OBCINE_H",
+      "source_key": "KO_ID_H",
+      "target_key": "ko_id_h",
+      "ignore_audit": null,
+      "ignore_audit_present": false,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_katastrske_obcine_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_katastrske_obcine_h_pkey ON public.kn_nep_katastrske_obcine_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "katastrske_obcine_h_ko_id_h_uidx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX katastrske_obcine_h_ko_id_h_uidx ON public.kn_nep_katastrske_obcine_h USING btree (ko_id_h)",
+          "columns": [
+            "ko_id_h"
+          ]
+        },
+        {
+          "name": "katastrske_obcine_h_ko_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX katastrske_obcine_h_ko_id_idx ON public.kn_nep_katastrske_obcine_h USING btree (ko_id)",
+          "columns": [
+            "ko_id"
+          ]
+        },
+        {
+          "name": "kn_nep_katastrske_obcine_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_katastrske_obcine_h_geom_idx ON public.kn_nep_katastrske_obcine_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_katastrske_obcine_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "KATASTRSKE_OBCINE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "KATASTRSKE_OBCINE_H_PK",
+          "columns": [
+            "KO_ID_H"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "KATASTRSKE_OBCINE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "KATASTRSKE_OBCINE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "KATASTRSKE_OBCINE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID_H"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "integration_id": "e0c4ee44-f34c-11ef-9c8f-02420a0001ec",
+      "source": "NEP_OSTALO.DEJANSKE_RABE_H",
+      "source_key": "DEJANSKA_RABA_H_ID",
+      "target_key": "dejanska_raba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_pkey ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_geom_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_od_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_do_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_datum_sys_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_id_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_id_index ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (dejanska_raba_id)",
+          "columns": [
+            "dejanska_raba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_h_id_idx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_h_id_idx ON public.kn_nep_ostalo_dejanske_rabe_parcel_h USING btree (dejanska_raba_h_id)",
+          "columns": [
+            "dejanska_raba_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_dejanske_rabe_parcel_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "DEJANSKE_RABE_H_IDPOSDO_UK",
+          "type": "U",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "DEJANSKE_RABE_H_IDPOSDO_UK",
+          "columns": [
+            "DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_DO"
+          ]
+        },
+        {
+          "name": "DEJANSKE_RABE_H_IDPOSOD_UK",
+          "type": "U",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "DEJANSKE_RABE_H_IDPOSOD_UK",
+          "columns": [
+            "DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "name": "DEJANSKE_RABE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "DEJANSKE_RABE_H_PK",
+          "columns": [
+            "DEJANSKA_RABA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_H_IDPOSDO_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_DO"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_H_IDPOSOD_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_H_POSDO_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_DO"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_H_POSOD_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_IN_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_IN_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_IN1_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_IN1_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_IN2_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_IN2_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_IN3_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_IN3_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_KG_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_KG_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_PO_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_PO_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "DEJANSKE_RABE_VZ_H_FK",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DEJANSKA_RABA_VZ_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_gozdno_gosp_obm",
+      "integration_id": "a99024c6-a8aa-11ef-adaf-0242ac120008",
+      "source": "NEP_OSTALO.GOZDNO_GOSP_OBM",
+      "source_key": "GOZDNO_GOSP_OBM_ID",
+      "target_key": "gozdno_gosp_obm_id",
+      "ignore_audit": null,
+      "ignore_audit_present": false,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_pkey ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_pk ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (gozdno_gosp_obm_id)",
+          "columns": [
+            "gozdno_gosp_obm_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_six",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_gozdno_gosp_obm_six ON public.kn_nep_ostalo_gozdno_gosp_obm USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_uk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_gozdno_gosp_obm_uk ON public.kn_nep_ostalo_gozdno_gosp_obm USING btree (ggo, odsek)",
+          "columns": [
+            "ggo",
+            "odsek"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_gozdno_gosp_obm_geom_idx ON public.kn_nep_ostalo_gozdno_gosp_obm USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_gozdno_gosp_obm_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "Y"
+      },
+      "oracle_constraints": [
+        {
+          "name": "GOZDNO_GOSP_OBM_PK",
+          "type": "P",
+          "status": "DISABLED",
+          "validated": "NOT VALIDATED",
+          "index": null,
+          "columns": [
+            "GOZDNO_GOSP_OBM_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "GOZDNO_GOSP_OBM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "GOZDNO_GOSP_OBM_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "GGO",
+            "ODSEK"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_namenske_rabe",
+      "integration_id": "74096586-f2b2-11ef-ac67-02420a0001ec",
+      "source": "NEP_OSTALO.NAMENSKE_RABE",
+      "source_key": "NAMENSKA_RABA_ID",
+      "target_key": "namenska_raba_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_namenske_rabe_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_namenske_rabe_pkey ON public.kn_nep_ostalo_namenske_rabe USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_namenske_rabe_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_namenske_rabe_geom_idx ON public.kn_nep_ostalo_namenske_rabe USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_namenske_rabe_namenska_raba_id_idx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_namenske_rabe_namenska_raba_id_idx ON public.kn_nep_ostalo_namenske_rabe USING btree (namenska_raba_id)",
+          "columns": [
+            "namenska_raba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_namenske_rabe_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_namenske_rabe_datum_sys_idx ON public.kn_nep_ostalo_namenske_rabe USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_namenske_rabe_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "NAMENSKA_RABA_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "NAMENSKA_RABA_PK",
+          "columns": [
+            "NAMENSKA_RABA_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "NAMENSKA_RABA_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "NAMENSKA_RABA_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "NAMENSKE_RABE_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "integration_id": "8264be70-aafd-11ef-947a-0242ac120008",
+      "source": "NEP_OSTALO.PARCELE_X_DEJANSKE_RABE_H",
+      "source_key": "PARCELA_X_DEJANSKA_RABA_H_ID",
+      "target_key": "parcela_x_dejanska_raba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_delez_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_delez_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (delez)",
+          "columns": [
+            "delez"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_kg_vr_dej_rabe_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_kg_vr_dej_rabe_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (kg_vrsta_dejanske_rabe_id)",
+          "columns": [
+            "kg_vrsta_dejanske_rabe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_parcela_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (parcela_id)",
+          "columns": [
+            "parcela_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_pk ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (parcela_x_dejanska_raba_h_id)",
+          "columns": [
+            "parcela_x_dejanska_raba_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_posoddokg_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_dejanske_rabe_h_posoddokg_idx ON public.kn_nep_ostalo_parcele_x_dejanske_rabe_h USING btree (postopek_id_od, postopek_id_do, kg_vrsta_dejanske_rabe_id)",
+          "columns": [
+            "postopek_id_od",
+            "postopek_id_do",
+            "kg_vrsta_dejanske_rabe_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_dejanske_rabe_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "PARCELE_X_DEJANSKE_RABE_H_IDPOSOD_UK",
+          "type": "U",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_DEJANSKE_RABE_H_IDPOSOD_UK",
+          "columns": [
+            "PARCELA_X_DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "name": "PARCELE_X_DEJANSKE_RABE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_DEJANSKE_RABE_H_PK",
+          "columns": [
+            "PARCELA_X_DEJANSKA_RABA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_DEJANSKE_RABE_H_IDPOSOD_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_X_DEJANSKA_RABA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_DEJANSKE_RABE_H_PARCELA_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_DEJANSKE_RABE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_X_DEJANSKA_RABA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_DEJANSKE_RABE_H_POSODDOKG_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_OD",
+            "POSTOPEK_ID_DO",
+            "KG_VRSTA_DEJANSKE_RABE_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "integration_id": "e0d985ce-a8bb-11ef-ac18-0242ac120008",
+      "source": "NEP_OSTALO.PARCELE_X_GOZDNO_GOSP_OBM_H",
+      "source_key": "PARCELE_X_GOZDNO_GOSP_OBM_H_ID",
+      "target_key": "parcele_x_gozdno_gosp_obm_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_idposd_uk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_idposd_uk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcele_x_gozdno_gosp_obm_id, postopek_id_od)",
+          "columns": [
+            "parcele_x_gozdno_gosp_obm_id",
+            "postopek_id_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_parcela_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcela_id)",
+          "columns": [
+            "parcela_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pcidposod_uk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pcidposod_uk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcela_id, postopek_id_od)",
+          "columns": [
+            "parcela_id",
+            "postopek_id_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pk ON public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h USING btree (parcele_x_gozdno_gosp_obm_h_id)",
+          "columns": [
+            "parcele_x_gozdno_gosp_obm_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_IDPOSOD_UK",
+          "type": "U",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_GOZDNO_GOSP_OBM_H_IDPOSOD_UK",
+          "columns": [
+            "PARCELE_X_GOZDNO_GOSP_OBM_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_PCIDPOSOD_UK",
+          "type": "U",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_GOZDNO_GOSP_OBM_H_PCIDPOSOD_UK",
+          "columns": [
+            "PARCELA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_GOZDNO_GOSP_OBM_H_PK",
+          "columns": [
+            "PARCELE_X_GOZDNO_GOSP_OBM_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_IDPOSOD_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELE_X_GOZDNO_GOSP_OBM_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_PCIDPOSOD_UK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_GOZDNO_GOSP_OBM_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELE_X_GOZDNO_GOSP_OBM_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "integration_id": "8b9adbea-a59f-11ef-a7dc-0242ac120008",
+      "source": "NEP_OSTALO.PARCELE_X_NAMENSKE_RABE_H",
+      "source_key": "PARCELA_X_NAMENSKA_RABA_H_ID",
+      "target_key": "parcela_x_namenska_raba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_do_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_od_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_datum_sys_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_delez_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_delez_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (delez)",
+          "columns": [
+            "delez"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_parcela_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_parcela_id_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_id)",
+          "columns": [
+            "parcela_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_pk ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_x_namenska_raba_h_id)",
+          "columns": [
+            "parcela_x_namenska_raba_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_vr_nam_rabe_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_namenske_rabe_h_vr_nam_rabe_idx ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (vrsta_namenske_rabe_id)",
+          "columns": [
+            "vrsta_namenske_rabe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_ostalo_parcele_x_nam_rabe_h_parc_x_nam_raba_id_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_ostalo_parcele_x_nam_rabe_h_parc_x_nam_raba_id_index ON public.kn_nep_ostalo_parcele_x_namenske_rabe_h USING btree (parcela_x_namenska_raba_id)",
+          "columns": [
+            "parcela_x_namenska_raba_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_ostalo_parcele_x_namenske_rabe_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "PARCELE_X_NAMENSKE_RABE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_X_NAMENSKE_RABE_H_PK",
+          "columns": [
+            "PARCELA_X_NAMENSKA_RABA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_NAMENSKE_RABE_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_X_NAMENSKA_RABA_ID",
+            "POSTOPEK_ID_OD"
+          ]
+        },
+        {
+          "owner": "NEP_OSTALO",
+          "name": "PARCELE_X_NAMENSKE_RABE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_X_NAMENSKA_RABA_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_parcele_h",
+      "integration_id": "4f44b04c-a7e5-11ef-b133-0242ac120008",
+      "source": "NEP.PARCELE_H",
+      "source_key": "PARCELA_H_ID",
+      "target_key": "parcela_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_parcele_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_parcele_h_pkey ON public.kn_nep_parcele_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_datum_do_idx ON public.kn_nep_parcele_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_datum_od_idx ON public.kn_nep_parcele_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_datum_sys_idx ON public.kn_nep_parcele_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_geom_idx ON public.kn_nep_parcele_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_idx01",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_idx01 ON public.kn_nep_parcele_h USING btree (upravni_status_id)",
+          "columns": [
+            "upravni_status_id"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_ko_st_parcele_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_ko_st_parcele_idx ON public.kn_nep_parcele_h USING btree (ko_id, st_parcele)",
+          "columns": [
+            "ko_id",
+            "st_parcele"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_parcela_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_parcele_h_parcela_id_idx ON public.kn_nep_parcele_h USING btree (parcela_id)",
+          "columns": [
+            "parcela_id"
+          ]
+        },
+        {
+          "name": "kn_nep_parcele_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_parcele_h_pk ON public.kn_nep_parcele_h USING btree (parcela_h_id)",
+          "columns": [
+            "parcela_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_parcele_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "PARCELE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PARCELE_H_PK",
+          "columns": [
+            "PARCELA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "IDX_PARCELE_H_DATUM_OD_DATUM_DO",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "DATUM_OD",
+            "DATUM_DO"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "UPRAVNI_STATUS_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_KO_ST_PARCELE_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID",
+            "ST_PARCELE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PARCELA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_POSTOPEK_ID_DO_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_DO"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PARCELE_H_POSTOPEK_ID_OD_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "POSTOPEK_ID_OD"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_prostori_h",
+      "integration_id": "5b16f1a0-a592-11ef-9316-0242ac120008",
+      "source": "NEP.PROSTORI_H",
+      "source_key": "PROSTOR_H_ID",
+      "target_key": "prostor_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_prostori_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_prostori_h_pkey ON public.kn_nep_prostori_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_prostori_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_prostori_h_datum_do_idx ON public.kn_nep_prostori_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_prostori_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_prostori_h_datum_od_idx ON public.kn_nep_prostori_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_prostori_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_prostori_h_datum_sys_idx ON public.kn_nep_prostori_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_prostori_h_del_stavbe_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_prostori_h_del_stavbe_id_idx ON public.kn_nep_prostori_h USING btree (del_stavbe_id)",
+          "columns": [
+            "del_stavbe_id"
+          ]
+        },
+        {
+          "name": "kn_nep_prostori_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_prostori_h_pk ON public.kn_nep_prostori_h USING btree (prostor_h_id)",
+          "columns": [
+            "prostor_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_prostori_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "PROSTORI_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "PROSTORI_H_PK",
+          "columns": [
+            "PROSTOR_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "PROSTORI_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PROSTOR_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "PROSTORI_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "PROSTOR_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_rpe_naselja_h",
+      "integration_id": "403dee5c-d34f-11ef-a441-0242ac120008",
+      "source": "NEP.RPE_NASELJA_H",
+      "source_key": "NASELJE_H_ID",
+      "target_key": "naselje_h_id",
+      "ignore_audit": null,
+      "ignore_audit_present": false,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_rpe_naselja_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_rpe_naselja_h_pkey ON public.kn_nep_rpe_naselja_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_naselja_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_naselja_h_geom_idx ON public.kn_nep_rpe_naselja_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_rpe_naselja_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "RPE_NASELJA_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "RPE_NASELJA_H_PK",
+          "columns": [
+            "NASELJE_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "RPE_NASELJA_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_NASELJA_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "NASELJE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_NASELJA_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "NASELJE_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_NASELJA_H_SIFRA_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "SESTAVLJENA_SIFRA"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_rpe_obcine_h",
+      "integration_id": "6460237c-f34d-11ef-91f1-02420a0001ec",
+      "source": "NEP.RPE_OBCINE_H",
+      "source_key": "OBCINA_H_ID",
+      "target_key": "obcina_h_id",
+      "ignore_audit": null,
+      "ignore_audit_present": false,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_rpe_obcine_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_rpe_obcine_h_pkey ON public.kn_nep_rpe_obcine_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_obcine_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_obcine_h_geom_idx ON public.kn_nep_rpe_obcine_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_rpe_obcine_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "RPE_OBCINE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "RPE_OBCINE_H_PK",
+          "columns": [
+            "OBCINA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "RPE_OBCINE_H_GEOM_RPE_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM_RPE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_OBCINE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_OBCINE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "OBCINA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_OBCINE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "OBCINA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_OBCINE_H_SIFRA_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "SIFRA"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_rpe_ulice_h",
+      "integration_id": "d1d4521c-bc79-11ef-89e9-0242ac120008",
+      "source": "NEP.RPE_ULICE_H",
+      "source_key": "ULICA_H_ID",
+      "target_key": "ulica_h_id",
+      "ignore_audit": null,
+      "ignore_audit_present": false,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_rpe_ulice_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_rpe_ulice_h_pkey ON public.kn_nep_rpe_ulice_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_ulice_h_datum_order_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_ulice_h_datum_order_idx ON public.kn_nep_rpe_ulice_h USING btree (datum_do DESC, datum_sys DESC)",
+          "columns": [
+            "datum_do",
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_ulice_h_datum_range_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_ulice_h_datum_range_idx ON public.kn_nep_rpe_ulice_h USING btree (datum_od, datum_do)",
+          "columns": [
+            "datum_od",
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_ulice_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_ulice_h_geom_idx ON public.kn_nep_rpe_ulice_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_rpe_ulice_h_ulica_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_rpe_ulice_h_ulica_id_idx ON public.kn_nep_rpe_ulice_h USING btree (ulica_id)",
+          "columns": [
+            "ulica_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_rpe_ulice_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "RPE_ULICE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "RPE_ULICE_H_PK",
+          "columns": [
+            "ULICA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "RPE_ULICE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_ULICE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ULICA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_ULICE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "ULICA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "RPE_ULICE_H_SIFRA_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "SESTAVLJENA_SIFRA"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_stanovanja_h",
+      "integration_id": "04f9f57a-a1b3-11ef-adba-0242ac120008",
+      "source": "NEP.STANOVANJA_H",
+      "source_key": "STANOVANJE_H_ID",
+      "target_key": "stanovanje_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_stanovanja_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stanovanja_h_pkey ON public.kn_nep_stanovanja_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_do_idx ON public.kn_nep_stanovanja_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_od_idx ON public.kn_nep_stanovanja_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stanovanja_h_datum_sys_idx ON public.kn_nep_stanovanja_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stanovanja_h_id_idx ON public.kn_nep_stanovanja_h USING btree (stanovanje_id)",
+          "columns": [
+            "stanovanje_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stanovanja_h_pk ON public.kn_nep_stanovanja_h USING btree (stanovanje_h_id)",
+          "columns": [
+            "stanovanje_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stanovanja_h_stanovanje_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stanovanja_h_stanovanje_id_idx ON public.kn_nep_stanovanja_h USING btree (stanovanje_id)",
+          "columns": [
+            "stanovanje_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_stanovanja_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "STANOVANJA_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "STANOVANJA_H_PK",
+          "columns": [
+            "STANOVANJE_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "IDX_STANOVANJA_H_STAVBA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STANOVANJA_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STANOVANJE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STANOVANJA_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STANOVANJE_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_stavbe_centroidi_h",
+      "integration_id": "45293dec-bd13-11ef-bde9-0242ac120008",
+      "source": "NEP.STAVBE_H",
+      "source_key": "STAVBA_H_ID",
+      "target_key": "stavba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_stavbe_centroidi_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_centroidi_h_pkey ON public.kn_nep_stavbe_centroidi_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_centroid_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_centroid_h_pk ON public.kn_nep_stavbe_centroidi_h USING btree (stavba_h_id)",
+          "columns": [
+            "stavba_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h___mod_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h___mod_index ON public.kn_nep_stavbe_centroidi_h USING btree (__mod)",
+          "columns": [
+            "__mod"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_do_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_od_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_datum_sys_idx ON public.kn_nep_stavbe_centroidi_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_geom_idx ON public.kn_nep_stavbe_centroidi_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_gid_index",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_gid_index ON public.kn_nep_stavbe_centroidi_h USING btree (gid)",
+          "columns": [
+            "gid"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_nosilna_konstrukcija_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_nosilna_konstrukcija_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (nosilna_konstrukcija_id)",
+          "columns": [
+            "nosilna_konstrukcija_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_stavba_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_stavba_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (stavba_id)",
+          "columns": [
+            "stavba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_centroidi_h_tip_stavbe_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_centroidi_h_tip_stavbe_id_idx ON public.kn_nep_stavbe_centroidi_h USING btree (tip_stavbe_id)",
+          "columns": [
+            "tip_stavbe_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_stavbe_centroidi_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "STAVBE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "STAVBE_H_PK",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "IDX_STAVBE_H_OBCINA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "OBCINA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_CENTROID_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "CENTROID_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_COALESCE_OBRIS_CENTROID_GEOM",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "FUNCTION-BASED DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "SYS_NC00082$"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "TIP_STAVBE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_KO_ST_STAVBE_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID",
+            "ST_STAVBE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_NADZEMNI_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "NADZEMNI_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_OBRIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "OBRIS_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TEREN_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TEREN_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TLORIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TLORIS_GEOM"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_stavbe_obrisi_h",
+      "integration_id": "e54577ee-f9b0-11ef-bd51-02420a0001ec",
+      "source": "NEP.STAVBE_H",
+      "source_key": "STAVBA_H_ID",
+      "target_key": "stavba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_stavbe_obrisi_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_obrisi_h_pkey ON public.kn_nep_stavbe_obrisi_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_do_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_sys_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_geom_idx ON public.kn_nep_stavbe_obrisi_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_stavba_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_stavba_id_idx ON public.kn_nep_stavbe_obrisi_h USING btree (stavba_id)",
+          "columns": [
+            "stavba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_stavba_h_id_idx",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_obrisi_h_stavba_h_id_idx ON public.kn_nep_stavbe_obrisi_h USING btree (stavba_h_id)",
+          "columns": [
+            "stavba_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_obrisi_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_obrisi_h_datum_od_idx ON public.kn_nep_stavbe_obrisi_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_stavbe_obrisi_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "STAVBE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "STAVBE_H_PK",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "IDX_STAVBE_H_OBCINA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "OBCINA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_CENTROID_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "CENTROID_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_COALESCE_OBRIS_CENTROID_GEOM",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "FUNCTION-BASED DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "SYS_NC00082$"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "TIP_STAVBE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_KO_ST_STAVBE_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID",
+            "ST_STAVBE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_NADZEMNI_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "NADZEMNI_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_OBRIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "OBRIS_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TEREN_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TEREN_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TLORIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TLORIS_GEOM"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_stavbe_parcele_h",
+      "integration_id": "a33e8606-a8c0-11ef-84ad-0242ac120008",
+      "source": "NEP.STAVBE_PARCELE_H",
+      "source_key": "STAVBA_PARCELA_H_ID",
+      "target_key": "stavba_parcela_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_stavbe_parcele_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_parcele_h_pkey ON public.kn_nep_stavbe_parcele_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_parcele_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_geom_idx ON public.kn_nep_stavbe_parcele_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_parcele_h_geom_six",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_geom_six ON public.kn_nep_stavbe_parcele_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_parcele_h_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_parcele_h_id_idx ON public.kn_nep_stavbe_parcele_h USING btree (stavba_parcela_id)",
+          "columns": [
+            "stavba_parcela_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_parcele_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_parcele_h_pk ON public.kn_nep_stavbe_parcele_h USING btree (stavba_parcela_h_id)",
+          "columns": [
+            "stavba_parcela_h_id"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_stavbe_parcele_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "STAVBE_PARCELE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "STAVBE_PARCELE_H_PK",
+          "columns": [
+            "STAVBA_PARCELA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "STAVBE_PARCELE_H_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_PARCELE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_PARCELA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_PARCELE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_PARCELA_H_ID"
+          ]
+        }
+      ]
+    },
+    {
+      "table": "kn_nep_stavbe_zps_h",
+      "integration_id": "969f1312-ff45-11ef-8df0-0242ac120008",
+      "source": "NEP.STAVBE_H",
+      "source_key": "STAVBA_H_ID",
+      "target_key": "stavba_h_id",
+      "ignore_audit": true,
+      "ignore_audit_present": true,
+      "lift_column": {
+        "not_null": false,
+        "type": "bigint"
+      },
+      "lift_indexes": [
+        {
+          "name": "kn_nep_stavbe_zps_h_pkey",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_zps_h_pkey ON public.kn_nep_stavbe_zps_h USING btree (id)",
+          "columns": [
+            "id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_h_pk",
+          "method": "btree",
+          "is_unique": true,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE UNIQUE INDEX kn_nep_stavbe_h_pk ON public.kn_nep_stavbe_zps_h USING btree (stavba_h_id)",
+          "columns": [
+            "stavba_h_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_zps_h_datum_do_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_do_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_do)",
+          "columns": [
+            "datum_do"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_zps_h_datum_sys_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_sys_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_sys)",
+          "columns": [
+            "datum_sys"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_zps_h_geom_idx",
+          "method": "gist",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_zps_h_geom_idx ON public.kn_nep_stavbe_zps_h USING gist (geom)",
+          "columns": [
+            "geom"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_zps_h_stavba_id_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_zps_h_stavba_id_idx ON public.kn_nep_stavbe_zps_h USING btree (stavba_id)",
+          "columns": [
+            "stavba_id"
+          ]
+        },
+        {
+          "name": "kn_nep_stavbe_zps_h_datum_od_idx",
+          "method": "btree",
+          "is_unique": false,
+          "valid": true,
+          "ready": true,
+          "predicate": null,
+          "definition": "CREATE INDEX kn_nep_stavbe_zps_h_datum_od_idx ON public.kn_nep_stavbe_zps_h USING btree (datum_od)",
+          "columns": [
+            "datum_od"
+          ]
+        }
+      ],
+      "lift_constraints": [
+        {
+          "name": "kn_nep_stavbe_zps_h_pkey",
+          "type": "p",
+          "validated": true,
+          "definition": "PRIMARY KEY (id)",
+          "columns": [
+            "id"
+          ]
+        }
+      ],
+      "oracle_column": {
+        "type": "NUMBER",
+        "nullable": "N"
+      },
+      "oracle_constraints": [
+        {
+          "name": "STAVBE_H_PK",
+          "type": "P",
+          "status": "ENABLED",
+          "validated": "VALIDATED",
+          "index": "STAVBE_H_PK",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        }
+      ],
+      "oracle_indexes": [
+        {
+          "owner": "NEP",
+          "name": "IDX_STAVBE_H_OBCINA_ID",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "OBCINA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_CENTROID_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "CENTROID_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_COALESCE_OBRIS_CENTROID_GEOM",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "FUNCTION-BASED DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "SYS_NC00082$"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_ID_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_IDX01",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "TIP_STAVBE_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_KO_ST_STAVBE_IDX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "KO_ID",
+            "ST_STAVBE"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_NADZEMNI_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "NADZEMNI_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_OBRIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "OBRIS_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_PK",
+          "uniqueness": "UNIQUE",
+          "status": "VALID",
+          "type": "NORMAL",
+          "partitioned": "NO",
+          "columns": [
+            "STAVBA_H_ID"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TEREN_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TEREN_GEOM"
+          ]
+        },
+        {
+          "owner": "NEP",
+          "name": "STAVBE_H_TLORIS_GEOM_SIX",
+          "uniqueness": "NONUNIQUE",
+          "status": "VALID",
+          "type": "DOMAIN",
+          "partitioned": "NO",
+          "columns": [
+            "TLORIS_GEOM"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,373 @@
+{
+  "rows": [
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "num_rows": 1924829,
+      "last_analyzed": "2026-04-21 21:05:24",
+      "index_name": "DEL_STAVBE_ENOTA_PK",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "num_rows": 1924829,
+      "last_analyzed": "2026-04-21 21:05:24",
+      "index_name": "DEL_STAVBE_ENOTA_2_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "EVALUATION_MODEL_STAT",
+      "num_rows": 2081660,
+      "last_analyzed": "2026-10-12 21:05:06",
+      "index_name": "IX_EVALUATION_MODEL_STAT_REV",
+      "column_name": "REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IDX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAVBE_ENOTA_REV_IX",
+      "column_name": "SYS_NC00016$",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "DST_SID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "ID_MODEL",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "num_rows": 11673062,
+      "last_analyzed": "2025-11-05 22:01:46",
+      "index_name": "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 4
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "IDX_JN_PARC_ENOTA_LOOKUP",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "IDX_JN_PARC_ENOTA_LOOKUP",
+      "column_name": "PC_MID",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "IDX_JN_PARC_ENOTA_LOOKUP",
+      "column_name": "ID_MODEL",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "IDX_JN_PARC_ENOTA_LOOKUP",
+      "column_name": "POSPLOSENA_VREDNOST",
+      "column_position": 4
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODEL_IX",
+      "column_name": "PC_MID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODEL_IX",
+      "column_name": "ID_MODEL",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODELREV_IX",
+      "column_name": "PC_MID",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODELREV_IX",
+      "column_name": "ID_MODEL",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODELREV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PCMIDMODELREV_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 4
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PK_JNF_IX",
+      "column_name": "ID_PARC_ENOTA",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PK_JNF_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PK_JNFT_IX",
+      "column_name": "ID_PARC_ENOTA",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 2
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_PK_JNFT_IX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 3
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_REV_IDX",
+      "column_name": "JN_REV_NUM_TO",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_REV_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "num_rows": 94442718,
+      "last_analyzed": "2026-10-13 21:03:26",
+      "index_name": "JN_PARC_ENOTA_REV_IX",
+      "column_name": "SYS_NC00018$",
+      "column_position": 2
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "IDX_PARC_ENOTA_REV",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "IDX_PARC_ENOTA_REV",
+      "column_name": "PC_MID",
+      "column_position": 2
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "IDX_PARC_ENOTA_REV",
+      "column_name": "ID_MODEL",
+      "column_position": 3
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "PARC_ENOTA_FAKTOR_IX",
+      "column_name": "FAKTOR_PO",
+      "column_position": 1
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "PARC_ENOTA_PK",
+      "column_name": "ID_PARC_ENOTA",
+      "column_position": 1
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "PARC_ENOTA_UIX",
+      "column_name": "PC_MID",
+      "column_position": 1
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "PARC_ENOTA_UIX",
+      "column_name": "ID_MODEL",
+      "column_position": 2
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "num_rows": 8344872,
+      "last_analyzed": "2026-10-09 21:02:37",
+      "index_name": "PARC_ENOTA_3_IX",
+      "column_name": "JN_REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "num_rows": 1722,
+      "last_analyzed": "2026-06-05 21:02:48",
+      "index_name": "REVISION_CREATED_ID",
+      "column_name": "SYS_NC00008$",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "num_rows": 1722,
+      "last_analyzed": "2026-06-05 21:02:48",
+      "index_name": "REVISION_NUM_DATE_IX",
+      "column_name": "REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "num_rows": 1722,
+      "last_analyzed": "2026-06-05 21:02:48",
+      "index_name": "REVISION_NUM_DATE_IX",
+      "column_name": "SYS_NC00008$",
+      "column_position": 2
+    },
+    {
+      "table_name": "REVISION",
+      "num_rows": 1722,
+      "last_analyzed": "2026-06-05 21:02:48",
+      "index_name": "REVISION_PK",
+      "column_name": "REV_NUM",
+      "column_position": 1
+    },
+    {
+      "table_name": "REVISION",
+      "num_rows": 1722,
+      "last_analyzed": "2026-06-05 21:02:48",
+      "index_name": "REVISION_USER_ID_IDX",
+      "column_name": "ID_USER",
+      "column_position": 1
+    }
+  ],
+  "truncated": false
+}

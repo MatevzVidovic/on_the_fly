@@ -1,0 +1,117 @@
+{
+  "rows": [
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "num_distinct": 11,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24"
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "num_distinct": 10,
+      "num_nulls": 2891,
+      "histogram": "NONE",
+      "last_analyzed": "2026-04-21 21:05:24"
+    },
+    {
+      "table_name": "DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "num_distinct": 119,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-04-21 21:05:24"
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL",
+      "num_distinct": 11,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2025-11-05 22:01:46"
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "num_distinct": 20,
+      "num_nulls": 81624,
+      "histogram": "NONE",
+      "last_analyzed": "2025-11-05 22:01:46"
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "num_distinct": 1264,
+      "num_nulls": 0,
+      "histogram": "HYBRID",
+      "last_analyzed": "2025-11-05 22:01:46"
+    },
+    {
+      "table_name": "JN_DEL_STAVBE_ENOTA",
+      "column_name": "JN_REV_NUM_TO",
+      "num_distinct": 1258,
+      "num_nulls": 2001149,
+      "histogram": "HYBRID",
+      "last_analyzed": "2025-11-05 22:01:46"
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "num_distinct": 6,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-13 21:03:26"
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "num_distinct": 8,
+      "num_nulls": 12696084,
+      "histogram": "NONE",
+      "last_analyzed": "2026-10-13 21:03:26"
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "num_distinct": 1560,
+      "num_nulls": 0,
+      "histogram": "HYBRID",
+      "last_analyzed": "2026-10-13 21:03:26"
+    },
+    {
+      "table_name": "JN_PARC_ENOTA",
+      "column_name": "JN_REV_NUM_TO",
+      "num_distinct": 1559,
+      "num_nulls": 10218373,
+      "histogram": "HYBRID",
+      "last_analyzed": "2026-10-13 21:03:26"
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL",
+      "num_distinct": 6,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37"
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "ID_MODEL_VER",
+      "num_distinct": 4,
+      "num_nulls": 929834,
+      "histogram": "NONE",
+      "last_analyzed": "2026-10-09 21:02:37"
+    },
+    {
+      "table_name": "PARC_ENOTA",
+      "column_name": "JN_REV_NUM",
+      "num_distinct": 242,
+      "num_nulls": 0,
+      "histogram": "FREQUENCY",
+      "last_analyzed": "2026-10-09 21:02:37"
+    }
+  ],
+  "truncated": false
+}

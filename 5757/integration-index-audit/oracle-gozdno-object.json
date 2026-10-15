@@ -1,0 +1,37 @@
+{
+  "rows": [
+    {
+      "owner": "NEP_OSTALO",
+      "object_name": "GOZDNO_GOSP_OBM",
+      "object_type": "TABLE",
+      "referenced_owner": "SYS",
+      "referenced_name": "STANDARD",
+      "referenced_type": "PACKAGE"
+    },
+    {
+      "owner": "NEP_OSTALO",
+      "object_name": "GOZDNO_GOSP_OBM",
+      "object_type": "TABLE",
+      "referenced_owner": "MDSYS",
+      "referenced_name": "SDO_ORDINATE_ARRAY",
+      "referenced_type": "TYPE"
+    },
+    {
+      "owner": "NEP_OSTALO",
+      "object_name": "GOZDNO_GOSP_OBM",
+      "object_type": "TABLE",
+      "referenced_owner": "MDSYS",
+      "referenced_name": "SDO_ELEM_INFO_ARRAY",
+      "referenced_type": "TYPE"
+    },
+    {
+      "owner": "NEP_OSTALO",
+      "object_name": "GOZDNO_GOSP_OBM",
+      "object_type": "TABLE",
+      "referenced_owner": "MDSYS",
+      "referenced_name": "SDO_GEOMETRY",
+      "referenced_type": "TYPE"
+    }
+  ],
+  "truncated": false
+}

@@ -1,0 +1,276 @@
+{
+  "ev_parc_enota_h_2020": [
+    {
+      "id_model": "DRZ",
+      "id_model_ver": 1163,
+      "sampled_rows": 9,
+      "first_sampled_start": "2020-04-20T14:05:58.165505",
+      "last_sampled_start": "2020-12-03T04:00:01.40807",
+      "first_sampled_end": "2020-09-22T04:00:01.677288",
+      "last_sampled_end": "2022-12-27T00:00:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "GOZ",
+      "id_model_ver": 1162,
+      "sampled_rows": 36,
+      "first_sampled_start": "2020-04-01T12:00:00",
+      "last_sampled_start": "2020-12-03T04:00:01.40807",
+      "first_sampled_end": "2020-04-20T14:05:58.165505",
+      "last_sampled_end": "2022-12-27T00:00:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "KME",
+      "id_model_ver": 1161,
+      "sampled_rows": 63,
+      "first_sampled_start": "2020-04-01T12:00:00",
+      "last_sampled_start": "2020-12-03T04:00:01.40807",
+      "first_sampled_end": "2020-04-20T14:05:58.165505",
+      "last_sampled_end": "2022-12-27T00:00:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "STZ",
+      "id_model_ver": 1164,
+      "sampled_rows": 61,
+      "first_sampled_start": "2020-04-01T12:00:00",
+      "last_sampled_start": "2020-12-03T04:00:01.40807",
+      "first_sampled_end": "2020-04-20T14:05:58.165505",
+      "last_sampled_end": "2022-12-27T00:00:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "ZPS",
+      "id_model_ver": null,
+      "sampled_rows": 32,
+      "first_sampled_start": "2020-04-01T12:00:00",
+      "last_sampled_start": "2020-12-03T04:00:01.40807",
+      "first_sampled_end": "2020-04-20T14:05:58.165505",
+      "last_sampled_end": "2021-06-18T04:00:01.833135",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    }
+  ],
+  "ev_parc_enota_h_2021": [
+    {
+      "id_model": "DRZ",
+      "id_model_ver": 1163,
+      "sampled_rows": 13,
+      "first_sampled_start": "2021-02-22T04:00:02.028032",
+      "last_sampled_start": "2021-03-06T12:00:01.364723",
+      "first_sampled_end": "2021-06-18T04:00:01.833135",
+      "last_sampled_end": "2021-06-18T04:00:01.833135",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "KME",
+      "id_model_ver": 1161,
+      "sampled_rows": 8,
+      "first_sampled_start": "2021-02-22T04:00:02.028032",
+      "last_sampled_start": "2021-03-06T12:00:01.364723",
+      "first_sampled_end": "2021-06-18T04:00:01.833135",
+      "last_sampled_end": "2021-06-18T04:00:01.833135",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "STZ",
+      "id_model_ver": 1164,
+      "sampled_rows": 12,
+      "first_sampled_start": "2021-02-22T04:00:02.028032",
+      "last_sampled_start": "2021-03-06T12:00:01.364723",
+      "first_sampled_end": "2021-06-18T04:00:01.833135",
+      "last_sampled_end": "2021-06-18T04:00:01.833135",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "ZPS",
+      "id_model_ver": null,
+      "sampled_rows": 7,
+      "first_sampled_start": "2021-02-22T04:00:02.028032",
+      "last_sampled_start": "2021-03-06T12:00:01.364723",
+      "first_sampled_end": "2021-06-18T04:00:01.833135",
+      "last_sampled_end": "2021-06-18T04:00:01.833135",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    }
+  ],
+  "ev_parc_enota_h_2022": [
+    {
+      "id_model": "DRZ",
+      "id_model_ver": 1163,
+      "sampled_rows": 4,
+      "first_sampled_start": "2022-05-14T14:00:01.608108",
+      "last_sampled_start": "2022-12-27T00:00:00",
+      "first_sampled_end": "2022-12-27T00:00:00",
+      "last_sampled_end": "2024-01-12T08:59:30.140102",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "GOZ",
+      "id_model_ver": 1162,
+      "sampled_rows": 23,
+      "first_sampled_start": "2022-05-14T14:00:01.608108",
+      "last_sampled_start": "2022-12-27T00:00:00",
+      "first_sampled_end": "2022-12-27T00:00:00",
+      "last_sampled_end": "2025-03-10T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "KME",
+      "id_model_ver": 1161,
+      "sampled_rows": 22,
+      "first_sampled_start": "2022-05-14T14:00:01.608108",
+      "last_sampled_start": "2022-12-27T00:00:00",
+      "first_sampled_end": "2022-12-27T00:00:00",
+      "last_sampled_end": "2024-06-27T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "STZ",
+      "id_model_ver": 1164,
+      "sampled_rows": 49,
+      "first_sampled_start": "2022-12-27T00:00:00",
+      "last_sampled_start": "2022-12-27T00:00:00",
+      "first_sampled_end": "2023-04-13T13:21:29",
+      "last_sampled_end": "2024-06-27T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "ZPS",
+      "id_model_ver": null,
+      "sampled_rows": 21,
+      "first_sampled_start": "2022-12-27T00:00:00",
+      "last_sampled_start": "2022-12-27T00:00:00",
+      "first_sampled_end": "2023-04-13T13:21:29",
+      "last_sampled_end": "2024-02-26T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    }
+  ],
+  "ev_parc_enota_h_2023": [
+    {
+      "id_model": "DRZ",
+      "id_model_ver": 1163,
+      "sampled_rows": 25,
+      "first_sampled_start": "2023-08-29T00:30:01",
+      "last_sampled_start": "2023-12-13T00:30:01",
+      "first_sampled_end": "2023-12-07T00:30:00",
+      "last_sampled_end": "2023-12-14T00:30:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "GOZ",
+      "id_model_ver": 1162,
+      "sampled_rows": 14,
+      "first_sampled_start": "2023-08-29T00:30:01",
+      "last_sampled_start": "2023-12-12T00:30:01",
+      "first_sampled_end": "2023-12-07T00:30:00",
+      "last_sampled_end": "2025-03-05T00:30:00",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "KME",
+      "id_model_ver": 1161,
+      "sampled_rows": 37,
+      "first_sampled_start": "2023-08-29T00:30:01",
+      "last_sampled_start": "2023-12-13T00:30:01",
+      "first_sampled_end": "2023-12-13T00:30:01",
+      "last_sampled_end": "2025-03-06T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "STZ",
+      "id_model_ver": 1164,
+      "sampled_rows": 32,
+      "first_sampled_start": "2023-08-29T00:30:01",
+      "last_sampled_start": "2023-12-13T00:30:01",
+      "first_sampled_end": "2023-09-18T00:30:01",
+      "last_sampled_end": "2025-03-06T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "ZPS",
+      "id_model_ver": null,
+      "sampled_rows": 11,
+      "first_sampled_start": "2023-08-29T00:30:01",
+      "last_sampled_start": "2023-12-13T00:30:01",
+      "first_sampled_end": "2023-12-07T00:30:00",
+      "last_sampled_end": "2025-03-06T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    }
+  ],
+  "ev_parc_enota_h_2024": [
+    {
+      "id_model": "DRZ",
+      "id_model_ver": 1163,
+      "sampled_rows": 7,
+      "first_sampled_start": "2024-02-26T00:30:01",
+      "last_sampled_start": "2024-11-19T00:30:00",
+      "first_sampled_end": "2024-02-27T00:30:01",
+      "last_sampled_end": "2024-02-29T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "GOZ",
+      "id_model_ver": 1162,
+      "sampled_rows": 31,
+      "first_sampled_start": "2024-02-26T00:30:01",
+      "last_sampled_start": "2024-11-19T00:30:00",
+      "first_sampled_end": "2024-02-27T00:30:01",
+      "last_sampled_end": "2024-02-29T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "KME",
+      "id_model_ver": 1161,
+      "sampled_rows": 72,
+      "first_sampled_start": "2024-02-26T00:30:01",
+      "last_sampled_start": "2024-11-19T00:30:00",
+      "first_sampled_end": "2024-02-27T00:30:01",
+      "last_sampled_end": "2025-03-25T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "STZ",
+      "id_model_ver": 1164,
+      "sampled_rows": 10,
+      "first_sampled_start": "2024-02-28T00:30:00",
+      "last_sampled_start": "2024-11-19T00:30:00",
+      "first_sampled_end": "2024-02-29T00:30:01",
+      "last_sampled_end": "2025-03-25T00:30:01",
+      "missing_start": 0,
+      "reversed_intervals": 0
+    },
+    {
+      "id_model": "ZPS",
+      "id_model_ver": null,
+      "sampled_rows": 3,
+      "first_sampled_start": "2024-07-30T00:30:01",
+      "last_sampled_start": "2024-11-19T00:30:00",
+      "first_sampled_end": null,
+      "last_sampled_end": null,
+      "missing_start": 0,
+      "reversed_intervals": 0
+    }
+  ]
+}

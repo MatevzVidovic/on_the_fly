@@ -1,0 +1,16 @@
+[
+  {
+    "spremenljivka": "velikost",
+    "id": "5c8efe17-3233-42ab-b0b5-cac7ab1c8a6c",
+    "opis": "Velikost",
+    "pogoj": null,
+    "vrednost_enacba": "neto_povr - coalesce(0.3 * sum(CASE WHEN id_prostora = 17 THEN povrsina ELSE 0 END), 0)"
+  },
+  {
+    "spremenljivka": "leto_obn",
+    "id": "18dd4e4f-ef46-4e0d-8872-a36a6da7d006",
+    "opis": "Povpre\u010dno leto obnove",
+    "pogoj": null,
+    "vrednost_enacba": "0.29 * coalesce(leto_obn_fasade, leto_izg) + 0.13 * coalesce(leto_obn_strehe, leto_izg) + 0.29 * coalesce(leto_obn_oken, leto_izg) + 0.29 * coalesce(leto_obn_inst, leto_izg)"
+  }
+]

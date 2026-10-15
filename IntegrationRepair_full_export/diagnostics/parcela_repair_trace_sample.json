@@ -1,0 +1,36 @@
+{
+  "at": "2026-10-15T11:41:55.881899+00:00",
+  "old_run": "03ff3376-0110-4c42-a617-07662100d1bf",
+  "new_run": "007bbd84-c118-41b5-86f1-34e6a897abb1",
+  "old_upserts": 28621,
+  "new_upserts": 28621,
+  "new_keys": 0,
+  "dropped_keys": 0,
+  "changed_source_dates": 0,
+  "database": "fmp_data_gurs",
+  "current_rows": {
+    "missing": 1,
+    "older": 1
+  },
+  "profiles": [
+    {
+      "uuid_version": 4,
+      "created_by": "154f70e2-a1a1-11ef-9574-0242ac120008",
+      "updated_by": "None",
+      "count": 1
+    }
+  ],
+  "examples": [
+    {
+      "key": "130311266-1354",
+      "id": "8e8409be-7c75-474a-9a72-789a20c5d82f",
+      "expected_date": "2026-01-07 23:59:59.999000",
+      "current_date": "2022-12-27 00:00:00",
+      "created_at": "2025-11-07 17:00:27.810284",
+      "updated_at": "None",
+      "created_by": "154f70e2-a1a1-11ef-9574-0242ac120008",
+      "updated_by": "None"
+    }
+  ],
+  "passed": false
+}

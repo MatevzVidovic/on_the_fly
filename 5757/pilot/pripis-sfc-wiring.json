@@ -1,0 +1,35 @@
+[
+  {
+    "sfc_item_id": "06635e34-6407-11f1-a726-0ecfb36ed36d",
+    "title": "Izra\u010dun vrednosti enot vrednotenja",
+    "description": "Gumb na posameznem zapisu v pripis_presecni_datum.\nOb kliku po\u017eene workflow za izra\u010dun vrednosti enot vrednotenja.\n\nNa BE se po\u0161lje id zapisa kot id_rel_pr_datum.",
+    "table_name": "pripis_presecni_datum",
+    "position_key": "RESULTS_TABLE_ROW_MENU",
+    "layer_id": null,
+    "menu_order": 24,
+    "inline_js_present": false,
+    "inline_button_js_present": false
+  },
+  {
+    "sfc_item_id": "2c3a6eb8-6407-11f1-b10e-0ecfb36ed36d",
+    "title": "Generiranje enot vrednotenja",
+    "description": "Gumb na posameznem zapisu v pripis_presecni_datum.\nOb kliku pozene workflow za generiranje enot vrednotenja.\n\nNa BE se poslje id zapisa kot id-pr-datum.",
+    "table_name": "pripis_presecni_datum",
+    "position_key": "RESULTS_TABLE_ROW_MENU",
+    "layer_id": null,
+    "menu_order": 25,
+    "inline_js_present": false,
+    "inline_button_js_present": false
+  },
+  {
+    "sfc_item_id": "efa10dfe-8026-11f1-915a-02420a0002b3",
+    "title": "Delitev vrednosti PEV",
+    "description": "Gumb na posameznem zapisu v pripis_presecni_datum.\nOb kliku po\u017eene workflow za delitev vrednosti PEV.\n\nWorkflow prejme id zapisa kot samostojno vrednost.",
+    "table_name": "pripis_presecni_datum",
+    "position_key": "RESULTS_TABLE_ROW_MENU",
+    "layer_id": null,
+    "menu_order": 28,
+    "inline_js_present": false,
+    "inline_button_js_present": false
+  }
+]

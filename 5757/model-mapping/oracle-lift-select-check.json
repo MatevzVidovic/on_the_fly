@@ -1,0 +1,27 @@
+{
+  "rows": [
+    {
+      "ev_model_version_id": 1150,
+      "model": "IND",
+      "datum_modela_text": "1.1.2020",
+      "original_gv_version_text": "51",
+      "runtime_gv_version_text": "51",
+      "ev_model_group_id": 2,
+      "model_valid_from": "2020-03-19 14:17:56",
+      "model_valid_to": "2090-12-31 14:16:42",
+      "group_market_date": "2020-01-01 00:00:00"
+    },
+    {
+      "ev_model_version_id": 1173,
+      "model": "IND",
+      "datum_modela_text": "1.1.2025",
+      "original_gv_version_text": "66",
+      "runtime_gv_version_text": "66",
+      "ev_model_group_id": 3,
+      "model_valid_from": "2025-05-11 13:00:49",
+      "model_valid_to": "2090-12-31 13:00:39",
+      "group_market_date": "2025-01-01 12:50:55"
+    }
+  ],
+  "truncated": false
+}

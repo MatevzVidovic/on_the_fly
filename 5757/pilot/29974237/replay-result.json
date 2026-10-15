@@ -1,0 +1,43 @@
+{
+  "variables": {
+    "dat_pri": "2026-01-01",
+    "dej_raba_dst": "17",
+    "id_elektrika": "false",
+    "id_kanalizacija": "false",
+    "id_konstrukcije": "1",
+    "id_lega": "2",
+    "id_plin": "null",
+    "id_tao": "1501",
+    "id_vodovod": "false",
+    "leto_izg": "1900",
+    "leto_obn": "1900.00",
+    "st_ravni": "6",
+    "velikost": "28.63",
+    "velikost_m2": "28.63",
+    "visina_etaze_rzd": "null",
+    "zps_dst": "50.00"
+  },
+  "factors": {
+    "f_cpt": "1.0000",
+    "f_last": "1.0",
+    "f_nk": "1.00",
+    "f_obn": "1",
+    "f_rt_m2": "0.04",
+    "f_rt_osnova": "0",
+    "v_dst": "420000",
+    "v_zps": "210"
+  },
+  "ev_xml_coefficient": "0.036",
+  "common_land_value": "10500.00",
+  "ev_reconstructed": "14824.3200",
+  "isam_formula_reconstructed": "15309.8400",
+  "isam_stored": "15310.0",
+  "difference": "485.6800",
+  "difference_components": {
+    "coefficient_precision": "480.98400",
+    "size_difference": "4.53600",
+    "stored_total_minus_reconstructed_formula": "0.1600"
+  },
+  "coefficient_only_corrected_total_rounded": "14828.86",
+  "scope": "Offline captured-data arithmetic, not a rerun of the live pipeline."
+}

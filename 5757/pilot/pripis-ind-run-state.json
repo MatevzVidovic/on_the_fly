@@ -1,0 +1,41 @@
+{
+  "dates": [
+    {
+      "id": "7273d0e6-6b09-11f1-86b6-424abd3ca6bd",
+      "datum": "2025-01-01"
+    },
+    {
+      "id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01"
+    },
+    {
+      "id": "ff611d92-6bb8-11f1-b613-424abd3ca6bd",
+      "datum": "2026-06-18"
+    }
+  ],
+  "ind_models": [
+    {
+      "id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "model": "IND",
+      "verzija": 66,
+      "datum_modela": "2025-01-01",
+      "pripisna": true
+    },
+    {
+      "id": "99956834-d772-4f90-b01a-0078f15f6062",
+      "model": "IND",
+      "verzija": 51,
+      "datum_modela": "2020-01-01",
+      "pripisna": true
+    }
+  ],
+  "ind_configs": [
+    {
+      "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+      "id_rel_pr_datum": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "id_rel_verzije_modeli": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "verzija": 66,
+      "datum": "2026-01-01"
+    }
+  ]
+}

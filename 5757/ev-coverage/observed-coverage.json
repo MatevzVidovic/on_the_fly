@@ -1,0 +1,704 @@
+{
+  "sampled_at_utc": "2026-10-15T12:45:55.193614+00:00",
+  "oracle": {
+    "DEL_STAVBE_ENOTA": [],
+    "JN_DEL_STAVBE_ENOTA": [
+      {
+        "id_model": "GAR",
+        "id_model_ver": 1155,
+        "sampled_rows": 245,
+        "example_unit": 28715445,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-16 04:00:03.420767",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 3
+      },
+      {
+        "id_model": "HIS",
+        "id_model_ver": 1149,
+        "sampled_rows": 643,
+        "example_unit": 28715437,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-06 23:22:56.342803",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 4
+      },
+      {
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "sampled_rows": 35,
+        "example_unit": 28720168,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-16 04:00:03.420767",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 3
+      },
+      {
+        "id_model": "INP",
+        "id_model_ver": 1151,
+        "sampled_rows": 2,
+        "example_unit": 32190348,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2022-12-27 00:00:00",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      },
+      {
+        "id_model": "KDS",
+        "id_model_ver": 1165,
+        "sampled_rows": 1734,
+        "example_unit": 28507678,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-16 04:00:03.420767",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 653
+      },
+      {
+        "id_model": "NAPAKA",
+        "id_model_ver": null,
+        "sampled_rows": 17,
+        "example_unit": 28715447,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-04-21 07:29:39.575906",
+        "latest_sampled_end": "2023-04-13 13:21:29",
+        "open_rows": 0
+      },
+      {
+        "id_model": "PPL",
+        "id_model_ver": 1152,
+        "sampled_rows": 27,
+        "example_unit": 28715439,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-15 04:00:01.915043",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 0
+      },
+      {
+        "id_model": "PPP",
+        "id_model_ver": 1153,
+        "sampled_rows": 53,
+        "example_unit": 28590628,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-16 04:00:03.420767",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 0
+      },
+      {
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "sampled_rows": 17,
+        "example_unit": 28716144,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-06-16 04:00:03.420767",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 0
+      },
+      {
+        "id_model": "STA",
+        "id_model_ver": 1148,
+        "sampled_rows": 227,
+        "example_unit": 28518824,
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2022-12-27 00:00:00",
+        "earliest_sampled_end": "2020-05-23 12:00:01.457849",
+        "latest_sampled_end": "2025-05-13 23:59:59",
+        "open_rows": 0
+      }
+    ],
+    "PARC_ENOTA": [
+      {
+        "id_model": "DRZ",
+        "id_model_ver": 1169,
+        "sampled_rows": 254,
+        "example_unit": "100000003802.DRZ",
+        "earliest_sampled_start": "2025-11-02 23:59:59.999000",
+        "latest_sampled_start": "2026-10-12 23:59:59.999000",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "open_rows": null
+      },
+      {
+        "id_model": "GOZ",
+        "id_model_ver": 1171,
+        "sampled_rows": 778,
+        "example_unit": "100000003802.GOZ",
+        "earliest_sampled_start": "2025-11-02 23:59:59.999000",
+        "latest_sampled_start": "2026-10-12 23:59:59.999000",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "open_rows": null
+      },
+      {
+        "id_model": "KME",
+        "id_model_ver": 1176,
+        "sampled_rows": 1121,
+        "example_unit": "100000003802.KME",
+        "earliest_sampled_start": "2025-11-02 23:59:59.999000",
+        "latest_sampled_start": "2026-10-08 23:59:59.999000",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "open_rows": null
+      },
+      {
+        "id_model": "STZ",
+        "id_model_ver": 1181,
+        "sampled_rows": 592,
+        "example_unit": "100000003802.STZ",
+        "earliest_sampled_start": "2025-11-02 23:59:59.999000",
+        "latest_sampled_start": "2026-10-12 23:59:59.999000",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "open_rows": null
+      },
+      {
+        "id_model": "ZPS",
+        "id_model_ver": null,
+        "sampled_rows": 255,
+        "example_unit": "100000130231.ZPS",
+        "earliest_sampled_start": "2025-11-02 23:59:59.999000",
+        "latest_sampled_start": "2026-10-12 23:59:59.999000",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "open_rows": null
+      }
+    ],
+    "JN_PARC_ENOTA": [
+      {
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "sampled_rows": 199,
+        "example_unit": "24571138.DRZ",
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2020-04-20 14:05:58.165505",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      },
+      {
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "sampled_rows": 608,
+        "example_unit": "24563889.GOZ",
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2020-04-20 14:05:58.165505",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      },
+      {
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "sampled_rows": 1184,
+        "example_unit": "24563885.KME",
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2020-04-20 14:05:58.165505",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      },
+      {
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "sampled_rows": 736,
+        "example_unit": "24563899.STZ",
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2020-04-20 14:05:58.165505",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      },
+      {
+        "id_model": "ZPS",
+        "id_model_ver": null,
+        "sampled_rows": 273,
+        "example_unit": "24566004.ZPS",
+        "earliest_sampled_start": "2020-04-01 12:00:00",
+        "latest_sampled_start": "2020-04-01 12:00:00",
+        "earliest_sampled_end": "2020-04-20 14:05:58.165505",
+        "latest_sampled_end": "2022-12-27 00:00:00",
+        "open_rows": 0
+      }
+    ]
+  },
+  "staging": {
+    "ev_del_stavbe_enota": [
+      {
+        "id_model": "GAR",
+        "id_model_ver": 1155,
+        "sampled_rows": 38,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 38
+      },
+      {
+        "id_model": "HIS",
+        "id_model_ver": 1149,
+        "sampled_rows": 149,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 149
+      },
+      {
+        "id_model": "IND",
+        "id_model_ver": 1150,
+        "sampled_rows": 8,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 8
+      },
+      {
+        "id_model": "KDS",
+        "id_model_ver": 1165,
+        "sampled_rows": 158,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 158
+      },
+      {
+        "id_model": "PPL",
+        "id_model_ver": 1152,
+        "sampled_rows": 4,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 4
+      },
+      {
+        "id_model": "PPP",
+        "id_model_ver": 1153,
+        "sampled_rows": 24,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 24
+      },
+      {
+        "id_model": "SDP",
+        "id_model_ver": 1154,
+        "sampled_rows": 4,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 4
+      },
+      {
+        "id_model": "STA",
+        "id_model_ver": 1148,
+        "sampled_rows": 88,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 88
+      },
+      {
+        "id_model": "TUR",
+        "id_model_ver": 1156,
+        "sampled_rows": 1,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 1
+      }
+    ],
+    "ev_del_stavbe_enota_h_2020_2024": [
+      {
+        "id_model": "GAR",
+        "id_model_ver": null,
+        "sampled_rows": 182,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 182
+      },
+      {
+        "id_model": "HIS",
+        "id_model_ver": null,
+        "sampled_rows": 346,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 346
+      },
+      {
+        "id_model": "IND",
+        "id_model_ver": null,
+        "sampled_rows": 23,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 23
+      },
+      {
+        "id_model": "INP",
+        "id_model_ver": null,
+        "sampled_rows": 5,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 5
+      },
+      {
+        "id_model": "KDS",
+        "id_model_ver": null,
+        "sampled_rows": 349,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 349
+      },
+      {
+        "id_model": "NAPAKA",
+        "id_model_ver": null,
+        "sampled_rows": 12,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 12
+      },
+      {
+        "id_model": "PPL",
+        "id_model_ver": null,
+        "sampled_rows": 11,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 11
+      },
+      {
+        "id_model": "PPP",
+        "id_model_ver": null,
+        "sampled_rows": 46,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 46
+      },
+      {
+        "id_model": "SDP",
+        "id_model_ver": null,
+        "sampled_rows": 12,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 12
+      },
+      {
+        "id_model": "STA",
+        "id_model_ver": null,
+        "sampled_rows": 170,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 170
+      },
+      {
+        "id_model": "TUR",
+        "id_model_ver": null,
+        "sampled_rows": 8,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 8
+      }
+    ],
+    "ev_del_stavbe_enota_h_2025_danes": [
+      {
+        "id_model": "GAR",
+        "id_model_ver": null,
+        "sampled_rows": 129,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2026-02-15T23:59:59.999",
+        "earliest_sampled_end": "2025-09-10T23:59:59.999",
+        "latest_sampled_end": "2026-05-12T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "HIS",
+        "id_model_ver": null,
+        "sampled_rows": 178,
+        "earliest_sampled_start": "2025-03-21T00:30:00",
+        "latest_sampled_start": "2026-02-03T23:59:59.999",
+        "earliest_sampled_end": "2025-05-13T23:59:59",
+        "latest_sampled_end": "2026-05-12T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "IND",
+        "id_model_ver": null,
+        "sampled_rows": 14,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-07-17T23:59:59.999",
+        "latest_sampled_end": "2026-02-03T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "INP",
+        "id_model_ver": null,
+        "sampled_rows": 1,
+        "earliest_sampled_start": "2025-11-02T23:59:59.999",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "KDS",
+        "id_model_ver": null,
+        "sampled_rows": 304,
+        "earliest_sampled_start": "2025-03-21T00:30:00",
+        "latest_sampled_start": "2026-02-03T23:59:59.999",
+        "earliest_sampled_end": "2025-05-13T23:59:59",
+        "latest_sampled_end": "2026-05-12T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "NAPAKA",
+        "id_model_ver": null,
+        "sampled_rows": 2,
+        "earliest_sampled_start": "2025-11-02T23:59:59.999",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "PPL",
+        "id_model_ver": null,
+        "sampled_rows": 22,
+        "earliest_sampled_start": "2025-03-21T00:30:00",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-05-13T23:59:59",
+        "latest_sampled_end": "2025-11-02T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "PPP",
+        "id_model_ver": null,
+        "sampled_rows": 40,
+        "earliest_sampled_start": "2025-03-21T00:30:00",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-05-13T23:59:59",
+        "latest_sampled_end": "2026-02-03T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "SDP",
+        "id_model_ver": null,
+        "sampled_rows": 13,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-11-02T23:59:59.999",
+        "latest_sampled_end": "2026-02-03T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "STA",
+        "id_model_ver": null,
+        "sampled_rows": 151,
+        "earliest_sampled_start": "2025-03-21T00:30:00",
+        "latest_sampled_start": "2026-02-03T23:59:59.999",
+        "earliest_sampled_end": "2025-05-13T23:59:59",
+        "latest_sampled_end": "2026-05-12T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "TUR",
+        "id_model_ver": null,
+        "sampled_rows": 3,
+        "earliest_sampled_start": "2025-08-28T23:59:59.999",
+        "latest_sampled_start": "2025-08-28T23:59:59.999",
+        "earliest_sampled_end": "2025-09-07T23:59:59.999",
+        "latest_sampled_end": "2025-09-07T23:59:59.999",
+        "missing_start_dates": 0
+      }
+    ],
+    "ev_parc_enota": [
+      {
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "sampled_rows": 206,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 206
+      },
+      {
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "sampled_rows": 250,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 250
+      },
+      {
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "sampled_rows": 534,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 534
+      },
+      {
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "sampled_rows": 323,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 323
+      },
+      {
+        "id_model": "ZPS",
+        "id_model_ver": null,
+        "sampled_rows": 164,
+        "earliest_sampled_start": null,
+        "latest_sampled_start": null,
+        "earliest_sampled_end": null,
+        "latest_sampled_end": null,
+        "missing_start_dates": 164
+      }
+    ],
+    "ev_parc_enota_h_2025_danes": [
+      {
+        "id_model": "DRZ",
+        "id_model_ver": 1163,
+        "sampled_rows": 28,
+        "earliest_sampled_start": "2025-01-10T00:30:01",
+        "latest_sampled_start": "2025-04-03T00:30:01",
+        "earliest_sampled_end": "2025-01-16T00:30:00",
+        "latest_sampled_end": "2025-05-13T23:59:59",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "DRZ",
+        "id_model_ver": 1169,
+        "sampled_rows": 290,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-05-19T23:59:59.999",
+        "latest_sampled_end": "2026-01-05T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "GOZ",
+        "id_model_ver": 1162,
+        "sampled_rows": 98,
+        "earliest_sampled_start": "2025-01-10T00:30:01",
+        "latest_sampled_start": "2025-02-21T00:30:01",
+        "earliest_sampled_end": "2025-01-16T00:30:00",
+        "latest_sampled_end": "2025-05-13T23:59:59",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "GOZ",
+        "id_model_ver": 1171,
+        "sampled_rows": 493,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-06-01T23:59:59.999",
+        "latest_sampled_end": "2025-12-29T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "KME",
+        "id_model_ver": 1161,
+        "sampled_rows": 141,
+        "earliest_sampled_start": "2025-01-10T00:30:01",
+        "latest_sampled_start": "2025-03-10T00:30:01",
+        "earliest_sampled_end": "2025-02-07T00:30:01",
+        "latest_sampled_end": "2025-05-13T23:59:59",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "KME",
+        "id_model_ver": 1176,
+        "sampled_rows": 801,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-05-12T23:59:59",
+        "latest_sampled_end": "2026-01-06T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "NAPAKA",
+        "id_model_ver": null,
+        "sampled_rows": 2,
+        "earliest_sampled_start": "2025-07-20T23:59:59.999",
+        "latest_sampled_start": "2025-07-20T23:59:59.999",
+        "earliest_sampled_end": "2025-10-05T23:59:59.999",
+        "latest_sampled_end": "2025-10-05T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "STZ",
+        "id_model_ver": 1164,
+        "sampled_rows": 123,
+        "earliest_sampled_start": "2025-01-10T00:30:01",
+        "latest_sampled_start": "2025-04-03T00:30:01",
+        "earliest_sampled_end": "2025-02-20T00:30:00",
+        "latest_sampled_end": "2025-05-13T23:59:59",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "STZ",
+        "id_model_ver": 1181,
+        "sampled_rows": 682,
+        "earliest_sampled_start": "2025-05-13T23:59:59",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-05-19T23:59:59.999",
+        "latest_sampled_end": "2026-01-05T23:59:59.999",
+        "missing_start_dates": 0
+      },
+      {
+        "id_model": "ZPS",
+        "id_model_ver": null,
+        "sampled_rows": 342,
+        "earliest_sampled_start": "2025-01-13T00:30:00",
+        "latest_sampled_start": "2025-11-02T23:59:59.999",
+        "earliest_sampled_end": "2025-03-11T00:30:00",
+        "latest_sampled_end": "2026-01-05T23:59:59.999",
+        "missing_start_dates": 0
+      }
+    ]
+  }
+}

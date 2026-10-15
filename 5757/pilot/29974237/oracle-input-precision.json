@@ -1,0 +1,75 @@
+{
+  "rows": [
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "F_OBN",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "IZMERA",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POV_LETO_OBN",
+      "data_type": "NUMBER",
+      "data_precision": 4,
+      "data_scale": 0
+    },
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "POVR_ZPS",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "DST_PRIPIS_PODATKI",
+      "column_name": "VT_DST",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "F_OBN",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "IZMERA",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POV_LETO_OBN",
+      "data_type": "NUMBER",
+      "data_precision": 4,
+      "data_scale": 0
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "POVR_ZPS",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    },
+    {
+      "table_name": "JN_DST_PRIPIS_PODATKI",
+      "column_name": "VT_DST",
+      "data_type": "NUMBER",
+      "data_precision": 12,
+      "data_scale": 2
+    }
+  ],
+  "truncated": false
+}

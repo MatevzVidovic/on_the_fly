@@ -1,0 +1,479 @@
+{
+  "prepared": [
+    {
+      "id": "4113d846-2f37-45c5-8573-caa160056487",
+      "gid": 5853763,
+      "__mod": null,
+      "model": "IND",
+      "napaka": null,
+      "id_lega": 2,
+      "id_plin": null,
+      "st_etaz": 1,
+      "zps_dst": 50.0,
+      "atr_povr": null,
+      "leto_izg": 1900,
+      "grad_faza": null,
+      "neto_povr": 40.9,
+      "stavba_id": 26703060,
+      "upor_povr": null,
+      "created_at": "2026-06-18T11:32:20.776369",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "id_dvigalo": null,
+      "id_vodovod": false,
+      "nadstropje": 0,
+      "neto_prost": null,
+      "tip_stavbe": 1,
+      "updated_at": null,
+      "updated_by": null,
+      "dej_raba_dst": 17,
+      "id_elektrika": false,
+      "st_stanovanj": 0,
+      "del_stavbe_id": 29974237,
+      "leto_obn_inst": null,
+      "leto_obn_oken": null,
+      "id_kanalizacija": false,
+      "id_konstrukcije": 1,
+      "id_rel_pr_datum": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "leto_obn_fasade": null,
+      "leto_obn_strehe": null,
+      "visina_etaze_rzd": null
+    }
+  ],
+  "result": [
+    {
+      "id": "e0113d9b-8ddf-4b96-a99b-436da1f31e9e",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null,
+      "created_at": "2026-06-18T13:47:09.141024",
+      "updated_at": null,
+      "id_rel_vm_pd": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+      "id_rel_prip_enota": "4113d846-2f37-45c5-8573-caa160056487",
+      "vrednost_izr": 15310.0,
+      "vrednost_zaokrozena": 15300,
+      "spremenljivke_vrednosti": "{2026-01-01, 17, false, false, 1, 2, null, 1501, false, 1900, 1900.00, 6, 28.63, 28.63, null, 50.00}",
+      "faktorji_vrednosti": "{1.0000, 1.0, 1.00, 1, 0.04, 0, 420000, 210}",
+      "napaka_izracuna": null
+    }
+  ],
+  "model": [
+    {
+      "id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "model": "IND",
+      "verzija": 66,
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_elektrika,id_kanalizacija,id_konstrukcije,id_lega,id_plin,id_tao,id_vodovod,leto_izg,leto_obn,st_ravni,velikost,velikost_m2,visina_etaze_rzd,zps_dst}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_rt_m2,f_rt_osnova,v_dst,v_zps}",
+      "enacba_desna": "v_{dst}\\cdot\\frac{\\left(f_{rt\\text{\\_}osnova}+f_{rt\\text{\\_}m2}\\cdot velikost_{m2}\\right)}{100}\\cdot f_{obn}\\cdot f_{last}\\cdot f_{nk}+zps_{dst}\\cdot v_{zps}",
+      "enacba_ref_obj": "v_{dst}+ref_{velikost\\text{\\_zps}}\\cdot v_{zps}",
+      "datum_modela": "2025-01-01"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX dst_pripis_podatki_pk_uk ON public.ev_dst_pripis_podatki_h USING btree (dst_pripis_podatki_pk)"
+    },
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_dst_pripis_podatki_h_pkey ON public.ev_dst_pripis_podatki_h USING btree (id)"
+    },
+    {
+      "tablename": "md_faktorji",
+      "indexdef": "CREATE INDEX md_faktorji_gid_index ON public.md_faktorji USING btree (gid)"
+    },
+    {
+      "tablename": "md_faktorji",
+      "indexdef": "CREATE INDEX md_faktorji___mod_index ON public.md_faktorji USING btree (__mod)"
+    },
+    {
+      "tablename": "md_faktorji",
+      "indexdef": "CREATE INDEX md_faktorji_id_rel_verzije_modeli_index ON public.md_faktorji USING btree (id_rel_verzije_modeli)"
+    },
+    {
+      "tablename": "md_faktorji",
+      "indexdef": "CREATE UNIQUE INDEX md_faktorji_pkey ON public.md_faktorji USING btree (id)"
+    },
+    {
+      "tablename": "md_spremenljivke",
+      "indexdef": "CREATE INDEX md_spremenljivke___mod_index ON public.md_spremenljivke USING btree (__mod)"
+    },
+    {
+      "tablename": "md_spremenljivke",
+      "indexdef": "CREATE INDEX md_spremenljivke_gid_index ON public.md_spremenljivke USING btree (gid)"
+    },
+    {
+      "tablename": "md_spremenljivke",
+      "indexdef": "CREATE INDEX md_spremenljivke_id_rel_verzije_modeli_index ON public.md_spremenljivke USING btree (id_rel_verzije_modeli)"
+    },
+    {
+      "tablename": "md_spremenljivke",
+      "indexdef": "CREATE UNIQUE INDEX md_spremenljivke_pkey ON public.md_spremenljivke USING btree (id)"
+    }
+  ],
+  "columns": [
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "dst_pripis_podatki_pk",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "dst_sid",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "eid",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "id_model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "error_msg",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "raven",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "cona_ime",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "d_dst",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "izmera",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "leto_izg_sta",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_dst",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "pov_leto_obn",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_obn",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "t_last",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_last",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_nk",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_zps",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_d_dst",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_zps_m2",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_pri",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vplivi",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_odd",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "t_dp",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_dp",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "t_lege",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_lege",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_gar",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_ppp_p",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_ppl_p",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "faktor_p",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_lp",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_dp_p",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_dp_m2_p",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_ppl_l",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_ppp_l",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "faktor_l",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "f_pl",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_dp_l",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_dp_m2_l",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "povr_dp_tur",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vt_dp_m2_tur",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "jn_rev_num",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "vrednost",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_dst_pripis_podatki_h",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "id_rel_verzije_modeli",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "faktor",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "opis",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_faktorji",
+      "column_name": "__readonly",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "id_rel_verzije_modeli",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "spremenljivka",
+      "data_type": "text"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "gid",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "__mod",
+      "data_type": "integer"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "obvezen_podatek",
+      "data_type": "boolean"
+    },
+    {
+      "table_name": "md_spremenljivke",
+      "column_name": "__readonly",
+      "data_type": "boolean"
+    }
+  ]
+}
