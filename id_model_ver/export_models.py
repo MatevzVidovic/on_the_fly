@@ -45,13 +45,14 @@ def export_models(oracle, path, table, source_id):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('table',choices=TABLES)
+    p.add_argument('--env',type=Path,default=ROOT/'id_model_ver/.env')
     p.add_argument('--cache',type=Path)
     p.add_argument('--rebuild',action='store_true',help='replace an existing completed export')
     args=p.parse_args()
     path=args.cache or ROOT/'id_model_ver/cache'/f'{args.table}.sqlite'
     if path.exists() and not args.rebuild:
         p.error(f'{path} already exists; reuse it, or use --rebuild for fresh source values')
-    cfg=dotenv_values(ROOT/'IntegrationRepair_full_export/.env')
+    cfg=dotenv_values(args.env)
     source_id=hashlib.sha256(cfg['KN_ORACLE_DSN'].encode()).hexdigest()
     if cfg.get('KN_ORACLE_CLIENT_LIB_DIR'):
         oracledb.init_oracle_client(lib_dir=cfg['KN_ORACLE_CLIENT_LIB_DIR'])

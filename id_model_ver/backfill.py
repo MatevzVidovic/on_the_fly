@@ -1,4 +1,4 @@
-"""Backfill only id_model_ver on the two staging history tables; dry-run by default."""
+"""Backfill only id_model_ver on the two history tables; dry-run by default."""
 import argparse
 import hashlib
 import sqlite3
@@ -65,6 +65,7 @@ def transfer(target, cache, table, *, after=None, page_size=10000, pages=None, a
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('table', choices=TABLES)
+    parser.add_argument('--env', type=Path, default=ROOT / 'id_model_ver/.env')
     parser.add_argument('--apply', action='store_true', help='commit updates; otherwise compare only')
     parser.add_argument('--after', type=UUID, help='last committed UUID when resuming')
     parser.add_argument('--page-size', type=int, default=10000)
@@ -73,17 +74,22 @@ def main():
     args = parser.parse_args()
     if args.page_size < 1 or (args.pages is not None and args.pages < 1):
         parser.error('--page-size and --pages must be positive')
-    cfg = dotenv_values(ROOT / 'IntegrationRepair/.env')
-    assert cfg['PG_HOST'] == dotenv_values(ROOT / 'KN_deltas_reason/reconciliation/.env')['STAG_HOST'], 'Expected staging host'
-    source = dotenv_values(ROOT / 'IntegrationRepair_full_export/.env')
+    cfg = dotenv_values(args.env)
+    reference = dotenv_values(ROOT / 'KN_deltas_reason/reconciliation/.env')
+    if cfg['PG_HOST'] == reference['PROD_HOST']:
+        environment = 'PRODUCTION'
+    elif cfg['PG_HOST'] == reference['STAG_HOST']:
+        environment = 'STAGING'
+    else:
+        parser.error('PostgreSQL host matches neither production nor staging reference')
     pg = dict(host=cfg['PG_HOST'], port=cfg['PG_PORT'], user=cfg['PG_USER'], password=cfg['PG_PASSWORD'],
               dbname=cfg['PG_DATABASE_DATA'], connect_timeout=10, autocommit=True,
               options='-c statement_timeout=60000' + ('' if args.apply else ' -c default_transaction_read_only=on'))
-    print(f'STAGING {args.table}: {"APPLY" if args.apply else "DRY RUN"}, page_size={args.page_size}', flush=True)
+    print(f'{environment} {args.table}: {"APPLY" if args.apply else "DRY RUN"}, page_size={args.page_size}', flush=True)
     path = args.cache or ROOT / 'id_model_ver/cache' / f'{args.table}.sqlite'
     with sqlite3.connect(path.resolve().as_uri() + '?mode=ro', uri=True) as cache:
         info = cache.execute('SELECT target_table,source_id,created_at,row_count FROM export_info').fetchone()
-        if info is None or info[0] != args.table or info[1] != hashlib.sha256(source['KN_ORACLE_DSN'].encode()).hexdigest():
+        if info is None or info[0] != args.table or info[1] != hashlib.sha256(cfg['KN_ORACLE_DSN'].encode()).hexdigest():
             parser.error('Cache does not match this table/source; create the correct export first')
         print(f'Using source export from {info[2]} ({info[3]:,} rows): {path}', flush=True)
         with psycopg.connect(**pg) as target:

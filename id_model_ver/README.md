@@ -1,5 +1,7 @@
 # Building-part model-version field
 
+**Current transfer configuration:** both export and backfill commands default to `id_model_ver/.env`, now configured for production. Completed Oracle caches can be reused on production when the Oracle DSN fingerprint matches. Do not reuse a staging `--after` UUID on production; start from the beginning. The investigation results below were collected on staging.
+
 Read-only staging investigation, 15 October 2026. No remote schema, integration, or row changes have been made.
 
 ## Current field and integration state
@@ -90,11 +92,11 @@ time IntegrationRepair_full_export/.venv/bin/python -u id_model_ver/export_model
 time IntegrationRepair_full_export/.venv/bin/python -u id_model_ver/export_models.py ev_del_stavbe_enota_h_2025_danes
 ```
 
-Default files are `id_model_ver/cache/ev_del_stavbe_enota_h_2020_2024.sqlite` and `id_model_ver/cache/ev_del_stavbe_enota_h_2025_danes.sqlite`. `--cache PATH` overrides the location on either command. `--rebuild` on the exporter explicitly replaces a completed cache with fresh source data. Oracle credentials come from `IntegrationRepair_full_export/.env`.
+Default files are `id_model_ver/cache/ev_del_stavbe_enota_h_2020_2024.sqlite` and `id_model_ver/cache/ev_del_stavbe_enota_h_2025_danes.sqlite`. `--cache PATH` overrides the location on either command. `--rebuild` on the exporter explicitly replaces a completed cache with fresh source data. Oracle credentials now come from `id_model_ver/.env` (or `--env PATH`).
 
 ## Compare, transfer, and resume
 
-Create nullable **bigint** `id_model_ver` LIFT fields on both history tables first. This tool does not create columns or change metadata. PostgreSQL staging credentials come from `IntegrationRepair/.env`; the script checks that host against the staging reference. UPDATE permission is needed for apply mode.
+Create nullable **bigint** `id_model_ver` LIFT fields on both history tables first. This tool does not create columns or change metadata. PostgreSQL credentials now come from `id_model_ver/.env` (or `--env PATH`). The script recognizes the existing production/staging host references and prints the chosen environment. The local `.env` currently points to production. UPDATE permission is needed for apply mode.
 
 Compare one page without writes:
 
