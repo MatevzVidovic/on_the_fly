@@ -1,0 +1,23 @@
+[
+  {
+    "spremenljivke_vrednosti": "{2026-01-01, 2108, 108.00, 0}",
+    "faktorji_vrednosti": "{null, 6.5, 0.38}",
+    "has_model_date_id": true,
+    "selection_found": true,
+    "model_found": false
+  },
+  {
+    "spremenljivke_vrednosti": "{2026-01-01, 2104, 0, 532.20}",
+    "faktorji_vrednosti": "{null, 13.2, 0.86}",
+    "has_model_date_id": true,
+    "selection_found": true,
+    "model_found": false
+  },
+  {
+    "spremenljivke_vrednosti": "{2026-01-01, 2112, 169.00, 0}",
+    "faktorji_vrednosti": "{null, 5.4, 0.31}",
+    "has_model_date_id": true,
+    "selection_found": true,
+    "model_found": false
+  }
+]

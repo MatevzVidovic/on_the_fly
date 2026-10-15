@@ -1,0 +1,72 @@
+{
+  "access": "test_njihov_access",
+  "checked_on": "2026-10-15",
+  "isam_samples": [],
+  "ev_building_samples": [
+    {
+      "id_model": "KDS",
+      "izmera": 478.7,
+      "f_obn": 1.0,
+      "f_last": 1.23,
+      "raven": 15,
+      "cona_ime": "KDS_1551150",
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null
+    },
+    {
+      "id_model": "KDS",
+      "izmera": 15.8,
+      "f_obn": 1.0,
+      "f_last": 0.73,
+      "raven": 26,
+      "cona_ime": "KDS_1551769",
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null
+    },
+    {
+      "id_model": "GAR",
+      "izmera": 28.6,
+      "f_obn": null,
+      "f_last": 1.0,
+      "raven": 15,
+      "cona_ime": "GAR_1545854",
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null
+    }
+  ],
+  "ev_parcel_samples": [
+    {
+      "id_model": "KME",
+      "izmera": 813.0,
+      "boniteta": 53.0,
+      "f_bon": 1.0,
+      "rk": null,
+      "f_rk": null,
+      "raven": 14,
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null
+    },
+    {
+      "id_model": "STZ",
+      "izmera": 790.0,
+      "boniteta": null,
+      "f_bon": null,
+      "rk": null,
+      "f_rk": null,
+      "raven": 15,
+      "valid_from": "2026-07-23T23:59:59.999",
+      "valid_to": null
+    },
+    {
+      "id_model": "ZPS",
+      "izmera": null,
+      "boniteta": null,
+      "f_bon": null,
+      "rk": null,
+      "f_rk": null,
+      "raven": null,
+      "valid_from": "2025-11-02T23:59:59.999",
+      "valid_to": null
+    }
+  ]
+}

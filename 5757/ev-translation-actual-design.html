@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5757 · Translation layer design</title><link rel="stylesheet" href="assets/teach.css"></head><body><main>
+<div class="eyebrow">5757 · PROPOSED DESIGN · ABOUT FIVE MINUTES</div>
+<h1>The EV translation layer</h1>
+<p><strong>Its job:</strong> turn EV intermediate results into records that have the same meaning as ISAM’s intermediate results. The comparison code can then compare those records without knowing EV’s original layout.</p>
+<p class="small">Source tables and formats below were inspected in the database/code. New table names and record layouts are proposals. Specific business mappings are not yet approved.</p>
+<nav class="stepnav" aria-label="Design sections"><a href="#sources">Inputs</a><a href="#rules">Rules</a><a href="#output">Output</a><a href="#save">Saved results</a></nav>
+<section id="sources"><h2>1. Start with a final-value difference</h2>
+<p>The final-value comparison has already identified a property, cutoff date and corresponding model versions. Intermediate work runs only when both calculated values are usable and <code>abs(delta_izr) &gt; tolerance</code>.</p>
+<p>For those selected properties, read:</p>
+<div class="tablewrap"><table><thead><tr><th>Side</th><th>Existing source</th><th>What we read</th></tr></thead><tbody>
+<tr><td>ISAM</td><td><code>pripis_vmxpd_x_enote</code></td><td><code>spremenljivke_vrednosti</code> and <code>faktorji_vrednosti</code>, plus the correct model-version key lists.</td></tr>
+<tr><td>EV building parts</td><td><code>ev_dst_pripis_podatki_h</code></td><td>Named intermediate fields such as <code>izmera</code>, <code>f_obn</code>, <code>f_last</code>, <code>raven</code> and <code>cona_ime</code>.</td></tr>
+<tr><td>EV parcels</td><td><code>ev_parc_pripis_podatki_h</code></td><td>Named fields such as <code>boniteta</code>, <code>f_bon</code>, <code>rk</code> and <code>f_rk</code>.</td></tr>
+</tbody></table></div>
+<p>The EV historical tables are candidates, not a completed extraction design. We still need to confirm how their rows relate to the final-value rows, the selected date, model version and parcel structure.</p>
+<div class="note"><p><strong>ISAM also needs preparation.</strong> Its saved intermediate values are ordered lists. The model’s ordered key lists tell us which value means what. We must validate that context and list lengths before pairing keys with values. In the inspected small sample, the referenced model record was missing. Those records cannot be decoded safely until that is resolved.</p></div>
+</section>
+<section id="rules"><h2>2. Store simple mapping rules in one table</h2>
+<section class="stage"><div class="number">PROPOSED · pripis_primerjava_preslikave</div><h3>One row defines one simple translation</h3><div class="tablewrap"><table><thead><tr><th>Rule information</th><th>Purpose</th></tr></thead><tbody>
+<tr><td>Rule ID and revision</td><td>Identify the exact rule used in a result.</td></tr>
+<tr><td>Unit type, model and confirmed version correspondence</td><td>Select a rule only where its meaning is valid. EV and ISAM version numbers need not be identical.</td></tr>
+<tr><td>EV source field</td><td>Identify what to read from an allowed source.</td></tr>
+<tr><td>ISAM target key and group</td><td>Say which variable, factor, level, zone or other ingredient it represents.</td></tr>
+<tr><td>Conversion settings</td><td>Declare value type, units, precision and NULL handling. Use a small set of supported operations such as identity or scaling.</td></tr>
+</tbody></table></div></section>
+<p><strong>Candidate example:</strong> EV has <code>f_bon</code>, and inspected ISAM KME model definitions also list <code>f_bon</code> as a factor. A rule could map EV <code>f_bon</code> to ISAM <code>FAKTOR / f_bon</code> unchanged—<em>after confirming they have the same meaning for the corresponding versions</em>. A matching name alone is not enough.</p>
+<p>If a transformation combines fields, splits a record or regroups parcel data, implement it as a <strong>versioned SQL view or function</strong>. Keep simple settings in the table and structural logic in reviewed SQL; do not turn the mapping table into a place for arbitrary SQL expressions.</p>
+</section>
+<section id="output"><h2>3. Return a common record format</h2>
+<p>Normalize ISAM’s ingredients and translate EV’s ingredients into the same format. These can be temporary SQL results inside the workflow; a separate permanent canonical-data table is not required.</p>
+<pre><code>property/date/model context
+part or component identity, where relevant
+group                  e.g. FAKTOR
+key                    e.g. f_bon
+value                  e.g. 1.00
+value type / unit      e.g. decimal / dimensionless
+source reference       table + record + original field/value
+translation reference  rule ID + revision
+translation outcome    usable / untranslated / ambiguous / invalid</code></pre>
+<p>The context links to the final comparison and preserves both original model-version identifiers. A component identity distinguishes multiple ingredients with the same key on a parcel; it must come from confirmed shared business attributes.</p>
+<p>Keep decimal values exact. Preserve the difference between an absent field, NULL, empty text and zero unless an explicit business rule equates them. Failed conversions become visible issues, not fabricated values.</p>
+<section class="stage"><h3>What the comparison code receives</h3><div class="tablewrap"><table><thead><tr><th>Same property/context/component</th><th>ISAM</th><th>Translated EV</th></tr></thead><tbody><tr><td><code>FAKTOR / f_bon</code></td><td><code>1.00</code></td><td><code>0.95</code></td></tr></tbody></table></div><p>It compares <code>1.00</code> with <code>0.95</code> and records the difference. It does not need to know how EV stored that factor.</p><p class="small">These values are illustrative. The source mapping remains a candidate. A factor difference is evidence, not proof that it caused the final-value difference.</p></section>
+</section>
+<section id="save"><h2>4. Save the comparison and its evidence</h2>
+<section class="stage"><div class="number">PROPOSED · pripis_primerjava_vmesni</div><h3>One row records one ingredient comparison</h3><p>Store the final-result link, canonical identity/group/key, both values, comparison outcome, translation issues, original EV field/value and applied rule revision.</p><p>Use numeric deltas for numeric values; compare text/categories according to their declared meaning. Keep one-sided or untranslated ingredients visible instead of using an inner join that drops them.</p></section>
+<p>Lift opens these detail rows from the final comparison. A user should be able to answer: <strong>“What differed, where did this EV value come from, and how was it translated?”</strong></p>
+</section>
+<h2>Parcel matching needs its own check</h2>
+<p>The final parcel total is compared after separately aggregating each source. That does not establish how the individual ingredients match.</p>
+<p>For detail comparison, check a model-specific key made from shared business attributes. If that key is not unique, mark <code>NEENOLICNA_STRUKTURA</code>. Keep the final aggregate comparison and show aggregate ingredient evidence only where that aggregation is meaningful. Do not pair parts by IDs, row order or area alone.</p>
+<h2>How this fits into the workflow</h2>
+<pre><code>Eligible final-comparison rows
+    ↓
+Read only their dated ISAM and EV ingredients
+    ↓
+Resolve keys, version context and component identities
+    ↓
+Apply mapping-table rules and versioned SQL recipes
+    ↓
+Compare common records, retaining issues and unmatched data
+    ↓
+Save linked detail rows → display in Lift</code></pre>
+<p>This can live in one comparison workflow, with SQL doing bulk work and Python coordinating it. It does not require a separate deployed service.</p>
+<div class="note"><p><strong>First implementation target:</strong> one model, confirmed version correspondence, and a reliably matched property. Prove that the source selection, translation and saved evidence are correct before extending the rules to more models and parcel structures.</p></div>
+<div class="footer"><p><strong>Three different things:</strong> a mapping row defines a rule; a common record is that rule’s output; a detail row records the comparison with ISAM.</p><p><a href="5757.md">Requirements, sections 3–5</a> · <a href="reference/db-translation-prerequisites.json">Inspected model keys</a> · <a href="reference/db-translation-shapes.json">EV sample fields</a> · <a href="reference/db-isam-intermediate-samples.json">ISAM sample format</a> · <a href="ev-translation-design.md">Short written explanation</a></p><p>Ask me about any unclear step. Which part would you like to inspect next: the mapping-table row, the SQL transformation, or the saved detail row?</p></div>
+</main></body></html>

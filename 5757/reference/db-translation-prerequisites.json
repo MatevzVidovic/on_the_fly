@@ -1,0 +1,59 @@
+{
+  "has_isam_result": true,
+  "model_key_samples": [
+    {
+      "model": "KME",
+      "verzija": 101,
+      "spremenljivke": "{boniteta,dat_pri,id_tao,p_hme,p_olj,p_sad,p_vin,zemlj_povr}",
+      "faktorji": "{f_bon,f_cpt,v_hme,v_olj,v_sad,v_vin,v_z}"
+    },
+    {
+      "model": "KME",
+      "verzija": 81,
+      "spremenljivke": "{boniteta,dat_pri,id_tao,p_hme,p_olj,p_sad,p_vin,zemlj_povr}",
+      "faktorji": "{f_bon,f_cpt,v_hme,v_olj,v_sad,v_vin,v_z}"
+    },
+    {
+      "model": "KME",
+      "verzija": 100,
+      "spremenljivke": "{boniteta,dat_pri,id_tao,p_hme,p_olj,p_sad,p_vin,zemlj_povr}",
+      "faktorji": "{f_bon,f_cpt,v_hme,v_olj,v_sad,v_vin,v_z}"
+    },
+    {
+      "model": "GAR",
+      "verzija": 90,
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_tao,st_ravni,velikost}",
+      "faktorji": "{f_cpt,f_gar,f_last,v_dst}"
+    },
+    {
+      "model": "STZ",
+      "verzija": 13,
+      "spremenljivke": "{dat_pri,id_tao,p_stz_a,p_stz_b,p_stz_c,p_stz_d,p_stz_e,p_stz_f,p_stz_g,st_ravni}",
+      "faktorji": "{f_cpt,v_stz_a,v_stz_b,v_stz_c,v_stz_d,v_stz_e,v_stz_f,v_stz_g}"
+    },
+    {
+      "model": "STZ",
+      "verzija": 44,
+      "spremenljivke": "{dat_pri,id_tao,p_stz_a,p_stz_b,p_stz_c,p_stz_d,p_stz_e,p_stz_f,p_stz_g,p_stz_h,st_ravni}",
+      "faktorji": "{f_cpt,v_stz_a,v_stz_b,v_stz_c,v_stz_d,v_stz_e,v_stz_f,v_stz_g,v_stz_h}"
+    }
+  ],
+  "ev_intermediate_indexes": [
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX dst_pripis_podatki_pk_uk ON public.ev_dst_pripis_podatki_h USING btree (dst_pripis_podatki_pk)"
+    },
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_dst_pripis_podatki_h_pkey ON public.ev_dst_pripis_podatki_h USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_pkey ON public.ev_parc_pripis_podatki_h USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_uk ON public.ev_parc_pripis_podatki_h USING btree (parc_pripis_podatki_pk)"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>5757 · The translator</title><link rel="stylesheet" href="assets/teach.css"></head><body><main>
+<div class="eyebrow">5757 · THE TRANSLATOR · A TWO-MINUTE EXPLANATION</div>
+<h1>Make two ingredient lists speak the same language</h1>
+<p>ISAM and EV calculated different property values. Now we want to compare the <strong>ingredients</strong> they used: areas, factors, zones and other intermediate results.</p>
+<p>But first, we must make those ingredients mean the same thing.</p>
+<section class="stage"><h2>Like comparing two cake recipes</h2><p>One cook writes <strong>0.8 kilograms</strong> of flour. The other writes <strong>800 grams</strong>.</p><p>The numbers look different. The amount is the same. A translator converts them into the same unit before we compare.</p></section>
+<h2>For property data, it looks like this</h2>
+<div class="flow">
+<section class="stage"><div class="number">EV’S INGREDIENT</div><h3>Area: 0.8 hectares</h3><p>EV has its own field names and way of storing information.</p></section>
+<div class="arrow">↓ Our rule: multiply hectares by 10,000</div>
+<section class="stage"><div class="number">COMMON WORKSHEET</div><h3>Area: 8,000 square metres</h3><p>This agreed format is what the ticket calls <strong>“canonical ISAM structure.”</strong></p></section>
+<div class="arrow">↓ Compare with the equivalent ISAM ingredient</div>
+<section class="stage"><div class="number">SAVED COMPARISON</div><h3>ISAM: 8,000 · EV: 8,000 → equal</h3><p>Keep the original EV value and the rule, so we can explain where the answer came from.</p></section>
+</div>
+<p class="caption">Invented example for teaching. The actual EV fields, units and mappings must be confirmed.</p>
+<h2>We need three small things</h2>
+<section class="stage"><div class="number">1 · A DICTIONARY TABLE</div><h3>“This EV field means this ISAM ingredient.”</h3><p>Store simple renaming and conversion rules, scoped to the right model/version. For example: hectares → square metres.</p></section>
+<section class="stage"><div class="number">2 · SQL RECIPES</div><h3>“This conversion needs a few steps.”</h3><p>Sometimes two EV fields make one ingredient, or parcel parts need regrouping. Write those more complicated rules in versioned SQL files.</p><p>We can split data only when the source contains enough information to do it correctly.</p></section>
+<section class="stage"><div class="number">3 · A DETAIL-RESULT TABLE</div><h3>“Here is what we compared.”</h3><p>Each row records <strong>which property/date/model, which ingredient, both values, the outcome, and the source/rule used</strong>. It links back to the final-value comparison.</p></section>
+<div class="note"><p><strong>The translator does not recalculate EV’s property value.</strong> It reshapes EV’s existing intermediate evidence so we can compare it with ISAM’s evidence.</p></div>
+<h2>When we cannot translate safely</h2><p>Missing does not automatically mean zero. Unknown fields stay visibly untranslated. Parcel parts that cannot be matched uniquely stay visibly ambiguous—we keep the parcel-total comparison and avoid invented pairings.</p>
+<p>ISAM also needs readable ingredient labels: its saved values are currently ordered lists. We must recover the correct matching keys before comparing them.</p>
+<p class="small">Run this detail work only when both calculated values are usable and their absolute difference exceeds the configured tolerance. First make it work for one model and one reliably matched property.</p>
+<div class="footer"><p><strong>Try explaining it back:</strong> what does the dictionary tell us, and what does a saved detail row tell us? Ask me about anything unclear.</p><p><a href="5757.md">Primary source: 5757, sections 3–5</a> · <a href="ev-translation-design.md">Written design</a> · <a href="lessons/0004-what-we-need-to-build.html">Full solution lesson</a></p></div>
+</main></body></html>

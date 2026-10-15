@@ -1,0 +1,182 @@
+{
+  "at": "2026-10-15T08:27:41.145007+00:00",
+  "run": {
+    "id": "dd95e254-41ff-46b4-8a35-8b9fa5fd2d52",
+    "integration_id": "39aa410c-beff-11f0-a601-5212cffe39ac",
+    "cutoff": "2026-10-14 23:59:59.999000",
+    "prepared": 1,
+    "applied": 1,
+    "max_date": "2026-10-15 07:57:49.964356",
+    "warnings": 0,
+    "created_at": "2026-10-15T07:55:54.727364+00:00",
+    "attribute_table_name": "ev_stavba_h",
+    "upsert_count": 678878,
+    "delete_count": 0,
+    "user_id": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+    "source_complete": 1,
+    "source_last_key": "\"38447831-2392\"",
+    "target_last_key": "\"38447831-2392\"",
+    "source_count": 3190250,
+    "target_count": 2812550
+  },
+  "cohorts": {
+    "repaired": {
+      "requested": 678878,
+      "counts": {
+        "oracle_missing": 0,
+        "duplicate_target_rows": 0,
+        "compared": 678878,
+        "has_geom": 0,
+        "created_updated_equal": 678878,
+        "metadata_matches_run": 678878,
+        "rows_with_mismatches": 0
+      },
+      "mismatched_fields": {},
+      "nonnull_target_when_source_null": {},
+      "actors": [
+        {
+          "created_by": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+          "updated_by": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+          "count": 678878
+        }
+      ],
+      "uuid_versions": {
+        "1": 678878
+      },
+      "oracle_python_types": {
+        "jn_sta_pk": "str",
+        "sta_sid": "str",
+        "ko_sifko": "str",
+        "stev_st": "str",
+        "st_etaz": "str",
+        "leto_izg_sta": "str",
+        "leto_obn_strehe": "NoneType",
+        "leto_obn_fasade": "NoneType",
+        "id_konstrukcija": "str",
+        "ima_vodovod_dn": "str",
+        "ima_elektriko_dn": "str",
+        "ima_kanalizacijo_dn": "str",
+        "ima_plin_dn": "str",
+        "id_tip_stavbe": "str",
+        "cenx": "str",
+        "ceny": "str",
+        "st_stanovanj": "str",
+        "st_poslovnih_prostorov": "str",
+        "jn_rev_num": "str",
+        "jn_rev_num_to": "str",
+        "jn_rev_num_prev": "str",
+        "pov_stavbe": "str",
+        "zps_stavba": "str",
+        "ob_mid": "str",
+        "eid": "str",
+        "jn_status": "str",
+        "valid_from": "str",
+        "valid_to": "str",
+        "date_change": "str"
+      },
+      "mismatch_examples": []
+    },
+    "older_controls": {
+      "requested": 100,
+      "counts": {
+        "oracle_missing": 0,
+        "duplicate_target_rows": 0,
+        "compared": 100,
+        "has_geom": 0,
+        "created_updated_equal": 5,
+        "metadata_matches_run": 0,
+        "rows_with_mismatches": 0
+      },
+      "mismatched_fields": {},
+      "nonnull_target_when_source_null": {},
+      "actors": [
+        {
+          "created_by": "00000000-0000-0000-0000-000000000000",
+          "updated_by": "None",
+          "count": 95
+        },
+        {
+          "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+          "updated_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+          "count": 1
+        },
+        {
+          "created_by": "7b87a13c-2c28-11f1-96ae-f649468e5bd6",
+          "updated_by": "7b87a13c-2c28-11f1-96ae-f649468e5bd6",
+          "count": 4
+        }
+      ],
+      "uuid_versions": {
+        "1": 100
+      },
+      "oracle_python_types": {
+        "jn_sta_pk": "str",
+        "sta_sid": "str",
+        "ko_sifko": "str",
+        "stev_st": "str",
+        "st_etaz": "str",
+        "leto_izg_sta": "str",
+        "leto_obn_strehe": "str",
+        "leto_obn_fasade": "str",
+        "id_konstrukcija": "str",
+        "ima_vodovod_dn": "str",
+        "ima_elektriko_dn": "str",
+        "ima_kanalizacijo_dn": "str",
+        "ima_plin_dn": "str",
+        "id_tip_stavbe": "str",
+        "cenx": "str",
+        "ceny": "str",
+        "st_stanovanj": "str",
+        "st_poslovnih_prostorov": "str",
+        "jn_rev_num": "str",
+        "jn_rev_num_to": "NoneType",
+        "jn_rev_num_prev": "str",
+        "pov_stavbe": "str",
+        "zps_stavba": "str",
+        "ob_mid": "str",
+        "eid": "str",
+        "jn_status": "str",
+        "valid_from": "str",
+        "valid_to": "NoneType",
+        "date_change": "str"
+      },
+      "mismatch_examples": []
+    }
+  },
+  "postgres_types": {
+    "id": "uuid",
+    "created_by": "uuid",
+    "updated_by": "uuid",
+    "created_at": "timestamp without time zone",
+    "updated_at": "timestamp without time zone",
+    "jn_sta_pk": "text",
+    "sta_sid": "bigint",
+    "ko_sifko": "integer",
+    "stev_st": "bigint",
+    "st_etaz": "integer",
+    "leto_izg_sta": "integer",
+    "leto_obn_strehe": "integer",
+    "leto_obn_fasade": "integer",
+    "id_konstrukcija": "bigint",
+    "ima_vodovod_dn": "integer",
+    "ima_elektriko_dn": "integer",
+    "ima_kanalizacijo_dn": "integer",
+    "ima_plin_dn": "integer",
+    "id_tip_stavbe": "bigint",
+    "cenx": "numeric",
+    "ceny": "numeric",
+    "st_stanovanj": "integer",
+    "st_poslovnih_prostorov": "integer",
+    "jn_rev_num": "bigint",
+    "jn_rev_num_to": "bigint",
+    "jn_rev_num_prev": "bigint",
+    "pov_stavbe": "numeric",
+    "zps_stavba": "numeric",
+    "ob_mid": "integer",
+    "eid": "bigint",
+    "jn_status": "text",
+    "valid_from": "timestamp without time zone",
+    "valid_to": "timestamp without time zone",
+    "date_change": "timestamp without time zone"
+  }
+}

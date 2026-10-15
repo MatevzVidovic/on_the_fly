@@ -1,0 +1,14 @@
+{
+  "access": "test_njihov_access",
+  "checked_on": "2026-10-15",
+  "value_column": [
+    {
+      "table_name": "pripis_vmxpd_x_enote",
+      "column_name": "vrednost_izr",
+      "data_type": "integer",
+      "numeric_precision": 32,
+      "numeric_scale": 0
+    }
+  ],
+  "comparison_named_tables": []
+}

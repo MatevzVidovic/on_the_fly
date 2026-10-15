@@ -29,6 +29,12 @@
 - [EV integration source SQL](../EV_INTEG/src/kn_to_stag_delta_with_delete/ev_del_stavbe_enota_h_2025_danes_kn.sql)
   Copies upstream ID_MODEL_VER. The corresponding Lift historical projection omits it; the current inspected building-part history table also lacks it. A query definition is not proof of deployed integration configuration.
 
+- [Solution prerequisite recheck](reference/db-solution-prerequisites.json)
+  Read-only check dated 2026-10-15: calculated-value column remains integer; bounded catalog search for proposed comparison naming found no matches. Does not inspect live Lift metadata or rule out other names.
+
+- [EV parcel table check](reference/db-ev-parcel-tables.json)
+  Read-only metadata on 2026-10-15 distinguishes parcel master ev_parcela, valuation rows ev_parc_enota, historical structure ev_parc_del_h and the currently audit-only ev_parc_del_enota. No row-level structure mapping was inferred.
+
 ## Wisdom (Communities)
 
 No community research needed for this first lesson. The task calls for agreement with GURS on uncertain parcel representation and rounding business rules.

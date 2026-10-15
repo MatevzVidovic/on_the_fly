@@ -1,0 +1,121 @@
+{
+  "at": "2026-10-15T08:37:31.105429+00:00",
+  "run": {
+    "id": "1635a1ce-f116-4d93-a2c7-6da4d74b94b7",
+    "integration_id": "3d6e03ec-ae6e-11f0-bc34-169cd02558fe",
+    "cutoff": "2026-10-14 23:59:59.999000",
+    "prepared": 1,
+    "applied": 1,
+    "max_date": "2026-10-15 08:20:35.717657",
+    "warnings": 0,
+    "created_at": "2026-10-15T08:16:19.420216+00:00",
+    "attribute_table_name": "ev_prostor_h",
+    "upsert_count": 148,
+    "delete_count": 0,
+    "user_id": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+    "source_complete": 1,
+    "source_last_key": "\"54032843-1354\"",
+    "target_last_key": "\"54032843-1354\"",
+    "source_count": 4659596,
+    "target_count": 4659448
+  },
+  "cohorts": {
+    "repaired": {
+      "requested": 148,
+      "counts": {
+        "oracle_missing": 0,
+        "duplicate_target_rows": 0,
+        "compared": 148,
+        "has_geom": 0,
+        "created_updated_equal": 148,
+        "metadata_matches_run": 148,
+        "rows_with_mismatches": 0
+      },
+      "mismatched_fields": {},
+      "nonnull_target_when_source_null": {},
+      "actors": [
+        {
+          "created_by": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+          "updated_by": "955ee6d4-d98e-11f0-bd04-de28270b37c5",
+          "count": 148
+        }
+      ],
+      "uuid_versions": {
+        "1": 148
+      },
+      "oracle_python_types": {
+        "jn_prostor_pk": "str",
+        "pro_id": "str",
+        "dst_sid": "str",
+        "id_dr_pros": "str",
+        "povrsina": "str",
+        "jn_rev_num": "str",
+        "jn_rev_num_to": "NoneType",
+        "jn_rev_num_prev": "NoneType",
+        "jn_status": "str",
+        "valid_from": "str",
+        "valid_to": "NoneType",
+        "date_change": "str"
+      },
+      "mismatch_examples": []
+    },
+    "older_controls": {
+      "requested": 100,
+      "counts": {
+        "oracle_missing": 0,
+        "duplicate_target_rows": 0,
+        "compared": 100,
+        "has_geom": 0,
+        "created_updated_equal": 0,
+        "metadata_matches_run": 0,
+        "rows_with_mismatches": 0
+      },
+      "mismatched_fields": {},
+      "nonnull_target_when_source_null": {},
+      "actors": [
+        {
+          "created_by": "154f70e2-a1a1-11ef-9574-0242ac120008",
+          "updated_by": "None",
+          "count": 100
+        }
+      ],
+      "uuid_versions": {
+        "4": 100
+      },
+      "oracle_python_types": {
+        "jn_prostor_pk": "str",
+        "pro_id": "str",
+        "dst_sid": "str",
+        "id_dr_pros": "str",
+        "povrsina": "str",
+        "jn_rev_num": "str",
+        "jn_rev_num_to": "NoneType",
+        "jn_rev_num_prev": "str",
+        "jn_status": "str",
+        "valid_from": "str",
+        "valid_to": "NoneType",
+        "date_change": "str"
+      },
+      "mismatch_examples": []
+    }
+  },
+  "postgres_types": {
+    "id": "uuid",
+    "created_by": "uuid",
+    "updated_by": "uuid",
+    "created_at": "timestamp without time zone",
+    "updated_at": "timestamp without time zone",
+    "jn_prostor_pk": "text",
+    "pro_id": "bigint",
+    "dst_sid": "bigint",
+    "id_dr_pros": "bigint",
+    "povrsina": "numeric",
+    "jn_rev_num": "bigint",
+    "jn_rev_num_to": "bigint",
+    "jn_rev_num_prev": "bigint",
+    "jn_status": "text",
+    "valid_from": "timestamp without time zone",
+    "valid_to": "timestamp without time zone",
+    "date_change": "timestamp without time zone"
+  }
+}

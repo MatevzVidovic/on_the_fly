@@ -1,0 +1,455 @@
+{
+  "checked_on": "2026-10-15",
+  "columns": [
+    {
+      "table_name": "ev_parc_del_enota",
+      "column_name": "id",
+      "data_type": "uuid",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ev_parc_del_enota",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "id",
+      "data_type": "uuid",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "jn_parcela_del_pk",
+      "data_type": "text",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "id_parc_del",
+      "data_type": "text",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "pc_mid",
+      "data_type": "bigint",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "id_nr_parc",
+      "data_type": "bigint",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "id_dr_parc",
+      "data_type": "bigint",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "delez_povrsine",
+      "data_type": "numeric",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "jn_rev_num",
+      "data_type": "bigint",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "jn_rev_num_to",
+      "data_type": "bigint",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "jn_rev_num_prev",
+      "data_type": "bigint",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "id_model",
+      "data_type": "text",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "message",
+      "data_type": "text",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "jn_status",
+      "data_type": "text",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "ev_parc_del_h",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id",
+      "data_type": "uuid",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id_parc_enota",
+      "data_type": "text",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "pc_mid",
+      "data_type": "bigint",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id_model",
+      "data_type": "text",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "delez_povrsine",
+      "data_type": "numeric",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "vrednost",
+      "data_type": "numeric",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "raven",
+      "data_type": "text",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "cona_ime",
+      "data_type": "text",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "faktor_po",
+      "data_type": "numeric",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "posplosena_vrednost",
+      "data_type": "bigint",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "err_msg",
+      "data_type": "text",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "ev_parc_enota",
+      "column_name": "id_model_ver",
+      "data_type": "bigint",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id",
+      "data_type": "uuid",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "created_by",
+      "data_type": "uuid",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "updated_by",
+      "data_type": "uuid",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "jn_parcela_enota_pk",
+      "data_type": "text",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id_parc_enota",
+      "data_type": "text",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "pc_mid",
+      "data_type": "bigint",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id_model",
+      "data_type": "text",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "delez_povrsine",
+      "data_type": "numeric",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "vrednost",
+      "data_type": "numeric",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "raven",
+      "data_type": "text",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "vpliv",
+      "data_type": "text",
+      "ordinal_position": 13
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "cona_ime",
+      "data_type": "text",
+      "ordinal_position": 14
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "faktor_po",
+      "data_type": "numeric",
+      "ordinal_position": 15
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "posplosena_vrednost",
+      "data_type": "bigint",
+      "ordinal_position": 16
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "id_model_ver",
+      "data_type": "bigint",
+      "ordinal_position": 17
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "jn_status",
+      "data_type": "text",
+      "ordinal_position": 18
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 19
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 20
+    },
+    {
+      "table_name": "ev_parc_enota_h_2025_danes",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone",
+      "ordinal_position": 21
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "PC_MID",
+      "data_type": "numeric",
+      "ordinal_position": 1
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "OB_MID",
+      "data_type": "numeric",
+      "ordinal_position": 2
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "KO_SIFKO",
+      "data_type": "numeric",
+      "ordinal_position": 3
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "PARCELA",
+      "data_type": "character varying",
+      "ordinal_position": 4
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "POVRSINA",
+      "data_type": "numeric",
+      "ordinal_position": 5
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "CENX",
+      "data_type": "numeric",
+      "ordinal_position": 6
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "CENY",
+      "data_type": "numeric",
+      "ordinal_position": 7
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "CENTROID",
+      "data_type": "text",
+      "ordinal_position": 8
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "BONITETA",
+      "data_type": "numeric",
+      "ordinal_position": 9
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "ODPRTOST",
+      "data_type": "numeric",
+      "ordinal_position": 10
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "RK",
+      "data_type": "numeric",
+      "ordinal_position": 11
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "JN_REV_NUM",
+      "data_type": "numeric",
+      "ordinal_position": 12
+    },
+    {
+      "table_name": "ev_parcela",
+      "column_name": "EID",
+      "data_type": "numeric",
+      "ordinal_position": 13
+    }
+  ]
+}

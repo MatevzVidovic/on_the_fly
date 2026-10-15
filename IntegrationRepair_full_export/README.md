@@ -175,3 +175,21 @@ integrations already use direct keys and need no split mapping. See the current
 retain their dated measurements; their EV-parcela-only configuration status is
 superseded by this audit. PostgreSQL write throughput remains unmeasured with the
 read-only account.
+
+## Recheck only LIFT after apply
+
+Compare the current LIFT inventory with an existing completed Oracle export:
+
+```sh
+time .venv/bin/python verify_lift.py --store full-ev-parcela.sqlite 03ff3376-0110-4c42-a617-07662100d1bf
+```
+
+This standalone read-only check reports remaining inserts, updates, removals and
+newer-LIFT warnings. It uses the saved cutoff and the same comparison rules as
+prepare. It opens SQLite read-only and PostgreSQL in read-only transactions; no
+Oracle connection is needed. It preserves the original plan, seen flags, checkpoints
+and applied status. Phase timing is appended to the normal local timing log.
+Expect a full LIFT scan, similar to prepare's LIFT phase. This checks against the
+saved source inventory, not Oracle changes since the export. It does not create a
+new apply plan; use a fresh prepare for that. Keep normal integrations stopped if
+you need counts for the same unchanged target state.
