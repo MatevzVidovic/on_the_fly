@@ -1,0 +1,32 @@
+[
+  {
+    "strategy": "current",
+    "rows": 1000,
+    "seconds": 0.838
+  },
+  {
+    "strategy": "prefetch1000",
+    "rows": 1000,
+    "seconds": 0.494
+  },
+  {
+    "strategy": "sequential_source_sample",
+    "rows": 1000,
+    "seconds": 0.055
+  },
+  {
+    "strategy": "current",
+    "rows": 10000,
+    "seconds": 5.923
+  },
+  {
+    "strategy": "prefetch1000",
+    "rows": 10000,
+    "seconds": 5.599
+  },
+  {
+    "strategy": "sequential_source_sample",
+    "rows": 10000,
+    "seconds": 0.5
+  }
+]

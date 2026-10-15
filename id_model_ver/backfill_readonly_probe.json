@@ -1,0 +1,16 @@
+[
+  {
+    "table": "ev_del_stavbe_enota_h_2020_2024",
+    "checked": 1000,
+    "missing": 0,
+    "source_nulls": 10,
+    "seconds": 6.932
+  },
+  {
+    "table": "ev_del_stavbe_enota_h_2025_danes",
+    "checked": 1000,
+    "missing": 0,
+    "source_nulls": 1,
+    "seconds": 1.093
+  }
+]

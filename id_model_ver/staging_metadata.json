@@ -1,0 +1,653 @@
+{
+  "environment": "staging",
+  "at": "2026-10-15T14:54:20.211735+00:00",
+  "tables": [
+    {
+      "table": "ev_del_stavbe_enota",
+      "metadata": [
+        {
+          "id": "7896ec9e-8724-11ef-bdb1-0242ac120007",
+          "name": "ev_del_stavbe_enota",
+          "type_params": null
+        }
+      ],
+      "fields": [
+        {
+          "name": "cona_ime",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "created_at",
+          "type": "date-time"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint"
+        },
+        {
+          "name": "err_msg",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "faktor_po",
+          "type": "decimal"
+        },
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "id_model",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "id_model_ver",
+          "type": "bigint"
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint"
+        },
+        {
+          "name": "raven",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "updated_at",
+          "type": "date-time"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid"
+        },
+        {
+          "name": "vrednost",
+          "type": "decimal"
+        }
+      ],
+      "integrations": [
+        {
+          "id": "bfae807e-8724-11ef-918a-0242ac120007",
+          "url": "select DST_SID,\n       ID_MODEL,\n       RAVEN,\n       VREDNOST,\n       CONA_IME,\n       FAKTOR_PO,\n       POSPLOSENA_VREDNOST,\n       ERR_MSG,\n       ID_MODEL_VER\nfrom EV.DEL_STAVBE_ENOTA",
+          "params": null,
+          "is_full_sync": true,
+          "last_changed_datetime": null,
+          "connection_name": "GURS ORCL"
+        }
+      ],
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "id_model",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "raven",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "vrednost",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "cona_ime",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "faktor_po",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "err_msg",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "id_model_ver",
+          "type": "bigint",
+          "not_null": false
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "ev_del_stavbe_enota_dst_sid",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_dst_sid ON public.ev_del_stavbe_enota USING btree (dst_sid)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_dst_sid_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_dst_sid_idx ON public.ev_del_stavbe_enota USING btree (dst_sid)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_pkey",
+          "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_pkey ON public.ev_del_stavbe_enota USING btree (id)"
+        }
+      ],
+      "estimate": {
+        "estimated_rows": 1914127
+      }
+    },
+    {
+      "table": "ev_del_stavbe_enota_h_2020_2024",
+      "metadata": [
+        {
+          "id": "f5a66010-f25e-11f0-bfd1-02420a000266",
+          "name": "ev_del_stavbe_enota_h_2020_2024",
+          "type_params": null
+        }
+      ],
+      "fields": [
+        {
+          "name": "cona_ime",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "created_at",
+          "type": "date-time"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "date_change",
+          "type": "date-time"
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint"
+        },
+        {
+          "name": "faktor_po",
+          "type": "decimal"
+        },
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "id_model",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "jn_del_st_enota_pk",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "jn_status",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint"
+        },
+        {
+          "name": "raven",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "updated_at",
+          "type": "date-time"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid"
+        },
+        {
+          "name": "valid_from",
+          "type": "date-time"
+        },
+        {
+          "name": "valid_to",
+          "type": "date-time"
+        },
+        {
+          "name": "vpliv",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "vrednost",
+          "type": "decimal"
+        }
+      ],
+      "integrations": [],
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "jn_del_st_enota_pk",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "id_model",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "raven",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "vpliv",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "vrednost",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "cona_ime",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "faktor_po",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "jn_status",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "date_change",
+          "type": "timestamp without time zone",
+          "not_null": false
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "ev_del_stavbe_enota_h_2020_2024_pkey",
+          "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2020_2024_pkey ON public.ev_del_stavbe_enota_h_2020_2024 USING btree (id)"
+        }
+      ],
+      "estimate": {
+        "estimated_rows": 6902079
+      }
+    },
+    {
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "metadata": [
+        {
+          "id": "12f5c9ee-f25f-11f0-9867-02420a000266",
+          "name": "ev_del_stavbe_enota_h_2025_danes",
+          "type_params": {
+            "events": {
+              "after_create_events": [
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+                  }
+                },
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f"
+                  }
+                }
+              ],
+              "after_delete_events": [
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+                  }
+                },
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f"
+                  }
+                }
+              ],
+              "after_update_events": [
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+                  }
+                },
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f"
+                  }
+                }
+              ],
+              "after_batch_save_events": [
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+                  }
+                },
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f"
+                  }
+                }
+              ],
+              "after_batch_delete_events": [
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+                  }
+                },
+                {
+                  "event_name": "gms.attribute_table.materialized_view.sync",
+                  "event_options": {
+                    "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f"
+                  }
+                }
+              ]
+            }
+          }
+        }
+      ],
+      "fields": [
+        {
+          "name": "cona_ime",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "created_at",
+          "type": "date-time"
+        },
+        {
+          "name": "created_by",
+          "type": "uuid"
+        },
+        {
+          "name": "date_change",
+          "type": "date-time"
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint"
+        },
+        {
+          "name": "faktor_po",
+          "type": "decimal"
+        },
+        {
+          "name": "id",
+          "type": "uuid"
+        },
+        {
+          "name": "id_model",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "jn_del_st_enota_pk",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "jn_status",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint"
+        },
+        {
+          "name": "raven",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "updated_at",
+          "type": "date-time"
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid"
+        },
+        {
+          "name": "valid_from",
+          "type": "date-time"
+        },
+        {
+          "name": "valid_to",
+          "type": "date-time"
+        },
+        {
+          "name": "vpliv",
+          "type": "plain-text-single-row"
+        },
+        {
+          "name": "vrednost",
+          "type": "decimal"
+        }
+      ],
+      "integrations": [
+        {
+          "id": "726fc9e4-b684-11f1-b953-02420a00027f",
+          "url": "SELECT\n    TO_CHAR(j.\"DST_SID\") || '-' || TO_CHAR(j.\"JN_REV_NUM\") AS jn_del_st_enota_pk,\n    j.\"DST_SID\" AS dst_sid,\n    j.\"ID_MODEL\" AS id_model,\n    j.\"RAVEN\" AS raven,\n    j.\"VPLIV\" AS vpliv,\n    j.\"VREDNOST\" AS vrednost,\n    j.\"CONA_IME\" AS cona_ime,\n    CAST(TRIM(j.\"JN_STATUS\") AS VARCHAR2(1)) AS jn_status,\n    j.\"FAKTOR_PO\" AS faktor_po,\n    j.\"POSPLOSENA_VREDNOST\" AS posplosena_vrednost,\n    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,\n    FROM_TZ(CAST(rt.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_to,\n    FROM_TZ(CAST(COALESCE(rt.CREATED, rf.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AS date_change\nFROM EV.JN_DEL_STAVBE_ENOTA j\nJOIN EV.REVISION rf ON j.\"JN_REV_NUM\" = rf.REV_NUM\nLEFT JOIN EV.REVISION rt ON j.\"JN_REV_NUM_TO\" = rt.REV_NUM\nWHERE j.\"JN_STATUS\" <> 'X'\n  AND rf.CREATED >= TIMESTAMP '2025-01-01 00:00:00'",
+          "params": {
+            "ignore_audit": true
+          },
+          "is_full_sync": false,
+          "last_changed_datetime": "2026-10-06 23:59:59.999000",
+          "connection_name": "KN ORACLE"
+        }
+      ],
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "created_by",
+          "type": "uuid",
+          "not_null": true
+        },
+        {
+          "name": "updated_by",
+          "type": "uuid",
+          "not_null": false
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp without time zone",
+          "not_null": true
+        },
+        {
+          "name": "updated_at",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "jn_del_st_enota_pk",
+          "type": "text",
+          "not_null": true
+        },
+        {
+          "name": "dst_sid",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "id_model",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "raven",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "vpliv",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "vrednost",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "cona_ime",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "faktor_po",
+          "type": "numeric",
+          "not_null": false
+        },
+        {
+          "name": "posplosena_vrednost",
+          "type": "bigint",
+          "not_null": false
+        },
+        {
+          "name": "jn_status",
+          "type": "text",
+          "not_null": false
+        },
+        {
+          "name": "valid_from",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "valid_to",
+          "type": "timestamp without time zone",
+          "not_null": false
+        },
+        {
+          "name": "date_change",
+          "type": "timestamp without time zone",
+          "not_null": false
+        }
+      ],
+      "indexes": [
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_valid_to_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_to_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_to)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_dst_sid_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_dst_sid_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (dst_sid)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_vrednost_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_vrednost_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (vrednost)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key",
+          "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key ON public.ev_del_stavbe_enota_h_2025_danes USING btree (jn_del_st_enota_pk)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_pkey",
+          "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_pkey ON public.ev_del_stavbe_enota_h_2025_danes USING btree (id)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_date_change_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_date_change_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (date_change)"
+        },
+        {
+          "indexname": "ev_del_stavbe_enota_h_2025_danes_valid_from_idx",
+          "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_from_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_from)"
+        }
+      ],
+      "estimate": {
+        "estimated_rows": 4877667
+      }
+    }
+  ]
+}

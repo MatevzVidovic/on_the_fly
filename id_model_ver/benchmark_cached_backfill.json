@@ -1,0 +1,8 @@
+{
+  "old_oracle_fetch_seconds": 4.286,
+  "sample_cache_write_seconds": 0.009,
+  "cached_page_seconds": {
+    "1000": 0.076,
+    "10000": 0.155
+  }
+}

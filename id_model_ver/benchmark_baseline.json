@@ -1,0 +1,7 @@
+{
+  "lift_read_seconds": 0.988,
+  "oracle_fetch_seconds": 6.223,
+  "rows": 10000,
+  "missing": 0,
+  "read_fetch_seconds": 7.211
+}

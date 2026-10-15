@@ -1,0 +1,154 @@
+{
+  "environment": "staging",
+  "started_at": "2026-10-15T14:55:03.383616+00:00",
+  "definition": "2020 <= starting revision date < 2025; JN_STATUS <> X; same joins as 2025 integration",
+  "oracle_indexes": [
+    {
+      "table": "JN_DEL_STAVBE_ENOTA",
+      "columns": [
+        [
+          "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+          "UNIQUE",
+          "VALID",
+          "DST_SID",
+          1
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_PK_JNF_IX",
+          "UNIQUE",
+          "VALID",
+          "JN_REV_NUM",
+          2
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+          "NONUNIQUE",
+          "VALID",
+          "DST_SID",
+          1
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM",
+          2
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_PK_JNFT_IX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM_TO",
+          3
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_REV_IDX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM_TO",
+          1
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_REV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM",
+          1
+        ],
+        [
+          "JN_DEL_STAVBE_ENOTA_REV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "SYS_NC00016$",
+          2
+        ],
+        [
+          "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "DST_SID",
+          1
+        ],
+        [
+          "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "ID_MODEL",
+          2
+        ],
+        [
+          "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM",
+          3
+        ],
+        [
+          "JN_DEL_STAV_EN_DSTSIDMODREV_IX",
+          "NONUNIQUE",
+          "VALID",
+          "JN_REV_NUM_TO",
+          4
+        ]
+      ]
+    },
+    {
+      "table": "REVISION",
+      "columns": [
+        [
+          "REVISION_CREATED_ID",
+          "NONUNIQUE",
+          "VALID",
+          "SYS_NC00008$",
+          1
+        ],
+        [
+          "REVISION_NUM_DATE_IX",
+          "NONUNIQUE",
+          "VALID",
+          "REV_NUM",
+          1
+        ],
+        [
+          "REVISION_NUM_DATE_IX",
+          "NONUNIQUE",
+          "VALID",
+          "SYS_NC00008$",
+          2
+        ],
+        [
+          "REVISION_PK",
+          "UNIQUE",
+          "VALID",
+          "REV_NUM",
+          1
+        ],
+        [
+          "REVISION_USER_ID_IDX",
+          "NONUNIQUE",
+          "VALID",
+          "ID_USER",
+          1
+        ]
+      ]
+    }
+  ],
+  "oracle_count": 6902602,
+  "oracle_model_version_non_null": 6834336,
+  "oracle_model_version_null": 68266,
+  "min_model_version": 1148,
+  "max_model_version": 1165,
+  "oracle_seconds": 2.141,
+  "staging": {
+    "row_count": 6902602,
+    "min_valid_from": null,
+    "max_valid_from": null,
+    "outside_start_date_window": 0,
+    "null_valid_from": 6902602,
+    "status_x": 0,
+    "null_business_key": 0
+  },
+  "staging_seconds": 0.499,
+  "oracle_minus_staging": 0,
+  "finished_at": "2026-10-15T14:55:07.484398+00:00"
+}
