@@ -1,0 +1,29 @@
+{
+  "checked_on": "2026-10-15",
+  "column": [
+    {
+      "table_schema": "public",
+      "table_name": "pripis_vmxpd_x_enote",
+      "column_name": "vrednost_izr",
+      "data_type": "integer"
+    }
+  ],
+  "column_dependents": [
+    {
+      "schema": "public",
+      "dependent_relation": "pripis_standardne_statistike_napak",
+      "relkind": "m",
+      "rulename": "_RETURN"
+    }
+  ],
+  "materialized_view": {
+    "schemaname": "public",
+    "matviewname": "pripis_standardne_statistike_napak",
+    "matviewowner": "gurs_readwrite",
+    "hasindexes": false,
+    "ispopulated": true,
+    "definition": " SELECT uuid_generate_v4() AS id,\n    src.id_rel_pr_datum,\n    src.presecni_datum,\n    src.model,\n    src.tip_enote,\n    src.id_rel_verzije_modeli,\n    src.verzija,\n    count(1) AS st_enot,\n    count(1) FILTER (WHERE (src.id_rel_pr_datum IS NULL)) AS st_brez_presecnega_datuma,\n    count(1) FILTER (WHERE (src.id_rel_vm_pd IS NULL)) AS st_brez_konfiguracije_modela,\n    count(1) FILTER (WHERE ((src.id_rel_vm_pd IS NOT NULL) AND (src.vrednost_izr IS NULL))) AS st_brez_izracunane_vrednosti,\n    count(1) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS st_izracunanih_vrednosti,\n    count(1) FILTER (WHERE ((src.napaka_priprave IS NOT NULL) AND (btrim(src.napaka_priprave) <> ''::text))) AS st_napak_priprave,\n    round((((count(1) FILTER (WHERE (src.vrednost_izr IS NULL)))::numeric / (NULLIF(count(1), 0))::numeric) / 0.01), 2) AS delez_brez_vrednosti_pct,\n    sum(src.vrednost_izr) AS vsota_vrednost_izr,\n    sum(src.vrednost_zaokrozena) AS vsota_vrednost_zaokrozena,\n    min(src.vrednost_izr) AS min_vrednost_izr,\n    max(src.vrednost_izr) AS max_vrednost_izr,\n    avg(src.vrednost_izr) AS avg_vrednost_izr,\n    percentile_cont((0.05)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p05_vrednost_izr,\n    percentile_cont((0.25)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p25_vrednost_izr,\n    percentile_cont((0.50)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS mediana_vrednost_izr,\n    percentile_cont((0.75)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p75_vrednost_izr,\n    percentile_cont((0.95)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p95_vrednost_izr,\n    stddev_pop(src.vrednost_izr) AS stddev_vrednost_izr,\n    now() AS refreshed_at\n   FROM ( SELECT e.id_pripis_enote,\n            e.id_rel_pr_datum,\n            pd.datum AS presecni_datum,\n            e.model,\n            e.tip_enote,\n            e.poslovni_kljuc,\n            e.napaka_priprave,\n            k.id_rel_vm_pd,\n            k.id_rel_verzije_modeli,\n            k.verzija,\n            r.vrednost_izr,\n            r.vrednost_zaokrozena,\n            r.spremenljivke_vrednosti,\n            r.faktorji_vrednosti\n           FROM (((( SELECT d.id AS id_pripis_enote,\n                    d.id_rel_pr_datum,\n                    d.model,\n                    'DEL_STAVBE'::text AS tip_enote,\n                    (d.del_stavbe_id)::text AS poslovni_kljuc,\n                    d.napaka AS napaka_priprave\n                   FROM pripis_enote_deli_stavb d\n                UNION ALL\n                 SELECT p.id AS id_pripis_enote,\n                    p.id_rel_pr_datum,\n                    p.model,\n                    'DEL_PARC'::text AS tip_enote,\n                    p.del_parcele_id AS poslovni_kljuc,\n                    NULL::text AS napaka_priprave\n                   FROM pripis_enote_deli_parcel p) e\n             LEFT JOIN pripis_presecni_datum pd ON ((pd.id = e.id_rel_pr_datum)))\n             LEFT JOIN ( SELECT x.id AS id_rel_vm_pd,\n                    x.id_rel_pr_datum,\n                    x.id_rel_verzije_modeli,\n                    vm.model,\n                    vm.verzija\n                   FROM (pripis_vm_x_pd x\n                     JOIN md_verzije_modeli vm ON ((vm.id = x.id_rel_verzije_modeli)))) k ON (((k.id_rel_pr_datum = e.id_rel_pr_datum) AND (k.model = e.model))))\n             LEFT JOIN pripis_vmxpd_x_enote r ON (((r.id_rel_vm_pd = k.id_rel_vm_pd) AND (r.id_rel_prip_enota = e.id_pripis_enote))))) src\n  GROUP BY src.id_rel_pr_datum, src.presecni_datum, src.model, src.tip_enote, src.id_rel_verzije_modeli, src.verzija;"
+  },
+  "view_dependents": [],
+  "indexes": []
+}

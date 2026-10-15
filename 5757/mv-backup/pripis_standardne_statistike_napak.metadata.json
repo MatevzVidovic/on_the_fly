@@ -1,0 +1,271 @@
+{
+  "view": {
+    "schema": "public",
+    "name": "pripis_standardne_statistike_napak",
+    "owner": "gurs_readwrite",
+    "populated": true,
+    "reloptions": null,
+    "tablespace": null,
+    "access_method": "heap",
+    "comment": null,
+    "definition": " SELECT uuid_generate_v4() AS id,\n    src.id_rel_pr_datum,\n    src.presecni_datum,\n    src.model,\n    src.tip_enote,\n    src.id_rel_verzije_modeli,\n    src.verzija,\n    count(1) AS st_enot,\n    count(1) FILTER (WHERE (src.id_rel_pr_datum IS NULL)) AS st_brez_presecnega_datuma,\n    count(1) FILTER (WHERE (src.id_rel_vm_pd IS NULL)) AS st_brez_konfiguracije_modela,\n    count(1) FILTER (WHERE ((src.id_rel_vm_pd IS NOT NULL) AND (src.vrednost_izr IS NULL))) AS st_brez_izracunane_vrednosti,\n    count(1) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS st_izracunanih_vrednosti,\n    count(1) FILTER (WHERE ((src.napaka_priprave IS NOT NULL) AND (btrim(src.napaka_priprave) <> ''::text))) AS st_napak_priprave,\n    round((((count(1) FILTER (WHERE (src.vrednost_izr IS NULL)))::numeric / (NULLIF(count(1), 0))::numeric) / 0.01), 2) AS delez_brez_vrednosti_pct,\n    sum(src.vrednost_izr) AS vsota_vrednost_izr,\n    sum(src.vrednost_zaokrozena) AS vsota_vrednost_zaokrozena,\n    min(src.vrednost_izr) AS min_vrednost_izr,\n    max(src.vrednost_izr) AS max_vrednost_izr,\n    avg(src.vrednost_izr) AS avg_vrednost_izr,\n    percentile_cont((0.05)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p05_vrednost_izr,\n    percentile_cont((0.25)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p25_vrednost_izr,\n    percentile_cont((0.50)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS mediana_vrednost_izr,\n    percentile_cont((0.75)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p75_vrednost_izr,\n    percentile_cont((0.95)::double precision) WITHIN GROUP (ORDER BY ((src.vrednost_izr)::double precision)) FILTER (WHERE (src.vrednost_izr IS NOT NULL)) AS p95_vrednost_izr,\n    stddev_pop(src.vrednost_izr) AS stddev_vrednost_izr,\n    now() AS refreshed_at\n   FROM ( SELECT e.id_pripis_enote,\n            e.id_rel_pr_datum,\n            pd.datum AS presecni_datum,\n            e.model,\n            e.tip_enote,\n            e.poslovni_kljuc,\n            e.napaka_priprave,\n            k.id_rel_vm_pd,\n            k.id_rel_verzije_modeli,\n            k.verzija,\n            r.vrednost_izr,\n            r.vrednost_zaokrozena,\n            r.spremenljivke_vrednosti,\n            r.faktorji_vrednosti\n           FROM (((( SELECT d.id AS id_pripis_enote,\n                    d.id_rel_pr_datum,\n                    d.model,\n                    'DEL_STAVBE'::text AS tip_enote,\n                    (d.del_stavbe_id)::text AS poslovni_kljuc,\n                    d.napaka AS napaka_priprave\n                   FROM pripis_enote_deli_stavb d\n                UNION ALL\n                 SELECT p.id AS id_pripis_enote,\n                    p.id_rel_pr_datum,\n                    p.model,\n                    'DEL_PARC'::text AS tip_enote,\n                    p.del_parcele_id AS poslovni_kljuc,\n                    NULL::text AS napaka_priprave\n                   FROM pripis_enote_deli_parcel p) e\n             LEFT JOIN pripis_presecni_datum pd ON ((pd.id = e.id_rel_pr_datum)))\n             LEFT JOIN ( SELECT x.id AS id_rel_vm_pd,\n                    x.id_rel_pr_datum,\n                    x.id_rel_verzije_modeli,\n                    vm.model,\n                    vm.verzija\n                   FROM (pripis_vm_x_pd x\n                     JOIN md_verzije_modeli vm ON ((vm.id = x.id_rel_verzije_modeli)))) k ON (((k.id_rel_pr_datum = e.id_rel_pr_datum) AND (k.model = e.model))))\n             LEFT JOIN pripis_vmxpd_x_enote r ON (((r.id_rel_vm_pd = k.id_rel_vm_pd) AND (r.id_rel_prip_enota = e.id_pripis_enote))))) src\n  GROUP BY src.id_rel_pr_datum, src.presecni_datum, src.model, src.tip_enote, src.id_rel_verzije_modeli, src.verzija;"
+  },
+  "columns": [
+    {
+      "attnum": 1,
+      "attname": "id",
+      "type": "uuid",
+      "comment": null
+    },
+    {
+      "attnum": 2,
+      "attname": "id_rel_pr_datum",
+      "type": "uuid",
+      "comment": null
+    },
+    {
+      "attnum": 3,
+      "attname": "presecni_datum",
+      "type": "date",
+      "comment": null
+    },
+    {
+      "attnum": 4,
+      "attname": "model",
+      "type": "text",
+      "comment": null
+    },
+    {
+      "attnum": 5,
+      "attname": "tip_enote",
+      "type": "text",
+      "comment": null
+    },
+    {
+      "attnum": 6,
+      "attname": "id_rel_verzije_modeli",
+      "type": "uuid",
+      "comment": null
+    },
+    {
+      "attnum": 7,
+      "attname": "verzija",
+      "type": "integer",
+      "comment": null
+    },
+    {
+      "attnum": 8,
+      "attname": "st_enot",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 9,
+      "attname": "st_brez_presecnega_datuma",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 10,
+      "attname": "st_brez_konfiguracije_modela",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 11,
+      "attname": "st_brez_izracunane_vrednosti",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 12,
+      "attname": "st_izracunanih_vrednosti",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 13,
+      "attname": "st_napak_priprave",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 14,
+      "attname": "delez_brez_vrednosti_pct",
+      "type": "numeric",
+      "comment": null
+    },
+    {
+      "attnum": 15,
+      "attname": "vsota_vrednost_izr",
+      "type": "bigint",
+      "comment": null
+    },
+    {
+      "attnum": 16,
+      "attname": "vsota_vrednost_zaokrozena",
+      "type": "numeric",
+      "comment": null
+    },
+    {
+      "attnum": 17,
+      "attname": "min_vrednost_izr",
+      "type": "integer",
+      "comment": null
+    },
+    {
+      "attnum": 18,
+      "attname": "max_vrednost_izr",
+      "type": "integer",
+      "comment": null
+    },
+    {
+      "attnum": 19,
+      "attname": "avg_vrednost_izr",
+      "type": "numeric",
+      "comment": null
+    },
+    {
+      "attnum": 20,
+      "attname": "p05_vrednost_izr",
+      "type": "double precision",
+      "comment": null
+    },
+    {
+      "attnum": 21,
+      "attname": "p25_vrednost_izr",
+      "type": "double precision",
+      "comment": null
+    },
+    {
+      "attnum": 22,
+      "attname": "mediana_vrednost_izr",
+      "type": "double precision",
+      "comment": null
+    },
+    {
+      "attnum": 23,
+      "attname": "p75_vrednost_izr",
+      "type": "double precision",
+      "comment": null
+    },
+    {
+      "attnum": 24,
+      "attname": "p95_vrednost_izr",
+      "type": "double precision",
+      "comment": null
+    },
+    {
+      "attnum": 25,
+      "attname": "stddev_vrednost_izr",
+      "type": "numeric",
+      "comment": null
+    },
+    {
+      "attnum": 26,
+      "attname": "refreshed_at",
+      "type": "timestamp with time zone",
+      "comment": null
+    }
+  ],
+  "acl": [
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "INSERT",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "SELECT",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "UPDATE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "DELETE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "TRUNCATE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "REFERENCES",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_readwrite",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "TRIGGER",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "INSERT",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "SELECT",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "UPDATE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "DELETE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "TRUNCATE",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "REFERENCES",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_rw",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "TRIGGER",
+      "is_grantable": false
+    },
+    {
+      "grantee": "gurs_read",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "SELECT",
+      "is_grantable": false
+    },
+    {
+      "grantee": "flycom_ro",
+      "grantor": "gurs_readwrite",
+      "privilege_type": "SELECT",
+      "is_grantable": false
+    }
+  ],
+  "column_acl": [],
+  "indexes": []
+}
