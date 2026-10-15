@@ -1,0 +1,25 @@
+{
+  "rows": [
+    {
+      "table_name": "MODELI_GRUPA",
+      "column_name": "DATUM_TRGA",
+      "data_type": "DATE"
+    },
+    {
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_DO",
+      "data_type": "DATE"
+    },
+    {
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_MODELA",
+      "data_type": "VARCHAR2"
+    },
+    {
+      "table_name": "MODELI_XML",
+      "column_name": "DATUM_OD",
+      "data_type": "DATE"
+    }
+  ],
+  "truncated": false
+}

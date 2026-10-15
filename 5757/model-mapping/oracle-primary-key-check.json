@@ -1,0 +1,12 @@
+{
+  "rows": [
+    {
+      "constraint_name": "MODELI_XML_PK",
+      "constraint_type": "P",
+      "status": "ENABLED",
+      "column_name": "ID_MODEL_VER",
+      "position": 1
+    }
+  ],
+  "truncated": false
+}

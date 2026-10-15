@@ -1,0 +1,230 @@
+[
+  {
+    "table_name": "attribute_fields",
+    "column_name": "name"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "type"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "type_params"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_detail_report"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_table"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_single"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "ord"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "created_at"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "updated_at"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "id"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "attribute_table_id"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "created_by"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "updated_by"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "attribute_field_group_id"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "virtual"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "privacy"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "privacy_property"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_pivot"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "restricted_access"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "is_locked"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "conditional_formatting"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_single_offline"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_result_table_offline"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_offline"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "required_lift_filter"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_if_lift_filter"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_add_online"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_edit_online"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_add_offline"
+  },
+  {
+    "table_name": "attribute_fields",
+    "column_name": "display_in_form_edit_offline"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "id"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "attribute_table_id"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "url"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "headers"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "sync_schedule"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "sync_start"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "created_at"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "updated_at"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "created_by"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "updated_by"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "last_sync_start"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "last_sync_end"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "integration_source_store"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "integration_source_update"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "integration_source_delete"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "params"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "use_changed_datetime_for_delta"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "last_changed_datetime"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "is_full_sync"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "integration_type"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "processing_status"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "name"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "attribute_table_sql_connection_id"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "processing_status_message"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "processing_progress"
+  },
+  {
+    "table_name": "attribute_table_integrations",
+    "column_name": "scheduled_task_id"
+  }
+]
