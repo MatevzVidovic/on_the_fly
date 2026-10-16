@@ -1,0 +1,162 @@
+[
+  {
+    "name": "id",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "created_at",
+    "type": "date-time",
+    "type_params": {
+      "required": true
+    },
+    "virtual": false
+  },
+  {
+    "name": "updated_at",
+    "type": "date-time",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "created_by",
+    "type": "uuid",
+    "type_params": {
+      "required": true
+    },
+    "virtual": false
+  },
+  {
+    "name": "updated_by",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_rel_pr_datum",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_rel_vm_pd",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_rel_prip_enota",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_rel_isam_izracun",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_rel_ev_enota",
+    "type": "uuid",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "del_stavbe_id",
+    "type": "bigint",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "model",
+    "type": "plain-text-single-row",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "verzija_modela",
+    "type": "integer",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "id_model_ver",
+    "type": "bigint",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "isam_vrednost_izr",
+    "type": "decimal",
+    "type_params": {
+      "scale": 1
+    },
+    "virtual": false
+  },
+  {
+    "name": "ev_vrednost",
+    "type": "decimal",
+    "type_params": {
+      "scale": 2
+    },
+    "virtual": false
+  },
+  {
+    "name": "delta_izr",
+    "type": "decimal",
+    "type_params": {
+      "scale": 1
+    },
+    "virtual": false
+  },
+  {
+    "name": "isam_vrednost_zaokrozena",
+    "type": "decimal",
+    "type_params": {
+      "scale": 1
+    },
+    "virtual": false
+  },
+  {
+    "name": "ev_posplosena_vrednost",
+    "type": "decimal",
+    "type_params": {
+      "scale": 2
+    },
+    "virtual": false
+  },
+  {
+    "name": "delta_posplosena",
+    "type": "decimal",
+    "type_params": {
+      "scale": 2
+    },
+    "virtual": false
+  },
+  {
+    "name": "status_izr",
+    "type": "plain-text-single-row",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "status_posplosena",
+    "type": "plain-text-single-row",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "status_vmesnih",
+    "type": "plain-text-single-row",
+    "type_params": null,
+    "virtual": false
+  },
+  {
+    "name": "opomba",
+    "type": "plain-text-multi-row",
+    "type_params": null,
+    "virtual": false
+  }
+]
