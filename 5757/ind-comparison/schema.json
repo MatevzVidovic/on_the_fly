@@ -1,0 +1,338 @@
+{
+  "columns": [
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "jn_del_st_enota_pk",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "dst_sid",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "id_model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "raven",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "vpliv",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "vrednost",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "cona_ime",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "faktor_po",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "posplosena_vrednost",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "jn_status",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2020_2024",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "jn_del_st_enota_pk",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "dst_sid",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "id_model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "raven",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "vpliv",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "vrednost",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "cona_ime",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "faktor_po",
+      "data_type": "numeric"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "posplosena_vrednost",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "jn_status",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "valid_from",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "valid_to",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "date_change",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_del_stavbe_enota_h_2025_danes",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "id",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "created_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "created_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "updated_at",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "updated_by",
+      "data_type": "uuid"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "id_model_ver",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "model",
+      "data_type": "text"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "datum_modela",
+      "data_type": "date"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "verzija_gv_originalna",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "verzija_gv_izvajalna",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "id_grupa",
+      "data_type": "bigint"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "datum_od",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "datum_do",
+      "data_type": "timestamp without time zone"
+    },
+    {
+      "table_name": "ev_verzije_modeli",
+      "column_name": "datum_trga",
+      "data_type": "timestamp without time zone"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_to_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_to)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_dst_sid_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (dst_sid)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_vrednost_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (vrednost)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_jn_del_st_enota_pk_key ON public.ev_del_stavbe_enota_h_2025_danes USING btree (jn_del_st_enota_pk)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2025_danes_pkey ON public.ev_del_stavbe_enota_h_2025_danes USING btree (id)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_date_change_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (date_change)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_del_stavbe_enota_h_2025_danes_valid_from_idx ON public.ev_del_stavbe_enota_h_2025_danes USING btree (valid_from)"
+    },
+    {
+      "tablename": "ev_del_stavbe_enota_h_2020_2024",
+      "indexdef": "CREATE UNIQUE INDEX ev_del_stavbe_enota_h_2020_2024_pkey ON public.ev_del_stavbe_enota_h_2020_2024 USING btree (id)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX pripis_enote_deli_stavb___mod_index ON public.pripis_enote_deli_stavb USING btree (__mod)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX pripis_enote_deli_stavb_stavba_id_index ON public.pripis_enote_deli_stavb USING btree (stavba_id)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX idx_pripis_enote_deli_stavb_dej_raba_dst ON public.pripis_enote_deli_stavb USING btree (dej_raba_dst)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX pripis_enote_deli_stavb_del_stavbe_id_index ON public.pripis_enote_deli_stavb USING btree (del_stavbe_id)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX idx_pripis_enote_deli_stavb_id_rel_pr_datum ON public.pripis_enote_deli_stavb USING btree (id_rel_pr_datum)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE INDEX pripis_enote_deli_stavb_geom_idx ON public.pripis_enote_deli_stavb USING gist (geom)"
+    },
+    {
+      "tablename": "pripis_enote_deli_stavb",
+      "indexdef": "CREATE UNIQUE INDEX pripis_enote_deli_stavb_pkey ON public.pripis_enote_deli_stavb USING btree (id)"
+    },
+    {
+      "tablename": "pripis_vmxpd_x_enote",
+      "indexdef": "CREATE UNIQUE INDEX pripis_vmxpd_x_enote_pkey ON public.pripis_vmxpd_x_enote USING btree (id)"
+    }
+  ],
+  "configs": [
+    {
+      "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+      "datum": "2026-01-01",
+      "verzija": 66,
+      "model_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40"
+    }
+  ]
+}

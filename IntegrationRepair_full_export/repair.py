@@ -18,9 +18,12 @@ from target import LiftTarget
 from timings import measure
 
 
-def prepare(definition, source, target, store, run_id=None, only_src=False):
+def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None):
     if run_id is None:
-        run_id = store.create_run(definition.id, wall_time(definition.cutoff), definition.table)
+        cutoff = wall_time(definition.cutoff)
+        if min_date is not None and min_date > cutoff:
+            raise ValueError('Minimum date must not be later than the integration cutoff')
+        run_id = store.create_run(definition.id, cutoff, definition.table, min_date)
     run = store.resume_preparation(run_id)
     if run['integration_id'] != definition.id or run['attribute_table_name'] != definition.table:
         raise ValueError('Resume requires the same integration and target table')
@@ -29,11 +32,14 @@ def prepare(definition, source, target, store, run_id=None, only_src=False):
         return run_id
     cutoff = run['cutoff']
     print(f'Preparing run {run_id}, cutoff {cutoff}', flush=True)
+    if run['min_date'] is not None:
+        print(f"Minimum change date {run['min_date']} (inclusive; upserts only)", flush=True)
     if not run['source_complete']:
         last_key = json.loads(run['source_last_key']) if run['source_last_key'] is not None else None
         # Keep newer source keys too: being outside cutoff does not mean deleted.
         with measure('prepare.oracle_export', run_id=run_id, resumed=last_key is not None, rows=0) as timing:
-            for page in source.inventory(None, after_key=last_key):
+            options = {'min_date': run['min_date']} if run['min_date'] is not None else {}
+            for page in source.inventory(None, after_key=last_key, **options):
                 store.save_source(run_id, page)
                 timing['rows'] += len(page)
             store.finish_source(run_id)
@@ -100,13 +106,21 @@ def main():
     parser.add_argument('--store', default='repair.sqlite')
     parser.add_argument('--resume', metavar='RUN_UUID', help='resume preparation of this saved run')
     parser.add_argument('--only-src', action='store_true', help='prepare only the Oracle inventory')
+    parser.add_argument('--min-date', help='inclusive minimum source change date: YYYY-MM-DD or ISO datetime; upserts only')
     parser.add_argument('command', choices=('prepare', 'apply'))
     parser.add_argument('id', nargs='?', help='integration UUID for prepare; repair UUID for apply (default: latest run)')
     args = parser.parse_args()
     if args.command == 'prepare' and args.id is None and args.resume is None:
         parser.error('prepare requires an integration UUID or --resume RUN_UUID')
-    if args.command == 'apply' and (args.resume or args.only_src):
-        parser.error('--resume and --only-src are prepare options')
+    if args.command == 'apply' and (args.resume or args.only_src or args.min_date is not None):
+        parser.error('--resume, --only-src and --min-date are prepare options')
+    if args.min_date is not None:
+        if args.resume:
+            parser.error('resume reuses the saved minimum date; omit --min-date')
+        try:
+            args.min_date = wall_time(datetime.fromisoformat(args.min_date))
+        except ValueError:
+            parser.error('--min-date requires YYYY-MM-DD or an ISO datetime')
     if args.resume and args.id:
         parser.error('use an integration UUID for a new prepare, or --resume RUN_UUID')
     load_dotenv(args.env)
@@ -152,7 +166,7 @@ def main():
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
         source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
         if args.command == 'prepare':
-            prepare(definition, source, target, store, args.resume, args.only_src)
+            prepare(definition, source, target, store, args.resume, args.only_src, args.min_date)
         else:
             apply(args.id, definition, source, target, store)
 

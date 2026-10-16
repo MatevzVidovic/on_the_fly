@@ -1,0 +1,119 @@
+{
+  "parcels": [
+    {
+      "id": "c777b9df-0036-46e0-a6cd-9fc7cbbcdc52",
+      "parcela_id": 19898477,
+      "del_parcele_id": "19898477-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "1373.47",
+      "delez": "91.2000000000000000"
+    },
+    {
+      "id": "a4747963-1e52-4633-83a2-6fb8f3309fa0",
+      "parcela_id": 19898479,
+      "del_parcele_id": "19898479-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "1368.44",
+      "delez": "92.4000000000000000"
+    },
+    {
+      "id": "bd24c040-01c8-42ad-b310-0a871b746e7a",
+      "parcela_id": 19898488,
+      "del_parcele_id": "19898488-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "8082.75",
+      "delez": "97.5000000000000000"
+    },
+    {
+      "id": "1c5081d0-dbcd-4992-9763-656144e4a59b",
+      "parcela_id": 19898495,
+      "del_parcele_id": "19898495-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "2938.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "94c17ccf-3837-4368-afd5-9791a5f66e8b",
+      "parcela_id": 19898497,
+      "del_parcele_id": "19898497-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "1008.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "f23d95ba-db11-4651-aade-e8839a80173a",
+      "parcela_id": 19898539,
+      "del_parcele_id": "19898539-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "1462.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "ecd6c609-1139-4981-84e3-acdce88ddc33",
+      "parcela_id": 19898574,
+      "del_parcele_id": "19898574-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "2163.34",
+      "delez": "52.7000000000000000"
+    },
+    {
+      "id": "99a83249-65c1-45ee-ab57-2b5ac3d2ff4b",
+      "parcela_id": 19898576,
+      "del_parcele_id": "19898576-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "634.41",
+      "delez": "79.8000000000000000"
+    },
+    {
+      "id": "aa1820a1-fdb0-4343-a943-15b8728d9c50",
+      "parcela_id": 19898578,
+      "del_parcele_id": "19898578-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "3765.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "8fe52db8-cc58-42c4-aa43-7be15772b584",
+      "parcela_id": 19898588,
+      "del_parcele_id": "19898588-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "3081.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "269c00ee-ea4d-448e-83e5-6beeba2acece",
+      "parcela_id": 19898591,
+      "del_parcele_id": "19898591-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "252.00",
+      "delez": "100.0000000000000000"
+    },
+    {
+      "id": "a61cc4c8-8bc7-4c6d-be81-09a6bc94936c",
+      "parcela_id": 19898593,
+      "del_parcele_id": "19898593-90-KME",
+      "model": "KME",
+      "faktor_nivo": null,
+      "zemlj_povr": "5740.00",
+      "delez": "100.0000000000000000"
+    }
+  ],
+  "intermediate": null,
+  "result": [
+    {
+      "spremenljivke_vrednosti": "{2026-01-01, 21, true, true, 2, 3, null, 1502, true, 1980, 1982.60, 4, 6.7, 6.7, 1, 2.56}",
+      "faktorji_vrednosti": "{1.0000, 0.68, 1.00, 1, 0.12, 0, 360000, 90}"
+    }
+  ]
+}

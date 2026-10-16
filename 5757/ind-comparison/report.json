@@ -1,0 +1,255 @@
+{
+  "run_at_utc": "2026-10-15T16:24:46.821310+00:00",
+  "cutoff": "2026-01-01",
+  "mode": "READ_ONLY_STORED_RESULTS",
+  "inventory": [
+    {
+      "id_model_ver": 1150,
+      "jn_status": "A",
+      "all_statuses": 0,
+      "history_rows": 30227,
+      "distinct_units": 30227,
+      "missing_valid_from": 30227,
+      "earliest_valid_from": null,
+      "latest_valid_from": null,
+      "table": "ev_del_stavbe_enota_h_2020_2024",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1150,
+      "jn_status": "H",
+      "all_statuses": 0,
+      "history_rows": 111948,
+      "distinct_units": 36603,
+      "missing_valid_from": 111948,
+      "earliest_valid_from": null,
+      "latest_valid_from": null,
+      "table": "ev_del_stavbe_enota_h_2020_2024",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1150,
+      "jn_status": null,
+      "all_statuses": 1,
+      "history_rows": 142175,
+      "distinct_units": 37230,
+      "missing_valid_from": 142175,
+      "earliest_valid_from": null,
+      "latest_valid_from": null,
+      "table": "ev_del_stavbe_enota_h_2020_2024",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1150,
+      "jn_status": "H",
+      "all_statuses": 0,
+      "history_rows": 4800,
+      "distinct_units": 4504,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-01-01T00:30:00",
+      "latest_valid_from": "2025-05-10T09:56:01",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1150,
+      "jn_status": "X",
+      "all_statuses": 0,
+      "history_rows": 149,
+      "distinct_units": 149,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-01-07T00:30:00",
+      "latest_valid_from": "2025-05-12T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1150,
+      "jn_status": null,
+      "all_statuses": 1,
+      "history_rows": 4949,
+      "distinct_units": 4634,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-01-01T00:30:00",
+      "latest_valid_from": "2025-05-12T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1150,
+          "model": "IND",
+          "datum_modela": "2020-01-01",
+          "verzija_gv_originalna": 51,
+          "verzija_gv_izvajalna": 51
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1173,
+      "jn_status": "A",
+      "all_statuses": 0,
+      "history_rows": 35062,
+      "distinct_units": 35062,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-11-02T23:59:59.999",
+      "latest_valid_from": "2026-10-06T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1173,
+          "model": "IND",
+          "datum_modela": "2025-01-01",
+          "verzija_gv_originalna": 66,
+          "verzija_gv_izvajalna": 66
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1173,
+      "jn_status": "H",
+      "all_statuses": 0,
+      "history_rows": 41242,
+      "distinct_units": 35195,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-05-12T23:59:59",
+      "latest_valid_from": "2026-09-21T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1173,
+          "model": "IND",
+          "datum_modela": "2025-01-01",
+          "verzija_gv_originalna": 66,
+          "verzija_gv_izvajalna": 66
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1173,
+      "jn_status": "X",
+      "all_statuses": 0,
+      "history_rows": 234,
+      "distinct_units": 233,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-05-13T23:59:59.999",
+      "latest_valid_from": "2026-01-20T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1173,
+          "model": "IND",
+          "datum_modela": "2025-01-01",
+          "verzija_gv_originalna": 66,
+          "verzija_gv_izvajalna": 66
+        }
+      ]
+    },
+    {
+      "id_model_ver": 1173,
+      "jn_status": null,
+      "all_statuses": 1,
+      "history_rows": 76538,
+      "distinct_units": 35741,
+      "missing_valid_from": 0,
+      "earliest_valid_from": "2025-05-12T23:59:59",
+      "latest_valid_from": "2026-10-06T23:59:59.999",
+      "table": "ev_del_stavbe_enota_h_2025_danes",
+      "mapping": [
+        {
+          "id_model_ver": 1173,
+          "model": "IND",
+          "datum_modela": "2025-01-01",
+          "verzija_gv_originalna": 66,
+          "verzija_gv_izvajalna": 66
+        }
+      ]
+    }
+  ],
+  "comparisons": [
+    {
+      "configuration": {
+        "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+        "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+        "datum": "2026-01-01",
+        "verzija": 66,
+        "datum_modela": "2025-01-01",
+        "model_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40"
+      },
+      "ev_model": {
+        "id_model_ver": 1173,
+        "model": "IND",
+        "datum_modela": "2025-01-01",
+        "verzija_gv_originalna": 66,
+        "verzija_gv_izvajalna": 66
+      },
+      "isam_units": 34941,
+      "dated_ev_units": 34925,
+      "union_units": 34941,
+      "summary": {
+        "calculated": {
+          "DIFFERENT": 33208,
+          "ISAM_ERROR": 815,
+          "EQUAL": 902,
+          "MISSING_DATED_EV": 16
+        },
+        "generalized": {
+          "DIFFERENT": 30576,
+          "EQUAL": 3534,
+          "ISAM_ERROR": 815,
+          "MISSING_DATED_EV": 16
+        }
+      },
+      "max_absolute_calculated_delta": "3586348.48",
+      "comparable_units": 34110,
+      "rows_file": "ind-66-2026-01-01-rows.json"
+    }
+  ],
+  "limitations": [
+    "History rows are not unique units and must not be summed as property counts.",
+    "Missing valid_from prevents dated matching. Such records are excluded, never guessed.",
+    "Timestamp columns have no timezone; cutoff uses the stored timestamp convention. Validate import timezone before relying on boundary records.",
+    "EV history tables do not expose err_msg. Non-null EV amounts are not proof of an error-free source calculation.",
+    "Inputs have not been checked for equivalence. Final differences do not establish a calculation-code defect.",
+    "Existing ISAM amounts are read, not recalculated. Missing IND configurations are not created.",
+    "Independent short read-only transactions: results are not a single database-wide snapshot."
+  ]
+}

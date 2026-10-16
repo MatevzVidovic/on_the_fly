@@ -1,0 +1,202 @@
+{
+  "configs": [
+    {
+      "id": "fffafc54-5ad9-11f1-90a7-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "fd19c573-649e-4b4a-909a-229e5fcdc3c4",
+      "model": "STZ",
+      "verzija": 44,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,id_tao,p_stz_a,p_stz_b,p_stz_c,p_stz_d,p_stz_e,p_stz_f,p_stz_g,p_stz_h,st_ravni}",
+      "faktorji": "{f_cpt,v_stz_a,v_stz_b,v_stz_c,v_stz_d,v_stz_e,v_stz_f,v_stz_g,v_stz_h}"
+    },
+    {
+      "id": "fc300ede-5ad9-11f1-8961-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "6457a49f-27d2-4472-8bc4-44172d234ab1",
+      "model": "SDP",
+      "verzija": 33,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_elektrika,id_kanalizacija,id_konstrukcije,id_plin,id_tao,id_vodovod,leto_izg,leto_obn,st_ravni,velikost,velikost_m2,zps_dst}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_rt_m2,f_rt_osnova,v_dst,v_zps}"
+    },
+    {
+      "id": "f76a7b3c-5ad9-11f1-8d3e-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "6dbdd502-dd66-4137-b115-d11b018249a7",
+      "model": "PPP",
+      "verzija": 225,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_dvigalo,id_tao,lega_dst,leto_izg,leto_obn,pov_ppl,pov_ppp,povrsina_dp,st_ravni,velikost,velikost_m2}",
+      "faktorji": "{f_cpt,f_last,f_lp,f_obn,f_rt_m2,f_rt_m2_dp,f_rt_osnova,v_dst}"
+    },
+    {
+      "id": "f38d90b2-5ad9-11f1-bfb7-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "a33ac58f-f285-44f7-b552-33fdea6e1c60",
+      "model": "PPL",
+      "verzija": 192,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_tao,lega_dst,leto_izg,leto_obn,pov_ppl,pov_ppp,povr_gar,povrsina_dp,st_ravni,velikost,velikost_m2}",
+      "faktorji": "{f_cpt,f_gar,f_last,f_obn,f_pl,f_rt_m2,f_rt_m2_dp,f_rt_osnova,v_dst,v_gartvr}"
+    },
+    {
+      "id": "f043b21a-5ad9-11f1-a582-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "4a9d6c76-0894-4226-9acd-7c0b30c7018c",
+      "model": "KME",
+      "verzija": 100,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{boniteta,dat_pri,id_tao,p_hme,p_olj,p_sad,p_vin,zemlj_povr}",
+      "faktorji": "{f_bon,f_cpt,v_hme,v_olj,v_sad,v_vin,v_z}"
+    },
+    {
+      "id": "ec8664a6-5ad9-11f1-a871-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "e40a646b-248c-4c8b-8c49-d5d89891943e",
+      "model": "KDS",
+      "verzija": 46,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_elektrika,id_kanalizacija,id_konstrukcije,id_plin,id_tao,id_vodovod,leto_izg,leto_obn,st_ravni,velikost,velikost_m2,zps_dst}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_rt_m2,f_rt_osnova,v_dst,v_zps}"
+    },
+    {
+      "id": "e768958e-5ad9-11f1-93b8-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "8eda8367-bf19-4470-944f-2efc96705d72",
+      "model": "INP",
+      "verzija": 49,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_tao,konstrukcija,leto_izg,leto_obn,neto_prost,povrsina_dp,st_ravni,velikost,velikost_m2}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_rt_m2,f_rt_osnova,v_dst,v_zps}"
+    },
+    {
+      "id": "e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "model": "IND",
+      "verzija": 66,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_elektrika,id_kanalizacija,id_konstrukcije,id_lega,id_plin,id_tao,id_vodovod,leto_izg,leto_obn,st_ravni,velikost,velikost_m2,visina_etaze_rzd,zps_dst}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_rt_m2,f_rt_osnova,v_dst,v_zps}"
+    },
+    {
+      "id": "e03bfb84-5ad9-11f1-a860-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "f950b1c9-4d17-4b23-a100-e44d91905ccd",
+      "model": "HIS",
+      "verzija": 286,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dej_raba_dst,id_elektrika,id_kanalizacija,id_konstrukcije,id_tao,id_vodovod,leto_izg,leto_obn,oddaljenost_ac_hs,oddaljenost_ceste,oddaljenost_daljnovodi_do_100kv,oddaljenost_daljnovodi_nad_100kv,oddaljenost_zeleznice,st_ravni,tip_stavbe,velikost,velikost_m2,zps_dst}",
+      "faktorji": "{f_cpt,f_last,f_nk,f_obn,f_odd,f_rt_m2,f_rt_osnova,pribitek,v_dst,v_z,v_zps}"
+    },
+    {
+      "id": "dd625674-5ad9-11f1-9a35-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "9763f702-9566-4f69-9d42-018cc610c3a5",
+      "model": "GOZ",
+      "verzija": 96,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{boniteta,dat_pri,id_tao,odprtost,rk,st_ravni,zemlj_povr}",
+      "faktorji": "{f_bon,f_cpt,f_odp,f_povr,f_rk,v_z}"
+    },
+    {
+      "id": "cf98deb4-5ad9-11f1-b6d8-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "0490cc29-510a-43da-8a86-cf74f7d946ad",
+      "model": "STA",
+      "verzija": 223,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_dvigalo,id_lega,id_tao,leto_izg,leto_obn,oddaljenost_ac_hs,oddaljenost_ceste,oddaljenost_daljnovodi_do_100kv,oddaljenost_daljnovodi_nad_100kv,oddaljenost_zeleznice,povrsina_dp,st_nadstropja,st_ravni,st_stanovanj,velikost,velikost_m2}",
+      "faktorji": "{f_cpt,f_dp,f_last,f_lege,f_obn,f_odd,f_rt_m2,f_rt_osnova,v_dst}"
+    },
+    {
+      "id": "046905f6-5ada-11f1-809a-b606ab4d8ece",
+      "date_id": "ad9bfd6c-00ea-11f1-8151-02420a0001f4",
+      "datum": "2026-01-01",
+      "model_id": "0102105c-3882-4e6f-8539-67b108643431",
+      "model": "TUR",
+      "verzija": 42,
+      "datum_modela": "2025-01-01",
+      "spremenljivke": "{dat_pri,dej_raba_dst,id_elektrika,id_kanalizacija,id_tao,id_vodovod,leto_izg,leto_obn,povrsina_dp,st_ravni,velikost,velikost_m2}",
+      "faktorji": "{f_cpt,f_last,f_obn,f_rt_m2,f_rt_m2_dp,f_rt_osnova,v_dst}"
+    }
+  ],
+  "indexes": [
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX dst_pripis_podatki_pk_uk ON public.ev_dst_pripis_podatki_h USING btree (dst_pripis_podatki_pk)"
+    },
+    {
+      "tablename": "ev_dst_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_dst_pripis_podatki_h_pkey ON public.ev_dst_pripis_podatki_h USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_date_change_idx ON public.ev_parc_enota_h_2025_danes USING btree (date_change)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_dst_sid_idx ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_jn_parcela_enota_pk_key ON public.ev_parc_enota_h_2025_danes USING btree (jn_parcela_enota_pk)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_enota_h_2025_danes_pkey ON public.ev_parc_enota_h_2025_danes USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_from_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_from)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_valid_to_idx ON public.ev_parc_enota_h_2025_danes USING btree (valid_to)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX ev_parc_enota_h_2025_danes_vrednost_idx ON public.ev_parc_enota_h_2025_danes USING btree (vrednost)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX idx_epe_model_valid ON public.ev_parc_enota_h_2025_danes USING btree (id_model, valid_from, valid_to)"
+    },
+    {
+      "tablename": "ev_parc_enota_h_2025_danes",
+      "indexdef": "CREATE INDEX idx_epe_pc_mid ON public.ev_parc_enota_h_2025_danes USING btree (pc_mid)"
+    },
+    {
+      "tablename": "ev_parc_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_pkey ON public.ev_parc_pripis_podatki_h USING btree (id)"
+    },
+    {
+      "tablename": "ev_parc_pripis_podatki_h",
+      "indexdef": "CREATE UNIQUE INDEX ev_parc_pripis_podatki_h_uk ON public.ev_parc_pripis_podatki_h USING btree (parc_pripis_podatki_pk)"
+    },
+    {
+      "tablename": "pripis_enote_deli_parcel",
+      "indexdef": "CREATE INDEX pripis_enote_deli_parcel___mod_index ON public.pripis_enote_deli_parcel USING btree (__mod)"
+    },
+    {
+      "tablename": "pripis_enote_deli_parcel",
+      "indexdef": "CREATE INDEX pripis_enote_deli_parcel_geom_idx ON public.pripis_enote_deli_parcel USING gist (geom)"
+    },
+    {
+      "tablename": "pripis_enote_deli_parcel",
+      "indexdef": "CREATE UNIQUE INDEX pripis_enote_deli_parcel_pkey ON public.pripis_enote_deli_parcel USING btree (id)"
+    }
+  ]
+}

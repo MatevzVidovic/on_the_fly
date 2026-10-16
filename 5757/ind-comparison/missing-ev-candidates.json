@@ -1,0 +1,308 @@
+[
+  {
+    "dst_sid": 28776426,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "28776426-2185"
+  },
+  {
+    "dst_sid": 28776426,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "28776426-2040"
+  },
+  {
+    "dst_sid": 28991466,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "28991466-2040"
+  },
+  {
+    "dst_sid": 28991466,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "28991466-2185"
+  },
+  {
+    "dst_sid": 29189480,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "29189480-2040"
+  },
+  {
+    "dst_sid": 29189480,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": "2026-07-15T23:59:59.999",
+    "jn_del_st_enota_pk": "29189480-2185"
+  },
+  {
+    "dst_sid": 29189480,
+    "id_model": "IND",
+    "id_model_ver": 1173,
+    "jn_status": "A",
+    "valid_from": "2026-07-15T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "29189480-2383"
+  },
+  {
+    "dst_sid": 29773109,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "29773109-2040"
+  },
+  {
+    "dst_sid": 29773109,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "29773109-2185"
+  },
+  {
+    "dst_sid": 29957460,
+    "id_model": "IND",
+    "id_model_ver": 1150,
+    "jn_status": "X",
+    "valid_from": "2025-02-18T00:30:01",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "29957460-1848"
+  },
+  {
+    "dst_sid": 30146309,
+    "id_model": "IND",
+    "id_model_ver": 1150,
+    "jn_status": "X",
+    "valid_from": "2025-02-18T00:30:01",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "30146309-1848"
+  },
+  {
+    "dst_sid": 31272530,
+    "id_model": "IND",
+    "id_model_ver": 1150,
+    "jn_status": "X",
+    "valid_from": "2025-02-18T00:30:01",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "31272530-1848"
+  },
+  {
+    "dst_sid": 31272531,
+    "id_model": "IND",
+    "id_model_ver": 1150,
+    "jn_status": "X",
+    "valid_from": "2025-02-18T00:30:01",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "31272531-1848"
+  },
+  {
+    "dst_sid": 31357052,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "31357052-2040"
+  },
+  {
+    "dst_sid": 31357052,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "31357052-2185"
+  },
+  {
+    "dst_sid": 31687432,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "31687432-2040"
+  },
+  {
+    "dst_sid": 31687432,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "31687432-2185"
+  },
+  {
+    "dst_sid": 31687433,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "31687433-2040"
+  },
+  {
+    "dst_sid": 31687433,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "31687433-2185"
+  },
+  {
+    "dst_sid": 32075914,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "32075914-2185"
+  },
+  {
+    "dst_sid": 32075914,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "32075914-2040"
+  },
+  {
+    "dst_sid": 32217522,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-03-21T00:30:00",
+    "valid_to": "2025-05-13T23:59:59",
+    "jn_del_st_enota_pk": "32217522-1871"
+  },
+  {
+    "dst_sid": 32217522,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "32217522-2040"
+  },
+  {
+    "dst_sid": 32217522,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "A",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "32217522-2185"
+  },
+  {
+    "dst_sid": 32314579,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "32314579-2040"
+  },
+  {
+    "dst_sid": 32314579,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": "2026-05-31T23:59:59.999",
+    "jn_del_st_enota_pk": "32314579-2185"
+  },
+  {
+    "dst_sid": 32314579,
+    "id_model": "IND",
+    "id_model_ver": 1173,
+    "jn_status": "A",
+    "valid_from": "2026-06-11T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "32314579-2359"
+  },
+  {
+    "dst_sid": 32314579,
+    "id_model": "IND",
+    "id_model_ver": 1173,
+    "jn_status": "H",
+    "valid_from": "2026-05-31T23:59:59.999",
+    "valid_to": "2026-06-11T23:59:59.999",
+    "jn_del_st_enota_pk": "32314579-2350"
+  },
+  {
+    "dst_sid": 32337380,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "32337380-2040"
+  },
+  {
+    "dst_sid": 32337380,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": "2026-05-31T23:59:59.999",
+    "jn_del_st_enota_pk": "32337380-2185"
+  },
+  {
+    "dst_sid": 32337380,
+    "id_model": "IND",
+    "id_model_ver": 1173,
+    "jn_status": "A",
+    "valid_from": "2026-06-11T23:59:59.999",
+    "valid_to": null,
+    "jn_del_st_enota_pk": "32337380-2359"
+  },
+  {
+    "dst_sid": 32337380,
+    "id_model": "IND",
+    "id_model_ver": 1173,
+    "jn_status": "H",
+    "valid_from": "2026-05-31T23:59:59.999",
+    "valid_to": "2026-06-11T23:59:59.999",
+    "jn_del_st_enota_pk": "32337380-2350"
+  },
+  {
+    "dst_sid": 35895740,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-05-13T23:59:59",
+    "valid_to": "2025-11-02T23:59:59.999",
+    "jn_del_st_enota_pk": "35895740-2040"
+  },
+  {
+    "dst_sid": 35895740,
+    "id_model": "NAPAKA",
+    "id_model_ver": null,
+    "jn_status": "H",
+    "valid_from": "2025-11-02T23:59:59.999",
+    "valid_to": "2026-09-09T23:59:59.999",
+    "jn_del_st_enota_pk": "35895740-2185"
+  }
+]

@@ -27,3 +27,15 @@ def test_verify_refuses_incomplete_source(store, run_id, definition):
     target = SimpleNamespace(d=definition)
     with pytest.raises(ValueError, match='completed Oracle export'):
         verify(run_id, target, store.db)
+
+
+def test_verify_date_filtered_export_does_not_infer_removals(store, definition):
+    run_id = store.create_run('integration', DATE, 'records', min_date=DATE)
+    store.save_source(run_id, [(1, DATE), (2, DATE)])
+    store.finish_source(run_id)
+    before = list(store.db.iterdump())
+    target = SimpleNamespace(d=definition, inventory=lambda cutoff: iter([
+        [('old-version', 1, '2024-01-01 00:00:00.000000'), ('outside-export', 3, DATE)]]))
+    counts = verify(run_id, target, store.db)
+    assert counts['updates'] == 1 and counts['inserts'] == 1 and counts['removals'] == 0
+    assert list(store.db.iterdump()) == before

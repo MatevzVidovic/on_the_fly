@@ -1,0 +1,44 @@
+{
+  "models": [
+    {
+      "id": "98cf8f2e-5f2d-11f1-82e0-3ed991e1a736",
+      "verzija": 67,
+      "datum_modela": "2025-01-01",
+      "pripisna": null
+    },
+    {
+      "id": "5f52e4a5-af0a-4ce7-9854-d14a6ce7cb40",
+      "verzija": 66,
+      "datum_modela": "2025-01-01",
+      "pripisna": true
+    },
+    {
+      "id": "99956834-d772-4f90-b01a-0078f15f6062",
+      "verzija": 51,
+      "datum_modela": "2020-01-01",
+      "pripisna": true
+    },
+    {
+      "id": "a6fa2d50-c7c6-11f1-b8bf-02420a00025b",
+      "verzija": 68,
+      "datum_modela": "2025-01-01",
+      "pripisna": false
+    }
+  ],
+  "sizes": [
+    {
+      "relname": "pripis_enote_deli_stavb",
+      "reltuples": 1920992.0
+    },
+    {
+      "relname": "pripis_vmxpd_x_enote",
+      "reltuples": 10747599.0
+    }
+  ],
+  "prepared": [
+    {
+      "datum": "2026-01-01",
+      "count": 34941
+    }
+  ]
+}

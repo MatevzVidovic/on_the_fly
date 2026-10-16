@@ -44,17 +44,22 @@ class OracleSource:
                                   oracledb.DB_TYPE_TIMESTAMP_TZ, oracledb.DB_TYPE_TIMESTAMP_LTZ):
             return cursor.var(oracledb.DB_TYPE_VARCHAR, size=80, arraysize=cursor.arraysize)
 
-    def inventory(self, cutoff, after_key=None):
-        # Scan all pairs so NULLs and duplicate keys cannot hide beyond the cutoff.
+    def inventory(self, cutoff, after_key=None, min_date=None):
+        # Keep pairs beyond the upper cutoff; optionally restrict the source date below.
         with self.db.cursor() as cur:
             cur.arraysize = PAGE_SIZE
             query = f'SELECT {self.key}, {self.date} FROM ({self.d.query})'
+            predicates, binds = [], {}
+            if min_date is not None:
+                predicates.append(f"CAST({self.date} AS TIMESTAMP) >= TO_TIMESTAMP(:min_date, 'YYYY-MM-DD HH24:MI:SS.FF6')")
+                binds['min_date'] = min_date
             if after_key is not None:
                 # Include the boundary to detect duplicate keys across a restart.
-                query += f' WHERE {self.key} >= :after_key'
-                cur.execute(query + f' ORDER BY {self.key}', {'after_key': after_key})
-            else:
-                cur.execute(query + f' ORDER BY {self.key}')
+                predicates.append(f'{self.key} >= :after_key')
+                binds['after_key'] = after_key
+            if predicates:
+                query += ' WHERE ' + ' AND '.join(predicates)
+            cur.execute(query + f' ORDER BY {self.key}', binds)
             previous = None
             while rows := cur.fetchmany(PAGE_SIZE):
                 page = []

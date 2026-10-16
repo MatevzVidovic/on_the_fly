@@ -1,0 +1,47 @@
+[
+  {
+    "id_model_ver": 1150,
+    "jn_status": "H",
+    "history_rows": 4800,
+    "units": 4504,
+    "missing_valid_from": 0,
+    "min": "2025-01-01T00:30:00",
+    "max": "2025-05-10T09:56:01"
+  },
+  {
+    "id_model_ver": 1150,
+    "jn_status": "X",
+    "history_rows": 149,
+    "units": 149,
+    "missing_valid_from": 0,
+    "min": "2025-01-07T00:30:00",
+    "max": "2025-05-12T23:59:59.999"
+  },
+  {
+    "id_model_ver": 1173,
+    "jn_status": "A",
+    "history_rows": 35062,
+    "units": 35062,
+    "missing_valid_from": 0,
+    "min": "2025-11-02T23:59:59.999",
+    "max": "2026-10-06T23:59:59.999"
+  },
+  {
+    "id_model_ver": 1173,
+    "jn_status": "H",
+    "history_rows": 41242,
+    "units": 35195,
+    "missing_valid_from": 0,
+    "min": "2025-05-12T23:59:59",
+    "max": "2026-09-21T23:59:59.999"
+  },
+  {
+    "id_model_ver": 1173,
+    "jn_status": "X",
+    "history_rows": 234,
+    "units": 233,
+    "missing_valid_from": 0,
+    "min": "2025-05-13T23:59:59.999",
+    "max": "2026-01-20T23:59:59.999"
+  }
+]

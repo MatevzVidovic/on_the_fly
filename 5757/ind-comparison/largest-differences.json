@@ -1,0 +1,352 @@
+[
+  {
+    "unit": 31153709,
+    "isam_candidates": [
+      {
+        "unit": 31153709,
+        "prepared_id": "ef962b70-bbc8-480d-b0b2-ec5a365773b8",
+        "result_id": "1b6c8972-b46e-4ea8-9cd4-d4cddfae4b18",
+        "calculated": "28479070.00",
+        "generalized": "28479000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 31153709,
+        "source_key": "31153709-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "32065418.48",
+        "generalized": "32065000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-3586348.48"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-3586000"
+    }
+  },
+  {
+    "unit": 100000026656,
+    "isam_candidates": [
+      {
+        "unit": 100000026656,
+        "prepared_id": "7ac40aae-5a90-422f-ba5d-91f68197c259",
+        "result_id": "4359440c-ccd0-4800-a49f-d1991966c594",
+        "calculated": "31691042.00",
+        "generalized": "31691000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 100000026656,
+        "source_key": "100000026656-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "34782489",
+        "generalized": "34782000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-3091447.00"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-3091000"
+    }
+  },
+  {
+    "unit": 100000044509,
+    "isam_candidates": [
+      {
+        "unit": 100000044509,
+        "prepared_id": "bf1c3eb5-104d-4133-a24b-872a7f266966",
+        "result_id": "a1ab1bd1-fc34-4a6c-ac2d-2ca821da18c2",
+        "calculated": "23360573.00",
+        "generalized": "23361000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 100000044509,
+        "source_key": "100000044509-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "25498722.48",
+        "generalized": "25499000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-2138149.48"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-2138000"
+    }
+  },
+  {
+    "unit": 31597297,
+    "isam_candidates": [
+      {
+        "unit": 31597297,
+        "prepared_id": "2586da61-8cf5-4779-af6c-8e179d27ffd8",
+        "result_id": "20d5333f-7217-45da-a5ff-8815a358b38d",
+        "calculated": "24625115.00",
+        "generalized": "24625000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 31597297,
+        "source_key": "31597297-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "26647380.55",
+        "generalized": "26647000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-2022265.55"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-2022000"
+    }
+  },
+  {
+    "unit": 31357266,
+    "isam_candidates": [
+      {
+        "unit": 31357266,
+        "prepared_id": "e6c022ec-4dd3-4ea9-a7ac-605226ccac74",
+        "result_id": "66ed7988-ce5d-4322-adeb-1bc530b2dbe8",
+        "calculated": "5928619.00",
+        "generalized": "5929000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 31357266,
+        "source_key": "31357266-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "3917785.81",
+        "generalized": "3918000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "2010833.19"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "2011000"
+    }
+  },
+  {
+    "unit": 29494260,
+    "isam_candidates": [
+      {
+        "unit": 29494260,
+        "prepared_id": "8ece58fa-df66-49d9-a119-158fd912a9f4",
+        "result_id": "1c74c3b1-c69e-47d7-87dc-00aec3c15ee6",
+        "calculated": "16194972.00",
+        "generalized": "16195000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 29494260,
+        "source_key": "29494260-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "18007483.73",
+        "generalized": "18007000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1812511.73"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1812000"
+    }
+  },
+  {
+    "unit": 31434580,
+    "isam_candidates": [
+      {
+        "unit": 31434580,
+        "prepared_id": "1a2f042d-9602-484c-b9b2-c6a866bc65b5",
+        "result_id": "b7066f1f-8d2a-4e01-bc41-97f25a4031e7",
+        "calculated": "11439844.00",
+        "generalized": "11440000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 31434580,
+        "source_key": "31434580-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "9798990.06",
+        "generalized": "9799000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "1640853.94"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "1641000"
+    }
+  },
+  {
+    "unit": 32690640,
+    "isam_candidates": [
+      {
+        "unit": 32690640,
+        "prepared_id": "b2c7761b-dd3a-47c4-b8d8-a55c5e4e8210",
+        "result_id": "90d290e4-a30e-4283-8d33-ad68d74ad1c5",
+        "calculated": "11539739.00",
+        "generalized": "11540000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 32690640,
+        "source_key": "32690640-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "13155701.63",
+        "generalized": "13156000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1615962.63"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1616000"
+    }
+  },
+  {
+    "unit": 28757892,
+    "isam_candidates": [
+      {
+        "unit": 28757892,
+        "prepared_id": "6e8afb16-4d13-43d9-a500-bed1c70c582b",
+        "result_id": "de1be2c0-f019-4869-b893-146c861e4de3",
+        "calculated": "12796033.00",
+        "generalized": "12796000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 28757892,
+        "source_key": "28757892-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "14251507.61",
+        "generalized": "14252000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1455474.61"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "-1456000"
+    }
+  },
+  {
+    "unit": 100000025417,
+    "isam_candidates": [
+      {
+        "unit": 100000025417,
+        "prepared_id": "0a67e950-af46-42ca-854e-ba1fcd0bb2f9",
+        "result_id": "8d52ae63-be60-415c-a8ef-543ed350c579",
+        "calculated": "18606689.00",
+        "generalized": "18607000",
+        "preparation_error": null,
+        "calculation_error": null
+      }
+    ],
+    "ev_candidates": [
+      {
+        "unit": 100000025417,
+        "source_key": "100000025417-2185",
+        "id_model_ver": 1173,
+        "jn_status": "A",
+        "valid_from": "2025-11-02T23:59:59.999",
+        "valid_to": null,
+        "source_table": "ev_del_stavbe_enota_h_2025_danes",
+        "calculated": "17178889.14",
+        "generalized": "17179000"
+      }
+    ],
+    "calculated": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "1427799.86"
+    },
+    "generalized": {
+      "status": "DIFFERENT",
+      "delta_isam_minus_ev": "1428000"
+    }
+  }
+]

@@ -49,7 +49,7 @@ class RepairStore:
                                ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER'), ('user_id', 'TEXT'),
                                ('source_complete', 'INTEGER'), ('source_last_key', 'TEXT'),
                                ('target_last_key', 'TEXT'), ('source_count', 'INTEGER NOT NULL DEFAULT 0'),
-                               ('target_count', 'INTEGER NOT NULL DEFAULT 0')):
+                               ('target_count', 'INTEGER NOT NULL DEFAULT 0'), ('min_date', 'TEXT')):
                 if name not in columns:
                     self.db.execute(f'ALTER TABLE integration_transfer ADD COLUMN {name} {kind}')
             if 'upsert_count' not in columns or 'delete_count' not in columns:
@@ -58,13 +58,13 @@ class RepairStore:
                     delete_count=(SELECT count(*) FROM removal_diff WHERE run_id=integration_transfer.id)
                     WHERE prepared=1''')
 
-    def create_run(self, integration_id, cutoff, table_name):
+    def create_run(self, integration_id, cutoff, table_name, min_date=None):
         run_id = str(uuid4())
         created_at = datetime.now(timezone.utc).isoformat(timespec='microseconds')
         with self.db:
             self.db.execute('''INSERT INTO integration_transfer
-                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete) VALUES (?,?,?,?,?,?,0)''',
-                (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID))
+                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete,min_date) VALUES (?,?,?,?,?,?,0,?)''',
+                (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID, min_date))
         return run_id
 
     def require_prepared_run(self, run_id):
@@ -117,13 +117,17 @@ class RepairStore:
 
     def compare_target_page(self, run_id, page):
         warnings = []
-        cutoff = self.db.execute('SELECT cutoff FROM integration_transfer WHERE id=?', (run_id,)).fetchone()[0]
+        run = self.db.execute('SELECT cutoff,min_date FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+        cutoff = run['cutoff']
         with self.db:
             for target_id, key, date in page:
                 encoded = json.dumps(key)
                 row = self.db.execute('SELECT date FROM remote_ids_and_date_changed WHERE run_id=? AND key=?',
                                       (run_id, encoded)).fetchone()
                 source_date = row['date'] if row else None
+                # A date-filtered export cannot establish that absent keys were deleted.
+                if run['min_date'] is not None and source_date is None:
+                    continue
                 decision = classify(source_date, date)
                 if row:
                     self.db.execute('UPDATE remote_ids_and_date_changed SET seen=1 WHERE run_id=? AND key=?',
@@ -193,3 +197,5 @@ class RepairStore:
         run = self.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
         print(f"Run {run_id}: {run['upsert_count']} upserts, {run['delete_count']} removals, {run['warnings']} warnings; "
               f"prepared={bool(run['prepared'])}, applied={bool(run['applied'])}")
+        if run['min_date'] is not None:
+            print(f"Change-date range: {run['min_date']} through {run['cutoff']} (inclusive; upserts only)")

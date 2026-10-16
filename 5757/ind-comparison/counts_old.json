@@ -1,0 +1,20 @@
+[
+  {
+    "id_model_ver": 1150,
+    "jn_status": "A",
+    "history_rows": 30227,
+    "units": 30227,
+    "missing_valid_from": 30227,
+    "min": null,
+    "max": null
+  },
+  {
+    "id_model_ver": 1150,
+    "jn_status": "H",
+    "history_rows": 111948,
+    "units": 36603,
+    "missing_valid_from": 111948,
+    "min": null,
+    "max": null
+  }
+]

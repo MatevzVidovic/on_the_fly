@@ -8,29 +8,29 @@ These are asserted plan counts from the latest completed run in each `prod-kn-*.
 
 These counts describe the prepared snapshot and cutoff. They are not an independent validation of payload values or deletion correctness, nor a guarantee of the actions a later apply will take if databases change.
 
-| Table | Oracle export rows | Inserts | Updates | Deletions | Warnings | Applied |
-| --- | ---: | ---: | ---: | ---: | ---: | --- |
-| `kn_nep_rpe_obcine_h` | 3,550 | 0 | 553 | 0 | 0 | No |
-| `kn_nep_katastrske_obcine_h` | 19,646 | 4 | 15,955 | 0 | 0 | No |
-| `kn_nep_rpe_naselja_h` | 20,012 | 0 | 622 | 0 | 0 | No |
-| `kn_nep_rpe_ulice_h` | 30,982 | 0 | 86 | 0 | 0 | No |
-| `kn_nep_ostalo_gozdno_gosp_obm` | 53,681 | 0 | 0 | 0 | 0 | No |
-| `kn_nep_ostalo_namenske_rabe` | 482,002 | 54,016 | 252,951 | 748,897 | 0 | No |
-| `kn_nep_stanovanja_h` | 651,616 | 0 | 210 | 0 | 0 | No |
-| `kn_nep_hisne_stevilke_h` | 1,448,319 | 2 | 205 | 0 | 0 | No |
-| `kn_nep_stavbe_parcele_h` | 1,641,296 | 21 | 5,108 | 0 | 0 | No |
-| `kn_nep_stavbe_zps_h` | 1,936,529 | 2 | 1,330 | 0 | 0 | No |
-| `kn_nep_etaze_h` | 2,361,201 | 24 | 3,033 | 0 | 0 | No |
-| `kn_nep_deli_stavb_h` | 2,740,435 | 120 | 7,427 | 11 | 0 | No |
-| `kn_nep_stavbe_centroidi_h` | 2,760,868 | 19 | 2,251 | 0 | 0 | No |
-| `kn_nep_stavbe_obrisi_h` | 2,760,868 | 19 | 2,251 | 0 | 0 | No |
-| `kn_nep_etaze_x_deli_stavb_h` | 2,887,492 | 7 | 2,734 | 1 | 0 | No |
-| `kn_nep_prostori_h` | 4,434,601 | 9 | 4,608 | 12 | 0 | No |
-| `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | 6,068,384 | 0 | 1,346 | 0 | 0 | No |
-| `kn_nep_parcele_h` | 7,895,851 | 2,971 | 19,566 | 0 | 0 | No |
-| `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | 15,106,108 | 287,470 | 235,933 | 0 | 0 | No |
-| `kn_nep_ostalo_parcele_x_namenske_rabe_h` | 16,464,218 | 363,962 | 528,433 | 0 | 0 | No |
-| **Total** | **69,767,659** | **708,646** | **1,084,602** | **748,921** | **0** | — |
+| Table                                       | Oracle export rows |     Inserts |       Updates |   Deletions | Warnings | Applied |
+| ------------------------------------------- | -----------------: | ----------: | ------------: | ----------: | -------: | ------- |
+| `kn_nep_rpe_obcine_h`                       |              3,550 |           0 |           553 |           0 |        0 | No      |
+| `kn_nep_katastrske_obcine_h`                |             19,646 |           4 |        15,955 |           0 |        0 | No      |
+| `kn_nep_rpe_naselja_h`                      |             20,012 |           0 |           622 |           0 |        0 | No      |
+| `kn_nep_rpe_ulice_h`                        |             30,982 |           0 |            86 |           0 |        0 | No      |
+| `kn_nep_ostalo_gozdno_gosp_obm`             |             53,681 |           0 |             0 |           0 |        0 | No      |
+| `kn_nep_ostalo_namenske_rabe`               |            482,002 |      54,016 |       252,951 |     748,897 |        0 | No      |
+| `kn_nep_stanovanja_h`                       |            651,616 |           0 |           210 |           0 |        0 | No      |
+| `kn_nep_hisne_stevilke_h`                   |          1,448,319 |           2 |           205 |           0 |        0 | No      |
+| `kn_nep_stavbe_parcele_h`                   |          1,641,296 |          21 |         5,108 |           0 |        0 | No      |
+| `kn_nep_stavbe_zps_h`                       |          1,936,529 |           2 |         1,330 |           0 |        0 | No      |
+| `kn_nep_etaze_h`                            |          2,361,201 |          24 |         3,033 |           0 |        0 | No      |
+| `kn_nep_deli_stavb_h`                       |          2,740,435 |         120 |         7,427 |          11 |        0 | No      |
+| `kn_nep_stavbe_centroidi_h`                 |          2,760,868 |          19 |         2,251 |           0 |        0 | No      |
+| `kn_nep_stavbe_obrisi_h`                    |          2,760,868 |          19 |         2,251 |           0 |        0 | No      |
+| `kn_nep_etaze_x_deli_stavb_h`               |          2,887,492 |           7 |         2,734 |           1 |        0 | No      |
+| `kn_nep_prostori_h`                         |          4,434,601 |           9 |         4,608 |          12 |        0 | No      |
+| `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` |          6,068,384 |           0 |         1,346 |           0 |        0 | No      |
+| `kn_nep_parcele_h`                          |          7,895,851 |       2,971 |        19,566 |           0 |        0 | No      |
+| `kn_nep_ostalo_parcele_x_dejanske_rabe_h`   |         15,106,108 |     287,470 |       235,933 |           0 |        0 | No      |
+| `kn_nep_ostalo_parcele_x_namenske_rabe_h`   |         16,464,218 |     363,962 |       528,433 |           0 |        0 | No      |
+| **Total**                                   |     **69,767,659** | **708,646** | **1,084,602** | **748,921** |    **0** | —       |
 
 **Review before applying:** `kn_nep_ostalo_namenske_rabe` has 748,897 planned deletions. The other runs with deletions are `kn_nep_deli_stavb_h` (11), `kn_nep_etaze_x_deli_stavb_h` (1), and `kn_nep_prostori_h` (12). Zero warnings does not independently establish that these deletions are correct.
 
@@ -40,9 +40,9 @@ From the earlier production/Oracle count check finished at 2026-10-15T12:24:07.6
 
 Both gaps are Oracle minus LIFT. Positive means a net shortfall in LIFT; negative means a net excess. Exact inserts, updates, and deletions are unknown until preparation.
 
-| Table | Oracle total | LIFT total | Total gap | Gap at/below saved watermark | Inserts | Updates | Deletions |
-| --- | ---: | ---: | ---: | ---: | --- | --- | --- |
-| `kn_nep_ostalo_dejanske_rabe_parcel_h` | 29,486,341 | 26,246,279 | +3,240,062 | -1,624,013 | Unknown | Unknown | Unknown |
+| Table                                  | Oracle total | LIFT total |  Total gap | Gap at/below saved watermark | Inserts | Updates | Deletions |
+| -------------------------------------- | -----------: | ---------: | ---------: | ---------------------------: | ------- | ------- | --------- |
+| `kn_nep_ostalo_dejanske_rabe_parcel_h` |   29,486,341 | 26,246,279 | +3,240,062 |                   -1,624,013 | Unknown | Unknown | Unknown   |
 
 ## Prepared run references
 

@@ -216,3 +216,33 @@ report, including cutoffs and per-database timings, is saved after each table to
 Use `--table ev_stavba_h` for one table, `--env PATH` for another environment, or
 `--output PATH` to retain a separate report. Equal counts do not verify matching keys,
 change dates or payload values; use the previous verification/audits for that.
+
+## Prepare only recent source changes
+
+Use an inclusive minimum change date with the usual integration high-water mark as
+its inclusive upper bound. For example, changes since midnight on 9 October:
+
+```sh
+time .venv/bin/python repair.py --store prod-kn-deli-recent.sqlite prepare bfe62b52-9aaf-11ef-9c54-0242ac120008 --min-date 2026-10-09
+```
+
+You can also pass a timestamp, such as `--min-date '2026-10-09 12:00:00'`.
+Dates use the same wall-clock convention as integration change dates; timezone
+suffixes do not shift the clock. The minimum must not exceed the saved upper cutoff.
+
+**With `--min-date`, prepare plans inserts and updates only, never deletions.**
+An ID absent from this date-filtered Oracle export might simply be older than the
+minimum. Recent Oracle changes are still compared against older LIFT versions of
+the same key. Omitting the flag retains the full preparation, including deletions.
+
+Oracle filters the inventory before transferring it. LIFT still gets a full
+inventory scan so old target versions can be found correctly; do not expect this
+flag to eliminate the LIFT scan cost. The Oracle query may still scan many source
+rows, depending on its date expression and indexes.
+
+The minimum is saved as `integration_transfer.min_date`. Resume with the existing
+`--resume RUN_UUID` option and omit `--min-date`; the saved bound is reused. This
+also works with `--only-src`. Apply takes the saved run as usual, with no date flag.
+Existing SQLite runs receive a nullable column and retain their original behavior.
+The standalone `verify_lift.py` check also respects date-filtered exports and does
+not report absent source keys as removals.

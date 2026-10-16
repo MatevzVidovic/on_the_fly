@@ -115,3 +115,13 @@ def test_text_component_preserves_letters_zeroes_and_separator(definition):
     source = OracleSource(Database(cursor), definition)
     assert source.fetch_payloads(['001-ABC-45'])['001-ABC-45']['KEY'] == '001-ABC-45'
     assert cursor.calls[-1][1] == {'k0_0': '001-ABC', 'k0_1': 45}
+
+
+def test_min_date_inventory_binds_wall_time_and_resume_key(definition):
+    cursor = Cursor([(2, DATE), (3, DATE)])
+    source = OracleSource(Database(cursor), definition)
+    assert list(source.inventory(None, after_key=2, min_date=DATE)) == [[(3, DATE)]]
+    query, binds = cursor.calls[-1]
+    assert 'CAST("CHANGED" AS TIMESTAMP) >= TO_TIMESTAMP(:min_date' in query
+    assert 'AND "KEY" >= :after_key ORDER BY "KEY"' in query
+    assert binds == {'min_date': DATE, 'after_key': 2}

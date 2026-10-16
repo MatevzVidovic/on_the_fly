@@ -123,3 +123,42 @@ def test_main_apply_rejects_prepare_flags(monkeypatch):
     with pytest.raises(SystemExit) as error:
         repair.main()
     assert error.value.code == 2
+
+
+def test_min_date_prepares_recent_upserts_without_deletions_and_resumes(definition, store):
+    minimum = '2025-01-01 00:00:00.000000'
+    old = '2024-01-01 00:00:00.000000'
+    future = '2025-01-03 00:00:00.000000'
+    cursor = Cursor([(1, minimum), (2, DATE), (3, future)])
+    source = OracleSource(Database(cursor), definition)
+    target = LiftTarget(Database(Cursor([
+        ('old-version', 1, old),  # Recent Oracle change updates an old LIFT row.
+        ('future-source', 3, old),
+        ('outside-export', 4, DATE),  # Must not become a deletion.
+    ])), None, definition)
+    run_id = repair.prepare(definition, source, target, store, only_src=True, min_date=minimum)
+    run = store.resume_preparation(run_id)
+    assert run['min_date'] == minimum and not run['prepared']
+    repair.prepare(definition, source, target, store, run_id=run_id)
+    run = store.require_prepared_run(run_id)
+    assert run['upsert_count'] == 2 and run['delete_count'] == 0
+    assert {r['key'] for r in store.db.execute('SELECT key FROM addition_diff')} == {'1', '2'}
+    assert store.db.execute('SELECT seen FROM remote_ids_and_date_changed WHERE key=?', ('1',)).fetchone()[0] == 1
+
+
+def test_min_date_after_cutoff_creates_no_run(definition, store):
+    import pytest
+    with pytest.raises(ValueError, match='later than'):
+        repair.prepare(definition, None, None, store, min_date='2099-01-01 00:00:00.000000')
+    assert store.db.execute('SELECT count(*) FROM integration_transfer').fetchone()[0] == 0
+
+
+def test_main_min_date_rejected_on_apply_or_resume(monkeypatch):
+    import pytest
+    for args in (['apply', '--min-date', '2025-01-01'],
+                 ['prepare', '--resume', 'run', '--min-date', '2025-01-01'],
+                 ['prepare', 'integration', '--min-date', 'bad-date']):
+        monkeypatch.setattr(sys, 'argv', ['repair.py', *args])
+        with pytest.raises(SystemExit) as error:
+            repair.main()
+        assert error.value.code == 2

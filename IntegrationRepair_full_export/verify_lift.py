@@ -31,6 +31,8 @@ def verify(run_id, target, db):
                 row = db.execute('''SELECT date FROM remote_ids_and_date_changed
                     WHERE run_id=? AND key=?''', (run_id, json.dumps(key))).fetchone()
                 source_date = row[0] if row else None
+                if 'min_date' in run.keys() and run['min_date'] is not None and row is None:
+                    continue
                 if source_date is not None and source_date > run['cutoff']:
                     continue
                 if row:

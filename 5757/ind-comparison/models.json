@@ -1,0 +1,100 @@
+[
+  {
+    "id_model_ver": 979,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 35,
+    "verzija_gv_izvajalna": 35
+  },
+  {
+    "id_model_ver": 996,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 35,
+    "verzija_gv_izvajalna": 35
+  },
+  {
+    "id_model_ver": 1013,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 40,
+    "verzija_gv_izvajalna": 40
+  },
+  {
+    "id_model_ver": 1023,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 40,
+    "verzija_gv_izvajalna": 40
+  },
+  {
+    "id_model_ver": 1042,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 44,
+    "verzija_gv_izvajalna": 44
+  },
+  {
+    "id_model_ver": 1059,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 46,
+    "verzija_gv_izvajalna": 46
+  },
+  {
+    "id_model_ver": 1068,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 46,
+    "verzija_gv_izvajalna": 46
+  },
+  {
+    "id_model_ver": 1080,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 46,
+    "verzija_gv_izvajalna": 46
+  },
+  {
+    "id_model_ver": 1098,
+    "model": "IND",
+    "datum_modela": "2010-07-01",
+    "verzija_gv_originalna": 48,
+    "verzija_gv_izvajalna": 48
+  },
+  {
+    "id_model_ver": 1112,
+    "model": "IND",
+    "datum_modela": "2019-01-01",
+    "verzija_gv_originalna": 49,
+    "verzija_gv_izvajalna": 49
+  },
+  {
+    "id_model_ver": 1126,
+    "model": "IND",
+    "datum_modela": "2019-01-01",
+    "verzija_gv_originalna": 49,
+    "verzija_gv_izvajalna": 49
+  },
+  {
+    "id_model_ver": 1146,
+    "model": "IND",
+    "datum_modela": "2019-01-01",
+    "verzija_gv_originalna": 49,
+    "verzija_gv_izvajalna": 49
+  },
+  {
+    "id_model_ver": 1150,
+    "model": "IND",
+    "datum_modela": "2020-01-01",
+    "verzija_gv_originalna": 51,
+    "verzija_gv_izvajalna": 51
+  },
+  {
+    "id_model_ver": 1173,
+    "model": "IND",
+    "datum_modela": "2025-01-01",
+    "verzija_gv_originalna": 66,
+    "verzija_gv_izvajalna": 66
+  }
+]
