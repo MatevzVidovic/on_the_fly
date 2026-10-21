@@ -1,11 +1,11 @@
 """Transaction-boundary and safety tests; live SQL preview remains a separate read-only check."""
-import ast
 import re
 import unittest
 from pathlib import Path
 from datetime import date
 from decimal import Decimal
-from pairing import pair_buildings
+from unittest.mock import patch
+from pairing import pair_buildings, DESTINATION_COLUMNS
 
 CONFIG = 'e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece'
 DATE_ID = 'ad9bfd6c-00ea-11f1-8151-02420a0001f4'
@@ -57,9 +57,9 @@ class PairingTests(unittest.TestCase):
     def test_write_replaces_only_selected_configuration(self):
         c = Cursor()
         self.assertEqual(pair_buildings(c, CONFIG, write=True)['written_rows'], 3)
-        deletes = [(q,p) for q,p in c.calls if q.startswith('DELETE')]
+        deletes = [(q,p) for q,p in c.calls if q.lstrip().startswith('DELETE')]
         self.assertEqual(deletes, [('DELETE FROM public.pripis_primerjava_ev WHERE id_rel_vm_pd=%s', [CONFIG])])
-        self.assertTrue(c.calls[-1][0].startswith('INSERT INTO public.pripis_primerjava_ev'))
+        self.assertTrue(c.calls[-1][0].lstrip().startswith('INSERT INTO public.pripis_primerjava_ev'))
         self.assertIsNone(c.calls[-1][1]['units'])
         self.assertEqual(c.calls[-1][1]['ev_version'], 1173)
 
@@ -73,22 +73,42 @@ class PairingTests(unittest.TestCase):
             with self.assertRaises(ValueError): pair_buildings(c, CONFIG, write=True)
             self.assertFalse(any(q.startswith('DELETE') for q,_ in c.calls))
 
-    def test_sql_output_order_matches_destination_fields(self):
-        # p.* is safe only while the final SELECT order equals the explicit INSERT list.
-        source = Path(__file__).with_name('pairing.py').read_text()
-        tree = ast.parse(source)
-        fields = next(ast.literal_eval(n.value) for n in ast.walk(tree)
-                      if isinstance(n, ast.Assign) and any(isinstance(t, ast.Name) and t.id == 'fields' for t in n.targets))
-        query = Path(__file__).with_name('pairs.sql').read_text()
-        final_select = query.rsplit('SELECT ', 1)[1].split('FROM podatki')[0]
-        # Split commas outside parentheses, then take explicit aliases or bare names.
-        expressions = re.split(r',\s*(?![^()]*\))', final_select)
-        output = [re.split(r'\s+AS\s+', x.strip(), flags=re.I)[-1] for x in expressions]
-        self.assertEqual(output, fields.split(','))
+    def test_insert_maps_destination_and_sql_columns_by_name(self):
+        cursor = Cursor()
+        pair_buildings(cursor, CONFIG, write=True)
+        insert = cursor.calls[-1][0]
+        target = re.search(r'INSERT INTO public.pripis_primerjava_ev \((.*?)\)', insert, re.S).group(1)
+        self.assertEqual([name.strip() for name in target.split(',')],
+                         ['id', 'created_at', 'created_by', *DESTINATION_COLUMNS])
+        projected = re.findall(r'comparison\.([a-z_]+)', insert.split('FROM (', 1)[0])
+        self.assertEqual(projected, list(DESTINATION_COLUMNS))
+        exported = {field['name'] for field in __import__('json').loads(
+            Path(__file__).with_name('export-fields.json').read_text())}
+        self.assertTrue(set(DESTINATION_COLUMNS) <= exported)
+
+    def test_write_sequence_resolves_checks_then_replaces(self):
+        cursor = Cursor()
+        pair_buildings(cursor, CONFIG, write=True)
+        statements = [statement.strip() for statement, _ in cursor.calls]
+        self.assertIn('JOIN public.md_verzije_modeli', statements[0])
+        self.assertIn('FROM public.ev_verzije_modeli', statements[1])
+        self.assertIn('pg_try_advisory', statements[2])
+        self.assertIn('information_schema.columns', statements[3])
+        self.assertIn('pg_index', statements[4])
+        self.assertIn('FROM public.pripis_enote_deli_stavb', statements[5])
+        self.assertTrue(statements[6].startswith('DELETE'))
+        self.assertTrue(statements[7].startswith('INSERT'))
+
+    def test_preview_never_calls_write_roles(self):
+        with patch('pairing._check_write_prerequisites') as check, \
+             patch('pairing._replace_saved_comparisons') as replace:
+            pair_buildings(Cursor(), CONFIG, units=[29974237])
+        check.assert_not_called()
+        replace.assert_not_called()
 
     def test_sql_duplicates_and_ev_errors_do_not_guess_a_match(self):
         query = Path(__file__).with_name('pairs.sql').read_text()
-        self.assertIn("e.prepared_count > 1 OR r.n > 1 OR h.n > 1", query)
+        self.assertIn("e.prepared_count > 1 OR r.result_count > 1 OR h.valuation_count > 1", query)
         self.assertIn("bool_or(h.id_model = 'NAPAKA' AND h.id_model_ver = %(ev_version)s", query)
         self.assertIn("AND h.jn_status IS DISTINCT FROM 'X') AS napaka", query)
 

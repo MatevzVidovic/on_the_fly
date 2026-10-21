@@ -28,7 +28,29 @@ Before a full run, install/verify the calculation lookup index `(id_rel_vm_pd,id
 
 ## What the code does
 
-`pairing.py` reads the selected configuration, requires exactly one EV version with the same model, original/runtime GV version and model date, then runs the single query in `pairs.sql`. The model date establishes model identity; **the selected pripis cutoff establishes property/EV validity**. No version aliases are guessed.
+Read `pair_buildings` first. Its entire flow is: **resolve scope → preview**, or **resolve scope → check write prerequisites → replace saved comparisons**. The same `pairs.sql` supplies both preview and saved rows.
+
+| Role in `pairing.py` | Input → guarantee → output |
+|---|---|
+| `_resolve_comparison_scope` | Selected configuration UUID → exactly one date/ISAM version and exactly one matching EV version → bound SQL parameters |
+| `_check_write_prerequisites` | That scope → lock acquired, decimals preserved, calculation lookup indexed, prepared buildings present → permission to replace |
+| `_replace_saved_comparisons` | Validated scope → delete only that configuration and insert its comparisons → written-row count |
+| `workflow.py` | Row action → one transaction and time limits → commit all changes together, or roll back |
+
+The EV mapping requires the same model, original/runtime GV version and model date. The model date establishes model identity; **the selected pripis cutoff establishes property/EV validity**. No version aliases are guessed.
+
+Read the SQL from top to bottom; each named stage has one role:
+
+| SQL stage | What it contributes |
+|---|---|
+| `prepared_units` | The requested buildings, with duplicate natural IDs counted; only needed columns are carried forward. |
+| `isam_calculations` | Stored calculations for this configuration, counted per prepared building. |
+| `ev_valuations_at_cutoff` | Exact-version EV valuations valid at this cutoff, plus diagnostic evidence. |
+| `paired_values` | Left joins preserve every prepared building. Counts distinguish a single match from missing or duplicate matches. Errors are classified before arithmetic. |
+| `differences` | Calculate each ISAM − EV delta once; errors, ambiguity and missing values produce NULL. |
+| Final SELECT | Classify calculated/generalized amounts independently and produce the destination fields. |
+
+This order makes the comparison meaningful: **same model and snapshot first, source uniqueness next, arithmetic last**. A missing source cannot disappear in a join, and a duplicate source cannot become an arbitrary successful comparison. The writer maps output columns by name, so changing their SELECT order cannot swap saved amounts.
 
 The query starts from prepared units for the selected date/model. It selects stored calculations for precisely the selected configuration and EV history records where `valid_from <= cutoff` and `valid_to > cutoff` (or open). Boundaries are midnight at the **start** of the selected day, using imported timestamp values; the session timezone is Europe/Ljubljana. Source history timestamps are currently without timezone. Ensure the existing import convention remains unchanged.
 
@@ -39,6 +61,15 @@ Both values are compared separately; deltas are ISAM minus EV, with **0.01 absol
 One transaction replaces only rows with the selected `id_rel_vm_pd`. Any failure rolls back the deletion and insertion together. A transaction advisory lock refuses concurrent comparisons of that same configuration. There is one set-based insert, no per-unit network requests. Do not simultaneously regenerate/recalculate that configuration while comparing. Re-running replaces comparison row IDs, so add intermediate children only after designing their replacement/deletion together.
 
 The output scope is **all prepared units**, including missing calculations/EV matches. It does not discover EV-only building parts absent from that prepared set. This is intentional for the requested selected-configuration action.
+
+## Where to change a rule
+
+- Model identity or supported generation: `_resolve_comparison_scope` in `pairing.py`.
+- Tolerance: the returned scope's `tolerance` value in that same function.
+- History source, validity intervals or EV error matching: `ev_valuations_at_cutoff` in `pairs.sql`.
+- Duplicate/error precedence: `paired_values`; equality/missing status: final SELECT.
+- Saved destination fields: `DESTINATION_COLUMNS` and the corresponding SQL output names.
+- Transaction timeout or commit behavior: `workflow.py` and its SDK session context.
 
 ## Local verification
 
@@ -55,4 +86,4 @@ uv run --no-project --with psycopg2-binary python 5757/building-pairing/preview.
   e2ff4f88-5ad9-11f1-ba5c-b606ab4d8ece 29974237 34797757 35484785
 ```
 
-The SQL passed PostgreSQL syntax parsing with `pglast`; the seven offline tests check scope, write guards and the SELECT/INSERT column contract, not SQL result arithmetic. Live execution of the new SQL has not yet been verified: the read-only staging connection was unavailable during implementation (even a trivial SELECT failed). No database writes, full runs, or deployments were performed. `export-fields.json` records the supplied export, not a live physical schema verification. Existing captured data provides the known IND examples; do not mistake it for a fresh run of this implementation.
+The SQL passed PostgreSQL syntax parsing with `pglast`; the nine offline tests check scope, write guards, execution order and named SELECT/INSERT mapping, not SQL result arithmetic. Live execution of the new SQL has not yet been verified: the read-only staging connection was unavailable during implementation (even a trivial SELECT failed). No database writes, full runs, or deployments were performed. `export-fields.json` records the supplied export, not a live physical schema verification. Existing captured data provides the known IND examples; do not mistake it for a fresh run of this implementation.
