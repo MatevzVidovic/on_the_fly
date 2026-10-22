@@ -1,0 +1,192 @@
+6118 — Ljubljana timezone / delta-watermark configuration audit
+Observed: 2026-10-22T12:55:50.686096+00:00
+Database: test_njihov_access, PG_DATABASE_SYSTEM. Company ID: 33.
+Scope: is_full_sync = false AND integration_type = 'sql'.
+Date watermark mapping: attribute_field_integrations.api_last_sync_field = true.
+Source SQL: attribute_table_integrations.url.
+All database statements ran in read-only transactions ending with ROLLBACK.
+Only integration metadata was read. No source-data queries, changes, or syncs were run.
+
+Total SQL delta integrations: 49
+AFFECTED: 45
+ALREADY_UTC: 1
+NEEDS_REVIEW: 2
+NO_DATE_WATERMARK: 1
+
+AFFECTED CONFIGURATIONS
+These match the mechanism described in jira.md. This audit does not establish actual missing rows.
+Status is reported as stored; FAILED/CONFIGURED integrations remain included if their configuration is affected.
+
+DATUM_SYS: 20 integrations
+  kn_nep_deli_stavb_h | integration: kn_nep_deli_stavb_h | PROCESSED
+    ID: bfe62b52-9aaf-11ef-9c54-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_etaze_h | integration: kn_nep_etaze_h | PROCESSED
+    ID: 550a20ee-9d03-11ef-8c7b-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_etaze_x_deli_stavb_h | integration: kn_nep_etaze_x_deli_stavb_h | PROCESSED
+    ID: fb72d988-b94d-11ef-bb81-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_hisne_stevilke_h | integration: kn_nep_hisne_stevilke_h | PROCESSED
+    ID: 736ac43c-b60b-11ef-a0fc-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_katastrske_obcine_h | integration: kn_nep_katastrske_obcine_h | PROCESSED
+    ID: f6c3a090-8638-11ef-8275-0242ac120007
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_dejanske_rabe_parcel_h | integration: kn_nep_ostalo_dejanske_rabe_parcel_h | PROCESSING
+    ID: e0c4ee44-f34c-11ef-9c8f-02420a0001ec
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_gozdno_gosp_obm | integration: kn_nep_ostalo_gozdno_gosp_obm | PROCESSED
+    ID: a99024c6-a8aa-11ef-adaf-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_namenske_rabe | integration: kn_nep_ostalo_namenske_rabe | PROCESSED
+    ID: 74096586-f2b2-11ef-ac67-02420a0001ec
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_parcele_x_dejanske_rabe_h | integration: kn_nep_ostalo_parcele_x_dejanske_rabe_h | PROCESSED
+    ID: 8264be70-aafd-11ef-947a-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | integration: kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | PROCESSED
+    ID: e0d985ce-a8bb-11ef-ac18-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_ostalo_parcele_x_namenske_rabe_h | integration: kn_nep_ostalo_parcele_x_namenske_rabe_h | PROCESSED
+    ID: 8b9adbea-a59f-11ef-a7dc-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_parcele_h | integration: kn_nep_parcele_h | PROCESSED
+    ID: 4f44b04c-a7e5-11ef-b133-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_prostori_h | integration: kn_nep_prostori_h | PROCESSED
+    ID: 5b16f1a0-a592-11ef-9316-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_rpe_naselja_h | integration: kn_nep_rpe_naselja_h | PROCESSED
+    ID: 403dee5c-d34f-11ef-a441-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_rpe_obcine_h | integration: kn_nep_rpe_obcine_h | PROCESSED
+    ID: 6460237c-f34d-11ef-91f1-02420a0001ec
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_rpe_ulice_h | integration: kn_nep_rpe_ulice_h | PROCESSED
+    ID: d1d4521c-bc79-11ef-89e9-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_stavbe_centroidi_h | integration: kn_nep_stavbe_centroidi_h | PROCESSED
+    ID: 45293dec-bd13-11ef-bde9-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_stavbe_obrisi_h | integration: kn_nep_stavbe_obrisi_h | PROCESSED
+    ID: e54577ee-f9b0-11ef-bd51-02420a0001ec
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_stavbe_parcele_h | integration: kn_nep_stavbe_parcele_h | PROCESSED
+    ID: a33e8606-a8c0-11ef-84ad-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+  kn_nep_stavbe_zps_h | integration: kn_nep_stavbe_zps_h | PROCESSED
+    ID: 969f1312-ff45-11ef-8df0-0242ac120008
+    SQL: from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')
+
+DATE_CHANGE: 25 integrations
+  ev_del_stavbe_cona_h | integration: prenos_h_del_stavbe_cona_h | FAILED
+    ID: 32af7386-ad7a-11f0-9b38-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_del_stavbe_enota_h_2025_danes | integration: prenos_ev_del_stavbe_enota_h_2025_danes | CONFIGURED
+    ID: 726fc9e4-b684-11f1-b953-02420a00027f
+    SQL: FROM_TZ(CAST(COALESCE(rt.CREATED, rf.CREATED) AS TIMESTAMP), 'Europe/Ljubljana')
+  ev_del_stavbe_h | integration: uvoz_ev_h_del_stavbe | PROCESSED
+    ID: b867296c-ab2a-11f0-a252-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_dst_pripis_podatki_h | integration: uvoz_ev_dst_pripis_podatki_h | PROCESSED
+    ID: ebe9dc2a-9356-11f1-a711-02420a000208
+    SQL: FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana')
+  ev_g_ceste_l_h | integration: prenos_ceste_h | FAILED
+    ID: ee78f108-ae49-11f0-9ffa-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_g_el_energija_l_h | integration: prenosev_el | FAILED
+    ID: 53d3f698-ae4e-11f0-b385-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_gurs_oseba_h | integration: prenos_gurs_oseba | FAILED
+    ID: 9af43084-bd57-11f0-b073-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_g_zeleznice_l_h | integration: prenos_zelez | FAILED
+    ID: a92b6db8-bd91-11f0-86c8-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_obcina_h | integration: prenos_ev_obcina_h | PROCESSED
+    ID: eec1d294-ae51-11f0-bae7-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_oseba_h | integration: prenos_ev_oseba | FAILED
+    ID: b37b77a2-ae52-11f0-8d2f-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_oseba_pe_h | integration: prnos_oseba_pe | PROCESSED
+    ID: 8e5fc5b2-ae53-11f0-ad7f-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_parc_del_cona_h | integration: pnepos_pracele_cona_h | PROCESSED
+    ID: 38be8174-ae59-11f0-a27d-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_parc_del_h | integration: prenos_parc_del_ev | PROCESSED
+    ID: 8a9ed9a4-ae58-11f0-9f8c-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_parcela_h | integration: prnos_ev_parcela | PROCESSED
+    ID: c469d91a-ae56-11f0-84be-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_parc_enota_h_2025_danes | integration: prenos_ev_parc_enota_h_2025_danes | PROCESSED
+    ID: 1e57d002-f69c-11f0-9f2c-02420a000266
+    SQL: FROM_TZ(CAST(COALESCE(rt.CREATED, rf.CREATED) AS TIMESTAMP), 'Europe/Ljubljana')
+  ev_parc_pripis_podatki_h | integration: uvoz_ev_parc_pripis_podatki_h | PROCESSED
+    ID: 5b3da3c2-9357-11f1-a60a-02420a000208
+    SQL: FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana')
+  ev_pe_dst_h | integration: ev_dst_pe | PROCESSED
+    ID: f5519202-ae65-11f0-adb7-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_pe_parc_h | integration: pnreos_pe_parc_ev | PROCESSED
+    ID: 26856cbc-ae67-11f0-8b08-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_posebna_enota_h | integration: prenos_ev_posebna_enota | PROCESSED
+    ID: a75bfb06-ae69-11f0-941e-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_posebna_enota_pod_h | integration: prenos_posebna_enota-h | PROCESSED
+    ID: c52259ac-bee3-11f0-bbb0-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_prostor_h | integration: prenos_prostor | PROCESSED
+    ID: 3d6e03ec-ae6e-11f0-bc34-169cd02558fe
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_sta_par_h | integration: prenos sta par | PROCESSED
+    ID: 77577da8-befa-11f0-84b1-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_stavba_h | integration: prenos ev stavba h | PROCESSED
+    ID: 39aa410c-beff-11f0-a601-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_upravljalec_dst_h | integration: prenos upr dst | PROCESSED
+    ID: 341b09a4-bef7-11f0-9965-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+  ev_upravljalec_parc_h | integration: prenos upr prac | PROCESSED
+    ID: 3576e4ec-bf03-11f0-bdbd-5212cffe39ac
+    SQL: from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')
+
+OTHER SQL DELTA INTEGRATIONS
+  etn3_building_part_h | integration: awd | NO_DATE_WATERMARK
+    Date-based delta is disabled.
+    ID: 80a4c4a4-7f06-11ef-8bd9-02420a0001e5
+    SQL: 
+  kn_nep_stanovanja_h | integration: kn_nep_stanovanja_h | ALREADY_UTC
+    Configured watermark projection already converts to UTC.
+    ID: 04f9f57a-a1b3-11ef-adba-0242ac120008
+    SQL: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC'
+  md_faktor_vrednost | integration: isam_rw_integracija | NEEDS_REVIEW
+    PostgreSQL query selects created_at directly; source type and timezone semantics are unknown.
+    ID: 28922214-6b10-11f1-856d-424abd3ca6bd
+    SQL: created_at
+  pev_pos_vnos | integration: pev_pos_vnos | NEEDS_REVIEW
+    PostgreSQL query selects created_at directly; source type and timezone semantics are unknown.
+    ID: cb5aa3c0-ab77-11f1-bc00-02420a00027f
+    SQL: created_at
+
+REMEDIATION REFERENCE (not applied)
+Add a separate UTC projection and designate it as the date watermark:
+  KN: FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS DATUM_SYS_SYNC
+  EV: FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS DATE_CHANGE_SYNC
+Prefer timezone-aware UTC: Lift compares against TO_TIMESTAMP_TZ bounds; bare SYS_EXTRACT_UTC depends on Oracle session timezone.
+  EV pripis tables use RF.CREATED alone: preserve that source expression (see CSV).
+An alias ending in _SYNC alone does not prove UTC conversion; inspect the selected expression and mapping.
+The already-UTC stanovanja integration uses AT TIME ZONE 'UTC' on its existing DATUM_SYS field.
+Confirm sync-field changes do not trigger full sync, as required by jira.md; this was not tested by this read-only audit.
+
+FILES / REPRODUCTION
+affected_integrations.csv: full affected list with IDs, mapping IDs, SQL evidence and suggested additional projection.
+all_sql_delta_integrations.csv: all 49 SQL delta integrations, including exceptions.
+audit_snapshot.jsonl: selected metadata and full integration SQL for independent review; no connection credentials.
+Refresh: python3 6118/read_db.py 6118/audit.sql > 6118/audit_snapshot.jsonl
+Rebuild: python3 6118/build_report.py
