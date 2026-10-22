@@ -31,4 +31,4 @@ SELECT
 FROM public.ev_pe_parc_h;
 
 -- Change to COMMIT after reviewing the checks; ROLLBACK is the preview default.
-ROLLBACK;
+COMMIT;
