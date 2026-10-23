@@ -268,6 +268,11 @@ Expected:
 - VO 118's 908 areas remain unchanged; VO 4's areas and IND models remain unchanged.
 - Both front flags remain unchanged. Target VO locking does not block the join.
 
+First one:
+  "message": "JOIN_NOT_ALLOWED: Pridružitev ni dovoljena glede na stanje izvorne in ciljne verzije območij.\n
+  This is actually correct. We dont allow transfering between historical VOs - that is old stuff.
+
+
 ### 4B. Join to the same front VO
 
 1. On **VO 4**, open **Pridruži na VO**.
@@ -275,6 +280,15 @@ Expected:
 3. Submit, wait, refresh.
 
 Expected: allowed. Same VM remains on VO 4; hierarchy is freshly reset to one level-1 cona and 132 links, zero LAO/TAO. No extra VM or accumulated cona is created.
+
+This isnt allowed - joining to the same one is forbidden - it makes no sense.
+
+I actually joined it to VO 4 and it succeeded.
+Then i joined to 117 where another sta model was. Suceeded.
+
+Then tried to join it to the empty 118 and it correctly failed with:
+ "message": "JOIN_NOT_SOLE_MODEL_OF_TYPE: Verzija modela ni edina verzija svojega tipa na izvorni verziji območij.\n
+
 
 ## 5. Historical join creates an editable copy
 
@@ -294,6 +308,15 @@ Expected:
 - New VM is editable: `zaklenjena_verzija=false`, `pripisna=false`, and hierarchy records permit editing.
 - New hierarchy: **one level-1 cona, 116 links to VO 104 areas, zero LAO/TAO**.
 - VO 104's IND v51 is unchanged. Neither VO's front flag or areas change.
+
+ "message": "JOIN_NOT_ALLOWED: Pridružitev ni dovoljena glede na stanje izvorne in ciljne verzije območij.\n
+Second one also does:
+
+{
+  "message": "JOIN_NOT_ALLOWED: Pridružitev ni dovoljena glede na stanje izvorne in ciljne verzije območij.\n
+This is correct. We have decided to remove the historical copiess and all that from the spec / the customer doesnt need it.
+
+This was correctly removed in the BE ticketbut wasnt removed in the SFC FE ticket or what?
 
 ### 5B. Historical → same historical VO
 
