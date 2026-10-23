@@ -19,15 +19,15 @@ After every successful mutation, verify that VO areas and unrelated VMs/hierarch
 
 ## How to read the instructions
 
-**The VO row where you open the SFC is the starting/source VO. It is not the destination.**
+**For Pridruži na VO, the VO row where you open the SFC is the DESTINATION VO.**
 
-For **Pridruži na VO**, there are three separate choices:
+1. **Destination first:** find the VO row you want to add a VM to and open **Pridruži na VO** on that row.
+2. **VM to add:** inside the SFC, select the specified VM. Its current VO is the source; you do not open the join action on that source row.
+3. Submit only when the test instructs you to execute.
 
-1. **Starting row:** open the action menu on the specified row in MD Območja verzije.
-2. **VM to move:** inside the SFC, select the specified VM belonging to that starting row.
-3. **Destination VO:** inside the SFC, select where that VM should go, only when the test specifies a destination.
+Example: to move STA v227 from VO 118 into VO 4, open **Pridruži na VO on row VO 4**, then select **STA v227**.
 
-Example: “starting row VO 118; VM to move STA v227; destination VO 4” means open the action on row 118 and move STA v227 out of it into VO 4.
+Where a VM is disallowed, it may be excluded from the selector or selected with execution blocked. Record the behavior and any explanation. Do not submit an unexpectedly enabled invalid operation just to test UI eligibility.
 
 For **Ponastavi hierarhijo**, select the VM whose hierarchy will be deleted and rebuilt. There is no destination VO.
 
@@ -41,27 +41,21 @@ For **Prekopiraj hierarhijo iz VM**, both VMs belong to the row where you open t
 
 First attempt:
 
-1. In **MD Območja verzije**, find the row whose VO number is **113**.
-2. Open the action menu **on that row** and click **Pridruži na VO**.
-3. In the SFC's **VM to move** selector, choose **HIS v291**. This is the source VM, not a VM already present at a destination you are selecting.
-4. **Do not select a destination VO for this check.** Inspect whether the SFC prevents proceeding with HIS v291 and displays the reason.
-5. Expected: it cannot execute because its starting VO 113 contains both HIS v291 and HIS v292.
-6. Cancel/close the SFC without executing.
+1. In **MD Območja verzije**, find **VO 116** — this is the destination.
+2. On row **VO 116**, open **Pridruži na VO**.
+3. Try to select **HIS v291**, currently on source VO 113, as the VM to add.
+4. Expected: excluded or blocked because source VO 113 contains both HIS v291 and HIS v292.
+5. Cancel without executing.
 
 Second attempt:
 
-1. Again open **Pridruži na VO on row VO 113**.
-2. This time select **HIS v292 as the VM to move**.
-3. Again check blocking and the explanation, without choosing a destination.
-4. Cancel/close without executing.
+1. Again open **Pridruži na VO on destination row VO 116**.
+2. Try to select **HIS v292**, currently on source VO 113.
+3. Check the same blocking and explanation. Cancel without executing.
 
-Expected for both attempts:
+Expected for both attempts: no mutation. Both VMs are editable; the relevant restriction is multiple HIS versions on their source VO 113.
 
-- The UI prevents execution and explains that the starting VO contains multiple VMs of the same model type.
-- Both VMs are editable, so the reason must be multiplicity, not protection.
-- No record or hierarchy changes.
-- If invalid VMs are excluded from the selector, record that behavior and whether the reason is visible. If they are selectable, execution must remain blocked.
-- If your UI requires a destination before displaying validation, choose **VO 116 as destination**. It is a front VO. The operation must still be blocked; do not execute it if the expected restriction is missing.
+**Context for the existing notes below:** opening the action on VO 113 and choosing a VM already on VO 113 tests a same-VO join. It does not isolate the multiple-version source restriction. The recorded messages below are preserved as your observations, not rewritten as expected behavior.
 
 Actually, we correctly fail with:
   
@@ -85,9 +79,9 @@ Should be more specific on why not.
 
 ### 1B. A pripisna VM cannot be modified
 
-1. Find **VO 8**.
-2. Open **Pridruži na VO** and select **PPP v225**. Check blocking and reason; cancel.
-3. Open **Ponastavi hierarhijo** and select **PPP v225**. Check blocking and reason; cancel.
+1. Find destination **VO 116**.
+2. On **VO 116**, open **Pridruži na VO** and try to select **PPP v225**, currently on source VO 8. Check blocking because it is pripisna; cancel. Using a different destination avoids a same-VO validation error masking this check.
+3. Now go to **VO 8**, open **Ponastavi hierarhijo**, and select **PPP v225**. Check blocking and reason; cancel.
 4. On the same **VO 8 row**, open **Prekopiraj hierarhijo iz VM**.
 5. Set **source = PPP_MN v21** (the hierarchy to read) and **target = PPP v225** (the protected VM you are trying to overwrite).
 6. Check blocking and reason; cancel. If PPP v225 cannot be selected as target, record that it is excluded; do not substitute another target.
@@ -258,12 +252,12 @@ Now both have 1.
 
 ### 4A. Move the same VM and reset using target areas
 
-1. Find **VO 118** and record **STA v227 UUID = 9ea37aa0-b810-11f1-a360-0e6a76f7d08a**.
-2. Open **Pridruži na VO**.
-3. Select **VM = STA v227**.
-4. Inspect destinations: historical VO 105 must not be available; front locked VO 4 must be available.
-5. Select **target VO = 4** and submit.
-6. Wait, refresh source and destination rows, then inspect hierarchy.
+1. Verify **STA v227** currently belongs to **source VO 118**. Record its UUID: **9ea37aa0-b810-11f1-a360-0e6a76f7d08a**.
+2. Go to **destination row VO 105** and open **Pridruži na VO**. Try to select STA v227: it must be excluded or blocked because this would be front → historical. Cancel.
+3. Go to **destination row VO 4** (front and locked).
+4. On **VO 4**, open **Pridruži na VO**.
+5. Select **STA v227** as the VM to add. It must be allowed despite destination VO 4 being locked. **Submit.**
+6. Wait, then refresh source VO 118 and destination VO 4 and inspect the hierarchy.
 
 Expected:
 
@@ -277,7 +271,7 @@ Expected:
 ### 4B. Join to the same front VO
 
 1. On **VO 4**, open **Pridruži na VO**.
-2. Select **STA v227**, **target VO = 4**.
+2. Select **STA v227** as the VM to add. It now already belongs to VO 4 after 4A, so this is a same-VO join.
 3. Submit, wait, refresh.
 
 Expected: allowed. Same VM remains on VO 4; hierarchy is freshly reset to one level-1 cona and 132 links, zero LAO/TAO. No extra VM or accumulated cona is created.
@@ -286,10 +280,10 @@ Expected: allowed. Same VM remains on VO 4; hierarchy is freshly reset to one le
 
 ### 5A. Historical → different historical VO
 
-1. On **VO 105**, open **Pridruži na VO**.
-2. Select **VM = INP v36** (`pripisna=true`).
-3. Inspect destinations: only historical VOs should be offered; front VO 4 must be absent.
-4. Select **target VO = 104** (historical and locked).
+1. On **destination row VO 4**, open **Pridruži na VO**. Try to select **INP v36**, currently on historical source VO 105: excluded or blocked because historical → front is disallowed. Cancel.
+2. Go to **destination row VO 104** (historical and locked).
+3. On **VO 104**, open **Pridruži na VO**.
+4. Select **INP v36** (`pripisna=true`, currently on source VO 105) as the VM to add.
 5. Submit, wait, refresh.
 
 Expected:
@@ -304,22 +298,22 @@ Expected:
 ### 5B. Historical → same historical VO
 
 1. On **VO 105**, open **Pridruži na VO** again.
-2. Select original **INP v36**, **target VO = 105**.
+2. Select original **INP v36** as the VM to add. Both its source and the destination row are VO 105.
 3. Submit, wait, refresh.
 
 Expected: another new editable INP copy is created on VO 105, with one level-1 cona and 116 area links. Original v36 remains unchanged. Same-VO selection must not skip copying in the historical branch.
 
 ## 6. Existing VO copy makes a blocked front VM movable
 
-1. On **VO 6**, open **Pridruži na VO**, select **KME v101**.
+1. On **destination row VO 116**, open **Pridruži na VO** and try to select **KME v101**, currently on source VO 6.
 2. Confirm blocked because both KME v100 and v101 belong to VO 6. Cancel.
 3. Run the existing **copy VO** action on **VO 6**. If the SFC asks for a source, choose VO 6. Do not manually change frontness.
 4. Wait and identify the new VO number; call it **VO N**.
 5. Check old VO 6 is historical and VO N is front.
 6. Check **KME v100 stays on VO 6**, while **KME v101 moves to VO N**. The copy selects highest version within the source VO.
 7. Check VO N has 227 copied areas and v101 links reference the copied areas. Existing v101 hierarchy should be preserved by VO copying.
-8. On **VO N**, open **Pridruži na VO**.
-9. Select **KME v101**, **target VO = 116**.
+8. On **destination row VO 116**, open **Pridruži na VO**.
+9. Select **KME v101**, now on source VO N, as the VM to add.
 10. Submit, wait, refresh.
 
 Expected: same KME v101 moves to front VO 116 and resets to **one level-1 cona, 238 area links, zero LAO/TAO**. VO N's copied areas remain. KME v100 and its historical hierarchy remain unchanged. VO N and VO 116 stay front.
@@ -331,21 +325,21 @@ These cases need valid fixtures; the inspected DB had no empty VO and no VM with
 ### 7A. Editable VM without a VO
 
 1. Create a valid editable **STA VM from scratch** using normal application creation. Leave VO empty as required; record new version and UUID.
-2. Open **Pridruži na VO** through the application's entry point that exposes unattached VMs.
-3. Select the new STA VM.
-4. Inspect targets: historical VO 105 is allowed; front VO 117 is allowed because it contains STA; front VO 114 is excluded because it contains only GOZ.
-5. Choose **VO 117**, submit, wait, refresh.
+2. On **destination row VO 114**, open **Pridruži na VO** and try to select the new unattached STA VM. It must be excluded or blocked because this front VO contains only GOZ. Cancel.
+3. On **destination row VO 105**, open **Pridruži na VO**. Confirm the new unattached STA is allowed, then cancel without executing.
+4. On **destination row VO 117**, open **Pridruži na VO**.
+5. Select the new unattached STA VM and submit. It is allowed because front VO 117 already contains STA. Wait and refresh.
 
 Expected: same UUID is joined, with one level-1 cona linked to all 907 areas of VO 117, zero LAO/TAO. Existing STA/TUR VMs remain unchanged. The “target already contains this type” restriction is specific to the no-VO → front branch.
 
-Repeat with another valid unattached STA and target historical VO 105: same VM is joined directly, without creating a copy.
+Repeat with another valid unattached STA: open **Pridruži na VO on destination row VO 105**, select that unattached STA and submit. Expected: same VM is joined directly, without creating a copy.
 
-**UI reachability check:** the ticket attaches SFCs to VO rows but also specifies VMs without VO. If every source selector only lists VMs on its row, this branch cannot be reached. Record this as a UI/spec gap rather than choosing an unrelated attached VM.
+**UI reachability check:** the join SFC on the destination row must expose eligible unattached VMs. If the selector cannot show them, record this as a UI gap.
 
 ### 7B. Empty VO
 
 1. Obtain a valid historical VO with zero areas through supported setup.
-2. Join a valid editable unattached VM to it; record the VM.
+2. On that **empty destination VO row**, open **Pridruži na VO**, select a valid editable unattached VM and submit. Record the VM.
 3. Run **Ponastavi hierarhijo** on that VM, then repeat once.
 
 Expected after join and each reset: exactly one level-1 cona, zero area links, no geometry, zero LAO/TAO. No duplicates or failure during geometry recalculation.
@@ -353,7 +347,7 @@ Expected after join and each reset: exactly one level-1 cona, zero area links, n
 ### 7C. Locked VM independently of pripisna
 
 1. Use **VO 117**, with **STA v228 as the VM to lock** and **TUR v43 as its editable peer**. Run this after section 3. Through a supported application action or approved fixture setup, set STA v228 to `zaklenjena_verzija=true`, `pripisna=false`. Confirm TUR v43 remains editable and both still belong to VO 117. Record the original lock state so you can restore it afterward. If you cannot prepare this state, mark this test as needing a fixture; do not treat the existing editable STA as locked.
-2. In **Pridruži na VO**, choose the locked VM: blocked with locking reason.
+2. On **destination row VO 116**, open **Pridruži na VO** and try to select **locked STA v228**, currently on source VO 117: blocked with locking reason. Cancel.
 3. In **Ponastavi hierarhijo**, choose it: blocked.
 4. On **VO 117**, open **Prekopiraj hierarhijo iz VM**. Set **source = TUR v43**, **target = locked STA v228**. Expected: blocked because the target is locked. Cancel.
 5. On **VO 117**, open **Prekopiraj hierarhijo iz VM** again. Set **source = locked STA v228**, **target = editable TUR v43**. Expected: allowed. Submit, wait, refresh, and verify the copied TUR hierarchy is editable while source STA remains unchanged.
