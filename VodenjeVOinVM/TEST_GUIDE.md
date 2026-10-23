@@ -317,6 +317,7 @@ Second one also does:
 This is correct. We have decided to remove the historical copiess and all that from the spec / the customer doesnt need it.
 
 This was correctly removed in the BE ticketbut wasnt removed in the SFC FE ticket or what?
+Yes, that was the case / we updated the DFC FE ticket now.
 
 ### 5B. Historical → same historical VO
 

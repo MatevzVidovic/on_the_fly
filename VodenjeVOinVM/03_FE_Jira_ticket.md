@@ -29,11 +29,11 @@ V izboru VO prikazati najmanj številko oziroma naziv VO in prisotne verzije mod
 | Stanje izbranega VM | Cilji in delovanje |
 |---|---|
 | Brez VO, spremenljiv VM | Vsi zgodovinski VO; frontni VO samo, če že vsebujejo njegov tip modela. Pridruži se isti VM. |
-| Na zgodovinskem VO | Samo zgodovinski VO. BE najprej ustvari spremenljivo kopijo in pridruži kopijo. Zaklenjenost/pripisnost izvornega VM ne onemogoči branja za kopijo. |
+| Na zgodovinskem VO | Akcija ni omogočena; prikazati razlog. Pridružitev VM, ki že pripada zgodovinskemu VO, ni podprta. |
 | Na frontnem VO, spremenljiv VM, edini svojega tipa na izvoru | Samo frontni VO. Premakne se isti VM. |
 | Na frontnem VO, zaklenjen/pripisen ali več VM njegovega tipa na izvoru | Akcija ni omogočena; prikazati razlog. |
 
-Enakega VO kot ciljnega ni treba izključiti. Akcija tudi v tem primeru ponastavi hierarhijo oziroma v zgodovinski veji ustvari kopijo.
+Enakega frontnega VO kot ciljnega ni treba izključiti. Akcija tudi v tem primeru ponastavi hierarhijo, če so izpolnjeni pogoji za pridružitev med frontnima VO.
 
 
 ## 2. Ponastavi hierarhijo
