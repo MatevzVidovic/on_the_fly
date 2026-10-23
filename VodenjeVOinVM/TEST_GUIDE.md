@@ -327,6 +327,8 @@ Yes, that was the case / we updated the DFC FE ticket now.
 
 Expected: another new editable INP copy is created on VO 105, with one level-1 cona and 116 area links. Original v36 remains unchanged. Same-VO selection must not skip copying in the historical branch.
 
+  "message": "JOIN_SAME_GEO_VERSION: Verzija modela je že pridružena izbrani verziji območij.\n
+
 ## 6. Existing VO copy makes a blocked front VM movable
 
 1. On **destination row VO 116**, open **Pridruži na VO** and try to select **KME v101**, currently on source VO 6.
@@ -342,6 +344,12 @@ Expected: another new editable INP copy is created on VO 105, with one level-1 c
 
 Expected: same KME v101 moves to front VO 116 and resets to **one level-1 cona, 238 area links, zero LAO/TAO**. VO N's copied areas remain. KME v100 and its historical hierarchy remain unchanged. VO N and VO 116 stay front.
 
+
+{
+  "message": "JOIN_NOT_SOLE_MODEL_OF_TYPE: Verzija modela ni edina verzija svojega tipa na izvorni verziji območij.\n
+
+Probably works, cant check, branch got swapped from under me.
+  
 ## 7. Additional fixtures for uncovered branches
 
 These cases need valid fixtures; the inspected DB had no empty VO and no VM with `zaklenjena_verzija=true`. Do not use the existing unnamed/model-less VM rows as valid fixtures.
