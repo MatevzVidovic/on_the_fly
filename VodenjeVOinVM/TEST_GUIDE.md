@@ -97,6 +97,8 @@ For this copy test, both VMs belong to VO 8. PPP_MN v21 is editable, so the expe
 {
   "message": "JOIN_SAME_GEO_VERSION: Verzija modela je že pridružena izbrani verziji območij.\n
   "message": "MODEL_VERSION_NOT_EDITABLE: Verzije modela ni mogoče urejati, ker je zaklenjena ali pripisna.\n
+  {
+  "message": "MODEL_VERSION_NOT_EDITABLE: Verzije modela ni mogoče urejati, ker je zaklenjena ali pripisna.\n
 
 Expected: all three modifications are blocked because PPP v225 is `pripisna=true`. It must not become executable by selecting another source or destination.
 
@@ -108,6 +110,9 @@ Expected: all three modifications are blocked because PPP v225 is `pripisna=true
 4. Confirm submission is available, then **cancel**.
 
 Expected: allowed because INP v50 is editable and has a VO. Neither historical status nor VO locking blocks it. The SFC needs no additional VO selection.
+
+
+Worked.
 
 ### 1D. A pripisna source can be read for copying
 
@@ -127,6 +132,8 @@ Expected:
 - Choices identify model type, version and name where available.
 - No global latest filter hides INP v36.
 
+Worked.
+
 ### 1E. Existing copy-VO button follows frontness, not locking
 
 1. Find **VO 4**: front, locked.
@@ -135,6 +142,9 @@ Expected:
 4. Inspect the same action. It must be hidden.
 
 Expected: `delovna_geo_coniranje=true` controls visibility. A locked front VO remains copyable. The exact deployed label of this pre-existing action was not verified locally.
+
+
+Not testing this rn.
 
 ### 1F. Manual relationship/frontness editing is unavailable
 
@@ -150,6 +160,9 @@ Expected:
 - Existing VM's VO is displayed as information.
 - A new VM starts without a VO and cannot manually select one during creation.
 - Existing copy-VM and copy-VO actions still exist where applicable.
+
+
+Not testing rn.
 
 ## 2. Historical hierarchy copy, then reset
 
@@ -172,6 +185,9 @@ Expected:
 - INP v36 and its hierarchy remain unchanged.
 - Copied target records are editable. Try a harmless editable text field, save, and restore it.
 
+
+Already tested under 1.
+
 ### 2B. Reset that target
 
 1. On **VO 105**, open **Ponastavi hierarhijo**.
@@ -188,6 +204,9 @@ Expected after each reset:
 - Repeating does not accumulate cone or duplicate links.
 - INP v36 is unchanged.
 
+Correct.
+
+
 ## 3. Copy hierarchy with different supported level counts
 
 Use **VO 117**. Initially STA v228 supports 20 levels and has 868 cone, 17 LAO, 17 TAO; TUR v43 supports 21 levels and has one base cona.
@@ -202,6 +221,9 @@ Use **VO 117**. Initially STA v228 supports 20 levels and has 868 cone, 17 LAO, 
 
 Expected: TUR gets 868 cone, 17 LAO, 17 TAO with the source cona levels preserved, new hierarchy IDs and correct copied parent references. Old TUR base cona is removed. STA is unchanged. Area links match STA's assignments; do not assume every one of VO 117's 907 areas was assigned in the source.
 
+
+Worked.
+
 ### 3B. Target supports fewer levels
 
 **SFC settings: open on row VO 117 → Prekopiraj hierarhijo iz VM → source TUR v43 → target STA v228 → submit. STA v228 is overwritten; TUR v43 is only read. Run after 3A.**
@@ -211,6 +233,8 @@ Expected: TUR gets 868 cone, 17 LAO, 17 TAO with the source cona levels preserve
 3. Submit, wait, refresh.
 
 Expected: STA gets a complete replacement copy, but **every copied cona has level 1** because STA supports 20 levels and TUR supports 21. This comparison uses supported levels, even though TUR's current copied cone only use levels up to 20. TUR stays unchanged, including its varied levels.
+
+Correct.
 
 ### 3C. Equal supported level counts
 
@@ -223,6 +247,12 @@ Expected: STA gets a complete replacement copy, but **every copied cona has leve
 Expected: 868 cone, 17 LAO, 17 TAO; levels preserved because both support 20. Historical target is allowed. Source v225 remains unchanged. Verify old target IDs disappear and new IDs are created, since the initial counts already match.
 
 Do not use HIS v292 as a clean capacity fixture: it currently has no `md_tvr` level definitions.
+
+LOG_POD_MANGARTOM
+source nastavljen na 1 tik po zagonu. Cilj nastavljeno na 9. origianlno pomoje 5.
+
+Correct
+Now both have 1.
 
 ## 4. Front join into a locked VO, then same-VO join
 
