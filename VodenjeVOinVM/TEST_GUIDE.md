@@ -88,8 +88,11 @@ Should be more specific on why not.
 1. Find **VO 8**.
 2. Open **Pridruži na VO** and select **PPP v225**. Check blocking and reason; cancel.
 3. Open **Ponastavi hierarhijo** and select **PPP v225**. Check blocking and reason; cancel.
-4. Open **Prekopiraj hierarhijo iz VM**.
-5. Select **PPP v225 as target**. Check blocking and reason; cancel.
+4. On the same **VO 8 row**, open **Prekopiraj hierarhijo iz VM**.
+5. Set **source = PPP_MN v21** (the hierarchy to read) and **target = PPP v225** (the protected VM you are trying to overwrite).
+6. Check blocking and reason; cancel. If PPP v225 cannot be selected as target, record that it is excluded; do not substitute another target.
+
+For this copy test, both VMs belong to VO 8. PPP_MN v21 is editable, so the expected rejection is caused by the target PPP v225 being pripisna, not by the source.
 
 {
   "message": "JOIN_SAME_GEO_VERSION: Verzija modela je že pridružena izbrani verziji območij.\n
@@ -107,6 +110,8 @@ Expected: all three modifications are blocked because PPP v225 is `pripisna=true
 Expected: allowed because INP v50 is editable and has a VO. Neither historical status nor VO locking blocks it. The SFC needs no additional VO selection.
 
 ### 1D. A pripisna source can be read for copying
+
+**SFC settings: open on row VO 105 → Prekopiraj hierarhijo iz VM → source INP v36 → target INP v50. Inspect and cancel; do not submit.**
 
 1. On **VO 105**, open **Prekopiraj hierarhijo iz VM**.
 2. Set **target = INP v50**.
@@ -150,6 +155,8 @@ Expected:
 
 ### 2A. Execute a copy from a protected source
 
+**SFC settings: open on row VO 105 → Prekopiraj hierarhijo iz VM → source INP v36 → target INP v50 → submit. INP v50 is overwritten; INP v36 is only read.**
+
 1. On **VO 105**, open **Prekopiraj hierarhijo iz VM**.
 2. Set **source = INP v36**, **target = INP v50**.
 3. Submit, wait for completion, refresh.
@@ -187,6 +194,8 @@ Use **VO 117**. Initially STA v228 supports 20 levels and has 868 cone, 17 LAO, 
 
 ### 3A. Target supports more levels
 
+**SFC settings: open on row VO 117 → Prekopiraj hierarhijo iz VM → source STA v228 → target TUR v43 → submit. TUR v43 is overwritten; STA v228 is only read.**
+
 1. On VO 117 open **Prekopiraj hierarhijo iz VM**.
 2. Set **source = STA v228**, **target = TUR v43**.
 3. Submit, wait, refresh.
@@ -195,13 +204,17 @@ Expected: TUR gets 868 cone, 17 LAO, 17 TAO with the source cona levels preserve
 
 ### 3B. Target supports fewer levels
 
-1. On VO 117 open the same SFC.
+**SFC settings: open on row VO 117 → Prekopiraj hierarhijo iz VM → source TUR v43 → target STA v228 → submit. STA v228 is overwritten; TUR v43 is only read. Run after 3A.**
+
+1. On **VO 117**, open **Prekopiraj hierarhijo iz VM**.
 2. Set **source = TUR v43**, **target = STA v228**.
 3. Submit, wait, refresh.
 
 Expected: STA gets a complete replacement copy, but **every copied cona has level 1** because STA supports 20 levels and TUR supports 21. This comparison uses supported levels, even though TUR's current copied cone only use levels up to 20. TUR stays unchanged, including its varied levels.
 
 ### 3C. Equal supported level counts
+
+**SFC settings: open on row VO 101 → Prekopiraj hierarhijo iz VM → source STA v225 → target STA v226 → submit. STA v226 is overwritten; STA v225 is only read.**
 
 1. On **VO 101**, open **Prekopiraj hierarhijo iz VM**.
 2. Set **source = STA v225**, **target = STA v226**.
@@ -309,11 +322,12 @@ Expected after join and each reset: exactly one level-1 cona, zero area links, n
 
 ### 7C. Locked VM independently of pripisna
 
-1. Obtain a VM on a front VO with `zaklenjena_verzija=true`, `pripisna=false`, and an editable peer VM on the same VO.
+1. Use **VO 117**, with **STA v228 as the VM to lock** and **TUR v43 as its editable peer**. Run this after section 3. Through a supported application action or approved fixture setup, set STA v228 to `zaklenjena_verzija=true`, `pripisna=false`. Confirm TUR v43 remains editable and both still belong to VO 117. Record the original lock state so you can restore it afterward. If you cannot prepare this state, mark this test as needing a fixture; do not treat the existing editable STA as locked.
 2. In **Pridruži na VO**, choose the locked VM: blocked with locking reason.
 3. In **Ponastavi hierarhijo**, choose it: blocked.
-4. In **Prekopiraj hierarhijo iz VM**, choose it as target: blocked.
-5. Choose the editable peer as target and locked VM as source: allowed; execute and verify an editable copy of the hierarchy.
+4. On **VO 117**, open **Prekopiraj hierarhijo iz VM**. Set **source = TUR v43**, **target = locked STA v228**. Expected: blocked because the target is locked. Cancel.
+5. On **VO 117**, open **Prekopiraj hierarhijo iz VM** again. Set **source = locked STA v228**, **target = editable TUR v43**. Expected: allowed. Submit, wait, refresh, and verify the copied TUR hierarchy is editable while source STA remains unchanged.
+6. Restore STA v228's original lock state using the supported setup mechanism.
 
 Expected: protection applies to the VM being changed, while protected sources can be read.
 
@@ -323,8 +337,9 @@ If you can replay SFC requests, submit deliberately invalid combinations using t
 
 - Front → historical and historical → front join.
 - Front join with multiple same-type source VMs.
-- Reset or copy into protected target.
-- Copy between different VOs or source = target.
+- Reset a protected target, or replay hierarchy copy with **source PPP_MN v21 → target PPP v225**, from **VO 8**: reject protected target.
+- Replay hierarchy copy with **source INP v36 (VO 105) → target STA v226 (VO 101)**: reject different VOs.
+- Replay hierarchy copy with **source INP v50 → target INP v50**, from **VO 105**: reject identical source and target.
 - No-VO VM → front VO without that model type.
 
 UI filtering and disabled buttons alone do not verify BE validation.
