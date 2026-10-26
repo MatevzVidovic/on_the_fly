@@ -69,3 +69,12 @@ generated and WAL disk. Press `t` (no Enter) to show/hide database sizes and ses
 counts. All metrics continue to be collected and saved regardless of display mode.
 Press `r` (no Enter) to immediately refresh database and table sizes and print a
 new sample. Automatic size refresh still runs every 30 seconds.
+
+All five runnable Python programs record start/stop UTC timestamps in the `runs`
+table in this directory's `full.sqlite`, with completed/interrupted/failed status.
+Unlogged scripts also record whether SET LOGGED finished. The tracker defaults to
+that same file; an explicit sample filename does not change the run-log location.
+Ctrl+C cancels an active query or stops a pause, records the stop, and exits with
+code 130 without a traceback. Previously committed batches remain committed.
+Unlogged tables are not automatically switched back on interruption: this could
+trigger a large unexpected rewrite. Check their state before continuing.
