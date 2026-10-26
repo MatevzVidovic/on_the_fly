@@ -2,14 +2,17 @@ from db import connect, sql, TABLE
 import time
 
 from run_log import run_log
+from barman import wait_for_barman
 
 with run_log(__file__) as run:
     with connect() as db:
+        wait_for_barman(db)
         run["phase"] = "set_unlogged"
         db.execute(sql.SQL("ALTER TABLE {table} SET UNLOGGED").format(table=TABLE))
         run["phase"] = "backfill"
         last_id = None
         while True:
+            wait_for_barman(db)
             after = sql.SQL('') if last_id is None else sql.SQL('AND id > %s')
             rows = db.execute(sql.SQL("""
                 SELECT id FROM {table}
@@ -31,10 +34,13 @@ with run_log(__file__) as run:
             """).format(table=TABLE), (ids,))
             print(f"Updated {result.rowcount} rows", flush=True)
             last_id = ids[-1]
+            wait_for_barman(db)
             time.sleep(1)
+        wait_for_barman(db)
         print("Setting table back to logged...", flush=True)
         run["phase"] = "set_logged"
         db.execute(sql.SQL("ALTER TABLE {table} SET LOGGED").format(table=TABLE))
         run["logging_restored"] = True
+        wait_for_barman(db)
     print("Done", flush=True)
     run["phase"] = "done"

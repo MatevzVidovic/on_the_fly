@@ -2,12 +2,14 @@ from db import connect, sql, TABLE
 import time
 
 from run_log import run_log
+from barman import wait_for_barman
 
 with run_log(__file__) as run:
     with connect() as db:
         run["phase"] = "backfill"
         last_id = None
         while True:
+            wait_for_barman(db)
             after = sql.SQL('') if last_id is None else sql.SQL('AND id > %s')
             rows = db.execute(sql.SQL("""
                 SELECT id FROM {table}
@@ -29,6 +31,7 @@ with run_log(__file__) as run:
             """).format(table=TABLE), (ids,))
             print(f"Updated {result.rowcount} rows", flush=True)
             last_id = ids[-1]
+            wait_for_barman(db)
             time.sleep(1)
     print("Done", flush=True)
     run["phase"] = "done"

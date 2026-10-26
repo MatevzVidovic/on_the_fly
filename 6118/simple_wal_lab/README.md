@@ -78,3 +78,11 @@ Ctrl+C cancels an active query or stops a pause, records the stop, and exits wit
 code 130 without a traceback. Previously committed batches remain committed.
 Unlogged tables are not automatically switched back on interruption: this could
 trigger a large unexpected rewrite. Check their state before continuing.
+
+Both batched scripts check the `barman` slot before and after each batch. At
+2 GiB retained WAL they pause, checking every 5 seconds until below 1 GiB.
+A missing/unmeasurable or inactive slot stops the script instead of continuing
+without monitoring. Ctrl+C also stops a wait. These are between-statement checks,
+not a hard cap: a running batch can exceed 2 GiB. The unlogged variant also checks
+before the logging changes and after SET LOGGED, but cannot pause SET LOGGED midway.
+This measures retained WAL on PostgreSQL, not the Barman server's archive disk size.
