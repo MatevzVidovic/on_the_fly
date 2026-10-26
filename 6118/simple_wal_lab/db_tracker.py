@@ -17,6 +17,12 @@ sqlite.execute('''CREATE TABLE IF NOT EXISTS samples (
     checkpoints_timed INTEGER, checkpoints_requested INTEGER,
     checkpoint_write_ms REAL, checkpoint_sync_ms REAL, details_json TEXT
 )''')
+# Keep existing SQLite recordings usable when adding these metrics.
+columns = {row[1] for row in sqlite.execute('PRAGMA table_info(samples)')}
+for name in ('fmp_bytes', 'postgres_bytes', 'wal_generated_bytes'):
+    if name not in columns:
+        sqlite.execute(f'ALTER TABLE samples ADD COLUMN {name} INTEGER')
+sqlite.commit()
 
 with connect() as db:
     db.row_factory = dict_row
@@ -24,17 +30,33 @@ with connect() as db:
     db.execute("SET statement_timeout = '10s'")
     allowed = db.execute("SELECT has_function_privilege('pg_ls_waldir()', 'EXECUTE') AS ok").fetchone()['ok']
     wal_size = '(SELECT sum(size) FROM pg_ls_waldir())' if allowed else 'NULL'
+    if not allowed:
+        print('WAL disk unavailable: pg_ls_waldir permission missing. WAL generation and slot retention are still measured.', flush=True)
     previous = None
+    starting_lsn = None
+    sizes = {}
+    next_size_check = 0
     try:
         while True:
+            if time.monotonic() >= next_size_check:
+                sizes = db.execute("""
+                SELECT
+                    pg_database_size(current_database()) AS database_bytes,
+                    (SELECT CASE WHEN has_database_privilege(oid,'CONNECT')
+                        THEN pg_database_size(oid) END FROM pg_database
+                     WHERE datname='fmp') AS fmp_bytes,
+                    (SELECT CASE WHEN has_database_privilege(oid,'CONNECT')
+                        THEN pg_database_size(oid) END FROM pg_database
+                     WHERE datname='postgres') AS postgres_bytes,
+                    pg_total_relation_size(to_regclass(%s)) AS test_table_bytes
+                """, (TABLE.as_string(),)).fetchone()
+                next_size_check = time.monotonic() + 30
             row = db.execute(f'''
                 SELECT clock_timestamp()::text AS time,
                     pg_wal_lsn_diff(pg_current_wal_insert_lsn(),'0/0')::bigint AS wal_position_bytes,
                     w.wal_bytes::bigint, {wal_size}::bigint AS wal_directory_bytes,
                     (SELECT max(pg_wal_lsn_diff(pg_current_wal_lsn(),restart_lsn))::bigint
                      FROM pg_replication_slots WHERE slot_name='barman') AS barman_retained_bytes,
-                    pg_database_size(current_database()) AS database_bytes,
-                    pg_total_relation_size(to_regclass(%s)) AS test_table_bytes,
                     (SELECT count(*) FROM pg_stat_activity
                      WHERE state='active' AND pid<>pg_backend_pid()) AS active_sessions,
                     (SELECT count(*) FROM pg_stat_activity
@@ -52,18 +74,25 @@ with connect() as db:
                     ) AS details_json
                 FROM pg_stat_wal w CROSS JOIN pg_stat_bgwriter b
                 JOIN pg_stat_database d ON d.datname=current_database()
-            ''', (TABLE.as_string(),)).fetchone()
+            ''').fetchone()
+            row.update(sizes)
             row['details_json'] = json.dumps(row['details_json'])
-            sqlite.execute('INSERT INTO samples VALUES (' + ','.join('?' for _ in row) + ')', list(row.values()))
+            if starting_lsn is None:
+                starting_lsn = row['wal_position_bytes']
+            row['wal_generated_bytes'] = row['wal_position_bytes'] - starting_lsn
+            sqlite.execute('INSERT INTO samples (' + ','.join(row) + ') VALUES ('
+                           + ','.join('?' for _ in row) + ')', list(row.values()))
             sqlite.commit()
             now = time.monotonic()
             rate = None if previous is None else (row['wal_position_bytes']-previous[1])/(now-previous[0])
             def mb(value):
-                return '?' if value is None else f'{value / 1024**2:.1f} MB'
-            print(f"{row['time']} | WAL/s {mb(rate)} | WAL disk {mb(row['wal_directory_bytes'])}"
+                return '?' if value is None else f'{value / 1024**2:.1f} MiB'
+            print(f"{row['time']} | WAL rate {mb(rate)}/s"
                   f" | Barman retained {mb(row['barman_retained_bytes'])}"
-                  f" | DB {mb(row['database_bytes'])} | table {mb(row['test_table_bytes'])}"
-                  f" | active {row['active_sessions']} waiting {row['waiting_sessions']}", flush=True)
+                  f" | data DB {mb(row['database_bytes'])} | fmp {mb(row['fmp_bytes'])}"
+                  f" | postgres {mb(row['postgres_bytes'])} | table {mb(row['test_table_bytes'])}"
+                  f" | active {row['active_sessions']} waiting {row['waiting_sessions']}"
+                  f" | WAL generated {mb(row['wal_generated_bytes'])} | WAL disk {mb(row['wal_directory_bytes'])}", flush=True)
             previous = (now, row['wal_position_bytes'])
             time.sleep(1)
     except KeyboardInterrupt:

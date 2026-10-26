@@ -7,7 +7,7 @@ with connect() as db:
             WITH batch AS (
                 SELECT ctid FROM {table}
                 WHERE date_change_utc IS NULL AND date_change IS NOT NULL
-                LIMIT 500
+                LIMIT 5000
             )
             UPDATE {table} t
             SET date_change_utc =

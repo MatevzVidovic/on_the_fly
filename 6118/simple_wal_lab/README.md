@@ -7,7 +7,6 @@ Both `date_change` and `date_change_utc` must already exist as timestamp without
 ```bash
 cd /Users/matevzvidovic/on_the_fly/6118/simple_wal_lab
 source .venv/bin/activate
-cp .env.example .env
 # Edit .env with the staging connection and target table.
 ```
 
@@ -50,3 +49,13 @@ Dependencies are installed in `.venv`; to recreate:
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 ```
+
+Tracker output also includes cumulative WAL generated since tracker start and the
+sizes of databases named `fmp` and `postgres` (unknown if absent/inaccessible).
+WAL lives in the cluster-wide `pg_wal` directory, not inside either database's
+reported size. Existing SQLite files are extended automatically with these metrics;
+older samples have NULL in the new columns. Displayed sizes use MiB (1024² bytes).
+
+Database and table sizes refresh every 30 seconds; intervening printed/SQLite
+samples repeat the last measured sizes. WAL, Barman and activity refresh each
+second. The final printed columns are WAL generated and WAL disk.
