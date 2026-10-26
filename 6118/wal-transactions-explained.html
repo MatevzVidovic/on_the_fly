@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Where an uncommitted change lives · PostgreSQL</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f4f4ef,#151a20);--panel:light-dark(#fffefa,#20262e);--ink:light-dark(#1e2b35,#eaf0f5);--muted:light-dark(#52616b,#abb8c4);--line:light-dark(#d5ddd9,#3c4854);--blue:light-dark(#175c93,#9bccff);--blue-bg:light-dark(#e8f1f9,#22394c);--green:light-dark(#1d6847,#9bdbb9);--green-bg:light-dark(#e7f3eb,#223b30);--orange:light-dark(#8e450d,#ffc696);--orange-bg:light-dark(#fff0df,#463122);--red:light-dark(#9c373c,#ffb6ba);--red-bg:light-dark(#fbeaec,#482a31)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}main{max-width:1180px;margin:auto;padding:42px 28px}h1{font-size:clamp(32px,4.7vw,54px);line-height:1.1;letter-spacing:-.045em;max-width:850px;margin:10px 0 16px;font-weight:650}h2{font-size:23px;letter-spacing:-.025em;line-height:1.25;margin:0 0 12px}h3{font-size:17px;margin:0 0 8px;line-height:1.3}p{margin:0 0 12px}.eyebrow{font-size:12px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);margin:0}.intro{max-width:850px;color:var(--muted);font-size:19px}.intro strong{color:var(--ink)}code,.mono{font: .88em ui-monospace,SFMono-Regular,Consolas,monospace}.mono{font-variant-numeric:tabular-nums}.lead-rule{margin:22px 0;padding:18px 21px;border-radius:12px;background:var(--blue-bg);display:grid;grid-template-columns:auto 1fr;gap:16px;align-items:center}.lead-rule .tag{font-size:12px;font-weight:650;text-transform:uppercase;letter-spacing:.08em;color:var(--blue)}.lead-rule p{margin:0}.lead-rule small{display:block;color:var(--muted);margin-top:4px;font-size:13px}button,select{font:inherit;font-size:14px;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:9px 14px}button{cursor:pointer}button[aria-pressed="true"]{background:var(--ink);color:var(--panel);border-color:var(--ink)}button:disabled{opacity:.4;cursor:default}button:hover:not(:disabled):not([aria-pressed="true"]){background:var(--blue-bg)}button:focus-visible,select:focus-visible,input:focus-visible,a:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline-offset:3px}.controls{display:flex;justify-content:space-between;gap:16px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.endings{display:flex;gap:7px;flex-wrap:wrap}.reader-control{font-size:13px;color:var(--muted);display:flex;align-items:center;gap:8px}.reader-control select{max-width:210px}.simulator{border:1px solid var(--line);border-radius:16px;background:var(--panel);padding:23px}.step-heading{display:grid;grid-template-columns:1fr auto;gap:15px;align-items:start}.step-label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.08em;margin:0 0 5px}.step-heading h2{margin:0}.sql-now{margin:14px 0 0;background:var(--bg);padding:10px 13px;border-radius:7px;overflow-wrap:anywhere;min-height:43px}.step-description{color:var(--muted);font-size:14px;margin:10px 0 18px;max-width:890px;min-height:44px}.step-actions{display:flex;gap:7px}.step-actions button{white-space:nowrap}.slider-row{display:flex;align-items:center;gap:12px;margin:17px 0 20px}.slider-row input{width:100%;accent-color:var(--blue)}.slider-row output{font-size:12px;color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}.phase-steps{display:flex;gap:5px;align-items:center;flex-wrap:wrap;margin-bottom:18px}.phase-steps button{font-size:11px;padding:5px 8px;border-radius:5px}.phase-steps button.done{background:var(--bg)}.phase-steps button.current{background:var(--blue-bg);border-color:var(--blue);color:var(--ink)}.readers{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:20px}.reader{padding:14px 16px;background:var(--bg);border-radius:10px;min-width:0}.reader-label{font-size:12px;color:var(--muted);margin-bottom:4px}.reader-value{display:flex;align-items:baseline;gap:10px}.reader-value strong{font-size:30px;line-height:1.3;letter-spacing:-.04em;font-weight:600}.reader-value span{font-size:12px;color:var(--muted)}.reader small{font-size:12px;display:block;margin-top:6px;color:var(--muted)}.status-value{font-size:16px!important;letter-spacing:0!important;line-height:2.4!important}.storage-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.storage-column{min-width:0}.storage-label{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);padding-bottom:8px;border-bottom:1px solid var(--line);margin-bottom:12px}.box{background:var(--bg);border-radius:10px;padding:15px;margin-bottom:12px;min-height:213px}.box.wal{background:var(--blue-bg);min-height:197px}.box-title{display:flex;justify-content:space-between;gap:10px;align-items:baseline;margin-bottom:11px}.box-title h3{margin:0}.badge{font-size:11px;color:var(--muted);text-align:right}.versions{display:grid;gap:7px;min-height:135px;align-content:start}.row-version{display:grid;grid-template-columns:32px 1fr auto;gap:9px;align-items:center;padding:9px 10px;background:var(--panel);border:1px solid var(--line);border-radius:7px;font-size:12px;min-height:39px}.row-version .version-id{color:var(--muted)}.row-version strong{font-size:16px}.row-version .tuple-meta{color:var(--muted);font-size:11px}.row-version.latest{background:var(--green-bg);border-color:transparent}.row-version.invisible{opacity:.62}.row-version .visibility{font-size:10px;padding:3px 5px;border-radius:4px;background:var(--bg);text-align:right}.empty{font-size:13px;color:var(--muted);padding:12px 0}.wal-record{display:grid;grid-template-columns:61px 1fr auto;gap:8px;align-items:baseline;font-size:12px;padding:8px 0;border-bottom:1px solid color-mix(in srgb,var(--ink) 12%,transparent)}.wal-record:last-child{border-bottom:0}.wal-record .lsn{font:11px ui-monospace,monospace;color:var(--muted)}.wal-record .record-state{font-size:10px;color:var(--muted);white-space:nowrap}.wal-record.released{opacity:.5;text-decoration:line-through}.wal-record.outcome{color:var(--green)}.wal-record.abort{color:var(--red)}.box-note{font-size:12px;color:var(--muted);margin:11px 0 0}.ordering{font-size:13px;padding:13px 15px;border-radius:8px;background:var(--orange-bg);margin:6px 0 0}.barman{display:grid;grid-template-columns:auto 1fr;gap:12px;align-items:baseline;padding:13px 0 0;font-size:13px;border-top:1px solid var(--line)}.barman span{color:var(--muted)}.live-note{margin-top:16px;padding:15px 17px;border-left:3px solid var(--blue);background:var(--blue-bg);border-radius:0 8px 8px 0;font-size:14px;min-height:76px}.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:15px}.legend i{display:inline-block;width:9px;height:9px;background:var(--green);border-radius:2px;margin-right:6px}.scope{font-size:12px;color:var(--muted);margin:16px 0 0}.answers{display:grid;grid-template-columns:1fr 1fr;gap:24px 32px;margin:32px 0}.answer{min-width:0}.answer .number{font-size:12px;color:var(--muted)}.answer h2{font-size:19px;margin:7px 0 10px}.answer p{font-size:14px;color:var(--muted)}.answer strong{color:var(--ink)}.two-jobs{display:grid;grid-template-columns:1fr 1fr;gap:12px}.job{background:var(--panel);padding:17px;border-radius:10px;border:1px solid var(--line)}.job h3{font-size:16px}.job p{font-size:13px;color:var(--muted);margin:0}.incident{background:var(--orange-bg);padding:21px;border-radius:12px;margin:28px 0}.incident h2{font-size:20px}.incident p{font-size:14px;max-width:900px}.incident-flow{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin:16px 0;font-size:13px}.incident-flow strong{background:var(--panel);padding:8px 11px;border-radius:6px}.incident .fine{font-size:12px;color:var(--muted);margin-bottom:0}details{border-top:1px solid var(--line);padding:15px 0;font-size:14px}summary{cursor:pointer;font-weight:600}details p{color:var(--muted);margin:12px 0 0;max-width:930px}footer{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);font-size:12px;color:var(--muted)}footer a,a{color:var(--blue);text-underline-offset:3px}.source-links{display:flex;gap:7px 17px;flex-wrap:wrap;margin-top:9px}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}[hidden]{display:none!important}@media(max-width:750px){main{padding:28px 16px}.simulator{padding:16px}.controls{align-items:flex-start}.reader-control{flex-wrap:wrap}.step-heading{grid-template-columns:1fr}.step-description{min-height:0}.readers{gap:7px}.reader{padding:11px}.reader-value{display:block}.reader-value strong{font-size:26px}.reader-value span{display:block}.status-value{font-size:13px!important;line-height:1.8!important}.storage-grid{gap:12px}.row-version{grid-template-columns:24px 1fr;padding:8px}.row-version .visibility{grid-column:2;font-size:10px;text-align:left}.box{padding:12px;min-height:247px}.box.wal{min-height:220px}.wal-record{grid-template-columns:1fr;gap:2px;padding:8px 0}.answers{gap:20px}.phase-steps{display:none}.barman{grid-template-columns:1fr;gap:4px}}@media(max-width:500px){.storage-grid,.answers,.two-jobs{grid-template-columns:1fr}.box,.box.wal{min-height:0}.versions{min-height:0}.wal-record{grid-template-columns:58px 1fr auto;gap:6px}.row-version{grid-template-columns:25px 1fr auto}.row-version .visibility{grid-column:auto}.readers{grid-template-columns:1fr 1fr}.reader:last-child{grid-column:1/-1}.reader:last-child .reader-value{display:flex}.step-actions{justify-content:flex-end}.endings button{flex:1 0 42%;font-size:12px}.badge{max-width:130px}.slider-row{margin:12px 0}.intro{font-size:17px}}@media(prefers-reduced-motion:no-preference){.row-version,.wal-record{transition:opacity .18s,background .18s}}@media print{.controls,.step-actions,.slider-row,.phase-steps{display:none}main{padding:0}.simulator,.incident,.answer,.job{break-inside:avoid}details{display:block}details>*{display:block}a{color:inherit}}
+</style>
+</head>
+<body>
+<main id="wal-transactions">
+<header>
+  <p class="eyebrow">PostgreSQL · WAL, row versions &amp; recoverability</p>
+  <h1>Where does an uncommitted change live?</h1>
+  <p class="intro">A row goes from <strong>100 → 80 → 60</strong> inside one transaction. Follow its physical versions, its recovery records, and what another connection can actually read.</p>
+</header>
+<div class="lead-rule"><span class="tag">Two jobs</span><p><strong>MVCC decides which row version you can see. WAL makes storage recoverable.</strong><small>Committed, visible, in memory, and on disk are different properties.</small></p></div>
+
+<div class="controls">
+  <div class="endings" role="group" aria-label="Choose the transaction ending">
+    <button type="button" data-ending="commit" aria-pressed="true">Commit</button>
+    <button type="button" data-ending="rollback" aria-pressed="false">Rollback</button>
+    <button type="button" data-ending="crash-before" aria-pressed="false">Crash before commit</button>
+    <button type="button" data-ending="crash-after" aria-pressed="false">Crash after commit</button>
+  </div>
+  <label class="reader-control" for="reader-isolation">Connection B<select id="reader-isolation"><option value="rc">Read Committed</option><option value="rr">Repeatable Read</option></select></label>
+</div>
+
+<section class="simulator" aria-label="Interactive transaction and storage walkthrough">
+  <div class="step-heading"><div><p class="step-label" id="step-label"></p><h2 id="step-title"></h2></div><div class="step-actions"><button id="back" type="button">← Back</button><button id="next" type="button">Next →</button></div></div>
+  <div class="sql-now mono" id="sql-now"></div>
+  <p class="step-description" id="step-description"></p>
+  <div class="slider-row"><label class="sr-only" for="timeline">Timeline step</label><input id="timeline" type="range" min="0" max="9" value="3"><output id="step-count" for="timeline"></output></div>
+  <nav class="phase-steps" id="phase-steps" aria-label="Jump to a step"></nav>
+
+  <div class="readers" aria-label="Logical visibility at this step">
+    <div class="reader"><div class="reader-label">Connection A · writer</div><div class="reader-value"><strong id="writer-value"></strong><span id="writer-label"></span></div><small id="writer-note"></small></div>
+    <div class="reader"><div class="reader-label">Connection B · ordinary SELECT</div><div class="reader-value"><strong id="reader-value"></strong><span id="reader-label"></span></div><small id="reader-note"></small></div>
+    <div class="reader"><div class="reader-label">Transaction T42</div><div class="reader-value"><strong class="status-value" id="transaction-status"></strong></div><small id="status-note"></small></div>
+  </div>
+
+  <div class="storage-grid">
+    <section class="storage-column" aria-label="Shared memory, lost on crash">
+      <div class="storage-label">RAM · shared, bounded buffers</div>
+      <div class="box"><div class="box-title"><h3>Cached table page</h3><span class="badge" id="memory-badge"></span></div><div id="memory-versions" class="versions"></div><p id="memory-note" class="box-note"></p></div>
+      <div class="box wal"><div class="box-title"><h3>WAL buffers</h3><span class="badge">Generate as work happens</span></div><div id="wal-memory"></div><p class="box-note">Buffers can be flushed and reused before the transaction finishes. The entire transaction does not have to fit in RAM.</p></div>
+    </section>
+    <section class="storage-column" aria-label="Durable storage, survives crash">
+      <div class="storage-label">Disk · survives a server crash</div>
+      <div class="box"><div class="box-title"><h3>Table file · heap</h3><span class="badge" id="disk-badge"></span></div><div id="disk-versions" class="versions"></div><p id="disk-note" class="box-note"></p></div>
+      <div class="box wal"><div class="box-title"><h3>WAL files · pg_wal</h3><span class="badge">One ordered cluster-wide stream</span></div><div id="wal-disk"></div><p id="wal-disk-note" class="box-note"></p></div>
+    </section>
+  </div>
+  <p class="ordering" id="ordering"></p>
+  <div class="barman"><strong>Barman’s physical slot</strong><span id="barman-note"></span></div>
+  <div class="live-note" id="live-note" aria-live="polite"></div>
+  <div class="legend"><span><i></i>Highlighted version = visible to connection B now</span><span><code>xmin</code> = creator XID</span><span><code>xmax</code> = replacing/deleting XID in this example</span></div>
+  <p class="scope">Illustrative XIDs and LSNs, not real measurements. T7 created the original row and committed earlier. Only the two UPDATE records and transaction outcome are shown; index, checkpoint, full-page-image and vacuum WAL are omitted. Durability assumes a logged table, fsync enabled, synchronous_commit=on, and no two-phase prepared transaction.</p>
+</section>
+
+<div class="answers">
+  <section class="answer"><span class="number">01 / YOUR WAL QUESTION</span><h2>“A separate history of everything that changed?”</h2><p>Broadly, <strong>yes: a separate ordered recovery stream on disk</strong>. Records describe storage operations on pages, tuples and indexes; some contain whole-page images. They carry enough information to redo those operations. WAL positions are called LSNs.</p><p>It is <strong>not a per-table, human-readable audit trail</strong> of every SQL statement and its timestamp. Records from different tables and transactions share the stream, and old WAL is eventually recycled or removed.</p></section>
+  <section class="answer"><span class="number">02 / YOUR COMMIT QUESTION</span><h2>“How does it know what changed at the end?”</h2><p><strong>It recorded the changes while executing each statement.</strong> Row headers identify the transaction that created or replaced a version. WAL records were generated along the way.</p><p>COMMIT records the outcome and, with the assumed settings, waits for the commit WAL record to be durable. It does not compare before/after tables, walk every changed row to publish it, or copy a private transaction-sized dataset into the table. Outcome bits are cached and tracked in <code>pg_xact</code>; recovery can restore them from durable WAL.</p></section>
+  <section class="answer"><span class="number">03 / YOUR UNFINISHED TRANSACTION QUESTION</span><h2>“Where are its changes stored meanwhile?”</h2><p>In <strong>new row versions in normal table pages</strong>, initially modified in shared buffers. An UPDATE also records the replacing XID on the old version. Those pages can be flushed to disk <strong>before commit</strong>, provided the corresponding WAL is durable first.</p><p>Other readers can encounter those bytes in memory or on disk. MVCC uses their snapshot, transaction status and row headers to ignore versions they cannot see. Ordinary SELECT does not replay WAL to reconstruct an older row.</p></section>
+  <section class="answer"><span class="number">04 / YOUR ROLLBACK QUESTION</span><h2>“Does rollback write every old value back?”</h2><p>For this ordinary UPDATE, <strong>no reverse UPDATE is needed</strong>. After T42 aborts, versions it created are invisible. Its attempted replacement of the old row has no effect on visibility, so the original committed version remains readable.</p><p>Physical garbage can remain until pruning or vacuum reclaims it. Rollback does not unwind the WAL stream or instantly shrink files; it also does not undo work committed by an earlier transaction.</p></section>
+</div>
+
+<div class="two-jobs">
+  <section class="job"><h3>Crash recovery: REDO storage safely</h3><p>Start from the recovery checkpoint and replay valid durable WAL as needed. A page’s LSN helps determine which changes it already has. Restore transaction outcomes too: a transaction without a durable commit is not treated as committed. Even if its tuple bytes are reconstructed, those tuples remain invisible.</p></section>
+  <section class="job"><h3>MVCC: select the visible version</h3><p>The writer sees its own completed statements. At Read Committed, each new ordinary SELECT gets a new snapshot. At Repeatable Read, an established snapshot can keep seeing the old version after another transaction commits. An UPDATE or SELECT FOR UPDATE can wait on the writer instead of behaving like these plain reads.</p></section>
+</div>
+
+<section class="incident"><h2>Why our failed backfill still filled storage</h2><div class="incident-flow"><strong>Millions of UPDATEs</strong><span aria-hidden="true">→</span><strong>New tuple + index versions</strong><span aria-hidden="true">+</span><strong>WAL produced before COMMIT</strong><span aria-hidden="true">→</span><strong>Barman falls behind</strong></div><p>Aborting the transaction stopped its changes from becoming visible. It did not erase the already-written tuples or WAL. Barman’s physical stream can receive that WAL before commit; it must preserve physical recovery information even for work that later aborts.</p><p><strong>Two different cleanup jobs:</strong> pruning/vacuum makes dead-row space reusable in tables. WAL recycling/removal depends on checkpoint progress, backup/replication consumers and retention settings. A shrinking slot backlog is not a direct measurement of filesystem space returned.</p><p class="fine">These diagrams explain the mechanism. They do not infer the exact crash cause or current state of any remote database.</p></section>
+
+<details><summary>The header numbers are not the entire visibility algorithm</summary><p><code>xmin</code> and <code>xmax</code> are transaction IDs, not timestamps. PostgreSQL also consults snapshots, active-transaction information, transaction status and hint bits; command IDs distinguish successive statements inside the same transaction. An <code>xmax</code> value does not alone prove a row was deleted: its transaction may have aborted, and locks/MultiXacts use these fields too. Here the IDs show only one simple UPDATE chain.</p></details>
+<details><summary>Does the whole transaction stay in memory until COMMIT?</summary><p>No. Both table-page buffers and WAL buffers are reused while the transaction is running. PostgreSQL flushes them as necessary, respecting WAL-before-data ordering. A huge transaction can generate huge disk usage without keeping every changed row or WAL record in RAM. Sort/hash operations, locks and other transaction resources can still consume memory.</p></details>
+<details><summary>What if it crashes before the abort record is flushed?</summary><p>For the ordinary transactions shown here, recovery does not require a durable ABORT record to keep uncommitted work invisible. A transaction lacking a valid durable COMMIT is not committed. Conversely, after a normal durable COMMIT, recovery must preserve the committed result even if cached pages were lost. This is why we separate physical recovery from row visibility.</p></details>
+
+<footer>
+  PostgreSQL 15 model · diagram deliberately shows a legal flush-before-commit sequence, not the only possible scheduling order. This file is self-contained and makes no database or network requests. <a href="wal-explained.html">Earlier WAL overview ↗</a>
+  <nav class="source-links" aria-label="Primary sources"><a href="https://www.postgresql.org/docs/15/wal-intro.html" target="_blank" rel="noreferrer">WAL ordering &amp; REDO ↗</a><a href="https://www.postgresql.org/docs/15/storage-page-layout.html" target="_blank" rel="noreferrer">Tuple headers &amp; page LSN ↗</a><a href="https://www.postgresql.org/docs/15/transaction-iso.html" target="_blank" rel="noreferrer">Snapshots &amp; isolation ↗</a><a href="https://www.postgresql.org/docs/15/runtime-config-wal.html#GUC-SYNCHRONOUS-COMMIT" target="_blank" rel="noreferrer">Durable commit ↗</a><a href="https://wiki.postgresql.org/wiki/Operations_cheat_sheet#WAL" target="_blank" rel="noreferrer">Transaction status &amp; rollback ↗</a><a href="https://www.postgresql.org/docs/15/routine-vacuuming.html" target="_blank" rel="noreferrer">Version cleanup ↗</a><a href="https://www.postgresql.org/docs/15/view-pg-replication-slots.html" target="_blank" rel="noreferrer">Slot retention ↗</a><a href="https://www.postgresql.org/docs/15/wal-configuration.html" target="_blank" rel="noreferrer">Checkpoints &amp; recycling ↗</a></nav>
+</footer>
+</main>
+<script>
+(() => {
+  'use strict';
+  const root = document.getElementById('wal-transactions');
+  const el = id => root.querySelector('#'+id);
+  let ending='commit', index=3, isolation='rc';
+  const common=['initial','begin','update1','update2','flushwal','flushheap'];
+  const tails={commit:['commit','checkpoint','vacuum','barman'],rollback:['rollback','checkpoint','vacuum','barman'],'crash-before':['crash','recover','checkpoint','vacuum','barman'],'crash-after':['commit','crash','recover','checkpoint','vacuum','barman']};
+  const copy={
+    initial:{short:'Original',title:'One committed version exists',sql:'SELECT balance FROM account WHERE id = 1;  -- 100',description:'T7 committed the original row. Both connections see 100. The demonstration starts after that earlier commit.',note:'There is already a committed row in the table. No table-sized copy is created for either connection.'},
+    begin:{short:'BEGIN',title:'A opens a transaction; B establishes its snapshot',sql:'A: BEGIN;     B: SELECT balance FROM account WHERE id = 1;  -- 100',description:'BEGIN does not ordinarily append a row-change WAL record. T42 is our illustrative writer ID; a real write XID is normally assigned on the first write.',note:'B has read 100 before A changes anything. Read Committed will refresh that snapshot for its next statement; Repeatable Read will keep it until its transaction ends.'},
+    update1:{short:'100 → 80',title:'The first UPDATE creates another row version',sql:'A: UPDATE account SET balance = 80 WHERE id = 1;',description:'V1 stays in the table, with xmax=42 recording the attempted replacement. New V2 has xmin=42. A sees its own 80; B still sees 100.',note:'The new value is already in a shared table-page buffer. It is not hidden in a private copy of the whole table. Visibility rules hide it from B.'},
+    update2:{short:'80 → 60',title:'The second UPDATE is recorded immediately too',sql:'A: UPDATE account SET balance = 60 WHERE id = 1;',description:'V3 is created by T42; V2 is replaced by T42. Command IDs distinguish the writer’s own statements. Recovery records exist for both changes before COMMIT.',note:'This answers “how does COMMIT know?” The work already happened and was tagged as T42. COMMIT will record the outcome, not rediscover all the changes.'},
+    flushwal:{short:'Flush WAL',title:'WAL can become durable before the transaction ends',sql:'Background activity: flush generated WAL records through 0/140.',description:'The two UPDATE records now survive a crash. The transaction is still uncommitted, so B continues reading the old version.',note:'WAL durability is not a visibility signal. Physical streaming to Barman can transfer these records now; it does not need to wait for COMMIT.'},
+    flushheap:{short:'Flush page',title:'Even the uncommitted row versions can be on disk',sql:'Buffer writer: flush the changed table page after its WAL is durable.',description:'The heap file now physically contains V1, V2 and V3. T42 remains uncommitted. Seeing those bytes on disk does not make V3 visible to another connection.',note:'This is a legal ordering: WAL first, table page second, COMMIT later. Disk does not contain only committed row versions.'},
+    commit:{short:'COMMIT',title:'COMMIT makes the outcome durable and publishable',sql:'A: COMMIT;  -- append the T42 commit record and durably flush through it',description:'With the assumed durability settings, success waits for local commit WAL to reach durable storage. No per-row copy-back or table comparison is needed.',note:'A new Read Committed SELECT can now see 60. B’s existing Repeatable Read snapshot can still see 100. The physical tuple values did not need to change at COMMIT.'},
+    rollback:{short:'ROLLBACK',title:'ROLLBACK aborts T42; the old version stays valid',sql:'A: ROLLBACK;  -- abort T42; release transaction resources',description:'T42-created V2 and V3 are invisible. V1’s xmax=42 is an aborted replacement and is ignored for visibility. No reverse UPDATE from 60 to 100 is required.',note:'The ABORT record is shown as generated, not necessarily synchronously flushed. Physical tuples and existing WAL remain; rollback does not reclaim those files.'},
+    crash:{short:'Crash',title:'The server crashes; memory disappears',sql:'Server crash / abrupt stop.  -- all sessions and cached buffers are lost',description:'Only durable WAL and table files survive. Connections A and B are gone. An old Repeatable Read snapshot cannot survive a server crash.',note:'The chosen example already flushed the table page. Recovery must check WAL and page LSNs even when many data changes are already present on disk.'},
+    recover:{short:'Recover',title:'REDO storage; restore transaction outcomes',sql:'Startup recovery: replay durable WAL from the recovery checkpoint as needed.',description:'Page LSNs avoid redoing changes a page already contains. Physical tuple data may include uncommitted changes; recovered transaction status controls whether they can be seen.',note:''},
+    checkpoint:{short:'Checkpoint',title:'Checkpoint advances the recovery starting point',sql:'Checkpointer: flush required dirty data and checkpoint metadata.',description:'A checkpoint helps bound crash recovery. It does not commit transactions or override backup retention. A slow Barman slot can still require older WAL.',note:'The heap and WAL have different cleanup rules. This checkpoint does not remove old row versions that an existing snapshot can still read.'},
+    vacuum:{short:'Vacuum',title:'After old snapshots finish, dead versions can be reclaimed',sql:'B ends any old snapshot; ordinary VACUUM reclaims eligible tuple space.',description:'For committed T42, V3 remains. For aborted T42, V1 remains. Pruning/vacuum can make the unused space reusable; ordinary vacuum generally does not shrink the whole file.',note:'We end B’s old snapshot at this step so it cannot pin an obsolete version. Vacuum cleans table/index storage; it does not erase retained WAL.'},
+    barman:{short:'WAL eligible',title:'Barman catches up; older WAL becomes eligible for recycling',sql:'Barman acknowledges its durable position; later checkpoint cleanup can recycle eligible segments.',description:'Recovery requirements, every replication slot, archiving and retention settings must allow release. Recycling can reuse an allocated file instead of immediately freeing filesystem space.',note:'A decreasing slot backlog and increasing filesystem free space are different measurements. A transaction ending, a vacuum finishing, or Barman advancing does not alone guarantee disk shrinkage.'}
+  };
+  const events=()=>common.concat(tails[ending]);
+  function state(){
+    const s={count:0,begun:false,tx:'not started',flushed:0,diskCount:0,offline:false,recovered:false,vacuum:false,checkpoint:false,caught:false,snapshotEnded:false,outcome:null};
+    for(const event of events().slice(0,index+1)){
+      if(event==='begin'){s.begun=true;s.tx='open · XID not assigned';}
+      if(event==='update1'||event==='update2'){s.count=event==='update1'?1:2;s.tx='in progress';}
+      if(event==='flushwal')s.flushed=2;
+      if(event==='flushheap')s.diskCount=2;
+      if(event==='commit'){s.outcome='commit';s.tx='COMMITTED';s.flushed=3;}
+      if(event==='rollback'){s.outcome='abort';s.tx='ABORTED';}
+      if(event==='crash'){s.offline=true;s.snapshotEnded=true;s.tx='recovery pending';}
+      if(event==='recover'){s.offline=false;s.recovered=true;s.tx=s.outcome==='commit'?'COMMITTED':'ABORTED';if(!s.outcome)s.outcome='abort-recovery';}
+      if(event==='checkpoint'){s.checkpoint=true;if(s.outcome==='abort')s.flushed=3;}
+      if(event==='vacuum'){s.vacuum=true;s.snapshotEnded=true;}
+      if(event==='barman')s.caught=true;
+    }
+    return s;
+  }
+  function logicalValue(s){
+    if(s.offline)return null;
+    if(s.tx==='COMMITTED')return isolation==='rr'&&!s.snapshotEnded?100:60;
+    return 100;
+  }
+  function rowData(count,s){
+    const rows=[{id:'V1',value:100,xmin:7,xmax:count?42:null}];
+    if(count>=1)rows.push({id:'V2',value:80,xmin:42,xmax:count===2?42:null});
+    if(count>=2)rows.push({id:'V3',value:60,xmin:42,xmax:null});
+    if(s.vacuum)return s.tx==='COMMITTED'?rows.filter(r=>r.id==='V3'):rows.filter(r=>r.id==='V1');
+    return rows;
+  }
+  function renderRows(count,s,memory){
+    if(memory&&s.offline)return '<div class="empty">Lost on crash. No readable buffer remains.</div>';
+    const visible=logicalValue(s);
+    return rowData(count,s).map(row=>{
+      const yes=!s.offline&&row.value===visible;
+      let label=yes?'B sees this':'not visible to B';
+      if(s.offline)label='physical bytes only';
+      const xmax=row.xmax===null?'—':row.xmax;
+      return `<div class="row-version ${yes?'latest':'invisible'}" data-version="${row.id}"><span class="version-id mono">${row.id}</span><div><strong>${row.value}</strong><div class="tuple-meta mono">xmin=${row.xmin} · xmax=${xmax}</div></div><span class="visibility">${label}</span></div>`;
+    }).join('');
+  }
+  function walRecords(s){
+    const records=[];
+    if(s.count>=1)records.push({lsn:'0/100',text:'T42 · replace V1, create V2 = 80',type:''});
+    if(s.count>=2)records.push({lsn:'0/140',text:'T42 · replace V2, create V3 = 60',type:''});
+    if(s.outcome==='commit')records.push({lsn:'0/180',text:'T42 · COMMIT',type:'outcome'});
+    if(s.outcome==='abort')records.push({lsn:'0/180',text:'T42 · ABORT',type:'abort'});
+    return records;
+  }
+  function renderWal(s,disk){
+    if(!disk&&s.offline)return '<div class="empty">Lost on crash.</div>';
+    if(!disk&&s.recovered)return '<div class="empty">The old buffers were lost. Recovery read durable WAL; these buffers now accept new records.</div>';
+    const records=walRecords(s).filter((r,i)=>!disk||i<s.flushed);
+    if(!records.length)return '<div class="empty">No demonstration records '+(disk?'durable yet.':'generated yet.')+'</div>';
+    return records.map((r,i)=>`<div class="wal-record ${r.type} ${s.caught&&disk?'released':''}"><span class="lsn">${r.lsn}</span><span>${r.text}</span><span class="record-state">${disk?(s.caught?'eligible*':'durable'):(i<s.flushed?'flushed':'pending flush')}</span></div>`).join('');
+  }
+  function render(){
+    const list=events();index=Math.max(0,Math.min(index,list.length-1));
+    const event=list[index],s=state(),item=copy[event];
+    root.dataset.ending=ending;root.dataset.event=event;root.dataset.step=index;
+    el('step-label').textContent=`Step ${index+1} of ${list.length} · ${ending.replaceAll('-',' ')}`;
+    el('step-title').textContent=item.title;el('sql-now').textContent=item.sql;el('step-description').textContent=item.description;
+    el('timeline').max=list.length-1;el('timeline').value=index;el('step-count').textContent=`${index+1} / ${list.length}`;
+    el('back').disabled=index===0;el('next').disabled=index===list.length-1;
+    el('phase-steps').innerHTML=list.map((e,i)=>`<button type="button" data-step="${i}" class="${i===index?'current':i<index?'done':''}" ${i===index?'aria-current="step"':''}>${copy[e].short}</button>`).join('');
+    const reader=logicalValue(s);
+    let writer=s.count===0?100:s.count===1?80:60;
+    if(s.tx==='ABORTED')writer=100;
+    el('writer-value').textContent=s.offline?'—':s.recovered?'—':writer;
+    el('writer-label').textContent=s.offline?'disconnected':s.recovered?'original connection gone':s.tx==='ABORTED'?'after rollback':s.tx==='COMMITTED'?'after commit':'own SELECT';
+    el('writer-note').textContent=s.offline?'All connections were terminated.':s.recovered?'Recovery does not reconnect the old client.':s.count&&s.tx==='in progress'?'Own completed UPDATEs are visible immediately.':'Ordinary row visibility in A.';
+    el('reader-value').textContent=reader===null?'—':reader;
+    el('reader-label').textContent=s.offline?'disconnected':s.recovered?'new connection':isolation==='rr'&&!s.snapshotEnded?'original snapshot':'fresh SELECT';
+    el('reader-note').textContent=s.offline?'No SELECT runs while the server is down.':isolation==='rr'&&!s.snapshotEnded?'Snapshot established before A’s first UPDATE.':'Read Committed: a snapshot at statement start.';
+    if(isolation==='rr'&&s.snapshotEnded&&!s.offline)el('reader-note').textContent='Old transaction ended; this is a new snapshot.';
+    el('transaction-status').textContent=s.tx;
+    el('status-note').textContent=s.tx==='COMMITTED'?'A commit record is durable in WAL.':s.tx==='ABORTED'?(s.recovered?'Recovered without a durable commit.':'T42-created versions are invisible.'):s.offline?'Transaction outcome will be recovered.':'Active transaction information + MVCC metadata.';
+    el('memory-versions').innerHTML=renderRows(s.count,s,true);el('disk-versions').innerHTML=renderRows(s.diskCount,s,false);
+    el('memory-badge').textContent=s.offline?'Lost':s.count>s.diskCount?'Dirty · newer than disk':s.vacuum?'Cleanup shown schematically':'Cached page';
+    el('memory-note').textContent=s.offline?'Shared buffers do not survive the crash.':'Buffers hold ordinary table pages, including multiple versions of the same logical row.';
+    el('disk-badge').textContent=s.diskCount?'Includes T42’s tuple versions':'Earlier durable page';
+    if(s.vacuum)el('disk-badge').textContent='Remaining live version';
+    el('disk-note').textContent=s.vacuum?'Reclaimed tuple space can be reused; table-file length need not shrink.':s.diskCount?'These bytes can exist before commit. MVCC still decides what readers see.':'The buffer can differ from this older on-disk page.';
+    el('wal-memory').innerHTML=renderWal(s,false);el('wal-disk').innerHTML=renderWal(s,true);
+    el('wal-disk-note').textContent=s.caught?'* Older segments may now be recycled/removed if all requirements allow. Files may remain allocated for reuse.':'WAL is for physical recovery and backup streaming. Plain SELECT reads visible tuple versions, not this history.';
+    el('ordering').textContent=s.diskCount?'Ordering satisfied: the UPDATE WAL was durable before the changed heap page was flushed. That does not require the transaction to have committed.':'Required ordering: corresponding WAL must be durable before a changed table page becomes durable.';
+    el('barman-note').textContent=s.caught?'Acknowledged newer WAL. Eligible older segments can be recycled once every retention requirement allows.':s.flushed?'In this illustration its restart position is still behind. Durable WAL remains required, even if T42 aborted.':'Can receive WAL after it has been flushed, including records of transactions that have not committed.';
+    let note=item.note;
+    if(event==='recover')note=s.tx==='COMMITTED'?'The durable COMMIT survived. A new reader must see the committed 60, even if some data pages had needed REDO.':'There was no durable COMMIT. Recovery may restore V2/V3 physically, but T42 is not committed; a new reader sees V1 = 100.';
+    if(event==='commit'&&isolation==='rr')note+=' Here B remains on its pre-commit snapshot, so it still sees 100.';
+    el('live-note').textContent=note;
+    for(const button of root.querySelectorAll('[data-ending]'))button.setAttribute('aria-pressed',String(button.dataset.ending===ending));
+  }
+  el('back').addEventListener('click',()=>{index--;render();});
+  el('next').addEventListener('click',()=>{index++;render();});
+  el('timeline').addEventListener('input',event=>{index=Number(event.target.value);render();});
+  el('reader-isolation').addEventListener('change',event=>{isolation=event.target.value;render();});
+  el('phase-steps').addEventListener('click',event=>{const button=event.target.closest('[data-step]');if(button){index=Number(button.dataset.step);render();}});
+  for(const button of root.querySelectorAll('[data-ending]'))button.addEventListener('click',()=>{ending=button.dataset.ending;index=Math.min(index,6);render();});
+  render();
+})();
+</script>
+</body>
+</html>
