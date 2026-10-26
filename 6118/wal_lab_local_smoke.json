@@ -1,0 +1,47 @@
+{
+  "environment": "disposable local PostgreSQL 15; no Barman",
+  "source_unchanged": true,
+  "source_rows": 100,
+  "source_null_dates": 10,
+  "validations": [
+    {
+      "time": "2026-10-26T13:01:32.186934+00:00",
+      "phase": "full",
+      "event": "validation",
+      "rows": 100,
+      "converted": 90,
+      "mismatches": 0,
+      "logged": true
+    },
+    {
+      "time": "2026-10-26T13:01:33.806960+00:00",
+      "phase": "unlogged_full",
+      "event": "validation",
+      "rows": 100,
+      "converted": 90,
+      "mismatches": 0,
+      "logged": true
+    },
+    {
+      "time": "2026-10-26T13:01:35.630932+00:00",
+      "phase": "batched",
+      "event": "validation",
+      "rows": 100,
+      "converted": 90,
+      "mismatches": 0,
+      "logged": true
+    },
+    {
+      "time": "2026-10-26T13:01:38.205333+00:00",
+      "phase": "unlogged_batched",
+      "event": "validation",
+      "rows": 100,
+      "converted": 90,
+      "mismatches": 0,
+      "logged": true
+    }
+  ],
+  "monitor_samples": 7,
+  "monitor_errors": 0,
+  "phase_csv": "phase,seconds,wal_bytes\nfull.setup,0.14392791700083762,41304\nfull.update,0.14456033299939008,9592\nunlogged_full.setup,0.1417549589968985,46976\nunlogged_full.set_unlogged,0.1522512919982546,20464\nunlogged_full.update,0.14483041699713795,40\nunlogged_full.set_logged,0.1503783329972066,21816\nbatched.setup,0.15845275000174297,35280\nbatched.batch,0.14590920900081983,6864\nbatched.batch,0.14678504100447753,7808\nbatched.batch,0.14570512500358745,384\nbatched.update,1.1239869170021848,15056\nunlogged_batched.setup,0.1462391250024666,37312\nunlogged_batched.set_unlogged,0.14693000000261236,11328\nunlogged_batched.batch,0.15072537499509053,40\nunlogged_batched.batch,0.14923570799874142,40\nunlogged_batched.batch,0.14560537500074133,0\nunlogged_batched.update,1.1401233340002364,80\nunlogged_batched.set_logged,0.1460600419959519,18112\n"
+}
