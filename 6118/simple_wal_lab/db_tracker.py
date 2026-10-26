@@ -4,7 +4,7 @@ import sqlite3
 import sys
 import time
 from psycopg.rows import dict_row
-from db import connect
+from db import connect, TABLE
 
 
 sqlite = sqlite3.connect(sys.argv[1] if len(sys.argv) > 1 else 'db_metrics.sqlite')
@@ -34,7 +34,7 @@ with connect() as db:
                     (SELECT max(pg_wal_lsn_diff(pg_current_wal_lsn(),restart_lsn))::bigint
                      FROM pg_replication_slots WHERE slot_name='barman') AS barman_retained_bytes,
                     pg_database_size(current_database()) AS database_bytes,
-                    pg_total_relation_size(to_regclass('simple_wal_lab.test_table')) AS test_table_bytes,
+                    pg_total_relation_size(to_regclass(%s)) AS test_table_bytes,
                     (SELECT count(*) FROM pg_stat_activity
                      WHERE state='active' AND pid<>pg_backend_pid()) AS active_sessions,
                     (SELECT count(*) FROM pg_stat_activity
@@ -52,7 +52,7 @@ with connect() as db:
                     ) AS details_json
                 FROM pg_stat_wal w CROSS JOIN pg_stat_bgwriter b
                 JOIN pg_stat_database d ON d.datname=current_database()
-            ''').fetchone()
+            ''', (TABLE.as_string(),)).fetchone()
             row['details_json'] = json.dumps(row['details_json'])
             sqlite.execute('INSERT INTO samples VALUES (' + ','.join('?' for _ in row) + ')', list(row.values()))
             sqlite.commit()
