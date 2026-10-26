@@ -1,0 +1,8 @@
+{
+  "reject_wrong_utc_type": true,
+  "refuse_overwrite_existing_comparison": true,
+  "separate_commits_and_restart_without_duplicates": true,
+  "reject_more_than_50000_rows": true,
+  "rejected_setup_leaves_no_partial_schema": true,
+  "reject_wrong_staging_endpoint_before_connection": true
+}

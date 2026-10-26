@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WAL: ahead of what?</title>
+  <style>
+    :root { color-scheme: light dark; --bg: light-dark(#f5f4ef,#171b20); --panel: light-dark(#fffefa,#20262d); --ink: light-dark(#202c36,#ecf0f3); --muted: light-dark(#56636d,#afbbc5); --line: light-dark(#d7ddd9,#3d4854); --blue: light-dark(#155b92,#9acbff); --blue-bg: light-dark(#eaf2f8,#24394b); --orange: light-dark(#93430e,#ffc49a); --orange-bg: light-dark(#fff0df,#443022); --green: light-dark(#26704d,#a2dcc0); --green-bg: light-dark(#edf5ed,#253b31); }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    main { max-width: 1060px; margin: auto; padding: 44px 28px 30px; }
+    .eyebrow { margin: 0 0 12px; font-size: 12px; letter-spacing: .13em; text-transform: uppercase; color: var(--muted); font-weight: 650; }
+    h1 { font-size: clamp(34px,5vw,55px); line-height: 1.08; letter-spacing: -.055em; margin: 0 0 16px; font-weight: 650; }
+    .intro { max-width: 730px; font-size: 19px; color: var(--muted); margin: 0 0 26px; }
+    strong { font-weight: 650; color: var(--ink); }
+    code { font: .88em ui-monospace,SFMono-Regular,Consolas,monospace; }
+    .rule { display: flex; gap: 18px; align-items: center; padding: 19px 22px; background: var(--blue-bg); border-radius: 12px; margin-bottom: 24px; }
+    .rule .symbol { font-size: 31px; color: var(--blue); flex: 0 0 auto; }
+    .rule p { margin: 0; }
+    .rule small { display: block; margin-top: 3px; color: var(--muted); }
+    .tabs { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 0 17px; }
+    button { color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 9px 17px; font: inherit; font-size: 14px; cursor: pointer; }
+    button[aria-selected="true"] { color: var(--panel); background: var(--ink); border-color: var(--ink); }
+    button:focus-visible, a:focus-visible { outline: 3px solid var(--blue); outline-offset: 4px; }
+    .diagram { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 23px; }
+    .diagram h2 { font-size: 20px; margin: 0 0 5px; letter-spacing: -.025em; }
+    .sub { color: var(--muted); font-size: 14px; margin: 0 0 22px; }
+    .flow { display: grid; grid-template-columns: 1fr 30px 1fr 30px 1fr; align-items: stretch; gap: 7px; }
+    .node { padding: 17px 15px 14px; border-radius: 10px; background: var(--bg); min-width: 0; }
+    .node .step { font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
+    .node h3 { margin: 8px 0 10px; font-size: 17px; line-height: 1.3; }
+    .node p { margin: 11px 0 0; font-size: 13px; color: var(--muted); }
+    .node.wal { background: var(--blue-bg); }
+    .node.warn { background: var(--orange-bg); }
+    .node.good { background: var(--green-bg); }
+    .arrow { display: grid; place-content: center; color: var(--muted); font-size: 25px; }
+    .blocks { display: flex; gap: 5px; min-height: 30px; align-items: stretch; margin-top: 12px; }
+    .block { width: 24px; background: var(--muted); opacity: .25; border-radius: 3px; }
+    .wal .block { background: var(--blue); opacity: .75; }
+    .warn .block { background: var(--orange); opacity: .65; }
+    .good .block { background: var(--green); opacity: .65; }
+    .block.faded { opacity: .18; }
+    .block.crossed { background: repeating-linear-gradient(135deg,var(--muted) 0 2px,transparent 2px 6px); opacity: .5; }
+    .note { margin: 20px 0 0; border-top: 1px solid var(--line); padding-top: 15px; font-size: 14px; }
+    .batch-demo { margin-top: 18px; padding-top: 15px; border-top: 1px solid var(--line); }
+    .batch-demo h3 { margin: 0 0 8px; font-size: 16px; }
+    .batch-demo p { margin: 8px 0; font-size: 13px; color: var(--muted); }
+    .batch-controls { display: flex; flex-wrap: wrap; gap: 7px; margin: 11px 0; }
+    .batch-controls button { padding: 6px 12px; font-size: 13px; }
+    .batch-controls button[aria-pressed="true"] { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+    .meter-row { display: grid; grid-template-columns: 85px 1fr 60px; align-items: center; gap: 10px; font-size: 13px; margin: 8px 0; font-variant-numeric: tabular-nums; }
+    .meter { height: 16px; border-radius: 3px; background: var(--bg); overflow: hidden; }
+    .meter i { height: 100%; display: block; border-radius: 3px; background: var(--muted); opacity: .5; }
+    .meter .result { opacity: .85; background: var(--blue); }
+    .batch-outcome { color: var(--ink) !important; }
+    .answers { display: grid; grid-template-columns: repeat(3,1fr); gap: 25px; margin-top: 28px; }
+    .answer .number { font: 13px ui-monospace,monospace; color: var(--muted); }
+    .answer h2 { font-size: 17px; line-height: 1.35; margin: 8px 0; letter-spacing: -.02em; }
+    .answer p { margin: 0; font-size: 14px; color: var(--muted); }
+    .takeaway { margin: 27px 0 18px; padding: 16px 19px; border-left: 3px solid var(--orange); background: var(--orange-bg); border-radius: 0 8px 8px 0; font-size: 14px; }
+    footer { font-size: 12px; color: var(--muted); border-top: 1px solid var(--line); padding-top: 15px; }
+    footer a { color: var(--blue); text-underline-offset: 3px; }
+    .sources { display: flex; flex-wrap: wrap; gap: 7px 18px; margin-top: 6px; }
+    [hidden] { display: none !important; }
+    @media (max-width: 660px) { main { padding: 26px 17px; } .intro { font-size: 17px; } .rule { padding: 16px; } .diagram { padding: 18px; } .flow { grid-template-columns: 1fr; gap: 8px; } .arrow { transform: rotate(90deg); height: 23px; } .node { padding: 13px 15px; } .node h3 { margin: 4px 0; } .blocks { float: right; margin: 0 0 0 10px; } .answers { grid-template-columns: 1fr; gap: 19px; } }
+    @media print { button { display: none; } [hidden] { display: block !important; } .diagram { margin-bottom: 15px; break-inside: avoid; } main { padding: 0; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <p class="eyebrow">PostgreSQL · a three-minute explanation</p>
+    <h1>Write ahead.<br>Ahead of <em>what</em>?</h1>
+    <p class="intro">Ahead of the <strong>durable table-page write</strong>. A transaction can be committed while some table pages still exist only in memory.</p>
+  </header>
+
+  <div class="rule">
+    <span class="symbol" aria-hidden="true">↳</span>
+    <p><strong>Save the recovery record before saving the changed data page.</strong><small>After a crash, PostgreSQL replays WAL to reconstruct the database. Barman preserves that same stream for backup recovery.</small></p>
+  </div>
+
+  <div class="tabs" role="tablist" aria-label="Explore WAL behavior">
+    <button id="tab-ahead" role="tab" aria-controls="panel-ahead" aria-selected="false" tabindex="-1" data-view="ahead">1 · The ordering rule</button>
+    <button id="tab-rollback" role="tab" aria-controls="panel-rollback" aria-selected="false" tabindex="-1" data-view="rollback">2 · A rollback</button>
+    <button id="tab-relog" role="tab" aria-controls="panel-relog" aria-selected="true" tabindex="0" data-view="relog">3 · Turning logging back on</button>
+    <button id="tab-retention" role="tab" aria-controls="panel-retention" aria-selected="false" tabindex="-1" data-view="retention">4 · Retention &amp; batches</button>
+  </div>
+
+  <section class="diagram" id="panel-ahead" role="tabpanel" aria-labelledby="tab-ahead" hidden>
+    <h2>“Ahead” describes storage ordering</h2>
+    <p class="sub">WAL records describe physical changes. They are not a list of SQL statements to execute again.</p>
+    <div class="flow">
+      <div class="node"><span class="step">Change in memory</span><h3>UPDATE creates a new row version</h3><div class="blocks" aria-hidden="true"><i class="block faded"></i><i class="block"></i></div><p>PostgreSQL also generates WAL records as it works.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node wal"><span class="step">Persist WAL first</span><h3>The recovery record reaches disk</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i></div><p>This must happen before the corresponding changed data page is written.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node good"><span class="step">Then the data page</span><h3>The table catches up on disk</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i></div><p>Recovery can replay the WAL if the server crashes before this write.</p></div>
+    </div>
+    <p class="note"><strong>COMMIT:</strong> with normal synchronous commit, PostgreSQL waits for the transaction’s WAL, including its commit record, to be durable. It need not flush every changed table page. Pages can also be written before commit, provided their WAL is durable first.</p>
+  </section>
+
+  <section class="diagram" id="panel-rollback" role="tabpanel" aria-labelledby="tab-rollback" hidden>
+    <h2>Rollback uses transaction visibility</h2>
+    <p class="sub">PostgreSQL’s WAL primarily supports REDO recovery, physical replication and point-in-time recovery.</p>
+    <div class="flow">
+      <div class="node"><span class="step">Before</span><h3>Old row version is visible</h3><div class="blocks" aria-hidden="true"><i class="block"></i></div><p>Existing committed data stays available.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node wal"><span class="step">During UPDATE</span><h3>A new version + WAL records</h3><div class="blocks" aria-hidden="true"><i class="block faded"></i><i class="block"></i></div><p>WAL can already be on disk before the transaction finishes.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node warn"><span class="step">ROLLBACK</span><h3>The transaction is aborted</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block crossed"></i></div><p>Its new row version is invisible; vacuum later reclaims dead versions.</p></div>
+    </div>
+    <p class="note"><strong>No reverse UPDATE is needed.</strong> WAL already generated remains part of the recovery stream. Rollback does not erase those files or override Barman’s retention requirements.</p>
+  </section>
+
+  <section class="diagram" id="panel-relog" role="tabpanel" aria-labelledby="tab-relog">
+    <h2><code>SET LOGGED</code> is a new operation happening now</h2>
+    <p class="sub">The old UPDATE has finished. The conversion must now make the table’s current contents recoverable.</p>
+    <div class="flow">
+      <div class="node warn"><span class="step">Already backfilled</span><h3>Unlogged table has the new values</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i><i class="block"></i></div><p>These data changes bypassed WAL. They are absent from physical replication.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node wal"><span class="step">ALTER TABLE … SET LOGGED</span><h3>WAL records the current table contents</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i><i class="block"></i></div><p>PostgreSQL rewrites the table into logged storage. This is the expensive step.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node good"><span class="step">Protected new storage</span><h3>The logged copy is replayable</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i><i class="block"></i></div><p>Its WAL precedes durable writes of the new pages. Barman must receive that WAL.</p></div>
+    </div>
+    <p class="note"><strong>What gets logged afterward?</strong> The data needed to reconstruct the <em>new logged copy</em>, containing the table’s present values. PostgreSQL does not re-run yesterday’s SQL or reconstruct its missing statement history.</p>
+  </section>
+
+  <section class="diagram" id="panel-retention" role="tabpanel" aria-labelledby="tab-retention" hidden>
+    <h2>WAL has no fixed expiry time</h2>
+    <p class="sub">WAL from an UPDATE and WAL from SET LOGGED follow the same retention rules.</p>
+    <div class="flow">
+      <div class="node wal"><span class="step">Generated</span><h3>WAL occupies disk space</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i><i class="block"></i></div><p>COMMIT and ROLLBACK do not delete the generated WAL.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node warn"><span class="step">Retained while needed</span><h3>The oldest requirement wins</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block"></i><i class="block"></i></div><p>Crash recovery, any replication slot, archiving if enabled, and configured retention can keep old WAL.</p></div>
+      <span class="arrow" aria-hidden="true">→</span>
+      <div class="node good"><span class="step">Eligible at a checkpoint</span><h3>Recycle or remove old files</h3><div class="blocks" aria-hidden="true"><i class="block"></i><i class="block faded"></i></div><p>Recycling reuses allocated files. Removal returns filesystem space. A reserve remains.</p></div>
+    </div>
+    <p class="note"><strong>How long?</strong> With healthy consumers, requirements advance as WAL is received and checkpoints complete. A stalled slot can retain WAL indefinitely unless capped. Your five-minute checkpoint setting is <strong>not a five-minute WAL lifetime</strong>; <code>max_wal_size</code> is not a hard disk limit.</p>
+    <div class="batch-demo">
+      <h3>Do small commits suffice? Only with enough drain capacity.</h3>
+      <p>Illustration: start with 20 MB backlog; Barman can persist 12 MB per batch-and-pause cycle. Choose the WAL generated by <strong>all writers</strong> in that cycle:</p>
+      <div class="batch-controls" role="group" aria-label="Illustrative WAL generation per cycle">
+        <button type="button" data-generated="8" aria-pressed="true">8 MB / cycle</button>
+        <button type="button" data-generated="20" aria-pressed="false">20 MB / cycle</button>
+      </div>
+      <div class="meter-row"><span>Before</span><div class="meter" aria-hidden="true"><i style="width:50%"></i></div><span>20 MB</span></div>
+      <div class="meter-row"><span>After</span><div class="meter" aria-hidden="true"><i class="result" id="batch-meter" style="width:40%"></i></div><span id="batch-size">16 MB</span></div>
+      <p class="batch-outcome" id="batch-outcome" aria-live="polite">20 + 8 − 12 = 16 MB. The backlog drains by 4 MB per cycle.</p>
+      <p><strong>Batches create opportunities to pause and throttle.</strong> Rapid small commits can still fill the disk. Physical WAL streaming can run before COMMIT. Keep the table logged, monitor every retention requirement and actual disk space, and leave headroom for cleanup and normal traffic. Batching does not promise less total WAL.</p>
+    </div>
+  </section>
+
+  <div class="answers">
+    <section class="answer"><span class="number">01 / PURPOSE</span><h2>“Is WAL for rollback?”</h2><p>Its central job is to <strong>redo storage changes after a crash</strong>. PostgreSQL handles ordinary rollback using aborted transaction status and MVCC row visibility.</p></section>
+    <section class="answer"><span class="number">02 / COMMIT</span><h2>“But it already committed?”</h2><p>A committed unlogged UPDATE has <strong>no crash-survival guarantee for that table</strong>. PostgreSQL empties unlogged tables after a crash or unclean shutdown.</p></section>
+    <section class="answer"><span class="number">03 / BARMAN</span><h2>“Why can’t it just flip a flag?”</h2><p>The protected storage and WAL stream need a <strong>complete starting state</strong>. A flag alone would leave backup recovery without the table’s contents.</p></section>
+  </div>
+
+  <p class="takeaway"><strong>For our backfill:</strong> <code>SET LOGGED</code> can produce a large burst for the whole table. Paced logged batches spread WAL generation over time so Barman can catch up. Neither approach makes WAL permanently “sticky”; consumer progress and retention rules determine when it becomes removable.</p>
+
+  <footer>
+    Simplified storage diagrams; blocks illustrate data, not measured bytes. Assumes normal durable settings and replica/logical WAL level.
+    <nav class="sources" aria-label="PostgreSQL sources">
+      <a href="https://www.postgresql.org/docs/15/wal-intro.html" target="_blank" rel="noreferrer">WAL ordering &amp; recovery ↗</a>
+      <a href="https://wiki.postgresql.org/wiki/Operations_cheat_sheet#WAL" target="_blank" rel="noreferrer">REDO &amp; rollback ↗</a>
+      <a href="https://www.postgresql.org/docs/15/sql-createtable.html#SQL-CREATETABLE-UNLOGGED" target="_blank" rel="noreferrer">Unlogged guarantees ↗</a>
+      <a href="https://wiki.postgresql.org/wiki/What%27s_new_in_PostgreSQL_9.5#ALTER_TABLE_..._SET_LOGGED_.2F_UNLOGGED" target="_blank" rel="noreferrer">SET LOGGED writes table data ↗</a>
+      <a href="https://www.postgresql.org/docs/15/wal-configuration.html" target="_blank" rel="noreferrer">Recycling &amp; checkpoints ↗</a>
+      <a href="https://www.postgresql.org/docs/15/view-pg-replication-slots.html" target="_blank" rel="noreferrer">Slot retention ↗</a>
+      <a href="https://www.postgresql.org/docs/15/warm-standby.html#STREAMING-REPLICATION" target="_blank" rel="noreferrer">Physical streaming ↗</a>
+    </nav>
+  </footer>
+</main>
+<script>
+  (() => {
+    const tabs = Array.from(document.querySelectorAll('[role="tab"]'));
+    function select(tab) {
+      for (const item of tabs) {
+        const active = item === tab;
+        item.setAttribute('aria-selected', String(active));
+        item.tabIndex = active ? 0 : -1;
+        document.getElementById(item.getAttribute('aria-controls')).hidden = !active;
+      }
+    }
+    for (const [index, tab] of tabs.entries()) {
+      tab.addEventListener('click', () => select(tab));
+      tab.addEventListener('keydown', (event) => {
+        let next;
+        if (event.key === 'ArrowRight') next = tabs[(index + 1) % tabs.length];
+        if (event.key === 'ArrowLeft') next = tabs[(index + tabs.length - 1) % tabs.length];
+        if (event.key === 'Home') next = tabs[0];
+        if (event.key === 'End') next = tabs[tabs.length - 1];
+        if (next) { event.preventDefault(); select(next); next.focus(); }
+      });
+    }
+    const scenarios = Array.from(document.querySelectorAll('[data-generated]'));
+    for (const button of scenarios) {
+      button.addEventListener('click', () => {
+        const generated = Number(button.dataset.generated);
+        const after = Math.max(0, 20 + generated - 12);
+        for (const item of scenarios) item.setAttribute('aria-pressed', String(item === button));
+        document.getElementById('batch-meter').style.width = `${after / 40 * 100}%`;
+        document.getElementById('batch-size').textContent = `${after} MB`;
+        document.getElementById('batch-outcome').textContent = generated < 12
+          ? `20 + ${generated} − 12 = ${after} MB. The backlog drains by ${12 - generated} MB per cycle.`
+          : `20 + ${generated} − 12 = ${after} MB. The backlog grows by ${generated - 12} MB per cycle, despite small commits.`;
+      });
+    }
+  })();
+</script>
+</body>
+</html>
