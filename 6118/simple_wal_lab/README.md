@@ -33,7 +33,7 @@ Unlogged variants explicitly SET UNLOGGED before the backfill and SET LOGGED
 afterwards. If interrupted or failed, the table can remain unlogged. These
 operations rewrite the existing table; SET LOGGED generates WAL.
 
-Batch size is 500 with one second pauses, editable directly in the batch scripts.
+Batch size is 5,000 with one second pauses, editable directly in the batch scripts.
 Each UPDATE/batch/ALTER commits separately. No monitoring inside update scripts.
 
 The tracker prints samples and commits them to SQLite `samples` every second.
@@ -59,3 +59,7 @@ older samples have NULL in the new columns. Displayed sizes use MiB (1024² byte
 Database and table sizes refresh every 30 seconds; intervening printed/SQLite
 samples repeat the last measured sizes. WAL, Barman and activity refresh each
 second. The final printed columns are WAL generated and WAL disk.
+
+Batched scripts select IDs in ascending order and remember the last ID in RAM.
+They update using the indexed `id` column. Restarting starts the scan again but
+skips rows whose UTC field is already filled.
