@@ -63,3 +63,9 @@ second. The final printed columns are WAL generated and WAL disk.
 Batched scripts select IDs in ascending order and remember the last ID in RAM.
 They update using the indexed `id` column. Restarting starts the scan again but
 skips rows whose UTC field is already filled.
+
+The default printed line shows time, WAL rate, Barman retained, table size, WAL
+generated and WAL disk. Press `t` (no Enter) to show/hide database sizes and session
+counts. All metrics continue to be collected and saved regardless of display mode.
+Press `r` (no Enter) to immediately refresh database and table sizes and print a
+new sample. Automatic size refresh still runs every 30 seconds.

@@ -10,7 +10,7 @@ with connect() as db:
             WHERE date_change_utc IS NULL AND date_change IS NOT NULL
             {after}
             ORDER BY id
-            LIMIT 5000
+            LIMIT 50000
         """).format(table=TABLE, after=after),
             () if last_id is None else (last_id,)).fetchall()
         if not rows:

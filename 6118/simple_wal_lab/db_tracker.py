@@ -1,8 +1,11 @@
 """Print PostgreSQL 15 metrics every second and save them in SQLite. Ctrl+C stops."""
 import json
+import select
 import sqlite3
 import sys
+import termios
 import time
+import tty
 from psycopg.rows import dict_row
 from db import connect, TABLE
 
@@ -36,6 +39,11 @@ with connect() as db:
     starting_lsn = None
     sizes = {}
     next_size_check = 0
+    expanded = False
+    terminal = termios.tcgetattr(sys.stdin) if sys.stdin.isatty() else None
+    if terminal is not None:
+        tty.setcbreak(sys.stdin.fileno())
+    print('Press t to show/hide extra columns; r to refresh sizes. Ctrl+C stops tracking.', flush=True)
     try:
         while True:
             if time.monotonic() >= next_size_check:
@@ -87,15 +95,33 @@ with connect() as db:
             rate = None if previous is None else (row['wal_position_bytes']-previous[1])/(now-previous[0])
             def mb(value):
                 return '?' if value is None else f'{value / 1024**2:.1f} MiB'
-            print(f"{row['time']} | WAL rate {mb(rate)}/s"
-                  f" | Barman retained {mb(row['barman_retained_bytes'])}"
-                  f" | data DB {mb(row['database_bytes'])} | fmp {mb(row['fmp_bytes'])}"
-                  f" | postgres {mb(row['postgres_bytes'])} | table {mb(row['test_table_bytes'])}"
-                  f" | active {row['active_sessions']} waiting {row['waiting_sessions']}"
-                  f" | WAL generated {mb(row['wal_generated_bytes'])} | WAL disk {mb(row['wal_directory_bytes'])}", flush=True)
+            line = (f"{row['time']} | WAL rate {mb(rate)}/s"
+                    f" | Barman retained {mb(row['barman_retained_bytes'])}"
+                    f" | table {mb(row['test_table_bytes'])}")
+            if expanded:
+                line += (f" | data DB {mb(row['database_bytes'])} | fmp {mb(row['fmp_bytes'])}"
+                         f" | postgres {mb(row['postgres_bytes'])}"
+                         f" | active {row['active_sessions']} waiting {row['waiting_sessions']}")
+            line += (f" | WAL generated {mb(row['wal_generated_bytes'])}"
+                     f" | WAL disk {mb(row['wal_directory_bytes'])}")
+            print(line, flush=True)
             previous = (now, row['wal_position_bytes'])
-            time.sleep(1)
+            if terminal is None:
+                time.sleep(1)
+            else:
+                deadline = time.monotonic() + 1
+                while time.monotonic() < deadline:
+                    ready, _, _ = select.select([sys.stdin], [], [], max(0, deadline-time.monotonic()))
+                    if ready:
+                        key = sys.stdin.read(1).lower()
+                        if key == 't':
+                            expanded = not expanded
+                        elif key == 'r':
+                            next_size_check = 0
+                            break
     except KeyboardInterrupt:
         print('\nStopped; samples saved.', flush=True)
     finally:
+        if terminal is not None:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, terminal)
         sqlite.close()
