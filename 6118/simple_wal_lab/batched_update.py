@@ -16,7 +16,7 @@ with run_log(__file__) as run:
                 WHERE date_change_utc IS NULL AND date_change IS NOT NULL
                 {after}
                 ORDER BY id
-                LIMIT 50000
+                LIMIT 500000
             """).format(table=TABLE, after=after),
                 () if last_id is None else (last_id,)).fetchall()
             if not rows:
