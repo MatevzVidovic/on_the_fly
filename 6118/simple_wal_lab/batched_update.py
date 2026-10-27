@@ -10,18 +10,21 @@ with run_log(__file__) as run:
         last_id = None
         while True:
             wait_for_barman(db)
+            batch_started = time.perf_counter()
             after = sql.SQL('') if last_id is None else sql.SQL('AND id > %s')
             rows = db.execute(sql.SQL("""
                 SELECT id FROM {table}
                 WHERE date_change_utc IS NULL AND date_change IS NOT NULL
                 {after}
                 ORDER BY id
-                LIMIT 500000
+                LIMIT 50000
             """).format(table=TABLE, after=after),
                 () if last_id is None else (last_id,)).fetchall()
+            select_seconds = time.perf_counter() - batch_started
             if not rows:
                 break
             ids = [row[0] for row in rows]
+            update_started = time.perf_counter()
             result = db.execute(sql.SQL("""
                 UPDATE {table} t
                 SET date_change_utc =
@@ -29,7 +32,11 @@ with run_log(__file__) as run:
                 WHERE t.id = ANY(%s)
                   AND t.date_change_utc IS NULL AND t.date_change IS NOT NULL
             """).format(table=TABLE), (ids,))
-            print(f"Updated {result.rowcount} rows", flush=True)
+            update_seconds = time.perf_counter() - update_started
+            batch_seconds = time.perf_counter() - batch_started
+            print(f"Updated {result.rowcount} rows | select {select_seconds:.2f}s"
+                  f" | update {update_seconds:.2f}s | batch {batch_seconds:.2f}s"
+                  f" | {result.rowcount / batch_seconds:.0f} rows/s", flush=True)
             last_id = ids[-1]
             wait_for_barman(db)
             time.sleep(1)

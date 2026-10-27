@@ -86,3 +86,7 @@ without monitoring. Ctrl+C also stops a wait. These are between-statement checks
 not a hard cap: a running batch can exceed 2 GiB. The unlogged variant also checks
 before the logging changes and after SET LOGGED, but cannot pause SET LOGGED midway.
 This measures retained WAL on PostgreSQL, not the Barman server's archive disk size.
+
+Both batched scripts now use 50,000 rows. Each completed batch prints SELECT,
+UPDATE and total batch seconds, plus rows/second. These timings exclude the
+Barman wait and the one-second pause.
