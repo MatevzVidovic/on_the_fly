@@ -1,5 +1,6 @@
 from db import connect, sql, TABLE
 import time
+from datetime import datetime, timezone
 
 from run_log import run_log
 from barman import wait_for_barman
@@ -34,7 +35,7 @@ with run_log(__file__) as run:
             """).format(table=TABLE), (ids,))
             update_seconds = time.perf_counter() - update_started
             batch_seconds = time.perf_counter() - batch_started
-            print(f"Updated {result.rowcount} rows | select {select_seconds:.2f}s"
+            print(f"{datetime.now(timezone.utc).isoformat(timespec='seconds')} | Updated {result.rowcount} rows | select {select_seconds:.2f}s"
                   f" | update {update_seconds:.2f}s | batch {batch_seconds:.2f}s"
                   f" | {result.rowcount / batch_seconds:.0f} rows/s", flush=True)
             last_id = ids[-1]
