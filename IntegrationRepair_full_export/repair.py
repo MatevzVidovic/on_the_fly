@@ -11,8 +11,8 @@ from dotenv import load_dotenv
 import oracledb
 import psycopg
 
-from definition import IntegrationDefinition
-from source import OracleSource, wall_time
+from definition import IntegrationDefinition, check_run_definition
+from source import OracleSource, wall_time, utc_time
 from store import RepairStore
 from target import LiftTarget
 from timings import measure
@@ -20,13 +20,13 @@ from timings import measure
 
 def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None):
     if run_id is None:
-        cutoff = wall_time(definition.cutoff)
+        cutoff = utc_time(definition.cutoff)
         if min_date is not None and min_date > cutoff:
             raise ValueError('Minimum date must not be later than the integration cutoff')
-        run_id = store.create_run(definition.id, cutoff, definition.table, min_date)
+        run_id = store.create_run(definition.id, cutoff, definition.table, min_date,
+                                 [definition.date['api_name'], definition.date['target'], 'UTC'])
+    check_run_definition(store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone(), definition)
     run = store.resume_preparation(run_id)
-    if run['integration_id'] != definition.id or run['attribute_table_name'] != definition.table:
-        raise ValueError('Resume requires the same integration and target table')
     if run['prepared']:
         store.summary(run_id)
         return run_id
@@ -62,6 +62,7 @@ def prepare(definition, source, target, store, run_id=None, only_src=False, min_
 
 def apply(run_id, definition, source, target, store):
     run = store.require_prepared_run(run_id)
+    check_run_definition(run, definition)
     if run['applied']:
         store.summary(run_id)
         return
@@ -76,7 +77,7 @@ def apply(run_id, definition, source, target, store):
             payload = payloads.get(key)
             if payload is None:
                 warning = 'Oracle row disappeared'
-            elif wall_time(payload[definition.date['api_name']]) != entry['date']:
+            elif utc_time(payload[definition.date['api_name']]) != entry['date']:
                 warning = 'Oracle change time changed since prepare'
             else:
                 writes.append((entry['key'], payload))
@@ -118,7 +119,7 @@ def main():
         if args.resume:
             parser.error('resume reuses the saved minimum date; omit --min-date')
         try:
-            args.min_date = wall_time(datetime.fromisoformat(args.min_date))
+            args.min_date = utc_time(datetime.fromisoformat(args.min_date))
         except ValueError:
             parser.error('--min-date requires YYYY-MM-DD or an ISO datetime')
     if args.resume and args.id:
@@ -139,10 +140,6 @@ def main():
         if run is None:
             store.db.close()
             parser.error('repair run not found in this SQLite store')
-        if run['prepared']:
-            store.summary(args.resume)
-            store.db.close()
-            return
         integration_id = run['integration_id']
     if args.command == 'apply':
         run = store.require_prepared_run(args.id)

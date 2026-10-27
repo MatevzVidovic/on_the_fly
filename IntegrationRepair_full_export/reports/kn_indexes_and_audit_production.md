@@ -1,21 +1,23 @@
 # KN integration ID indexes and audit settings
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 **Environment:** production LIFT and the configured KN Oracle source. **Checked:** 2026-10-15T13:13:00.983441+00:00.
 
-Read-only catalog queries only. No indexes, constraints, integration parameters, or data were changed. Scope: all 21 current KN Oracle SQL delta integrations.
+Read-only catalog queries only. No indexes, constraints, integration parameters, or data were changed. Scope: all 20 KN Oracle SQL delta integrations in the remaining historical list.
 
 ## Findings
 
 | Check                                                                                            | Result      |
 | ------------------------------------------------------------------------------------------------ | ----------- |
-| LIFT unique B-tree index on the integration ID                                                   | **18 / 21** |
-| LIFT formal primary-key/unique constraint on the integration ID                                  | **0 / 21**  |
-| LIFT integration ID declared NOT NULL                                                            | **0 / 21**  |
-| Oracle enabled, validated single-column primary key and valid unique index on the integration ID | **20 / 21** |
-| Integration explicitly sets `ignore_audit: true`                                                 | **16 / 21** |
-| Integration omits `ignore_audit` (PHP defaults to false)                                         | **5 / 21**  |
+| LIFT unique B-tree index on the integration ID                                                   | **17 / 20** |
+| LIFT formal primary-key/unique constraint on the integration ID                                  | **0 / 20**  |
+| LIFT integration ID declared NOT NULL                                                            | **0 / 20**  |
+| Oracle enabled, validated single-column primary key and valid unique index on the integration ID | **19 / 20** |
+| Integration explicitly sets `ignore_audit: true`                                                 | **15 / 20** |
+| Integration omits `ignore_audit` (PHP defaults to false)                                         | **5 / 20**  |
 
-LIFT’s 18 indexes enforce uniqueness of non-null integration IDs even though they are standalone indexes rather than named UNIQUE constraints. The table UUID `id` primary key is separate and does not help lookups on the integration ID. All 21 LIFT integration ID columns are nullable `bigint`; this audit checked declarations, not whether existing rows actually contain nulls or duplicates.
+LIFT’s 17 indexes enforce uniqueness of non-null integration IDs even though they are standalone indexes rather than named UNIQUE constraints. The table UUID `id` primary key is separate and does not help lookups on the integration ID. All 20 LIFT integration ID columns are nullable `bigint`; this audit checked declarations, not whether existing rows actually contain nulls or duplicates.
 
 ## Configuration checklist by table
 
@@ -30,7 +32,6 @@ Each column reports the current state, so missing settings can be reviewed separ
 | `kn_nep_katastrske_obcine_h`                | **No**              | Yes                  | Yes                    | Yes                         | Yes                |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h`      | Yes                 | Yes                  | Yes                    | Yes                         | Yes                |
 | `kn_nep_ostalo_gozdno_gosp_obm`             | **No**              | Yes                  | **No**                 | **No**                      | **No**             |
-| `kn_nep_ostalo_namenske_rabe`               | Yes                 | Yes                  | Yes                    | Yes                         | Yes                |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h`   | Yes                 | Yes                  | Yes                    | Yes                         | Yes                |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | Yes                 | Yes                  | Yes                    | Yes                         | Yes                |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h`   | Yes                 | Yes                  | Yes                    | Yes                         | Yes                |
@@ -60,7 +61,6 @@ Each column reports the current state, so missing settings can be reviewed separ
 | `kn_nep_katastrske_obcine_h` | `KO_ID_H` | UI | PK + UI | **Absent — defaults false** |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | `DEJANSKA_RABA_H_ID` | UI | PK + UI | `true` — audit skipped |
 | `kn_nep_ostalo_gozdno_gosp_obm` | `GOZDNO_GOSP_OBM_ID` | UI | **Disabled PK; no ID index** | **Absent — defaults false** |
-| `kn_nep_ostalo_namenske_rabe` | `NAMENSKA_RABA_ID` | UI | PK + UI | `true` — audit skipped |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | `PARCELA_X_DEJANSKA_RABA_H_ID` | UI | PK + UI | `true` — audit skipped |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | `PARCELE_X_GOZDNO_GOSP_OBM_H_ID` | UI | PK + UI | `true` — audit skipped |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | `PARCELA_X_NAMENSKA_RABA_H_ID` | UI | PK + UI | `true` — audit skipped |
@@ -99,20 +99,19 @@ These tables have indexes on other fields, but none on the integration ID. In pa
 
 ### What this establishes about performance
 
-The other 18 LIFT tables and 20 Oracle integration mappings have index structures suitable for direct typed ID equality/IN lookups. All 21 integrations use direct single-column IDs; none need the EV text-composite-key split.
+The other 17 LIFT tables and 19 Oracle integration mappings have index structures suitable for direct typed ID equality/IN lookups. All 20 integrations use direct single-column IDs; none need the EV text-composite-key split.
 
 This was a catalog audit, not an execution-plan or timing benchmark. Index presence does not guarantee that every query uses it. Full inventory scans/counts still process many rows, payload geometry conversion can be expensive, and date filtering has separate indexing requirements. This report does not assess change-date indexes.
 
 ## Audit behavior in normal PHP integrations
 
-The local FMP `deltaSyncTable()` implementation initializes `$ignoreAudit = false`, reads `params.ignore_audit` when present, and passes the value to create/update/delete/save services. Therefore the following 16 integrations explicitly request audit suppression:
+The local FMP `deltaSyncTable()` implementation initializes `$ignoreAudit = false`, reads `params.ignore_audit` when present, and passes the value to create/update/delete/save services. Therefore the following 15 integrations explicitly request audit suppression:
 
 - `kn_nep_deli_stavb_h`
 - `kn_nep_etaze_h`
 - `kn_nep_etaze_x_deli_stavb_h`
 - `kn_nep_hisne_stevilke_h`
 - `kn_nep_ostalo_dejanske_rabe_parcel_h`
-- `kn_nep_ostalo_namenske_rabe`
 - `kn_nep_ostalo_parcele_x_dejanske_rabe_h`
 - `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h`
 - `kn_nep_ostalo_parcele_x_namenske_rabe_h`
@@ -147,7 +146,6 @@ Code evidence: [parameter default and read](../../symlinks/fmp/app/Repositories/
 | `kn_nep_katastrske_obcine_h` | `katastrske_obcine_h_ko_id_h_uidx` | `KATASTRSKE_OBCINE_H_PK` |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | `kn_nep_ostalo_dejanske_rabe_parcel_h_dejanska_raba_h_id_idx` | `DEJANSKE_RABE_H_PK` |
 | `kn_nep_ostalo_gozdno_gosp_obm` | `kn_nep_ostalo_gozdno_gosp_obm_pk` | `GOZDNO_GOSP_OBM_PK` (disabled; no index) |
-| `kn_nep_ostalo_namenske_rabe` | `kn_nep_ostalo_namenske_rabe_namenska_raba_id_idx` | `NAMENSKA_RABA_PK` |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | `kn_nep_ostalo_parcele_x_dejanske_rabe_h_pk` | `PARCELE_X_DEJANSKE_RABE_H_PK` |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_pk` | `PARCELE_X_GOZDNO_GOSP_OBM_H_PK` |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | `kn_nep_ostalo_parcele_x_namenske_rabe_h_pk` | `PARCELE_X_NAMENSKE_RABE_H_PK` |

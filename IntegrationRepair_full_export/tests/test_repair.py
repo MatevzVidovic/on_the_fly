@@ -162,3 +162,31 @@ def test_main_min_date_rejected_on_apply_or_resume(monkeypatch):
         with pytest.raises(SystemExit) as error:
             repair.main()
         assert error.value.code == 2
+
+
+def test_legacy_run_is_rejected_before_resume_or_apply_mutates_it(definition, store):
+    import pytest
+    run = store.create_run(definition.id, DATE, definition.table)
+    store.save_source(run, [(1, DATE)])
+    before = list(store.db.iterdump())
+    with pytest.raises(ValueError, match='fresh prepare'):
+        repair.prepare(definition, None, None, store, run_id=run)
+    assert list(store.db.iterdump()) == before
+    store.finish_preparation(run)
+    before = list(store.db.iterdump())
+    with pytest.raises(ValueError, match='fresh prepare'):
+        repair.apply(run, definition, None, None, store)
+    assert list(store.db.iterdump()) == before
+
+
+def test_prepare_utc_mapping_and_payload_dates_agree(definition, store):
+    from datetime import datetime, timezone, timedelta
+    definition.date.update(api_name='DATE_CHANGE_UTC', target='date_change_utc')
+    definition.cutoff = datetime(2025, 1, 2, 14, tzinfo=timezone(timedelta(hours=2)))
+    source = OracleSource(Database(Cursor([(1, '2025-01-02 12:00:00 +00:00')])), definition)
+    target = LiftTarget(Database(Cursor()), None, definition)
+    run = repair.prepare(definition, source, target, store)
+    saved = store.require_prepared_run(run)
+    assert saved['cutoff'] == DATE
+    assert saved['date_mapping'] == '["DATE_CHANGE_UTC", "date_change_utc", "UTC"]'
+    assert saved['upsert_count'] == 1

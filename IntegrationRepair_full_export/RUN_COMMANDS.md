@@ -1,4 +1,4 @@
-# Timed staging runs
+# Timed UTC repair runs
 
 These commands use this full-export copy, including deletions. Use fresh prepares;
 do not apply old prepared deletion lists. Run one table at a time, with regular
@@ -10,32 +10,32 @@ The repair user is hardcoded to `mvidovic` (`955ee6d4-d98e-11f0-bd04-de28270b37c
 cd /Users/matevzvidovic/on_the_fly/IntegrationRepair_full_export
 ```
 
-The existing `.venv` and `.env` work here. Each prepare prints its repair UUID.
+Use the existing `.venv` and confirm `.env` points to the intended environment. Each prepare prints its repair UUID.
 Review its upsert/removal counts before apply. Apply defaults to the newest run in
 the specified SQLite file; an explicit repair UUID remains optional.
 
 ## Small test: ev_pe_parc_h
 
 ```sh
-time .venv/bin/python repair.py --store full-ev-pe-parc.sqlite prepare 26856cbc-ae67-11f0-8b08-169cd02558fe
+time .venv/bin/python repair.py --store prod-utc-ev-pe-parc.sqlite prepare 26856cbc-ae67-11f0-8b08-169cd02558fe
 # Review the prepared counts, then apply the latest run:
-time .venv/bin/python repair.py --store full-ev-pe-parc.sqlite apply
+time .venv/bin/python repair.py --store prod-utc-ev-pe-parc.sqlite apply
 ```
 
 ## Medium test: kn_nep_deli_stavb_h
 
 ```sh
-time .venv/bin/python repair.py --store full-kn-deli.sqlite prepare bfe62b52-9aaf-11ef-9c54-0242ac120008
+time .venv/bin/python repair.py --store prod-utc-kn-deli.sqlite prepare bfe62b52-9aaf-11ef-9c54-0242ac120008
 # Review the prepared counts, then apply the latest run:
-time .venv/bin/python repair.py --store full-kn-deli.sqlite apply
+time .venv/bin/python repair.py --store prod-utc-kn-deli.sqlite apply
 ```
 
 ## Larger test: ev_parcela_h
 
 ```sh
-time .venv/bin/python repair.py --store full-ev-parcela.sqlite prepare c469d91a-ae56-11f0-84be-169cd02558fe
+time .venv/bin/python repair.py --store prod-utc-ev-parcela.sqlite prepare c469d91a-ae56-11f0-84be-169cd02558fe
 # Review the prepared counts, then apply the latest run:
-time .venv/bin/python repair.py --store full-ev-parcela.sqlite apply
+time .venv/bin/python repair.py --store prod-utc-ev-parcela.sqlite apply
 ```
 
 The small and medium tables already received repairs, so fresh runs measure their
@@ -46,16 +46,17 @@ speed. This copy also writes the entire Oracle inventory to SQLite during prepar
 After a failure, rerun the same apply command to resume. MVs and map displays can
 remain stale until the normal integration runs; this tool does not refresh them.
 
-## Resume the failed EV parcela prepare
+## Resume a new UTC preparation
 
-This legacy run has a completed Oracle export, so its first resume reuses Oracle
-and restarts LIFT comparison. Further interruptions use the new page checkpoints.
-Close the SQLite viewer before running:
+Only resume runs created after the UTC migration, with the same date mapping.
+Pre-migration run UUIDs are historical and require fresh prepares.
 
 ```sh
-time .venv/bin/python repair.py --store full-ev-parcela.sqlite prepare --resume f367fe38-f811-4d32-ab08-7ccc694f6955
+time .venv/bin/python repair.py --store prod-utc-ev-parcela.sqlite prepare --resume NEW_UTC_RUN_UUID
 ```
 
-For any new source-only export, append `--only-src` to prepare. Resume it with
-`prepare --resume RUN_UUID --only-src` to finish only Oracle, or omit `--only-src`
-to also compare LIFT and finish preparation. Apply still defaults to the latest run.
+Append `--only-src` to prepare to stop after the Oracle export. Resume with
+`prepare --resume NEW_UTC_RUN_UUID` to compare LIFT and finish preparation.
+
+Finish the UTC backfill, watermark corrections, and normal LIFT integrations before
+starting these commands. Do not apply historical pre-UTC plans.

@@ -9,7 +9,7 @@ import oracledb
 import psycopg
 from psycopg.rows import dict_row
 from count_ev import count_table
-from definition import IntegrationDefinition
+from definition import IntegrationDefinition, EXCLUDED_TABLES
 
 cfg = dotenv_values('.env')
 reference = dotenv_values('../KN_deltas_reason/reconciliation/.env')
@@ -27,7 +27,8 @@ with psycopg.connect(**pg, dbname=cfg['PG_DATABASE_SYSTEM'], autocommit=True) as
             JOIN attribute_tables t ON t.id=i.attribute_table_id
             JOIN attribute_table_sql_connections c ON c.id=i.attribute_table_sql_connection_id
             WHERE t.name LIKE 'kn_%' AND c.name='KN ORACLE'
-            AND NOT i.is_full_sync AND i.integration_type='sql' ORDER BY t.name""")
+            AND NOT i.is_full_sync AND i.integration_type='sql'
+            AND NOT (t.name=ANY(%s)) ORDER BY t.name""", (list(EXCLUDED_TABLES),))
         ids = [str(row['id']) for row in cur.fetchall()]
     definitions = [IntegrationDefinition.load(metadata, id) for id in ids]
 with psycopg.connect(**pg, dbname=cfg['PG_DATABASE_DATA']) as lift:

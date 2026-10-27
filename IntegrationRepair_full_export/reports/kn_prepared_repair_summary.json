@@ -60,18 +60,6 @@
     "applied": false
   },
   {
-    "table": "kn_nep_ostalo_namenske_rabe",
-    "run_id": "4449a6b1-3a33-4bde-9ea4-7bd50f344367",
-    "store": "prod-kn-namenske-rabe.sqlite",
-    "cutoff": "2026-09-08 12:31:08.000000",
-    "oracle_export": 482002,
-    "inserts": 54016,
-    "updates": 252951,
-    "deletions": 748897,
-    "warnings": 0,
-    "applied": false
-  },
-  {
     "table": "kn_nep_stanovanja_h",
     "run_id": "ec944d58-ff4e-4822-b1f0-598b2ba329e6",
     "store": "prod-kn-stanovanja.sqlite",

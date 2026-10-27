@@ -1,5 +1,7 @@
 # KN Oracle and production LIFT counts
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 Read-only count check started at 2026-10-15T12:21:30.055666+00:00 and finished at 2026-10-15T12:24:07.617833+00:00.
 
 Gap = Oracle minus LIFT. Positive means fewer rows in LIFT; negative means extra rows in LIFT. These are net count differences, not exact insert counts: missing and extra keys can offset each other. Equal counts do not prove matching keys or values.
@@ -15,7 +17,6 @@ Gap = Oracle minus LIFT. Positive means fewer rows in LIFT; negative means extra
 | `kn_nep_katastrske_obcine_h`                |            +58 |         19,646 |         19,588 |                    -50 |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h`      |     +3,240,062 |     29,486,341 |     26,246,279 |             -1,624,013 |
 | `kn_nep_ostalo_gozdno_gosp_obm`             |             +0 |         53,681 |         53,681 |                     +0 |
-| `kn_nep_ostalo_namenske_rabe`               |       -658,392 |        482,002 |      1,140,394 |               -694,881 |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h`   |       +291,104 |     15,106,100 |     14,814,996 |               +284,431 |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` |           +396 |      6,068,384 |      6,067,988 |                   -317 |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h`   |       +364,196 |     16,464,213 |     16,100,017 |               +363,817 |
@@ -29,7 +30,7 @@ Gap = Oracle minus LIFT. Positive means fewer rows in LIFT; negative means extra
 | `kn_nep_stavbe_obrisi_h`                    |            +94 |      2,760,860 |      2,760,766 |                    -50 |
 | `kn_nep_stavbe_parcele_h`                   |         +1,023 |      1,641,292 |      1,640,269 |                   -935 |
 | `kn_nep_stavbe_zps_h`                       |           +340 |      1,936,525 |      1,936,185 |                   -228 |
-| **Total**                                   | **+3,246,393** | **99,252,523** | **96,006,130** |         **-1,673,019** |
+| **Total** | **3,904,785** | **98,770,521** | **+94,865,736** | **-978,138** |
 
 ## Integration IDs
 
@@ -46,7 +47,6 @@ All 21 use a direct single-column integration ID, mapped to a LIFT `bigint`. Non
 | `kn_nep_katastrske_obcine_h` | `KO_ID_H` |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | `DEJANSKA_RABA_H_ID` |
 | `kn_nep_ostalo_gozdno_gosp_obm` | `GOZDNO_GOSP_OBM_ID` |
-| `kn_nep_ostalo_namenske_rabe` | `NAMENSKA_RABA_ID` |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | `PARCELA_X_DEJANSKA_RABA_H_ID` |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | `PARCELE_X_GOZDNO_GOSP_OBM_H_ID` |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | `PARCELA_X_NAMENSKA_RABA_H_ID` |

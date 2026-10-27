@@ -8,7 +8,7 @@ import sqlite3
 from dotenv import dotenv_values
 import psycopg
 
-from definition import IntegrationDefinition
+from definition import IntegrationDefinition, check_run_definition
 from store import classify
 from target import LiftTarget
 from timings import measure
@@ -18,8 +18,7 @@ def verify(run_id, target, db):
     run = db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
     if run is None or not run['source_complete']:
         raise ValueError('Verify requires a completed Oracle export')
-    if run['integration_id'] != target.d.id or run['attribute_table_name'] != target.d.table:
-        raise ValueError('Verify requires the same integration and target table')
+    check_run_definition(run, target.d)
     counts = dict(source_eligible=0, lift_eligible=0, equal=0, updates=0, removals=0, warnings=0)
     counts['source_eligible'] = db.execute('''SELECT count(*) FROM remote_ids_and_date_changed
         WHERE run_id=? AND date<=?''', (run_id, run['cutoff'])).fetchone()[0]

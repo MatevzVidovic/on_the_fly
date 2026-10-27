@@ -38,3 +38,24 @@ def test_load_optional_oracle_key_json(definition, tmp_path, monkeypatch):
     assert IntegrationDefinition.load(Database(cursor), 'integration').oracle_key == mapping
     config.write_text('{}')
     assert IntegrationDefinition.load(Database(cursor), 'integration').oracle_key is None
+
+
+def test_run_mapping_rejects_old_exports_and_changed_mapping(definition):
+    import json
+    import pytest
+    from definition import check_run_definition
+    run = dict(integration_id=definition.id, attribute_table_name=definition.table)
+    with pytest.raises(ValueError, match='fresh prepare'):
+        check_run_definition(run, definition)
+    run['date_mapping'] = json.dumps(['CHANGED', 'changed', 'UTC'])
+    check_run_definition(run, definition)
+    definition.date = dict(api_name='CHANGED_UTC', target='changed_utc')
+    with pytest.raises(ValueError, match='fresh prepare'):
+        check_run_definition(run, definition)
+
+
+def test_full_sync_table_stays_excluded_even_if_delta_flag_changes(definition):
+    import pytest
+    row = dict(table_name='kn_nep_ostalo_namenske_rabe')
+    with pytest.raises(ValueError, match='excluded'):
+        IntegrationDefinition.load(Database(Cursor([row])), 'integration')

@@ -125,3 +125,22 @@ def test_min_date_inventory_binds_wall_time_and_resume_key(definition):
     assert 'CAST("CHANGED" AS TIMESTAMP) >= TO_TIMESTAMP(:min_date' in query
     assert 'AND "KEY" >= :after_key ORDER BY "KEY"' in query
     assert binds == {'min_date': DATE, 'after_key': 2}
+
+
+def test_utc_time_preserves_utc_and_converts_explicit_offsets():
+    from datetime import datetime, timezone
+    from zoneinfo import ZoneInfo
+    from source import utc_time
+    assert utc_time('2026-07-01 12:00:00.123456 +02:00') == '2026-07-01 10:00:00.123456'
+    assert utc_time('2026-01-01 12:00:00 +01:00') == '2026-01-01 11:00:00.000000'
+    assert utc_time('2026-07-01 10:00:00 +00:00') == '2026-07-01 10:00:00.000000'
+    assert utc_time('2026-07-01 10:00:00Z') == '2026-07-01 10:00:00.000000'
+    assert utc_time(datetime(2026, 7, 1, 12, tzinfo=ZoneInfo('Europe/Ljubljana'))) == '2026-07-01 10:00:00.000000'
+    assert utc_time(datetime(2026, 7, 1, 10, tzinfo=timezone.utc)) == utc_time('2026-07-01 10:00:00')
+    assert utc_time(DATE) == DATE  # Backfilled naive UTC must not be shifted again.
+
+
+def test_inventory_normalizes_change_time_to_utc(definition):
+    cursor = Cursor([(1, '2025-01-02 14:00:00 +02:00')])
+    source = OracleSource(Database(cursor), definition)
+    assert list(source.inventory(DATE)) == [[(1, DATE)]]

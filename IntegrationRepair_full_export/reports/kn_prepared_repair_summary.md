@@ -1,10 +1,12 @@
 # KN repair preparation results
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 Report updated: 2026-10-15T15:41:44.317617+00:00.
 
 ## Prepared tables — planned inserts, updates and deletions
 
-These are asserted plan counts from the latest completed run in each `prod-kn-*.sqlite` file. Inserts are upsert keys not seen in the bounded LIFT scan; updates are upsert keys seen in that scan. Their sum was checked against the saved upsert count, and deletion counts against the saved removal count. All SQLite files were opened read-only; no remote queries or applies were run for this report.
+These are asserted plan counts from the latest completed run in each `prod-kn-*.sqlite` file. Inserts are upsert keys not seen in the bounded LIFT scan; updates are upsert keys seen in that scan. Their sum was checked against the saved upsert count, and deletion counts against the saved removal count. All SQLite files were opened read-only when this historical report was generated; no remote queries or applies were run for it. These runs predate UTC mapping changes and must not be resumed or applied now.
 
 These counts describe the prepared snapshot and cutoff. They are not an independent validation of payload values or deletion correctness, nor a guarantee of the actions a later apply will take if databases change.
 
@@ -15,7 +17,6 @@ These counts describe the prepared snapshot and cutoff. They are not an independ
 | `kn_nep_rpe_naselja_h`                      |             20,012 |           0 |           622 |           0 |        0 | No      |
 | `kn_nep_rpe_ulice_h`                        |             30,982 |           0 |            86 |           0 |        0 | No      |
 | `kn_nep_ostalo_gozdno_gosp_obm`             |             53,681 |           0 |             0 |           0 |        0 | No      |
-| `kn_nep_ostalo_namenske_rabe`               |            482,002 |      54,016 |       252,951 |     748,897 |        0 | No      |
 | `kn_nep_stanovanja_h`                       |            651,616 |           0 |           210 |           0 |        0 | No      |
 | `kn_nep_hisne_stevilke_h`                   |          1,448,319 |           2 |           205 |           0 |        0 | No      |
 | `kn_nep_stavbe_parcele_h`                   |          1,641,296 |          21 |         5,108 |           0 |        0 | No      |
@@ -30,9 +31,9 @@ These counts describe the prepared snapshot and cutoff. They are not an independ
 | `kn_nep_parcele_h`                          |          7,895,851 |       2,971 |        19,566 |           0 |        0 | No      |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h`   |         15,106,108 |     287,470 |       235,933 |           0 |        0 | No      |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h`   |         16,464,218 |     363,962 |       528,433 |           0 |        0 | No      |
-| **Total**                                   |     **69,767,659** | **708,646** | **1,084,602** | **748,921** |    **0** | —       |
+| **Total** | **69,285,657** | **654,630** | **831,651** | **24** | **0** | — |
 
-**Review before applying:** `kn_nep_ostalo_namenske_rabe` has 748,897 planned deletions. The other runs with deletions are `kn_nep_deli_stavb_h` (11), `kn_nep_etaze_x_deli_stavb_h` (1), and `kn_nep_prostori_h` (12). Zero warnings does not independently establish that these deletions are correct.
+**Historical runs with deletions:** `kn_nep_deli_stavb_h` (11), `kn_nep_etaze_x_deli_stavb_h` (1), and `kn_nep_prostori_h` (12). Zero warnings does not independently establish that these deletions are correct.
 
 ## Other KN tables — preliminary counts only
 
@@ -53,7 +54,6 @@ Both gaps are Oracle minus LIFT. Positive means a net shortfall in LIFT; negativ
 | `kn_nep_rpe_naselja_h` | `prod-kn-naselja.sqlite` | `65d25d1b-b474-4595-828f-69761c7d9287` | 2026-10-08 09:53:14.000000 |
 | `kn_nep_rpe_ulice_h` | `prod-kn-ulice.sqlite` | `f0c08483-cffa-477e-a579-7e415d611121` | 2026-10-15 14:36:50.000000 |
 | `kn_nep_ostalo_gozdno_gosp_obm` | `prod-kn-gozdno-gosp-obm.sqlite` | `1e77ae6c-1e02-40c4-b08c-d0c1250e2eac` | 2024-06-03 21:42:35.000000 |
-| `kn_nep_ostalo_namenske_rabe` | `prod-kn-namenske-rabe.sqlite` | `4449a6b1-3a33-4bde-9ea4-7bd50f344367` | 2026-09-08 12:31:08.000000 |
 | `kn_nep_stanovanja_h` | `prod-kn-stanovanja.sqlite` | `ec944d58-ff4e-4822-b1f0-598b2ba329e6` | 2026-10-15 13:04:40.000000 |
 | `kn_nep_hisne_stevilke_h` | `prod-kn-hisne-stevilke.sqlite` | `98a3b6b1-ef98-4826-8434-c8ffc9ca9a2a` | 2026-10-15 14:46:24.000000 |
 | `kn_nep_stavbe_parcele_h` | `prod-kn-stavbe-parcele.sqlite` | `1d372e24-d681-4f8c-af66-a76afa8db015` | 2026-10-15 14:48:44.000000 |

@@ -2,7 +2,7 @@
 from uuid import uuid1
 from psycopg import sql
 
-from source import PAGE_SIZE, wall_time
+from source import PAGE_SIZE, wall_time, utc_time
 
 from definition import REPAIR_USER_ID
 
@@ -23,7 +23,7 @@ def map_row(payload, definition, max_date, user_id=REPAIR_USER_ID):
             values.extend((value, field['api_location_transformation_srid'], settings['geometry_srid']))
         else:
             if field['field_type'] in ('datetime', 'date-time'):
-                value = wall_time(value)
+                value = utc_time(value) if field['api_name'] == definition.date['api_name'] else wall_time(value)
             values.append(value)
         columns.append('geom' if field['api_location'] else field['target'])
         expressions.append(expression)
@@ -54,7 +54,7 @@ class LiftTarget:
             while rows := cur.fetchmany(PAGE_SIZE):
                 page = []
                 for target_id, key, date in rows:
-                    key, date = self.d.key_value(key), wall_time(date)
+                    key, date = self.d.key_value(key), utc_time(date)
                     if key == previous:
                         raise ValueError(f'Duplicate LIFT key: {key}')
                     previous = key
@@ -70,7 +70,7 @@ class LiftTarget:
         with self.db.cursor() as cur:
             cur.execute(sql.SQL('SELECT {}, id, {} FROM {} WHERE {}=ANY(%s)').format(
                 self.key, self.date, self.table, self.key), (keys,))
-            return {self.d.key_value(key): (target_id, wall_time(date)) for key, target_id, date in cur}
+            return {self.d.key_value(key): (target_id, utc_time(date)) for key, target_id, date in cur}
 
     def upsert_batch(self, writes, max_date):
         if not writes:
@@ -84,7 +84,7 @@ class LiftTarget:
             for encoded_key, payload in writes:
                 key = self.d.key_value(payload[self.d.key['api_name']])
                 row = existing.get(key)
-                if row and row[1] > wall_time(payload[self.d.date['api_name']]):
+                if row and row[1] > utc_time(payload[self.d.date['api_name']]):
                     warning = 'LIFT date is newer than Oracle date'
                     print(f'Warning key={key}: {warning}', flush=True)
                     outcomes.append((encoded_key, warning))

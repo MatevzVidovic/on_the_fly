@@ -1,5 +1,7 @@
 # KN count check after recent repairs
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 Read-only production check finished: 2026-10-16T12:03:49.953151+00:00.
 
 All 1,550 recent upsert entries across 11 nonempty runs are marked applied with zero warnings. Direct LIFT lookups confirmed all 1,550 keys exist, their change dates equal their saved prepared values, and there are no duplicate matches. This checks keys/dates, not every payload field. The seven other recent plans were empty.

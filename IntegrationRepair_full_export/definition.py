@@ -7,6 +7,16 @@ from psycopg.rows import dict_row
 ORACLE_KEYS_PATH = Path(__file__).with_name('oracle_keys.json')
 
 REPAIR_USER_ID = '955ee6d4-d98e-11f0-bd04-de28270b37c5'
+EXCLUDED_TABLES = ('kn_nep_ostalo_namenske_rabe',)
+
+
+def check_run_definition(run, definition):
+    """Saved pairs must use the current integration and UTC date mapping."""
+    if run['integration_id'] != definition.id or run['attribute_table_name'] != definition.table:
+        raise ValueError('Run requires the same integration and target table')
+    expected = [definition.date['api_name'], definition.date['target'], 'UTC']
+    if 'date_mapping' not in run.keys() or run['date_mapping'] != json.dumps(expected):
+        raise ValueError('Run has a legacy or different change-date mapping; start a fresh prepare in a new UTC SQLite file')
 
 
 @dataclass
@@ -37,6 +47,8 @@ class IntegrationDefinition:
             row = cur.fetchone()
             if row is None:
                 raise ValueError('Integration not found')
+            if row['table_name'] in EXCLUDED_TABLES:
+                raise ValueError('This table uses full sync and is excluded from repair')
             if row['is_full_sync'] or row['integration_type'] != 'sql' or row['connection_name'] != 'KN ORACLE':
                 raise ValueError('Only KN Oracle SQL delta integrations are supported')
             if row['last_changed_datetime'] is None:

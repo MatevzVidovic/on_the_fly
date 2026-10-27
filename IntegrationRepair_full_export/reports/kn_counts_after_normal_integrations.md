@@ -1,5 +1,7 @@
 # KN counts after normal LIFT integrations
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 Read-only production check finished: 2026-10-16T10:59:06.063286+00:00.
 
 Gap = Oracle minus LIFT. Positive means fewer rows in LIFT. The bounded gap compares change dates at or below each integration’s current watermark. Counts are stable within each database transaction but do not share one atomic snapshot across systems. Equal counts do not establish matching keys or values.
@@ -13,7 +15,6 @@ Gap = Oracle minus LIFT. Positive means fewer rows in LIFT. The bounded gap comp
 | `kn_nep_katastrske_obcine_h` | 19,652 | 19,652 | +0 | +0 |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | 29,486,368 | 26,246,279 | +3,240,089 | -1,624,034 |
 | `kn_nep_ostalo_gozdno_gosp_obm` | 53,681 | 53,681 | +0 | +0 |
-| `kn_nep_ostalo_namenske_rabe` | 482,002 | 1,176,883 | -694,881 | -694,881 |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | 15,106,649 | 15,106,635 | +14 | -7 |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | 6,068,421 | 6,068,420 | +1 | -1 |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | 16,464,545 | 16,464,515 | +30 | +19 |

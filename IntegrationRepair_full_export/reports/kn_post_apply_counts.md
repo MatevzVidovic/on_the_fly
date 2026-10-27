@@ -1,5 +1,7 @@
 # KN post-apply count check
 
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
 Production LIFT and configured KN Oracle source. Finished: 2026-10-16T09:36:30.568886+00:00.
 
 All remote checks were read-only. Local SQLite run status was also read read-only. All 19 requested applies are marked complete. The prepared `kn_nep_ostalo_namenske_rabe` run remains unapplied, and `kn_nep_ostalo_dejanske_rabe_parcel_h` remains unprepared.
@@ -15,7 +17,6 @@ Gap = Oracle minus LIFT. The bounded gap restricts both sides to their change da
 | `kn_nep_katastrske_obcine_h` | 19,652 | 19,646 | +6 | -6 | Applied | 1 |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | 29,486,356 | 26,246,279 | +3,240,077 | -1,624,025 | Excluded — not prepared | — |
 | `kn_nep_ostalo_gozdno_gosp_obm` | 53,681 | 53,681 | +0 | +0 | Applied | 0 |
-| `kn_nep_ostalo_namenske_rabe` | 482,002 | 1,176,883 | -694,881 | -694,881 | Excluded — not applied | 0 |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | 15,106,520 | 15,106,081 | +439 | -411 | Applied | 25 |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | 6,068,404 | 6,068,384 | +20 | -23 | Applied | 0 |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | 16,464,447 | 16,464,196 | +251 | -191 | Applied | 3 |

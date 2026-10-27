@@ -10,7 +10,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from dotenv import dotenv_values
 import oracledb
 import psycopg
-from definition import IntegrationDefinition
+from definition import IntegrationDefinition, EXCLUDED_TABLES
 from source import OracleSource
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +28,7 @@ with psycopg.connect(host=cfg['PG_HOST'], port=cfg['PG_PORT'], user=cfg['PG_USER
                           dsn=cfg['KN_ORACLE_DSN']) as db:
         db.call_timeout = 10000
         for row in queries:
-            if row['is_full_sync'] or row['connection_name'] != 'KN ORACLE':
+            if row['name'] in EXCLUDED_TABLES or row['is_full_sync'] or row['connection_name'] != 'KN ORACLE':
                 continue
             result = {'table': row['name'], 'integration_id': row['id']}
             started = perf_counter()

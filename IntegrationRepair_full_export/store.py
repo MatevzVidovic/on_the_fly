@@ -49,7 +49,8 @@ class RepairStore:
                                ('upsert_count', 'INTEGER'), ('delete_count', 'INTEGER'), ('user_id', 'TEXT'),
                                ('source_complete', 'INTEGER'), ('source_last_key', 'TEXT'),
                                ('target_last_key', 'TEXT'), ('source_count', 'INTEGER NOT NULL DEFAULT 0'),
-                               ('target_count', 'INTEGER NOT NULL DEFAULT 0'), ('min_date', 'TEXT')):
+                               ('target_count', 'INTEGER NOT NULL DEFAULT 0'), ('min_date', 'TEXT'),
+                               ('date_mapping', 'TEXT')):
                 if name not in columns:
                     self.db.execute(f'ALTER TABLE integration_transfer ADD COLUMN {name} {kind}')
             if 'upsert_count' not in columns or 'delete_count' not in columns:
@@ -58,13 +59,15 @@ class RepairStore:
                     delete_count=(SELECT count(*) FROM removal_diff WHERE run_id=integration_transfer.id)
                     WHERE prepared=1''')
 
-    def create_run(self, integration_id, cutoff, table_name, min_date=None):
+    def create_run(self, integration_id, cutoff, table_name, min_date=None, date_mapping=None):
         run_id = str(uuid4())
         created_at = datetime.now(timezone.utc).isoformat(timespec='microseconds')
         with self.db:
             self.db.execute('''INSERT INTO integration_transfer
-                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete,min_date) VALUES (?,?,?,?,?,?,0,?)''',
-                (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID, min_date))
+                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete,min_date,date_mapping)
+                VALUES (?,?,?,?,?,?,0,?,?)''',
+                (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID, min_date,
+                 json.dumps(date_mapping) if date_mapping is not None else None))
         return run_id
 
     def require_prepared_run(self, run_id):

@@ -12,7 +12,7 @@ import psycopg
 from psycopg import sql
 
 from definition import IntegrationDefinition
-from source import wall_time
+from source import utc_time
 
 # Same order as the EV repair list.
 INTEGRATIONS = {
@@ -32,11 +32,11 @@ INTEGRATIONS = {
 
 
 def count_table(definition, oracle, lift):
-    cutoff = wall_time(definition.cutoff)
+    cutoff = utc_time(definition.cutoff)
     date = '"' + definition.date['api_name'].replace('"', '""') + '"'
     started = perf_counter()
     with oracle.cursor() as cur:
-        # Drop the timezone tag without shifting wall-clock fields, as prepare does.
+        # The saved integration query now projects its change time in UTC.
         cur.execute(f'''SELECT COUNT(*), COUNT(CASE WHEN CAST({date} AS TIMESTAMP)
             <= TO_TIMESTAMP(:cutoff, 'YYYY-MM-DD HH24:MI:SS.FF6') THEN 1 END)
             FROM ({definition.query})''', {'cutoff': cutoff})
@@ -48,6 +48,7 @@ def count_table(definition, oracle, lift):
             sql.Identifier(definition.date['target']), sql.Identifier(definition.table)), (cutoff,))
         lift_total, lift_eligible = cur.fetchone()
     return dict(table=definition.table, integration_id=definition.id, cutoff=cutoff,
+                source_date=definition.date['api_name'], target_date=definition.date['target'], time_basis='UTC',
                 oracle_total=oracle_total, lift_total=lift_total, total_difference=lift_total-oracle_total,
                 oracle_eligible=oracle_eligible, lift_eligible=lift_eligible,
                 eligible_difference=lift_eligible-oracle_eligible,

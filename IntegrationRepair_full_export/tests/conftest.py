@@ -88,7 +88,7 @@ def store():
 
 @pytest.fixture
 def run_id(store):
-    return store.create_run('integration', DATE, 'records')
+    return store.create_run('integration', DATE, 'records', date_mapping=['CHANGED', 'changed', 'UTC'])
 
 
 @pytest.fixture

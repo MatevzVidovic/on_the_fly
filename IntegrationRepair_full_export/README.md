@@ -2,6 +2,53 @@
 
 A standalone Python tool for the agreed KN Oracle delta repair. Run the regular integration first, then keep integrations writing the target table stopped through prepare, review and apply. Configuration must stay unchanged. Run the regular integration again later to clear map caches.
 
+
+## UTC rerun (2026-10-27)
+
+The active scope is **12 EV + 20 KN delta integrations**.
+`kn_nep_ostalo_namenske_rabe` is full sync and explicitly excluded from repair,
+counts, and catalog checks. Historical reports are not current repair plans.
+
+New prepares read the saved Oracle query and enabled `api_last_sync_field` mapping.
+They use `DATE_CHANGE_UTC → date_change_utc` for EV and
+`DATUM_SYS_UTC → datum_sys_utc` for KN where configured. The tool does not rewrite
+source SQL, subtract a fixed two hours, or move normal integration watermarks.
+The UTC projection in the source query handles Ljubljana summer/winter offsets.
+Naive change timestamps are UTC; explicit offsets on change times or cutoffs are
+normalized to UTC. Other mapped dates retain their source wall-clock fields.
+
+Read-only metadata checks found all 12 EV and 19 of 20 KN delta integrations using
+new `_utc` mappings. **`kn_nep_stanovanja_h` still maps `DATUM_SYS → datum_sys`**,
+although its saved query already converts that alias to UTC. It has no
+`datum_sys_utc` target column yet. Resolve that exception if all KN integrations
+should use the new column convention; the tool follows the actual mapping.
+
+Before the rerun:
+
+1. Finish the UTC backfill and watermark corrections in LIFT.
+2. Run the normal LIFT integrations, then stop writes to each table for its repair.
+3. Start fresh prepares, preferably in new `prod-utc-*.sqlite` files.
+4. Review diffs, apply the new run UUIDs, then verify against those exports.
+
+```sh
+# Examples only: run after the normal integration and watermark correction.
+time .venv/bin/python repair.py --store prod-utc-kn-deli.sqlite prepare bfe62b52-9aaf-11ef-9c54-0242ac120008
+time .venv/bin/python repair.py --store prod-utc-ev-parcela.sqlite prepare c469d91a-ae56-11f0-84be-169cd02558fe
+```
+
+New runs save `date_mapping`: Oracle date alias, LIFT date column, and `UTC` basis.
+Resume, apply, and verification reject pre-migration exports or a different current
+date mapping. Old runs are not converted, relabelled, or recalculated; retain them
+as history. An already-applied CLI run may still print its saved summary without
+performing work. `--only-src` and resume work for new UTC runs. `--min-date` is
+interpreted in UTC; omit it for a full inventory repair.
+
+No normal integrations, exports, repairs, backfills, or watermark changes were
+started during this update. Live PostgreSQL metadata/column checks succeeded.
+The small Oracle sample check could not connect: the local Oracle tunnel at port
+10522 was unavailable. Metadata evidence is saved in
+`diagnostics/utc_mapping_readiness.json` and `diagnostics/utc_target_columns.json`.
+
 ```sh
 cd /Users/matevzvidovic/on_the_fly/IntegrationRepair_full_export
 python3 -m venv .venv
@@ -24,7 +71,7 @@ SELECT * FROM removal_diff WHERE run_id='REPAIR_UUID';
 ```
 
 `integration_transfer` also stores `created_at` (UTC), `attribute_table_name`,
-`upsert_count`, and `delete_count`. The counts are saved when preparation finishes
+`upsert_count`, `delete_count`, and `date_mapping`. The counts are saved when preparation finishes
 and remain the prepared totals after apply, including entries that are skipped.
 Existing SQLite files gain these columns automatically on opening; counts are
 filled for old prepared runs, while unavailable historical creation times and
@@ -46,7 +93,7 @@ All warnings are printed with the business key. Apply warnings also remain on ad
 
 No framework, repository interfaces, audit writes, locks or normal integration metadata updates. Unknown custom hooks/decorators and non-WKT transforms are rejected. This tool assumes the inspected FMP global event/decorator configs remain empty; it cannot discover PHP config from PostgreSQL.
 
-Oracle inventory keeps all keys so rows newer than the cutoff cannot be mistaken for deletions. Only source rows at or below the cutoff can become upserts. LIFT inventory filters by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Timestamps use source wall-clock fields, with six fractional digits matching PostgreSQL; no offset conversion. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
+Oracle inventory keeps all keys so rows newer than the cutoff cannot be mistaken for deletions. Only source rows at or below the cutoff can become upserts. LIFT inventory filters by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Change timestamps use UTC with six fractional digits matching PostgreSQL. Other mapped dates preserve their source wall-clock fields. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
 
 **Performance:** inventories stream into SQLite; apply looks up target UUIDs/dates once per page and pipelines row writes before committing. Configured Oracle composite keys use numeric component predicates; unconfigured integrations retain the saved text-key lookup, which can be very slow. Sorting full inventories and local per-row SQLite comparisons remain costs at large scale. Payload memory is bounded by one 10,000-row page, but large WKT values can make that page substantial.
 
@@ -204,7 +251,7 @@ The read-only script counts each saved Oracle integration query and its LIFT tar
 then prints totals, `LIFT minus Oracle`, and the difference when both sides are
 restricted to the integration's current change-date cutoff. Full Oracle counts
 respect the integration's status/year filters; they are not raw physical-table
-counts. Cutoff comparisons preserve source wall-clock timestamps, as prepare does.
+counts. Cutoff comparisons use the configured UTC change timestamps, as prepare does.
 Both database sessions use stable read-only snapshots, but the two systems do not
 share one atomic snapshot. Rows newer than the cutoff can explain total differences.
 Even cutoff differences need key-level investigation when a key's source date has
@@ -227,8 +274,8 @@ time .venv/bin/python repair.py --store prod-kn-deli-recent.sqlite prepare bfe62
 ```
 
 You can also pass a timestamp, such as `--min-date '2026-10-09 12:00:00'`.
-Dates use the same wall-clock convention as integration change dates; timezone
-suffixes do not shift the clock. The minimum must not exceed the saved upper cutoff.
+Dates are UTC; explicit timezone offsets are converted to UTC. The minimum must
+not exceed the saved upper cutoff.
 
 **With `--min-date`, prepare plans inserts and updates only, never deletions.**
 An ID absent from this date-filtered Oracle export might simply be older than the

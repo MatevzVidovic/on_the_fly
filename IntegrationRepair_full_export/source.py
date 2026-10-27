@@ -1,5 +1,5 @@
 """Oracle SQL and driver values. Both reads wrap the same saved query."""
-from datetime import datetime
+from datetime import datetime, timezone
 import re
 import oracledb
 
@@ -20,6 +20,19 @@ def wall_time(value):
     if len(fraction) > 6 and fraction[6:].strip('0'):
         raise ValueError('Source timestamp exceeds PostgreSQL microsecond precision')
     return f'{match[1]} {match[2]}.{fraction[:6]}'
+
+
+def utc_time(value):
+    """Change times: naive values are UTC; explicit offsets identify instants."""
+    text = wall_time(value[:-1] if isinstance(value, str) and value.endswith('Z') else value)
+    if isinstance(value, datetime):
+        return wall_time(value.astimezone(timezone.utc)) if value.tzinfo else text
+    if value.endswith(('+00:00', '-00:00', 'Z')):
+        return text
+    offset = re.search(r'([+-]\d{2}:\d{2})$', value)
+    if offset:
+        return wall_time(datetime.fromisoformat(text + offset[1]).astimezone(timezone.utc))
+    return text
 
 
 class OracleSource:
@@ -64,7 +77,7 @@ class OracleSource:
             while rows := cur.fetchmany(PAGE_SIZE):
                 page = []
                 for key, date in rows:
-                    key, date = self.d.key_value(key), wall_time(date)
+                    key, date = self.d.key_value(key), utc_time(date)
                     if key == previous:
                         raise ValueError(f'Duplicate Oracle key: {key}')
                     previous = key

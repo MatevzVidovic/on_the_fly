@@ -1,10 +1,12 @@
 # Oracle payload key coverage — 15 October 2026
 
-Checked the 31 KN ORACLE delta integrations in the existing repair-table list against current staging metadata and Oracle. Full-sync and other-connection integrations are outside this tool. No remote data or stored integration queries were changed.
+> Repair scope updated 2026-10-27: `kn_nep_ostalo_namenske_rabe` is full sync and excluded from these repair lists. Measurements below are historical, not a post-UTC rerun.
+
+Checked the 30 KN ORACLE delta integrations in the existing repair-table list against current staging metadata and Oracle. Full-sync and other-connection integrations are outside this tool. No remote data or stored integration queries were changed.
 
 All ten concatenated EV keys now have explicit mappings. Five include a text component: preserve it verbatim; convert numeric revision components to integers. The two enota queries receive an extra revision projection only during payload fetch. Original fields matched in all three-row payload samples; the additional helper field is not mapped to LIFT.
 
-The other 21 integrations already filter a direct key, so need no split configuration. Their output types and primary keys were checked; they did not receive payload timing benchmarks in this audit.
+The other 20 integrations already filter a direct key, so need no split configuration. Their output types and primary keys were checked; they did not receive payload timing benchmarks in this audit.
 
 | Table | Lookup | Sample payload fetch |
 | --- | --- | --- |
@@ -27,7 +29,6 @@ The other 21 integrations already filter a direct key, so need no split configur
 | `kn_nep_katastrske_obcine_h` | Direct KO_ID_H | Type and primary-key check only |
 | `kn_nep_ostalo_dejanske_rabe_parcel_h` | Direct DEJANSKA_RABA_H_ID | Type and primary-key check only |
 | `kn_nep_ostalo_gozdno_gosp_obm` | Direct GOZDNO_GOSP_OBM_ID | Type and primary-key check only |
-| `kn_nep_ostalo_namenske_rabe` | Direct NAMENSKA_RABA_ID | Type and primary-key check only |
 | `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | Direct PARCELA_X_DEJANSKA_RABA_H_ID | Type and primary-key check only |
 | `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | Direct PARCELE_X_GOZDNO_GOSP_OBM_H_ID | Type and primary-key check only |
 | `kn_nep_ostalo_parcele_x_namenske_rabe_h` | Direct PARCELA_X_NAMENSKA_RABA_H_ID | Type and primary-key check only |

@@ -115,3 +115,14 @@ def test_empty_batch_has_no_database_work(definition):
     db = Database(Cursor())
     assert LiftTarget(db, None, definition).upsert_batch([], DATE) == []
     assert db.commits == 0 and db.example_cursor.calls == []
+
+
+def test_map_row_utc_change_time_does_not_shift_other_dates(definition):
+    definition.date.update(api_name='DATE_CHANGE_UTC', target='date_change_utc')
+    definition.fields.append(dict(api_name='VALID_FROM', target='valid_from', field_type='date-time', api_location=False))
+    payload = dict(KEY=1, DATE_CHANGE_UTC='2026-07-01 10:00:00 +00:00',
+                   VALID_FROM='2026-07-01 12:00:00 +02:00')
+    columns, _, values = map_row(payload, definition, DATE)
+    mapped = dict(zip(columns, values))
+    assert mapped['date_change_utc'] == '2026-07-01 10:00:00.000000'
+    assert mapped['valid_from'] == '2026-07-01 12:00:00.000000'
