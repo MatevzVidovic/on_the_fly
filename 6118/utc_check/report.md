@@ -1,6 +1,6 @@
 # KN and EV UTC audit
 
-Exported: 2026-10-27T11:11:36.831271+00:00  
+Exported: 2026-10-27T12:57:06.865826+00:00  
 Data database: `fmp_data_gurs`; metadata database: `fmp`.
 
 Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one audit row per UTC candidate and integration. KN expects `datum_sys_utc`; EV expects `date_change_utc`. Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. Snapshots from the two databases are taken separately.
@@ -12,35 +12,35 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_del_stavbe_enota_h_2025_danes | logged | 4894832 | 1794 MB | 1218 MB | 3012 MB | 3158777856 |
 | public.ev_del_stavbe_h | logged | 11060290 | 2901 MB | 1008 MB | 3909 MB | 4099252224 |
 | public.ev_dst_pripis_podatki_h | logged | 1949662 | 482 MB | 118 MB | 600 MB | 629579776 |
-| public.ev_parc_del_h | logged | 16970546 | 3001 MB | 1078 MB | 4080 MB | 4277731328 |
+| public.ev_parc_del_h | unlogged | 16955564 | 4310 MB | 2049 MB | 6359 MB | 6667862016 |
 | public.ev_parc_enota_h_2025_danes | logged | 26490712 | 5534 MB | 3762 MB | 9296 MB | 9747603456 |
 | public.ev_parc_pripis_podatki_h | logged | 8825796 | 1842 MB | 535 MB | 2377 MB | 2492530688 |
 | public.ev_parcela_h | logged | 26520712 | 5712 MB | 3673 MB | 9386 MB | 9841475584 |
-| public.ev_pe_dst_h | logged | 210842 | 45 MB | 15 MB | 59 MB | 62267392 |
+| public.ev_pe_dst_h | unlogged | 210842 | 91 MB | 29 MB | 121 MB | 126435328 |
 | public.ev_pe_parc_h | logged | 193814 | 84 MB | 27 MB | 111 MB | 116375552 |
 | public.ev_posebna_enota_h | logged | 45222 | 95 MB | 5616 kB | 101 MB | 105381888 |
 | public.ev_prostor_h | logged | 4659596 | 752 MB | 282 MB | 1034 MB | 1084350464 |
 | public.ev_stavba_h | logged | 3190187 | 897 MB | 320 MB | 1217 MB | 1276542976 |
-| public.kn_nep_deli_stavb_h | logged | 2740431 | 557 MB | 456 MB | 1014 MB | 1063051264 |
-| public.kn_nep_etaze_h | logged | 2359504 | 485 MB | 413 MB | 897 MB | 941015040 |
-| public.kn_nep_etaze_x_deli_stavb_h | logged | 2878408 | 680 MB | 415 MB | 1096 MB | 1149009920 |
-| public.kn_nep_hisne_stevilke_h | logged | 1447996 | 336 MB | 174 MB | 510 MB | 534257664 |
-| public.kn_nep_katastrske_obcine_h | logged | 19652 | 224 MB | 3752 kB | 228 MB | 238567424 |
-| public.kn_nep_ostalo_dejanske_rabe_parcel_h | logged | 26196414 | 19 GB | 5579 MB | 25 GB | 26445512704 |
-| public.kn_nep_ostalo_gozdno_gosp_obm | logged | 53681 | 210 MB | 7528 kB | 217 MB | 227680256 |
-| public.kn_nep_ostalo_namenske_rabe | logged | 481310 | 417 MB | 65 MB | 482 MB | 505176064 |
-| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | logged | 15118339 | 2286 MB | 1856 MB | 4142 MB | 4343021568 |
-| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | logged | 6068445 | 855 MB | 929 MB | 1784 MB | 1870856192 |
-| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | logged | 16466390 | 2783 MB | 2245 MB | 5029 MB | 5273018368 |
-| public.kn_nep_parcele_h | unlogged | 7903936 | 3582 MB | 1314 MB | 4896 MB | 5134163968 |
-| public.kn_nep_prostori_h | logged | 4435126 | 675 MB | 388 MB | 1063 MB | 1115086848 |
-| public.kn_nep_rpe_naselja_h | logged | 20014 | 59 MB | 1464 kB | 60 MB | 63004672 |
-| public.kn_nep_rpe_obcine_h | logged | 3550 | 156 MB | 344 kB | 157 MB | 164208640 |
-| public.kn_nep_rpe_ulice_h | logged | 30982 | 13 MB | 3264 kB | 16 MB | 16941056 |
-| public.kn_nep_stavbe_centroidi_h | logged | 2765199 | 1042 MB | 609 MB | 1650 MB | 1730363392 |
-| public.kn_nep_stavbe_obrisi_h | logged | 2753964 | 1144 MB | 455 MB | 1600 MB | 1677459456 |
-| public.kn_nep_stavbe_parcele_h | logged | 1639297 | 827 MB | 248 MB | 1075 MB | 1127178240 |
-| public.kn_nep_stavbe_zps_h | logged | 1934875 | 759 MB | 316 MB | 1076 MB | 1127849984 |
+| public.kn_nep_deli_stavb_h | unlogged | 2737008 | 759 MB | 822 MB | 1581 MB | 1657552896 |
+| public.kn_nep_etaze_h | unlogged | 2361478 | 650 MB | 711 MB | 1361 MB | 1426939904 |
+| public.kn_nep_etaze_x_deli_stavb_h | unlogged | 2887402 | 903 MB | 696 MB | 1598 MB | 1676025856 |
+| public.kn_nep_hisne_stevilke_h | unlogged | 1447189 | 494 MB | 298 MB | 792 MB | 830750720 |
+| public.kn_nep_katastrske_obcine_h | unlogged | 19711 | 251 MB | 4064 kB | 255 MB | 267214848 |
+| public.kn_nep_ostalo_dejanske_rabe_parcel_h | unlogged | 26246280 | 17 GB | 3541 MB | 20 GB | 21694029824 |
+| public.kn_nep_ostalo_gozdno_gosp_obm | unlogged | 53720 | 420 MB | 20 MB | 440 MB | 461225984 |
+| public.kn_nep_ostalo_namenske_rabe | unlogged | 478726 | 767 MB | 100 MB | 867 MB | 908861440 |
+| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | unlogged | 15126035 | 2854 MB | 2549 MB | 5403 MB | 5665783808 |
+| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | unlogged | 5945249 | 1745 MB | 1845 MB | 3590 MB | 3764609024 |
+| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | unlogged | 16519724 | 4836 MB | 4414 MB | 9250 MB | 9699442688 |
+| public.kn_nep_parcele_h | unlogged | 7781634 | 4637 MB | 2022 MB | 6659 MB | 6982647808 |
+| public.kn_nep_prostori_h | unlogged | 4435427 | 882 MB | 638 MB | 1520 MB | 1594302464 |
+| public.kn_nep_rpe_naselja_h | unlogged | 20018 | 110 MB | 2904 kB | 113 MB | 118611968 |
+| public.kn_nep_rpe_obcine_h | unlogged | 3559 | 125 MB | 568 kB | 125 MB | 131334144 |
+| public.kn_nep_rpe_ulice_h | unlogged | 30983 | 26 MB | 12 MB | 38 MB | 39346176 |
+| public.kn_nep_stavbe_centroidi_h | unlogged | 2637143 | 1059 MB | 769 MB | 1828 MB | 1916354560 |
+| public.kn_nep_stavbe_obrisi_h | unlogged | 2761168 | 1163 MB | 569 MB | 1731 MB | 1815420928 |
+| public.kn_nep_stavbe_parcele_h | unlogged | 1495142 | 1221 MB | 424 MB | 1645 MB | 1724620800 |
+| public.kn_nep_stavbe_zps_h | unlogged | 1930484 | 960 MB | 456 MB | 1416 MB | 1485021184 |
 
 ## UTC fields and integration mappings
 
@@ -52,34 +52,34 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_del_stavbe_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_dst_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_parc_del_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
-| public.ev_parc_enota_h_2025_danes | date_change_utc | True | timestamp(0) without time zone | True | date-time | True | True | — | False |
-| public.ev_parc_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.ev_parc_enota_h_2025_danes | date_change_utc | True | timestamp(0) without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_parc_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_parcela_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
-| public.ev_pe_dst_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.ev_pe_dst_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_pe_parc_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
-| public.ev_posebna_enota_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
-| public.ev_prostor_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
-| public.ev_stavba_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
-| public.kn_nep_deli_stavb_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_etaze_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_etaze_x_deli_stavb_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_hisne_stevilke_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_katastrske_obcine_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_ostalo_dejanske_rabe_parcel_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_ostalo_gozdno_gosp_obm | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_ostalo_namenske_rabe | datum_sys_utc | False | — | False | — | False | False | — | False |
-| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.ev_posebna_enota_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_prostor_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_stavba_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.kn_nep_deli_stavb_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_etaze_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_etaze_x_deli_stavb_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_hisne_stevilke_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS → datum_sys | False |
+| public.kn_nep_katastrske_obcine_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_dejanske_rabe_parcel_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_gozdno_gosp_obm | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_namenske_rabe | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | — | False |
+| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_parcele_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS → datum_sys | False |
-| public.kn_nep_prostori_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_rpe_naselja_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_rpe_obcine_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_rpe_ulice_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_stavbe_centroidi_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_stavbe_obrisi_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_stavbe_parcele_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
-| public.kn_nep_stavbe_zps_h | datum_sys_utc | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_prostori_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_rpe_naselja_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_rpe_obcine_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_rpe_ulice_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_centroidi_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_obrisi_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_parcele_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_zps_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 
 ## Integration SQL for LLM review
 
@@ -357,7 +357,8 @@ SELECT
     j."VREDNOST" AS vrednost,
     FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS valid_from,
     CAST(NULL AS TIMESTAMP WITH TIME ZONE) AS valid_to,
-    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS date_change
+    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AS date_change,
+    FROM_TZ(CAST(rf.CREATED AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS date_change_utc
 FROM EV.PARC_PRIPIS_PODATKI j
 JOIN EV.REVISION rf ON j."JN_REV_NUM" = rf.REV_NUM
 ```
@@ -380,7 +381,8 @@ DELITEV_MSG,
   CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
     from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from,
     from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
-    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change,
+    FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS date_change_utc
 from EV.JN_PE_DST j
              join ev.revision rf on (j.jn_rev_num = rf.rev_num)
          left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)
@@ -450,7 +452,8 @@ ID_MODEL_VER,
 CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
     from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, 
     from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
-    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change,
+    FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS date_change_utc
 from EV.JN_POSEBNA_ENOTA j
              join ev.revision rf on (j.jn_rev_num = rf.rev_num)
          left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)
@@ -473,7 +476,8 @@ JN_REV_NUM_PREV,
   CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
     from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, 
     from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
-    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change,
+    FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS date_change_utc
 from EV.JN_PROSTOR j
              join ev.revision rf on (j.jn_rev_num = rf.rev_num)
          left join ev.revision rt on (j.jn_rev_num_to = rt.rev_num)
@@ -513,7 +517,8 @@ select to_char("STA_SID") || '-' || to_char("JN_REV_NUM") as jn_sta_pk,
    CAST(TRIM(j.JN_STATUS) AS VARCHAR2(1)) AS JN_STATUS,
     from_tz(cast(RF.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_from, 
     from_tz(cast(RT.CREATED as TIMESTAMP), 'Europe/Ljubljana')                                       valid_to,
-    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change
+    from_tz(cast(COALESCE(RT.CREATED, RF.CREATED) as TIMESTAMP), 'Europe/Ljubljana')                 date_change,
+    FROM_TZ(CAST(COALESCE(RT.CREATED, RF.CREATED) AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS date_change_utc
 from EV.JN_STAVBA j
              join EV.revision rf on (j.jn_rev_num = rf.rev_num)
          left join EV.revision rt on (j.jn_rev_num_to = rt.rev_num)
@@ -546,6 +551,7 @@ POSTOPEK_ID_DO,
 FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
 FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 EID,
 NACIN_DOLOCITVE_POVRSINE_DELA_STAVBE_ID,
 UPRAVNIK_STATUS,
@@ -571,6 +577,7 @@ POSTOPEK_ID_DO ,
 FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
 FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 CASE
         WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'MULTIPOLYGON%' THEN SDO_UTIL.TO_WKTGEOMETRY(GEOM)
         WHEN SDO_UTIL.TO_WKTGEOMETRY(GEOM) LIKE 'POLYGON%' THEN
@@ -610,6 +617,7 @@ select ETAZA_X_DEL_STAVBE_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                                                                                   DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                                                                                   DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                  DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        TIP_POLIGONA_DELA_STAVBE_ID,
        GLAVNI_VHOD_DELA_STAVBE
 from nep.ETAZE_X_DELI_STAVB_H
@@ -636,6 +644,7 @@ select HISNA_STEVILKA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID
 from nep.HISNE_STEVILKE_H
 ```
@@ -667,6 +676,7 @@ select KO_ID_H,
        FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
        FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
        FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        SIFKO,
        EID
 from nep.KATASTRSKE_OBCINE_H
@@ -711,7 +721,8 @@ SELECT  DEJANSKA_RABA_H_ID,
         POSTOPEK_ID_DO,
         from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
         from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
-        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS
+        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+        FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc
 from nep_ostalo.DEJANSKE_RABE_H
 ```
 
@@ -729,6 +740,7 @@ POVRSINA_GEOM,
 SDO_UTIL.TO_WKTGEOMETRY(geom) AS geom, 
 POSTOPEK_ID, 
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 GGO
 from nep_ostalo.gozdno_gosp_obm
 ```
@@ -748,6 +760,7 @@ select NAMENSKA_RABA_ID,
                                                                                                          treat(geom as MDSYS.SDO_GEOMETRY).SDO_ELEM_INFO,
                                                                                                          treat(geom as MDSYS.SDO_GEOMETRY).SDO_ORDINATES)) end as GEOM,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                  DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        OBCINA_ID,
        from_tz(cast(DATUM_VELJAVNOSTI as TIMESTAMP), 'Europe/Ljubljana')                                                                                          DATUM_VELJAVNOSTI,
        povrsina_geom,
@@ -777,7 +790,8 @@ select PARCELA_X_DEJANSKA_RABA_H_ID,
        POSTOPEK_ID_DO,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
-       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS
+       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc
 from nep_ostalo.PARCELE_X_DEJANSKE_RABE_H
 ```
 
@@ -795,7 +809,8 @@ select PARCELE_X_GOZDNO_GOSP_OBM_H_ID,
        POSTOPEK_ID_DO,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
-       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS
+       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc
 from nep_ostalo.PARCELE_X_GOZDNO_GOSP_OBM_H
 ```
 
@@ -815,6 +830,7 @@ OBCINA_ID,
 FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
 FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 VIR_NAMENSKE_RABE_ID, 
 DELEZ
 FROM nep_ostalo.PARCELE_X_NAMENSKE_RABE_H
@@ -841,6 +857,7 @@ POSTOPEK_ID_DO,
 FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
 FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 EID, 
 BONITETA, 
 DRZAVNA_MEJA, 
@@ -864,6 +881,7 @@ POSTOPEK_ID_DO,
 FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
 FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
 FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
 EID
 from nep.PROSTORI_H
 ```
@@ -890,7 +908,8 @@ select NASELJE_H_ID,
        SDO_UTIL.TO_WKTGEOMETRY(GEOM) as                          geom,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
-       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS
+       from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc
 from nep.RPE_NASELJA_H
 ```
 
@@ -911,6 +930,7 @@ select OBCINA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID,
        SDO_UTIL.TO_WKTGEOMETRY(GEOM_RPE) as                      geom_rpe,
        NAZIV_DJ
@@ -940,6 +960,7 @@ select ULICA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                                                                                      DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                                                                                      DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                                                                                     DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID,
        NAZIV_DJ,
        SESTAVLJENA_SIFRA,
@@ -979,6 +1000,7 @@ select stavba_h_id,
     FROM_TZ(CAST(DATUM_OD AS TIMESTAMP), 'Europe/Ljubljana') DATUM_OD,
     FROM_TZ(CAST(DATUM_DO AS TIMESTAMP), 'Europe/Ljubljana') DATUM_DO,
     FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+    FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
     eid,
     visinski_datum_stavbe_id,
     status_vpisa_id,
@@ -1002,6 +1024,7 @@ select STAVBA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID,
        case when OBRIS_GEOM is null then null
            -- Če je že MULTIPOLYGON, ohrani enako
@@ -1050,6 +1073,7 @@ select STAVBA_PARCELA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')                                       DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')                                       DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana')                                      DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID,
        POVRSINA_ZPS,
        regexp_substr(SDO_UTIL.TO_WKTGEOMETRY(GEOM), '^[A-Z]+')                                     as ORIGINAL_TIP_GEOM
@@ -1069,6 +1093,7 @@ select STAVBA_H_ID,
        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,
        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,
        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,
+       FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc,
        EID,
        case when TLORIS_GEOM is null then null
            -- Če je že MULTIPOLYGON, ohrani enako

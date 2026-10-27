@@ -38,6 +38,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--metadata-db', default='fmp', help='Database containing LIFT metadata (default: fmp)')
     parser.add_argument('--num-nulls', action='store_true', help='Count NULLs in existing UTC columns (scans table rows)')
+    parser.add_argument('--any-null', action='store_true', help='Check whether existing UTC columns contain any NULLs')
     args = parser.parse_args()
     load_dotenv(ROOT.parent / 'simple_wal_lab' / '.env')
     # Inventory row counts are estimates; UTC NULL counts below are exact scans.
@@ -88,7 +89,7 @@ def main():
            '', '## UTC fields and integration mappings', '',
            '“Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. '
            'LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. '
-           + ('Num-null is an exact count of rows where the UTC column IS NULL (including rows with a NULL source date). Missing columns show —; counts exceeding 30 seconds show timeout. ' if args.num_nulls else 'NULL counts were not requested; use --num-nulls to include them. ') + 'SQL correctness requires review below.', '']
+           + ('Num-null is an exact count of rows where the UTC column IS NULL (including rows with a NULL source date). Missing columns show —; counts exceeding 30 seconds show timeout. ' if args.num_nulls else 'NULL counts were not requested; use --num-nulls to include them. ') + ('Any-null indicates whether the UTC column contains at least one NULL. Missing columns show —; checks exceeding 30 seconds show timeout. ' if args.any_null else '') + 'SQL correctness requires review below.', '']
     rows=[]
     with connect() as count_db:
         count_db.autocommit = True
@@ -98,6 +99,7 @@ def main():
             candidates=['date_change_utc'] if t['name'].startswith('ev_') else ['datum_sys_utc']
             for name in candidates:
                 num_null = None
+                any_null = None
                 if args.num_nulls and name in t['columns']:
                     print(f"Counting NULLs: {t['schema']}.{t['name']}.{name}", flush=True)
                     try:
@@ -107,6 +109,18 @@ def main():
                                  sql.Identifier(name))).fetchone()['n']
                     except psycopg.errors.QueryCanceled:
                         num_null = 'timeout'
+                if args.any_null and name in t['columns']:
+                    if args.num_nulls and isinstance(num_null, int):
+                        any_null = num_null > 0
+                    else:
+                        print(f"Checking for NULLs: {t['schema']}.{t['name']}.{name}", flush=True)
+                        try:
+                            any_null = count_db.execute(sql.SQL(
+                                'SELECT EXISTS (SELECT 1 FROM {}.{} WHERE {} IS NULL) AS found'
+                            ).format(sql.Identifier(t['schema']), sql.Identifier(t['name']),
+                                     sql.Identifier(name))).fetchone()['found']
+                        except psycopg.errors.QueryCanceled:
+                            any_null = 'timeout'
                 matching=[f for f in fs if f['name']==name]
                 for i in ins or [None]:
                     scoped=[f for f in matching if i is None or f['table_id']==i['table_id']]
@@ -118,10 +132,11 @@ def main():
                         bool(scoped) and all(str(f['type']).lower() in ('date-time','datetime','timestamp','timestamp without time zone','timestamp with time zone') for f in scoped),
                         bool(physical and physical.startswith('timestamp')),
                         *((num_null,) if args.num_nulls else ()),
+                        *((any_null,) if args.any_null else ()),
                         ', '.join(f"{m['source']} → {m['target']}" for m in watermarks) or None,
                         bool(i and len(watermarks)==1 and watermarks[0] in mappings)))
     out += [table(['Table','UTC field','DB column exists','DB type','LIFT field exists','LIFT type','LIFT datetime','DB timestamp',
-                   *(['Num-null'] if args.num_nulls else []),'All watermarks','Sole watermark'],rows),
+                   *(['Num-null'] if args.num_nulls else []),*(['Any-null'] if args.any_null else []),'All watermarks','Sole watermark'],rows),
             '', '## Integration SQL for LLM review', '',
             'Check that each mapped UTC source alias is selected, converts the intended source timezone to UTC, '
             'and matches the target field and sole watermark above. An `_utc` name alone does not prove correctness.', '']
