@@ -79,7 +79,7 @@ def main():
     out = ['# KN and EV UTC audit', '', f'Exported: {datetime.now(timezone.utc).isoformat()}  ',
            f'Data database: `{database}`; metadata database: `{args.metadata_db}`.', '',
            'Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one audit row per UTC candidate and integration. '
-           'KN candidates are fields/columns ending in `_utc`; EV expects `date_change_utc`. '
+           'KN expects `datum_sys_utc`; EV expects `date_change_utc`. '
            'Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; '
            'children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. '
            'Snapshots from the two databases are taken separately.', '', '## Tables and sizes', '',
@@ -95,10 +95,8 @@ def main():
         for t in tables:
             fs=[f for f in fields if f['table_name']==t['name']]
             ins=[i for i in integrations if i['table_name']==t['name']]
-            candidates=['date_change_utc'] if t['name'].startswith('ev_') else sorted(
-                {f['name'] for f in fs if f['name'].endswith('_utc')} |
-                {c for c in t['columns'] if c.endswith('_utc')})
-            for name in candidates or ['(no _utc field)']:
+            candidates=['date_change_utc'] if t['name'].startswith('ev_') else ['datum_sys_utc']
+            for name in candidates:
                 num_null = None
                 if args.num_nulls and name in t['columns']:
                     print(f"Counting NULLs: {t['schema']}.{t['name']}.{name}", flush=True)

@@ -113,3 +113,19 @@ Otherwise unfinished rows can be skipped. Source-NULL rows are ignored and may
 require scanning past them during a probe. Uses at most 128 probes plus endpoint
 lookups; it creates no indexes or other database objects. Final full validation is
 still needed; this assumption is not verified by the bisection itself.
+
+## Table and date-column settings
+
+`.env` defaults: `TARGET_SCHEMA=public`, `TARGET_TABLE=...`,
+`SOURCE_DATE_COLUMN=date_change`, `DATE_COLUMN=date_change_utc`.
+Flags override these settings on all update scripts and the tracker:
+
+```bash
+.venv/bin/python batched_update.py --table kn_nep_parcele_h --source-date-column datum_sys --date-column datum_sys_utc
+.venv/bin/python db_tracker.py kn.sqlite --table kn_nep_parcele_h --source-date-column datum_sys --date-column datum_sys_utc
+```
+
+`--table public.kn_nep_parcele_h` also works. `--schema` sets the schema when
+passing an unqualified table. `--utc-column` is an alias for `--date-column`.
+Identifiers are quoted safely. Column flags change names only; the conversion
+still interprets the source timestamp as Europe/Ljubljana local time.

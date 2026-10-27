@@ -8,11 +8,11 @@ import termios
 import time
 import tty
 from psycopg.rows import dict_row
-from db import connect, TABLE
+from db import connect, TABLE, ARGS
 from run_log import run_log
 
 
-sqlite = sqlite3.connect(sys.argv[1] if len(sys.argv) > 1 else str(Path(__file__).with_name('full.sqlite')))
+sqlite = sqlite3.connect(ARGS.sqlite_file)
 sqlite.execute('''CREATE TABLE IF NOT EXISTS samples (
     time TEXT, wal_position_bytes INTEGER, wal_bytes INTEGER,
     wal_directory_bytes INTEGER, barman_retained_bytes INTEGER,

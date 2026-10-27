@@ -1,4 +1,4 @@
-from db import connect, sql, TABLE
+from db import connect, sql, TABLE, DATE_COLUMN, SOURCE_DATE_COLUMN
 import time
 from datetime import datetime, timezone
 
@@ -10,7 +10,7 @@ with run_log(__file__) as run:
     with connect() as db:
         wait_for_barman(db)
         run["phase"] = "set_unlogged"
-        db.execute(sql.SQL("ALTER TABLE {table} SET UNLOGGED").format(table=TABLE))
+        db.execute(sql.SQL("ALTER TABLE {table} SET UNLOGGED").format(table=TABLE, date_column=DATE_COLUMN, source_date_column=SOURCE_DATE_COLUMN))
         run["phase"] = "backfill"
         init_started = time.perf_counter()
         print('Finding start by UUID bisection (assumes no gaps in completed rows)...', flush=True)
@@ -30,7 +30,7 @@ with run_log(__file__) as run:
                     LIMIT 50000
                 ) batch
                 ORDER BY id DESC LIMIT 1
-            """).format(table=TABLE, after=after),
+            """).format(table=TABLE, date_column=DATE_COLUMN, source_date_column=SOURCE_DATE_COLUMN, after=after),
                 (last_id,)).fetchone()
             select_seconds = time.perf_counter() - batch_started
             if bound is None:
@@ -40,11 +40,11 @@ with run_log(__file__) as run:
             update_started = time.perf_counter()
             result = db.execute(sql.SQL("""
                 UPDATE {table}
-                SET date_change_utc =
-                    (date_change AT TIME ZONE 'Europe/Ljubljana') AT TIME ZONE 'UTC'
+                SET {date_column} =
+                    ({source_date_column} AT TIME ZONE 'Europe/Ljubljana') AT TIME ZONE 'UTC'
                 WHERE id <= %s {lower}
-                  AND date_change_utc IS NULL AND date_change IS NOT NULL
-            """).format(table=TABLE, lower=lower),
+                  AND {date_column} IS NULL AND {source_date_column} IS NOT NULL
+            """).format(table=TABLE, date_column=DATE_COLUMN, source_date_column=SOURCE_DATE_COLUMN, lower=lower),
                 (upper_id, last_id))
             update_seconds = time.perf_counter() - update_started
             batch_seconds = time.perf_counter() - batch_started
@@ -58,7 +58,7 @@ with run_log(__file__) as run:
         wait_for_barman(db)
         print("Setting table back to logged...", flush=True)
         run["phase"] = "set_logged"
-        db.execute(sql.SQL("ALTER TABLE {table} SET LOGGED").format(table=TABLE))
+        db.execute(sql.SQL("ALTER TABLE {table} SET LOGGED").format(table=TABLE, date_column=DATE_COLUMN, source_date_column=SOURCE_DATE_COLUMN))
         run["logging_restored"] = True
         wait_for_barman(db)
     print("Done", flush=True)

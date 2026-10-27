@@ -1,4 +1,4 @@
-from db import connect, sql, TABLE
+from db import connect, sql, TABLE, DATE_COLUMN, SOURCE_DATE_COLUMN
 
 from run_log import run_log
 
@@ -7,10 +7,10 @@ with run_log(__file__) as run:
         run["phase"] = "backfill"
         result = db.execute(sql.SQL("""
             UPDATE {table}
-            SET date_change_utc =
-                (date_change AT TIME ZONE 'Europe/Ljubljana') AT TIME ZONE 'UTC'
-            WHERE date_change_utc IS NULL AND date_change IS NOT NULL
-        """).format(table=TABLE))
+            SET {date_column} =
+                ({source_date_column} AT TIME ZONE 'Europe/Ljubljana') AT TIME ZONE 'UTC'
+            WHERE {date_column} IS NULL AND {source_date_column} IS NOT NULL
+        """).format(table=TABLE, date_column=DATE_COLUMN, source_date_column=SOURCE_DATE_COLUMN))
         print(f"Updated {result.rowcount} rows", flush=True)
     print("Done", flush=True)
     run["phase"] = "done"
