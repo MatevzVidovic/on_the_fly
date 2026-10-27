@@ -1,46 +1,46 @@
 # KN and EV UTC audit
 
-Exported: 2026-10-27T09:09:30.911704+00:00  
+Exported: 2026-10-27T10:05:48.525486+00:00  
 Data database: `fmp_data_gurs`; metadata database: `fmp`.
 
 Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one audit row per UTC candidate and integration. KN candidates are fields/columns ending in `_utc`; EV expects `date_change_utc`. Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. Snapshots from the two databases are taken separately.
 
 ## Tables and sizes
 
-| Table | Estimated rows | Table + TOAST | Indexes | Total | Total bytes |
-| --- | --- | --- | --- | --- | --- |
-| public.ev_del_stavbe_enota_h_2025_danes | 4894832 | 1794 MB | 1218 MB | 3012 MB | 3158777856 |
-| public.ev_del_stavbe_h | 11060290 | 2901 MB | 1008 MB | 3909 MB | 4099252224 |
-| public.ev_dst_pripis_podatki_h | 1949662 | 482 MB | 118 MB | 600 MB | 629579776 |
-| public.ev_parc_del_h | 16970546 | 3001 MB | 1078 MB | 4080 MB | 4277731328 |
-| public.ev_parc_enota_h_2025_danes | 26118360 | 6488 MB | 5009 MB | 11 GB | 12055412736 |
-| public.ev_parc_pripis_podatki_h | 8825796 | 1842 MB | 535 MB | 2377 MB | 2492530688 |
-| public.ev_parcela_h | 26478128 | 7175 MB | 5963 MB | 13 GB | 13775331328 |
-| public.ev_pe_dst_h | 210842 | 45 MB | 18 MB | 64 MB | 66674688 |
-| public.ev_pe_parc_h | 193814 | 84 MB | 27 MB | 111 MB | 116375552 |
-| public.ev_posebna_enota_h | 45222 | 95 MB | 5616 kB | 101 MB | 105381888 |
-| public.ev_prostor_h | 4659596 | 752 MB | 282 MB | 1034 MB | 1084350464 |
-| public.ev_stavba_h | 3190187 | 897 MB | 320 MB | 1217 MB | 1276542976 |
-| public.kn_nep_deli_stavb_h | 2740431 | 557 MB | 456 MB | 1014 MB | 1063051264 |
-| public.kn_nep_etaze_h | 2359504 | 485 MB | 413 MB | 897 MB | 941015040 |
-| public.kn_nep_etaze_x_deli_stavb_h | 2878408 | 680 MB | 415 MB | 1096 MB | 1149009920 |
-| public.kn_nep_hisne_stevilke_h | 1447996 | 336 MB | 174 MB | 510 MB | 534257664 |
-| public.kn_nep_katastrske_obcine_h | 19652 | 224 MB | 3752 kB | 228 MB | 238567424 |
-| public.kn_nep_ostalo_dejanske_rabe_parcel_h | 26196414 | 19 GB | 5579 MB | 25 GB | 26445512704 |
-| public.kn_nep_ostalo_gozdno_gosp_obm | 53681 | 210 MB | 7528 kB | 217 MB | 227680256 |
-| public.kn_nep_ostalo_namenske_rabe | 481310 | 417 MB | 65 MB | 482 MB | 505176064 |
-| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | 15118339 | 2286 MB | 1856 MB | 4142 MB | 4343021568 |
-| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | 6068445 | 855 MB | 929 MB | 1784 MB | 1870856192 |
-| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | 16466390 | 2783 MB | 2245 MB | 5029 MB | 5273018368 |
-| public.kn_nep_parcele_h | 7889332 | 3607 MB | 1321 MB | 4928 MB | 5167767552 |
-| public.kn_nep_prostori_h | 4435126 | 675 MB | 388 MB | 1063 MB | 1115086848 |
-| public.kn_nep_rpe_naselja_h | 20014 | 59 MB | 1464 kB | 60 MB | 63004672 |
-| public.kn_nep_rpe_obcine_h | 3550 | 156 MB | 344 kB | 157 MB | 164208640 |
-| public.kn_nep_rpe_ulice_h | 30982 | 13 MB | 3264 kB | 16 MB | 16941056 |
-| public.kn_nep_stavbe_centroidi_h | 2765199 | 1042 MB | 609 MB | 1650 MB | 1730363392 |
-| public.kn_nep_stavbe_obrisi_h | 2753964 | 1144 MB | 455 MB | 1600 MB | 1677459456 |
-| public.kn_nep_stavbe_parcele_h | 1639297 | 827 MB | 248 MB | 1075 MB | 1127178240 |
-| public.kn_nep_stavbe_zps_h | 1934875 | 759 MB | 316 MB | 1076 MB | 1127849984 |
+| Table | Persistence | Estimated rows | Table + TOAST | Indexes | Total | Total bytes |
+| --- | --- | --- | --- | --- | --- | --- |
+| public.ev_del_stavbe_enota_h_2025_danes | logged | 4894832 | 1794 MB | 1218 MB | 3012 MB | 3158777856 |
+| public.ev_del_stavbe_h | logged | 11060290 | 2901 MB | 1008 MB | 3909 MB | 4099252224 |
+| public.ev_dst_pripis_podatki_h | logged | 1949662 | 482 MB | 118 MB | 600 MB | 629579776 |
+| public.ev_parc_del_h | logged | 16970546 | 3001 MB | 1078 MB | 4080 MB | 4277731328 |
+| public.ev_parc_enota_h_2025_danes | logged | 26490712 | 5534 MB | 3762 MB | 9296 MB | 9747603456 |
+| public.ev_parc_pripis_podatki_h | logged | 8825796 | 1842 MB | 535 MB | 2377 MB | 2492530688 |
+| public.ev_parcela_h | unlogged | 26595092 | 7175 MB | 5966 MB | 13 GB | 13778468864 |
+| public.ev_pe_dst_h | logged | 210842 | 45 MB | 18 MB | 64 MB | 66674688 |
+| public.ev_pe_parc_h | logged | 193814 | 84 MB | 27 MB | 111 MB | 116375552 |
+| public.ev_posebna_enota_h | logged | 45222 | 95 MB | 5616 kB | 101 MB | 105381888 |
+| public.ev_prostor_h | logged | 4659596 | 752 MB | 282 MB | 1034 MB | 1084350464 |
+| public.ev_stavba_h | logged | 3190187 | 897 MB | 320 MB | 1217 MB | 1276542976 |
+| public.kn_nep_deli_stavb_h | logged | 2740431 | 557 MB | 456 MB | 1014 MB | 1063051264 |
+| public.kn_nep_etaze_h | logged | 2359504 | 485 MB | 413 MB | 897 MB | 941015040 |
+| public.kn_nep_etaze_x_deli_stavb_h | logged | 2878408 | 680 MB | 415 MB | 1096 MB | 1149009920 |
+| public.kn_nep_hisne_stevilke_h | logged | 1447996 | 336 MB | 174 MB | 510 MB | 534257664 |
+| public.kn_nep_katastrske_obcine_h | logged | 19652 | 224 MB | 3752 kB | 228 MB | 238567424 |
+| public.kn_nep_ostalo_dejanske_rabe_parcel_h | logged | 26196414 | 19 GB | 5579 MB | 25 GB | 26445512704 |
+| public.kn_nep_ostalo_gozdno_gosp_obm | logged | 53681 | 210 MB | 7528 kB | 217 MB | 227680256 |
+| public.kn_nep_ostalo_namenske_rabe | logged | 481310 | 417 MB | 65 MB | 482 MB | 505176064 |
+| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | logged | 15118339 | 2286 MB | 1856 MB | 4142 MB | 4343021568 |
+| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | logged | 6068445 | 855 MB | 929 MB | 1784 MB | 1870856192 |
+| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | logged | 16466390 | 2783 MB | 2245 MB | 5029 MB | 5273018368 |
+| public.kn_nep_parcele_h | logged | 7889332 | 3607 MB | 1321 MB | 4928 MB | 5167767552 |
+| public.kn_nep_prostori_h | logged | 4435126 | 675 MB | 388 MB | 1063 MB | 1115086848 |
+| public.kn_nep_rpe_naselja_h | logged | 20014 | 59 MB | 1464 kB | 60 MB | 63004672 |
+| public.kn_nep_rpe_obcine_h | logged | 3550 | 156 MB | 344 kB | 157 MB | 164208640 |
+| public.kn_nep_rpe_ulice_h | logged | 30982 | 13 MB | 3264 kB | 16 MB | 16941056 |
+| public.kn_nep_stavbe_centroidi_h | logged | 2765199 | 1042 MB | 609 MB | 1650 MB | 1730363392 |
+| public.kn_nep_stavbe_obrisi_h | logged | 2753964 | 1144 MB | 455 MB | 1600 MB | 1677459456 |
+| public.kn_nep_stavbe_parcele_h | logged | 1639297 | 827 MB | 248 MB | 1075 MB | 1127178240 |
+| public.kn_nep_stavbe_zps_h | logged | 1934875 | 759 MB | 316 MB | 1076 MB | 1127849984 |
 
 ## UTC fields and integration mappings
 

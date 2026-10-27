@@ -45,6 +45,7 @@ def main():
         database = db.execute('SELECT current_database() AS name').fetchone()['name']
         tables = db.execute("""
             SELECT n.nspname AS schema, c.relname AS name, c.reltuples::bigint AS estimated_rows,
+                   CASE c.relpersistence WHEN 'p' THEN 'logged' WHEN 'u' THEN 'unlogged' WHEN 't' THEN 'temporary' END AS persistence,
                    pg_size_pretty(pg_table_size(c.oid)) AS table_toast,
                    pg_size_pretty(pg_indexes_size(c.oid)) AS indexes,
                    pg_size_pretty(pg_total_relation_size(c.oid)) AS total,
@@ -82,8 +83,8 @@ def main():
            'Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; '
            'children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. '
            'Snapshots from the two databases are taken separately.', '', '## Tables and sizes', '',
-           table(['Table','Estimated rows','Table + TOAST','Indexes','Total','Total bytes'],
-                 [(f"{t['schema']}.{t['name']}",t['estimated_rows'],t['table_toast'],t['indexes'],t['total'],t['total_bytes']) for t in tables]),
+           table(['Table','Persistence','Estimated rows','Table + TOAST','Indexes','Total','Total bytes'],
+                 [(f"{t['schema']}.{t['name']}",t['persistence'],t['estimated_rows'],t['table_toast'],t['indexes'],t['total'],t['total_bytes']) for t in tables]),
            '', '## UTC fields and integration mappings', '',
            '“Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. '
            'LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. '

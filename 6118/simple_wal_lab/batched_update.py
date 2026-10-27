@@ -24,7 +24,7 @@ with run_log(__file__) as run:
                     SELECT id FROM {table}
                     {after}
                     ORDER BY id
-                    LIMIT 50000
+                    LIMIT 500000
                 ) batch
                 ORDER BY id DESC LIMIT 1
             """).format(table=TABLE, after=after),
