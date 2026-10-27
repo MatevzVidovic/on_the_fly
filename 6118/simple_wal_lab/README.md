@@ -90,3 +90,11 @@ This measures retained WAL on PostgreSQL, not the Barman server's archive disk s
 Both batched scripts now use 50,000 rows. Each completed batch prints SELECT,
 UPDATE and total batch seconds, plus rows/second. These timings exclude the
 Barman wait and the one-second pause.
+
+Batches now use ID ranges. Boundary selection reads only the next 50,000 IDs
+(without date filters) and returns the upper ID. The UPDATE uses `id > last_id`
+and `id <= upper_id`, plus the existing NULL/date conditions. Only one boundary
+ID travels to Python; no ID array is sent back. The first range has no lower bound.
+A range updating zero rows still advances; only an empty boundary selection ends
+processing. Restarting scans ranges again but preserves already-filled UTC values.
+Keep other writers stopped: new qualifying rows behind the cursor are not revisited.
