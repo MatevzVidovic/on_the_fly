@@ -1,6 +1,6 @@
 # KN and EV UTC audit
 
-Exported: 2026-10-27T08:59:17.122150+00:00  
+Exported: 2026-10-27T09:09:30.911704+00:00  
 Data database: `fmp_data_gurs`; metadata database: `fmp`.
 
 Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one audit row per UTC candidate and integration. KN candidates are fields/columns ending in `_utc`; EV expects `date_change_utc`. Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. Snapshots from the two databases are taken separately.
@@ -13,7 +13,7 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_del_stavbe_h | 11060290 | 2901 MB | 1008 MB | 3909 MB | 4099252224 |
 | public.ev_dst_pripis_podatki_h | 1949662 | 482 MB | 118 MB | 600 MB | 629579776 |
 | public.ev_parc_del_h | 16970546 | 3001 MB | 1078 MB | 4080 MB | 4277731328 |
-| public.ev_parc_enota_h_2025_danes | 26497772 | 6244 MB | 4691 MB | 11 GB | 11466162176 |
+| public.ev_parc_enota_h_2025_danes | 26118360 | 6488 MB | 5009 MB | 11 GB | 12055412736 |
 | public.ev_parc_pripis_podatki_h | 8825796 | 1842 MB | 535 MB | 2377 MB | 2492530688 |
 | public.ev_parcela_h | 26478128 | 7175 MB | 5963 MB | 13 GB | 13775331328 |
 | public.ev_pe_dst_h | 210842 | 45 MB | 18 MB | 64 MB | 66674688 |
@@ -44,42 +44,42 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 
 ## UTC fields and integration mappings
 
-“Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. Delta-date enabled is reported separately. SQL correctness requires review below.
+“Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. NULL counts were not requested; use --num-nulls to include them. SQL correctness requires review below.
 
-| Table | UTC field | DB column exists | DB type | LIFT field exists | LIFT type | LIFT datetime | DB timestamp | Integration | Integration ID | Full sync | Mapped | Mapped source | All watermarks | Sole watermark | Delta-date enabled |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| public.ev_del_stavbe_enota_h_2025_danes | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prenos_ev_del_stavbe_enota_h_2025_danes | 726fc9e4-b684-11f1-b953-02420a00027f | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_del_stavbe_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | uvoz_ev_h_del_stavbe | b867296c-ab2a-11f0-a252-169cd02558fe | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_dst_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | uvoz_ev_dst_pripis_podatki_h | ebe9dc2a-9356-11f1-a711-02420a000208 | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_parc_del_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prenos_parc_del_ev | 8a9ed9a4-ae58-11f0-9f8c-169cd02558fe | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_parc_enota_h_2025_danes | date_change_utc | True | timestamp(0) without time zone | True | date-time | True | True | prenos_ev_parc_enota_h_2025_danes | 1e57d002-f69c-11f0-9f2c-02420a000266 | False | False | — | — | False | True |
-| public.ev_parc_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | uvoz_ev_parc_pripis_podatki_h | 5b3da3c2-9357-11f1-a60a-02420a000208 | False | False | — | DATE_CHANGE → date_change | False | True |
-| public.ev_parcela_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prnos_ev_parcela | c469d91a-ae56-11f0-84be-169cd02558fe | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_pe_dst_h | date_change_utc | False | — | False | — | False | False | ev_dst_pe | f5519202-ae65-11f0-adb7-169cd02558fe | False | False | — | DATE_CHANGE → date_change | False | True |
-| public.ev_pe_parc_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | pnreos_pe_parc_ev | 26856cbc-ae67-11f0-8b08-169cd02558fe | False | True | DATE_CHANGE_UTC | DATE_CHANGE_UTC → date_change_utc | True | True |
-| public.ev_posebna_enota_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prenos_ev_posebna_enota | a75bfb06-ae69-11f0-941e-169cd02558fe | False | False | — | DATE_CHANGE → date_change | False | True |
-| public.ev_prostor_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prenos_prostor | 3d6e03ec-ae6e-11f0-bc34-169cd02558fe | False | False | — | DATE_CHANGE → date_change | False | True |
-| public.ev_stavba_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | prenos ev stavba h | 39aa410c-beff-11f0-a601-5212cffe39ac | False | False | — | DATE_CHANGE → date_change | False | True |
-| public.kn_nep_deli_stavb_h | (no _utc field) | False | — | False | — | False | False | kn_nep_deli_stavb_h | bfe62b52-9aaf-11ef-9c54-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_etaze_h | (no _utc field) | False | — | False | — | False | False | kn_nep_etaze_h | 550a20ee-9d03-11ef-8c7b-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_etaze_x_deli_stavb_h | (no _utc field) | False | — | False | — | False | False | kn_nep_etaze_x_deli_stavb_h | fb72d988-b94d-11ef-bb81-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_hisne_stevilke_h | (no _utc field) | False | — | False | — | False | False | kn_nep_hisne_stevilke_h | 736ac43c-b60b-11ef-a0fc-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_katastrske_obcine_h | (no _utc field) | False | — | False | — | False | False | kn_nep_katastrske_obcine_h | f6c3a090-8638-11ef-8275-0242ac120007 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_ostalo_dejanske_rabe_parcel_h | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_dejanske_rabe_parcel_h | e0c4ee44-f34c-11ef-9c8f-02420a0001ec | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_ostalo_gozdno_gosp_obm | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_gozdno_gosp_obm | a99024c6-a8aa-11ef-adaf-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_ostalo_namenske_rabe | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_namenske_rabe | 74096586-f2b2-11ef-ac67-02420a0001ec | True | False | — | — | False | False |
-| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_parcele_x_dejanske_rabe_h | 8264be70-aafd-11ef-947a-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | e0d985ce-a8bb-11ef-ac18-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | (no _utc field) | False | — | False | — | False | False | kn_nep_ostalo_parcele_x_namenske_rabe_h | 8b9adbea-a59f-11ef-a7dc-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_parcele_h | (no _utc field) | False | — | False | — | False | False | kn_nep_parcele_h | 4f44b04c-a7e5-11ef-b133-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_prostori_h | (no _utc field) | False | — | False | — | False | False | kn_nep_prostori_h | 5b16f1a0-a592-11ef-9316-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_rpe_naselja_h | (no _utc field) | False | — | False | — | False | False | kn_nep_rpe_naselja_h | 403dee5c-d34f-11ef-a441-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_rpe_obcine_h | (no _utc field) | False | — | False | — | False | False | kn_nep_rpe_obcine_h | 6460237c-f34d-11ef-91f1-02420a0001ec | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_rpe_ulice_h | (no _utc field) | False | — | False | — | False | False | kn_nep_rpe_ulice_h | d1d4521c-bc79-11ef-89e9-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_stavbe_centroidi_h | (no _utc field) | False | — | False | — | False | False | kn_nep_stavbe_centroidi_h | 45293dec-bd13-11ef-bde9-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_stavbe_obrisi_h | (no _utc field) | False | — | False | — | False | False | kn_nep_stavbe_obrisi_h | e54577ee-f9b0-11ef-bd51-02420a0001ec | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_stavbe_parcele_h | (no _utc field) | False | — | False | — | False | False | kn_nep_stavbe_parcele_h | a33e8606-a8c0-11ef-84ad-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
-| public.kn_nep_stavbe_zps_h | (no _utc field) | False | — | False | — | False | False | kn_nep_stavbe_zps_h | 969f1312-ff45-11ef-8df0-0242ac120008 | False | False | — | DATUM_SYS → datum_sys | False | True |
+| Table | UTC field | DB column exists | DB type | LIFT field exists | LIFT type | LIFT datetime | DB timestamp | All watermarks | Sole watermark |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| public.ev_del_stavbe_enota_h_2025_danes | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_del_stavbe_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_dst_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_parc_del_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_parc_enota_h_2025_danes | date_change_utc | True | timestamp(0) without time zone | True | date-time | True | True | — | False |
+| public.ev_parc_pripis_podatki_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.ev_parcela_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_pe_dst_h | date_change_utc | False | — | False | — | False | False | DATE_CHANGE → date_change | False |
+| public.ev_pe_parc_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
+| public.ev_posebna_enota_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.ev_prostor_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.ev_stavba_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE → date_change | False |
+| public.kn_nep_deli_stavb_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_etaze_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_etaze_x_deli_stavb_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_hisne_stevilke_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_katastrske_obcine_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_ostalo_dejanske_rabe_parcel_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_ostalo_gozdno_gosp_obm | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_ostalo_namenske_rabe | (no _utc field) | False | — | False | — | False | False | — | False |
+| public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_ostalo_parcele_x_namenske_rabe_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_parcele_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_prostori_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_rpe_naselja_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_rpe_obcine_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_rpe_ulice_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_stavbe_centroidi_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_stavbe_obrisi_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_stavbe_parcele_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
+| public.kn_nep_stavbe_zps_h | (no _utc field) | False | — | False | — | False | False | DATUM_SYS → datum_sys | False |
 
 ## Integration SQL for LLM review
 
