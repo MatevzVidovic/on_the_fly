@@ -98,3 +98,18 @@ ID travels to Python; no ID array is sent back. The first range has no lower bou
 A range updating zero rows still advances; only an empty boundary selection ends
 processing. Restarting scans ranges again but preserves already-filled UTC values.
 Keep other writers stopped: new qualifying rows behind the cursor are not revisited.
+
+At startup, batched scripts find the first eligible ID using `ORDER BY id LIMIT 1`
+with the NULL/date conditions, and print the lookup time. The first range includes
+that ID (`>=`); subsequent ranges start strictly after the previous upper bound.
+This skips the completed prefix without assuming all later rows are unfinished.
+The one-time lookup may still read a large completed prefix; no new index is created.
+
+Starting-point lookup now uses UUID-value bisection (`find_start_id.py`), replacing
+its earlier completed-prefix scan. Each probe seeks to the midpoint UUID and
+checks the next row with a non-NULL source date. UUID gaps are fine; completion
+must be monotonic: all filled eligible rows precede all unfinished eligible rows.
+Otherwise unfinished rows can be skipped. Source-NULL rows are ignored and may
+require scanning past them during a probe. Uses at most 128 probes plus endpoint
+lookups; it creates no indexes or other database objects. Final full validation is
+still needed; this assumption is not verified by the bisection itself.
