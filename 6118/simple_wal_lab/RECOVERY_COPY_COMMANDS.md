@@ -27,7 +27,8 @@ empty initial destination followed by this script's ordered committed batches.
 The copy preserves IDs/other fields and computes UTC during INSERT. Default batch
 size is 500,000; it is explicit below. Barman retention is checked between batches,
 not a hard disk-space cap. The final SQL block in each section drops the restored source and renames the
-filled `_org2810` table to its original name. Logging mode is unchanged.
+filled `_org2810` table to its original name. The separate SET LOGGED command
+at the end of each entry then restores logging on that renamed table.
 An unlogged destination can lose its contents again after a crash. Verify actual
 filesystem headroom before starting, including space for indexes and later SET LOGGED.
 
@@ -35,8 +36,8 @@ filesystem headroom before starting, including space for indexes and later SET L
 finishes successfully and you validate row counts, IDs, copied values and UTC
 values. The source DROP removes your restored copy. Keep the restoration backup.
 The transaction makes DROP + RENAME atomic; on any error issue ROLLBACK. No CASCADE
-is used: dependency errors must be investigated, not bypassed. These blocks do not
-SET LOGGED; logging restoration remains a separate manual step. Stop writers through
+is used: dependency errors must be investigated, not bypassed. DROP/RENAME and SET LOGGED are separate steps; run SET LOGGED only after the
+rename transaction has committed. Stop writers through
 validation and cutover. A successful copy command alone is not full validation.
 
 The count comparison immediately before each cutover reads both complete tables
@@ -79,6 +80,11 @@ ALTER TABLE public.kn_nep_rpe_ulice_h_org2810 RENAME TO kn_nep_rpe_ulice_h;
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_rpe_ulice_h SET LOGGED;
+```
+
 ## 2. `public.kn_nep_rpe_naselja_h` — 113 MB
 
 ```sql
@@ -111,6 +117,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_rpe_naselja_h;
 ALTER TABLE public.kn_nep_rpe_naselja_h_org2810 RENAME TO kn_nep_rpe_naselja_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_rpe_naselja_h SET LOGGED;
 ```
 
 ## 3. `public.ev_pe_dst_h` — 121 MB
@@ -146,6 +157,11 @@ DROP TABLE public.ev_pe_dst_h;
 ALTER TABLE public.ev_pe_dst_h_org2810 RENAME TO ev_pe_dst_h;
 COMMIT;
 ``` -->
+<!-- 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.ev_pe_dst_h SET LOGGED;
+```
 
 ## 4. `public.kn_nep_rpe_obcine_h` — 125 MB
 
@@ -179,8 +195,13 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_rpe_obcine_h;
 ALTER TABLE public.kn_nep_rpe_obcine_h_org2810 RENAME TO kn_nep_rpe_obcine_h;
 COMMIT;
-``` -->
-
+<!-- ``` -->
+<!-- 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+-- ALTER TABLE public.kn_nep_rpe_obcine_h SET LOGGED;
+``` --> --> -->
+<!-- 
 ## 5. `public.kn_nep_katastrske_obcine_h` — 255 MB
 
 ```sql
@@ -215,6 +236,11 @@ ALTER TABLE public.kn_nep_katastrske_obcine_h_org2810 RENAME TO kn_nep_katastrsk
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_katastrske_obcine_h SET LOGGED;
+``` -->
+
 ## 6. `public.kn_nep_ostalo_gozdno_gosp_obm` — 440 MB
 
 ```sql
@@ -247,6 +273,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_ostalo_gozdno_gosp_obm;
 ALTER TABLE public.kn_nep_ostalo_gozdno_gosp_obm_org2810 RENAME TO kn_nep_ostalo_gozdno_gosp_obm;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_ostalo_gozdno_gosp_obm SET LOGGED;
 ```
 
 ## 7. `public.kn_nep_hisne_stevilke_h` — 792 MB
@@ -283,6 +314,11 @@ ALTER TABLE public.kn_nep_hisne_stevilke_h_org2810 RENAME TO kn_nep_hisne_stevil
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_hisne_stevilke_h SET LOGGED;
+```
+
 ## 8. `public.kn_nep_etaze_h` — 1361 MB
 
 ```sql
@@ -315,6 +351,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_etaze_h;
 ALTER TABLE public.kn_nep_etaze_h_org2810 RENAME TO kn_nep_etaze_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_etaze_h SET LOGGED;
 ```
 
 ## 9. `public.kn_nep_stavbe_zps_h` — 1416 MB
@@ -351,6 +392,11 @@ ALTER TABLE public.kn_nep_stavbe_zps_h_org2810 RENAME TO kn_nep_stavbe_zps_h;
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_stavbe_zps_h SET LOGGED;
+```
+
 ## 10. `public.kn_nep_prostori_h` — 1520 MB
 
 ```sql
@@ -383,6 +429,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_prostori_h;
 ALTER TABLE public.kn_nep_prostori_h_org2810 RENAME TO kn_nep_prostori_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_prostori_h SET LOGGED;
 ```
 
 ## 11. `public.kn_nep_deli_stavb_h` — 1581 MB
@@ -419,6 +470,11 @@ ALTER TABLE public.kn_nep_deli_stavb_h_org2810 RENAME TO kn_nep_deli_stavb_h;
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_deli_stavb_h SET LOGGED;
+```
+
 ## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB
 
 ```sql
@@ -451,6 +507,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_etaze_x_deli_stavb_h;
 ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h_org2810 RENAME TO kn_nep_etaze_x_deli_stavb_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h SET LOGGED;
 ```
 
 ## 13. `public.kn_nep_stavbe_parcele_h` — 1645 MB
@@ -487,6 +548,11 @@ ALTER TABLE public.kn_nep_stavbe_parcele_h_org2810 RENAME TO kn_nep_stavbe_parce
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_stavbe_parcele_h SET LOGGED;
+```
+
 ## 14. `public.kn_nep_stavbe_obrisi_h` — 1731 MB
 
 ```sql
@@ -519,6 +585,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_stavbe_obrisi_h;
 ALTER TABLE public.kn_nep_stavbe_obrisi_h_org2810 RENAME TO kn_nep_stavbe_obrisi_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_stavbe_obrisi_h SET LOGGED;
 ```
 
 ## 15. `public.kn_nep_stavbe_centroidi_h` — 1828 MB
@@ -555,6 +626,11 @@ ALTER TABLE public.kn_nep_stavbe_centroidi_h_org2810 RENAME TO kn_nep_stavbe_cen
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_stavbe_centroidi_h SET LOGGED;
+```
+
 ## 16. `public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — 3590 MB
 
 ```sql
@@ -587,6 +663,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h;
 ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_org2810 RENAME TO kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h SET LOGGED;
 ```
 
 ## 17. `public.kn_nep_ostalo_parcele_x_dejanske_rabe_h` — 5403 MB
@@ -623,6 +704,11 @@ ALTER TABLE public.kn_nep_ostalo_parcele_x_dejanske_rabe_h_org2810 RENAME TO kn_
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_ostalo_parcele_x_dejanske_rabe_h SET LOGGED;
+```
+
 ## 18. `public.ev_parc_del_h` — 6359 MB
 <!-- 
 ```sql
@@ -657,38 +743,48 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
 -- COMMIT;
 ``` -->
 
-## 19. `public.kn_nep_parcele_h` — 6659 MB
+-- ```sql
+-- -- After the rename has committed; run separately with sufficient disk headroom.
+-- ALTER TABLE public.ev_parc_del_h SET LOGGED;
+-- ```
 
-```sql
-ALTER TABLE public.kn_nep_parcele_h ALTER COLUMN id SET NOT NULL;
-CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_19_source_id_uq
-    ON public.kn_nep_parcele_h (id);
-```
+-- ## 19. `public.kn_nep_parcele_h` — 6659 MB
 
-```bash
-.venv/bin/python batched_copy_backfill.py --table public.kn_nep_parcele_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
-```
+-- ```sql
+-- ALTER TABLE public.kn_nep_parcele_h ALTER COLUMN id SET NOT NULL;
+-- CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_19_source_id_uq
+--     ON public.kn_nep_parcele_h (id);
+-- ```
 
-```sql
--- Exact counts: require counts_match = true and difference = 0 before cutover.
-WITH counts AS MATERIALIZED (
-    SELECT
-        (SELECT count(*) FROM public.kn_nep_parcele_h) AS restored_source_rows,
-        (SELECT count(*) FROM public.kn_nep_parcele_h_org2810) AS copied_target_rows
-)
-SELECT *,
-       copied_target_rows - restored_source_rows AS difference,
-       restored_source_rows = copied_target_rows AS counts_match
-FROM counts;
-```
+-- ```bash
+-- .venv/bin/python batched_copy_backfill.py --table public.kn_nep_parcele_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+-- ```
 
-```sql
--- After validating the completed copy:
-BEGIN;
-SET LOCAL lock_timeout = '5s';
-DROP TABLE public.kn_nep_parcele_h;
-ALTER TABLE public.kn_nep_parcele_h_org2810 RENAME TO kn_nep_parcele_h;
-COMMIT;
+-- ```sql
+-- -- Exact counts: require counts_match = true and difference = 0 before cutover.
+-- WITH counts AS MATERIALIZED (
+--     SELECT
+--         (SELECT count(*) FROM public.kn_nep_parcele_h) AS restored_source_rows,
+--         (SELECT count(*) FROM public.kn_nep_parcele_h_org2810) AS copied_target_rows
+-- )
+-- SELECT *,
+--        copied_target_rows - restored_source_rows AS difference,
+--        restored_source_rows = copied_target_rows AS counts_match
+-- FROM counts;
+-- ```
+
+-- ```sql
+-- -- After validating the completed copy:
+-- BEGIN;
+-- SET LOCAL lock_timeout = '5s';
+-- DROP TABLE public.kn_nep_parcele_h;
+-- ALTER TABLE public.kn_nep_parcele_h_org2810 RENAME TO kn_nep_parcele_h;
+-- COMMIT;
+-- ```
+
+-- ```sql
+-- -- After the rename has committed; run separately with sufficient disk headroom.
+-- ALTER TABLE public.kn_nep_parcele_h SET LOGGED;
 ```
 
 ## 20. `public.kn_nep_ostalo_parcele_x_namenske_rabe_h` — 9250 MB
@@ -725,6 +821,11 @@ ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h_org2810 RENAME TO kn_
 COMMIT;
 ```
 
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h SET LOGGED;
+```
+
 ## 21. `public.kn_nep_ostalo_dejanske_rabe_parcel_h` — 20 GB
 
 ```sql
@@ -757,5 +858,10 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_ostalo_dejanske_rabe_parcel_h;
 ALTER TABLE public.kn_nep_ostalo_dejanske_rabe_parcel_h_org2810 RENAME TO kn_nep_ostalo_dejanske_rabe_parcel_h;
 COMMIT;
+```
+
+```sql
+-- After the rename has committed; run separately with sufficient disk headroom.
+ALTER TABLE public.kn_nep_ostalo_dejanske_rabe_parcel_h SET LOGGED;
 ```
 
