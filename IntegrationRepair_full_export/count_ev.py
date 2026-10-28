@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Read-only Oracle/LIFT counts for the twelve repaired EV integrations."""
 import argparse
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 import json
 from pathlib import Path
 from time import perf_counter
@@ -47,12 +47,23 @@ def count_table(definition, oracle, lift):
         cur.execute(sql.SQL('SELECT count(*), count(*) FILTER (WHERE {} <= %s::timestamp) FROM {}').format(
             sql.Identifier(definition.date['target']), sql.Identifier(definition.table)), (cutoff,))
         lift_total, lift_eligible = cur.fetchone()
+    boundary = {}
+    if definition.table == 'ev_parc_enota_h_2025_danes':
+        # Historical timestamp(0) rows rounded .999 to the next whole second.
+        rounded = datetime.fromisoformat(cutoff)
+        rounded = rounded.replace(microsecond=0) + timedelta(seconds=rounded.microsecond >= 500000)
+        with lift.cursor() as cur:
+            cur.execute(sql.SQL('SELECT count(*) FROM {} WHERE {} <= %s::timestamp').format(
+                sql.Identifier(definition.table), sql.Identifier(definition.date['target'])), (rounded,))
+            adjusted_count = cur.fetchone()[0]
+        boundary = dict(lift_rounded_cutoff=utc_time(rounded), lift_rounded_eligible=adjusted_count,
+                        rounded_cutoff_gap=oracle_eligible-adjusted_count)
     return dict(table=definition.table, integration_id=definition.id, cutoff=cutoff,
                 source_date=definition.date['api_name'], target_date=definition.date['target'], time_basis='UTC',
                 oracle_total=oracle_total, lift_total=lift_total, total_difference=lift_total-oracle_total,
                 oracle_eligible=oracle_eligible, lift_eligible=lift_eligible,
                 eligible_difference=lift_eligible-oracle_eligible,
-                oracle_seconds=round(oracle_seconds, 3), lift_seconds=round(perf_counter()-started, 3))
+                oracle_seconds=round(oracle_seconds, 3), lift_seconds=round(perf_counter()-started, 3), **boundary)
 
 
 def main():

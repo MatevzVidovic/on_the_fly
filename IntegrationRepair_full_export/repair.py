@@ -2,7 +2,7 @@
 """Prepare the membership diff; apply its saved entries with resumable batches."""
 import argparse
 from contextlib import ExitStack
-from datetime import datetime
+from datetime import datetime, timezone
 import json
 import os
 from zoneinfo import ZoneInfo
@@ -19,9 +19,11 @@ from target import LiftTarget
 from timings import measure
 
 
-def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None, allow_one_second_ahead=False, allow_one_second_behind=False):
+def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None, allow_one_second_ahead=False, allow_one_second_behind=False, since_watermark=False):
     if run_id is None:
         cutoff = utc_time(definition.cutoff)
+        if since_watermark:
+            min_date, cutoff = cutoff, utc_time(datetime.now(timezone.utc))
         if min_date is not None and min_date > cutoff:
             raise ValueError('Minimum date must not be later than the integration cutoff')
         run_id = store.create_run(definition.id, cutoff, definition.table, min_date,
@@ -120,6 +122,7 @@ def main():
     parser.add_argument('--store', default='repair.sqlite')
     parser.add_argument('--resume', metavar='RUN_UUID', help='resume preparation of this saved run')
     parser.add_argument('--only-src', action='store_true', help='prepare only the Oracle inventory')
+    parser.add_argument('--since-watermark', action='store_true', help='prepare upserts from the current integration watermark through a fixed UTC now; does not move the watermark')
     parser.add_argument('--min-date', help='inclusive minimum source change date: YYYY-MM-DD or ISO datetime; upserts only')
     parser.add_argument('--allow-one-second-ahead', action='store_true', help='treat LIFT up to one second ahead as equal; enabling on resume restarts the LIFT comparison')
     parser.add_argument('--allow-one-second-behind', action='store_true', help='treat LIFT up to one second behind as equal; enabling on resume restarts the LIFT comparison')
@@ -128,8 +131,10 @@ def main():
     args = parser.parse_args()
     if args.command == 'prepare' and args.id is None and args.resume is None:
         parser.error('prepare requires an integration UUID or --resume RUN_UUID')
-    if args.command == 'apply' and (args.resume or args.only_src or args.min_date is not None or args.allow_one_second_ahead or args.allow_one_second_behind):
+    if args.command == 'apply' and (args.resume or args.only_src or args.since_watermark or args.min_date is not None or args.allow_one_second_ahead or args.allow_one_second_behind):
         parser.error('--resume, --only-src, --min-date and one-second leeway flags are prepare options')
+    if args.since_watermark and (args.resume or args.min_date is not None):
+        parser.error('--since-watermark starts a new run; use --resume alone to continue it')
     if args.min_date is not None:
         if args.resume:
             parser.error('resume reuses the saved minimum date; omit --min-date')
@@ -178,7 +183,7 @@ def main():
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
         source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
         if args.command == 'prepare':
-            prepare(definition, source, target, store, args.resume, args.only_src, args.min_date, args.allow_one_second_ahead, args.allow_one_second_behind)
+            prepare(definition, source, target, store, args.resume, args.only_src, args.min_date, args.allow_one_second_ahead, args.allow_one_second_behind, args.since_watermark)
         else:
             apply(args.id, definition, source, target, store)
 

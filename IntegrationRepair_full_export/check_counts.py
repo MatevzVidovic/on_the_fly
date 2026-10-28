@@ -53,26 +53,30 @@ def main(argv=None):
             oracle.call_timeout = 600000
             with oracle.cursor() as cur:
                 cur.execute('SET TRANSACTION READ ONLY')
-            print('Gap = Oracle minus LIFT. Cutoff gap uses both change dates <= the current watermark.', flush=True)
-            print(f"{'Table':40} {'Oracle':>13} {'LIFT':>13} {'Gap':>10} {'Cutoff gap':>12}  Result", flush=True)
+            print('Gap = Oracle minus LIFT. Parity compares TOTAL counts only.', flush=True)
+            print('Cutoff gaps filter each side independently; they are not missing-key counts or repair verdicts.', flush=True)
+            print(f"{'Table':40} {'Oracle':>13} {'LIFT':>13} {'Gap':>10} {'Cutoff gap':>12} {'Rounded gap':>12}  Total parity", flush=True)
             for definition in definitions:
                 print(f'Counting {definition.table} ...', flush=True)
                 result = count_table(definition, oracle, lift)
                 result['total_gap'] = -result.pop('total_difference')
                 result['cutoff_gap'] = -result.pop('eligible_difference')
-                result['counts_match'] = result['total_gap'] == result['cutoff_gap'] == 0
+                result['counts_match'] = result['total_gap'] == 0
+                result['cutoff_counts_match'] = result['cutoff_gap'] == 0
                 report['tables'].append(result)
                 path.write_text(json.dumps(report, indent=2) + '\n')
                 state = 'MATCH' if result['counts_match'] else 'DIFF'
+                rounded = f"{result['rounded_cutoff_gap']:+,}" if 'rounded_cutoff_gap' in result else '—'
                 print(f"{result['table']:40} {result['oracle_total']:13,} {result['lift_total']:13,} "
-                      f"{result['total_gap']:+10,} {result['cutoff_gap']:+12,}  {state}", flush=True)
+                      f"{result['total_gap']:+10,} {result['cutoff_gap']:+12,} {rounded:>12}  {state}", flush=True)
             oracle.rollback()
         lift.rollback()
     report['finished_at'] = datetime.now(timezone.utc).isoformat()
     path.write_text(json.dumps(report, indent=2) + '\n')
     matches = sum(t['counts_match'] for t in report['tables'])
-    print(f'{matches}/{len(definitions)} tables match both counts. Saved {path}', flush=True)
-    print('Equal counts do not prove matching keys or values; live source changes can also create gaps.', flush=True)
+    print(f'{matches}/{len(definitions)} tables have total count parity. Saved {path}', flush=True)
+    print('Rounded gap includes parcel-unit rows up to the nearest-second watermark (historical timestamp(0) rounding).', flush=True)
+    print('Equal totals do not prove matching keys or values. Post-watermark changes can leave total gaps after a successful repair.', flush=True)
 
 
 if __name__ == '__main__':

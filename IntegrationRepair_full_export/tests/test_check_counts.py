@@ -19,7 +19,7 @@ def test_main_reports_real_count_gaps_and_preserves_read_only(definition, tmp_pa
         def rollback(self):
             rollbacks.append(self)
     metadata = Connection(Cursor([('integration', 'records')]))
-    lift = Connection(Cursor([(lift_count, 8)]))
+    lift = Connection(Cursor([(lift_count, 7)]))
     oracle = Connection(Cursor([(10, 8)]))
     def connect(**settings):
         assert 'default_transaction_read_only=on' in settings['options']
@@ -30,7 +30,7 @@ def test_main_reports_real_count_gaps_and_preserves_read_only(definition, tmp_pa
     check_counts.main([*options, '--output', str(path)])
     report = json.loads(path.read_text())
     result = report['tables'][0]
-    assert result['total_gap'] == 10-lift_count and result['cutoff_gap'] == 0
+    assert result['total_gap'] == 10-lift_count and result['cutoff_gap'] == 1
     assert result['counts_match'] == (lift_count == 10)
     assert report['finished_at'] and report['difference'] == 'Oracle minus LIFT'
     assert 'kn_nep_ostalo_namenske_rabe' in report['excluded_tables']

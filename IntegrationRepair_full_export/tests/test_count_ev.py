@@ -18,3 +18,20 @@ def test_count_table(definition):
     assert 'WHERE "changed" <= %s::timestamp' in query.as_string()
     assert params == (DATE,)
     assert len(INTEGRATIONS) == 12
+
+
+def test_parcel_units_report_both_exact_and_rounded_boundaries(definition):
+    from dataclasses import replace
+    from datetime import datetime
+    definition = replace(definition, table='ev_parc_enota_h_2025_danes',
+                         cutoff='2026-10-26 22:59:59.999000')
+    oracle_cursor = Cursor([(100, 90)])
+    class ResultsCursor(Cursor):
+        def fetchone(self):
+            return self.rows.pop(0)
+    lift_cursor = ResultsCursor([(100, 80), (92,)])
+    result = count_table(definition, Database(oracle_cursor), Database(lift_cursor))
+    assert result['eligible_difference'] == -10
+    assert result['rounded_cutoff_gap'] == -2
+    assert result['lift_rounded_cutoff'] == '2026-10-26 23:00:00.000000'
+    assert lift_cursor.calls[-1][1] == (datetime(2026, 10, 26, 23),)

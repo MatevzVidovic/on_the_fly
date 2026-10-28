@@ -1,5 +1,5 @@
 {
-  "started_at": "2026-10-28T18:45:33.772690+00:00",
+  "started_at": "2026-10-28T19:07:05.561642+00:00",
   "env_file": ".env",
   "difference": "Oracle minus LIFT",
   "excluded_tables": [
@@ -18,11 +18,12 @@
       "lift_total": 2743050,
       "oracle_eligible": 2742932,
       "lift_eligible": 2743050,
-      "oracle_seconds": 4.483,
-      "lift_seconds": 0.842,
+      "oracle_seconds": 5.026,
+      "lift_seconds": 0.91,
       "total_gap": 144,
       "cutoff_gap": -118,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_etaze_h",
@@ -35,11 +36,12 @@
       "lift_total": 2362474,
       "oracle_eligible": 2362370,
       "lift_eligible": 2362474,
-      "oracle_seconds": 3.705,
-      "lift_seconds": 0.785,
+      "oracle_seconds": 3.993,
+      "lift_seconds": 2.925,
       "total_gap": 140,
       "cutoff_gap": -104,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_etaze_x_deli_stavb_h",
@@ -52,11 +54,12 @@
       "lift_total": 2889109,
       "oracle_eligible": 2889026,
       "lift_eligible": 2889109,
-      "oracle_seconds": 3.567,
-      "lift_seconds": 0.814,
+      "oracle_seconds": 3.731,
+      "lift_seconds": 1.002,
       "total_gap": 172,
       "cutoff_gap": -83,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_hisne_stevilke_h",
@@ -69,11 +72,12 @@
       "lift_total": 1448469,
       "oracle_eligible": 1448460,
       "lift_eligible": 1448469,
-      "oracle_seconds": 2.427,
-      "lift_seconds": 0.718,
+      "oracle_seconds": 2.401,
+      "lift_seconds": 0.779,
       "total_gap": 12,
       "cutoff_gap": -9,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_katastrske_obcine_h",
@@ -87,10 +91,11 @@
       "oracle_eligible": 19723,
       "lift_eligible": 19731,
       "oracle_seconds": 0.065,
-      "lift_seconds": 0.174,
+      "lift_seconds": 0.254,
       "total_gap": 8,
       "cutoff_gap": -8,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_ostalo_gozdno_gosp_obm",
@@ -103,11 +108,12 @@
       "lift_total": 53681,
       "oracle_eligible": 53681,
       "lift_eligible": 53681,
-      "oracle_seconds": 0.298,
-      "lift_seconds": 0.388,
+      "oracle_seconds": 0.304,
+      "lift_seconds": 0.642,
       "total_gap": 0,
       "cutoff_gap": 0,
-      "counts_match": true
+      "counts_match": true,
+      "cutoff_counts_match": true
     },
     {
       "table": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
@@ -120,11 +126,12 @@
       "lift_total": 15148831,
       "oracle_eligible": 15148252,
       "lift_eligible": 15148831,
-      "oracle_seconds": 18.634,
-      "lift_seconds": 2.768,
+      "oracle_seconds": 19.712,
+      "lift_seconds": 4.512,
       "total_gap": 665,
       "cutoff_gap": -579,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
@@ -137,11 +144,12 @@
       "lift_total": 6069095,
       "oracle_eligible": 6069040,
       "lift_eligible": 6069095,
-      "oracle_seconds": 8.337,
-      "lift_seconds": 2.032,
+      "oracle_seconds": 9.881,
+      "lift_seconds": 1.638,
       "total_gap": 84,
       "cutoff_gap": -55,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
@@ -154,11 +162,12 @@
       "lift_total": 16486863,
       "oracle_eligible": 16486655,
       "lift_eligible": 16486863,
-      "oracle_seconds": 20.331,
-      "lift_seconds": 4.121,
+      "oracle_seconds": 20.996,
+      "lift_seconds": 4.508,
       "total_gap": 330,
       "cutoff_gap": -208,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_parcele_h",
@@ -171,11 +180,12 @@
       "lift_total": 7904745,
       "oracle_eligible": 7904138,
       "lift_eligible": 7904745,
-      "oracle_seconds": 9.749,
-      "lift_seconds": 6.241,
+      "oracle_seconds": 10.487,
+      "lift_seconds": 4.229,
       "total_gap": 928,
       "cutoff_gap": -607,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_prostori_h",
@@ -188,11 +198,12 @@
       "lift_total": 4436755,
       "oracle_eligible": 4436590,
       "lift_eligible": 4436755,
-      "oracle_seconds": 6.276,
-      "lift_seconds": 1.242,
+      "oracle_seconds": 7.01,
+      "lift_seconds": 1.109,
       "total_gap": 199,
       "cutoff_gap": -165,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_rpe_naselja_h",
@@ -205,11 +216,12 @@
       "lift_total": 20018,
       "oracle_eligible": 20018,
       "lift_eligible": 20018,
-      "oracle_seconds": 0.142,
-      "lift_seconds": 0.104,
+      "oracle_seconds": 0.137,
+      "lift_seconds": 0.147,
       "total_gap": 0,
       "cutoff_gap": 0,
-      "counts_match": true
+      "counts_match": true,
+      "cutoff_counts_match": true
     },
     {
       "table": "kn_nep_rpe_obcine_h",
@@ -223,10 +235,11 @@
       "oracle_eligible": 3564,
       "lift_eligible": 3564,
       "oracle_seconds": 0.031,
-      "lift_seconds": 0.025,
+      "lift_seconds": 0.024,
       "total_gap": 0,
       "cutoff_gap": 0,
-      "counts_match": true
+      "counts_match": true,
+      "cutoff_counts_match": true
     },
     {
       "table": "kn_nep_rpe_ulice_h",
@@ -239,11 +252,12 @@
       "lift_total": 30983,
       "oracle_eligible": 30983,
       "lift_eligible": 30983,
-      "oracle_seconds": 0.081,
-      "lift_seconds": 0.077,
+      "oracle_seconds": 0.086,
+      "lift_seconds": 0.054,
       "total_gap": 0,
       "cutoff_gap": 0,
-      "counts_match": true
+      "counts_match": true,
+      "cutoff_counts_match": true
     },
     {
       "table": "kn_nep_stanovanja_h",
@@ -256,11 +270,12 @@
       "lift_total": 651777,
       "oracle_eligible": 651717,
       "lift_eligible": 651777,
-      "oracle_seconds": 0.881,
-      "lift_seconds": 0.076,
+      "oracle_seconds": 1.079,
+      "lift_seconds": 0.072,
       "total_gap": 149,
       "cutoff_gap": -60,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_stavbe_centroidi_h",
@@ -273,11 +288,12 @@
       "lift_total": 2761599,
       "oracle_eligible": 2761538,
       "lift_eligible": 2761599,
-      "oracle_seconds": 3.702,
-      "lift_seconds": 1.605,
+      "oracle_seconds": 4.012,
+      "lift_seconds": 1.516,
       "total_gap": 72,
       "cutoff_gap": -61,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_stavbe_obrisi_h",
@@ -290,11 +306,12 @@
       "lift_total": 2761599,
       "oracle_eligible": 2761538,
       "lift_eligible": 2761599,
-      "oracle_seconds": 3.64,
-      "lift_seconds": 1.429,
+      "oracle_seconds": 3.938,
+      "lift_seconds": 1.363,
       "total_gap": 72,
       "cutoff_gap": -61,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_stavbe_parcele_h",
@@ -307,11 +324,12 @@
       "lift_total": 1643215,
       "oracle_eligible": 1643082,
       "lift_eligible": 1643215,
-      "oracle_seconds": 2.117,
-      "lift_seconds": 1.889,
+      "oracle_seconds": 2.377,
+      "lift_seconds": 1.341,
       "total_gap": 158,
       "cutoff_gap": -133,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     },
     {
       "table": "kn_nep_stavbe_zps_h",
@@ -324,12 +342,13 @@
       "lift_total": 1937258,
       "oracle_eligible": 1937221,
       "lift_eligible": 1937258,
-      "oracle_seconds": 2.791,
-      "lift_seconds": 1.293,
+      "oracle_seconds": 3.096,
+      "lift_seconds": 0.83,
       "total_gap": 72,
       "cutoff_gap": -37,
-      "counts_match": false
+      "counts_match": false,
+      "cutoff_counts_match": false
     }
   ],
-  "finished_at": "2026-10-28T18:47:32.427976+00:00"
+  "finished_at": "2026-10-28T19:09:12.596130+00:00"
 }
