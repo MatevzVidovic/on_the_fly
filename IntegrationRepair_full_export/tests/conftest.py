@@ -102,3 +102,9 @@ def prepared_run(store, run_id):
 def isolated_timings(tmp_path, monkeypatch):
     import timings
     monkeypatch.setattr(timings, 'LOG_PATH', tmp_path / 'timings.jsonl')
+
+
+@pytest.fixture(autouse=True)
+def no_remote_barman_check(monkeypatch):
+    # Coordinator examples use row cursors, not a PostgreSQL replication slot.
+    monkeypatch.setattr('repair.wait_for_barman', lambda db: None)

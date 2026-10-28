@@ -436,7 +436,7 @@ COMMIT;
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_prostori_h SET LOGGED;
 ``` -->
-
+<!-- 
 ## 11. `public.kn_nep_deli_stavb_h` — 1581 MB — ~2,741,147 rows
 
 ```sql
@@ -474,7 +474,7 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_deli_stavb_h SET LOGGED;
-```
+``` -->
 
 ## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB — ~2,891,696 rows
 

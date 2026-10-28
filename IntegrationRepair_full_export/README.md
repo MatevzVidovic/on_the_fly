@@ -84,6 +84,7 @@ All warnings are printed with the business key. Apply warnings also remain on ad
 | File / unit | Responsibility |
 | --- | --- |
 | `repair.py`: prepare/apply | The complete sequence, rechecks and commit-before-progress order |
+| `barman.py`: wait_for_barman | Pause apply while the Barman slot retains too much WAL |
 | `store.py`: classify | The five comparison rules; no database access |
 | `definition.py`: IntegrationDefinition | Read and interpret LIFT metadata |
 | `source.py`: OracleSource | Wrap saved Oracle SQL, stream pairs, fetch payload pages |
@@ -92,6 +93,23 @@ All warnings are printed with the business key. Apply warnings also remain on ad
 | `target.py`: LiftTarget | PostgreSQL inventory, writes, sampling fill; materialized views are deferred |
 
 No framework, repository interfaces, audit writes, locks or normal integration metadata updates. Unknown custom hooks/decorators and non-WKT transforms are rejected. This tool assumes the inspected FMP global event/decorator configs remain empty; it cannot discover PHP config from PostgreSQL.
+
+## Barman failsafe during apply
+
+Apply always checks the PostgreSQL replication slot named `barman` before and after
+each upsert/deletion batch, and before/after completion work. If retained WAL is
+**above 5 GiB**, it pauses and polls every five seconds until retained WAL is
+**below 2 GiB**. A reading between 2 and 5 GiB does not start a pause, but does not
+end an existing pause either. No flag is needed; prepare does not use this check.
+
+This reuses the simple WAL lab measurement:
+`pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)` for the `barman` slot.
+It measures retained WAL on PostgreSQL, not archive disk usage on the Barman server.
+Checks are between committed batches, so a running batch or completion statement
+can exceed the threshold before the next check. Monitor reads are committed before
+sleeping. A missing, inactive, or unmeasurable slot stops apply instead of allowing
+unmonitored writes. Previously committed batches and their SQLite progress remain
+saved; rerun the same apply command after resolving the issue. Ctrl+C stops a wait.
 
 Oracle inventory keeps all keys so rows newer than the cutoff cannot be mistaken for deletions. Only source rows at or below the cutoff can become upserts. LIFT inventory filters by cutoff in Python. This lets NULL and duplicate values fail visibly rather than disappearing behind SQL filtering. Inventories stream 10,000 rows at a time; apply fetches 10,000 payloads, using Oracle IN groups of 1,000. Source names use exact configured casing, like FMP payload access: all 583 inspected enabled KN mappings were uppercase, matching Oracle unquoted result names. Text keys stay text (including leading zeroes); bigint keys stay integers. Change timestamps use UTC with six fractional digits matching PostgreSQL. Other mapped dates preserve their source wall-clock fields. The first apply timestamp uses APP_TIMEZONE (default UTC), matching the backend. Source timestamps with nonzero precision beyond microseconds are unsupported.
 

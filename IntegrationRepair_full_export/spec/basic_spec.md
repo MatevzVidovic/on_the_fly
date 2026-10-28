@@ -102,3 +102,13 @@ pipelines its writes, checking pipeline completion before PostgreSQL commit and
 SQLite progress marking. Preserve existing metadata and newer-date semantics.
 Normal runs record phase timings. Read-only benchmarks and disposable local
 comparison trials are documented in `BENCHMARKS.md`; they never apply repairs.
+
+## Apply WAL backpressure
+
+Before and after each committed upsert/removal batch, and around completion work,
+measure retained WAL for PostgreSQL's `barman` replication slot using
+`pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)`. Above 5 GiB, pause and poll
+every five seconds until below 2 GiB. End each monitor read transaction before
+sleeping. Missing, inactive, or unmeasurable slots stop apply. Committed repair
+progress remains resumable. These checks cannot pause a statement already running
+and measure retained PostgreSQL WAL rather than the Barman server's archive disk.

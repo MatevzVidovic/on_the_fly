@@ -190,3 +190,27 @@ def test_prepare_utc_mapping_and_payload_dates_agree(definition, store):
     assert saved['cutoff'] == DATE
     assert saved['date_mapping'] == '["DATE_CHANGE_UTC", "date_change_utc", "UTC"]'
     assert saved['upsert_count'] == 1
+
+
+def test_barman_stop_after_batch_preserves_committed_progress(definition, store, prepared_run, monkeypatch):
+    import pytest
+    checks = []
+    def wait(db):
+        checks.append(db)
+        if len(checks) == 2:
+            raise RuntimeError('Barman slot is inactive')
+    monkeypatch.setattr(repair, 'wait_for_barman', wait)
+    source = OracleSource(Database(Cursor([(1, DATE)])), definition)
+    db = Database(Cursor())
+    target = LiftTarget(db, None, definition)
+    with pytest.raises(RuntimeError, match='inactive'):
+        repair.apply(prepared_run, definition, source, target, store)
+    assert len(checks) == 2 and all(connection is db for connection in checks)
+    assert store.db.execute('SELECT processed FROM addition_diff').fetchone()[0] == 1
+    assert not store.require_prepared_run(prepared_run)['applied']
+    # A later retry only completes the run, without replaying the saved batch.
+    monkeypatch.setattr(repair, 'wait_for_barman', lambda db: None)
+    writes_before = len(db.example_cursor.calls)
+    repair.apply(prepared_run, definition, source, target, store)
+    assert len(db.example_cursor.calls) == writes_before
+    assert store.require_prepared_run(prepared_run)['applied']

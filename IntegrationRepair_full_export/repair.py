@@ -12,6 +12,7 @@ import oracledb
 import psycopg
 
 from definition import IntegrationDefinition, check_run_definition
+from barman import wait_for_barman
 from source import OracleSource, wall_time, utc_time
 from store import RepairStore
 from target import LiftTarget
@@ -68,6 +69,7 @@ def apply(run_id, definition, source, target, store):
         return
     max_date = store.start_apply(run_id, wall_time(datetime.now(ZoneInfo(os.environ.get('APP_TIMEZONE', 'UTC')))), target.user_id)
     for rows in store.pending('addition_diff', run_id):
+        wait_for_barman(target.db)
         keys = [json.loads(row['key']) for row in rows]
         print(f'Fetching {len(keys)} Oracle payloads', flush=True)
         with measure('apply.oracle_payloads', run_id=run_id, rows=len(keys)):
@@ -90,14 +92,19 @@ def apply(run_id, definition, source, target, store):
         with measure('apply.sqlite_progress', run_id=run_id, rows=len(outcomes)):
             store.finish_additions(run_id, outcomes)
         print(f'Committed {len(rows)} upsert entries', flush=True)
+        wait_for_barman(target.db)
     for rows in store.pending('removal_diff', run_id):
+        wait_for_barman(target.db)
         with measure('apply.postgres_removals', run_id=run_id, rows=len(rows)):
             target.delete_batch(rows)
         with measure('apply.sqlite_progress', run_id=run_id, rows=len(rows)):
             store.finish_removals(run_id, rows)
         print(f'Committed {len(rows)} removal entries', flush=True)
+        wait_for_barman(target.db)
+    wait_for_barman(target.db)
     with measure('apply.completion', run_id=run_id):
         target.complete()
+    wait_for_barman(target.db)
     store.finish_application(run_id)
 
 
