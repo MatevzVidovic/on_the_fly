@@ -241,3 +241,26 @@ def test_adding_behind_flag_restarts_comparison_and_keeps_ahead_flag(definition,
     assert final['upsert_count'] == 0 and final['warnings'] == 0
     assert final['allow_one_second_ahead'] and final['allow_one_second_behind']
     assert final['source_complete'] and final['source_count'] == 1
+
+
+def test_since_watermark_saves_fixed_range_and_only_upserts(definition, store, monkeypatch):
+    from datetime import datetime, timezone
+    class Clock(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return datetime(2025, 1, 3, tzinfo=timezone.utc)
+    monkeypatch.setattr(repair, 'datetime', Clock)
+    source = OracleSource(Database(Cursor([
+        (1, DATE),
+        (2, '2025-01-02 18:00:00.000000'),
+        (3, '2025-01-04 00:00:00.000000'),
+    ])), definition)
+    target = LiftTarget(Database(Cursor([('unrelated', 4, DATE)])), None, definition)
+    run_id = repair.prepare(definition, source, target, store, since_watermark=True)
+    run = store.require_prepared_run(run_id)
+    assert run['min_date'] == DATE
+    assert run['cutoff'] == '2025-01-03 00:00:00.000000'
+    assert run['upsert_count'] == 2 and run['delete_count'] == 0
+    assert definition.cutoff == DATE
+    repair.prepare(definition, None, None, store, run_id=run_id)
+    assert store.require_prepared_run(run_id)['cutoff'] == run['cutoff']
