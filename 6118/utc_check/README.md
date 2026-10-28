@@ -1,5 +1,16 @@
 # UTC backfill audit
 
+For recovery `_org2810` tables (writes a separate `report_org2810.md`):
+
+```bash
+../simple_wal_lab/.venv/bin/python export.py --table-suffix _org2810
+```
+
+This includes logging mode, estimated rows, sizes and UTC field checks. LIFT
+metadata is matched to the original unsuffixed table names. It does not mean LIFT
+is currently reading the renamed tables. Add `--any-null` or `--num-nulls` if needed;
+those options read table data. `--output PATH` overrides the destination.
+
 From this directory, run:
 
 ```bash

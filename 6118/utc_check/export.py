@@ -39,7 +39,10 @@ def main():
     parser.add_argument('--metadata-db', default='fmp', help='Database containing LIFT metadata (default: fmp)')
     parser.add_argument('--num-nulls', action='store_true', help='Count NULLs in existing UTC columns (scans table rows)')
     parser.add_argument('--any-null', action='store_true', help='Check whether existing UTC columns contain any NULLs')
+    parser.add_argument('--table-suffix', default='', help='Inspect suffixed physical tables, e.g. _org2810; match metadata to original names')
+    parser.add_argument('--output', type=Path, help='Report destination (default: report<SUFFIX>.md here)')
     args = parser.parse_args()
+    physical_tables = [name + args.table_suffix for name in BACKFILL_TABLES]
     load_dotenv(ROOT.parent / 'simple_wal_lab' / '.env')
     # Inventory row counts are estimates; UTC NULL counts below are exact scans.
     with connect() as db:
@@ -57,7 +60,7 @@ def main():
             WHERE c.relkind IN ('r','p') AND n.nspname NOT IN ('pg_catalog','information_schema')
               AND n.nspname='public' AND c.relname = ANY(%s)
             ORDER BY c.relname,n.nspname
-        """, (BACKFILL_TABLES,)).fetchall()
+        """, (physical_tables,)).fetchall()
     # Both connections use server-enforced read-only transactions, rolled back on close.
     with connect(args.metadata_db) as db:
         fields = db.execute("""
@@ -90,12 +93,18 @@ def main():
            '“Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. '
            'LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. '
            + ('Num-null is an exact count of rows where the UTC column IS NULL (including rows with a NULL source date). Missing columns show —; counts exceeding 30 seconds show timeout. ' if args.num_nulls else 'NULL counts were not requested; use --num-nulls to include them. ') + ('Any-null indicates whether the UTC column contains at least one NULL. Missing columns show —; checks exceeding 30 seconds show timeout. ' if args.any_null else '') + 'SQL correctness requires review below.', '']
+    if args.table_suffix:
+        out[0] += f' — {args.table_suffix} tables'
+        out[5:5] = [f'Physical tables use suffix `{args.table_suffix}`. LIFT metadata and integration SQL '
+                     'are matched to the original unsuffixed names; this does not establish that LIFT '
+                     'currently reads the suffixed tables.', '']
     rows=[]
     with connect() as count_db:
         count_db.autocommit = True
         for t in tables:
-            fs=[f for f in fields if f['table_name']==t['name']]
-            ins=[i for i in integrations if i['table_name']==t['name']]
+            base_name = t['name'][:-len(args.table_suffix)] if args.table_suffix else t['name']
+            fs=[f for f in fields if f['table_name']==base_name]
+            ins=[i for i in integrations if i['table_name']==base_name]
             candidates=['date_change_utc'] if t['name'].startswith('ev_') else ['datum_sys_utc']
             for name in candidates:
                 num_null = None
@@ -145,7 +154,8 @@ def main():
         fence='`' * max(3, max((len(s) for s in re.findall(r'`+',query)),default=0)+1)
         out += [f"### {i['table_name']} — {i['name']}", '', f"Integration ID: `{i['id']}`; type: `{i['integration_type']}`; full sync: `{i['is_full_sync']}`.",
                 '',fence+'sql',query,fence,'']
-    destination=ROOT/'report.md'
+    suffix = re.sub(r'[^a-zA-Z0-9_-]', '_', args.table_suffix)
+    destination=args.output or ROOT/f'report{suffix}.md'
     destination.write_text('\n'.join(out)+'\n')
     print(f'Exported {len(tables)} tables and {len(integrations)} integrations to {destination}')
 
