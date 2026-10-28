@@ -129,3 +129,7 @@ Flags override these settings on all update scripts and the tracker:
 passing an unqualified table. `--utc-column` is an alias for `--date-column`.
 Identifiers are quoted safely. Column flags change names only; the conversion
 still interprets the source timestamp as Europe/Ljubljana local time.
+
+For restoring original-name tables into their existing `_org2810` counterparts
+while calculating UTC in the INSERT, use `batched_copy_backfill.py`.
+See [COPY_BACKFILL.md](COPY_BACKFILL.md) for commands and resume requirements.
