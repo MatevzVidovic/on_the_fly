@@ -311,3 +311,118 @@ also works with `--only-src`. Apply takes the saved run as usual, with no date f
 Existing SQLite runs receive a nullable column and retain their original behavior.
 The standalone `verify_lift.py` check also respects date-filtered exports and does
 not report absent source keys as removals.
+
+## Current UTC batch scripts
+
+```sh
+# Terminal 1: compare the 19 pinned, completed KN Oracle exports with LIFT.
+bash run_kn_utc_compare.sh
+
+# Terminal 2: show saved EV insert/update/delete counts immediately (local reads).
+bash run_ev_utc_diff.sh
+
+# Resume the remaining EV comparisons if needed.
+bash run_ev_utc_compare.sh
+
+# After reviewing all EV plans: apply the exact same pinned EV run UUIDs.
+bash run_ev_utc_apply.sh
+```
+
+The KN comparison script excludes the large `kn_nep_ostalo_dejanske_rabe_parcel_h`
+backfill table and full-sync `kn_nep_ostalo_namenske_rabe`. It pins a completed
+source export for each table, skipping the partial duplicate source export. It
+never starts a new source inventory. Repeating comparison scripts resumes progress.
+
+The EV diff summary is read-only and shows planned inserts, updates, deletions,
+warnings, and preparation/application status. Unfinished comparisons display dashes
+rather than zero differences. Totals cover completed plans only. The EV apply
+script checks that all twelve pinned plans are prepared before executing any apply;
+it stops on the first error and uses the normal Barman failsafe. Counts are not a
+fresh database verification. Keep normal integrations stopped for each table during
+comparison and apply. These scripts were created without running remote comparisons
+or writes; the original export script still starts fresh runs when repeated.
+
+### Large KN table (separate from the 19-table script)
+
+`kn_nep_ostalo_dejanske_rabe_parcel_h` has dedicated commands:
+
+```sh
+bash run_kn_huge_utc_export.sh
+bash run_kn_huge_utc_compare.sh
+# Review the diff before running:
+bash run_kn_huge_utc_apply.sh
+```
+
+The export is Oracle-only and captures the integration's current watermark. Prefer
+starting it after watermark correction and normal integration, for the intended
+repair cutoff. Never compare or apply while the LIFT backfill/copy is still running.
+Wait for the final target table to be ready and the normal integration to finish,
+then keep writes stopped during comparison/review/apply. The comparison requires
+this dedicated store's latest source export to be complete and resumes its saved
+run; apply uses that store's latest prepared run. Do not start another export
+between review and apply. Repeating the export script creates another full run;
+repeating comparison/apply resumes progress. No export for this table existed when
+these scripts were created; they were syntax-checked without running remote work.
+
+### Opt-in one-second LIFT-ahead leeway
+
+For the `timestamp(0)` change column on `ev_parc_enota_h_2025_danes`, use
+`prepare --allow-one-second-ahead`. The EV comparison script includes this flag
+**only for that table**. Default comparisons remain exact.
+
+The flag treats `Oracle <= LIFT <= Oracle + 1 second` as equal. It does not add a
+second to exported timestamps, extend the cutoff, or hide changes where Oracle is
+newer. Source payload freshness is still checked exactly against the saved export.
+The setting is saved on the run and reused by resume, verification, and apply's
+newer-LIFT check; apply needs no extra flag.
+
+Enabling it on an existing, not-yet-applied run clears only the previous comparison
+results, seen flags, target checkpoint and warning count, then restarts the full
+LIFT comparison with the same Oracle export and cutoff. Resetting millions of seen
+flags can itself take some local SQLite time. Stop the earlier comparison process
+before restarting it. The setting cannot be changed after apply starts.
+
+```sh
+time .venv/bin/python repair.py --store prod-utc-ev-parc-enota.sqlite prepare --resume a83190e2-dece-462b-aba7-0588bee1c7ee --allow-one-second-ahead
+```
+
+### Both one-second leeway flags and the enota column type
+
+`--allow-one-second-behind` independently treats a same-key LIFT date up to one
+second older than Oracle as equal. Combining it with `--allow-one-second-ahead`
+accepts an inclusive ±1-second difference. Other tables remain exact by default.
+Both flags are now in `run_ev_utc_compare.sh` only for
+`ev_parc_enota_h_2025_danes`. The setting is saved in SQLite, used by comparison,
+verification and apply, and never changes the raw export or cutoff. Enabling an
+additional flag on resume restarts only the LIFT comparison with the saved export,
+clearing old diff/seen/warning state. Stop the old comparison first. Flags cannot
+be changed once apply has started.
+
+For that table alone:
+
+```sh
+time .venv/bin/python repair.py --store prod-utc-ev-parc-enota.sqlite prepare --resume a83190e2-dece-462b-aba7-0588bee1c7ee --allow-one-second-ahead --allow-one-second-behind
+```
+
+Optional type change is saved in `enota_timestamp_precision.sql`; it has **not**
+been executed. Live checks found PostgreSQL 15.7, a `timestamp(0) without time zone`
+column, no indexes involving that column, and no dependent views/MVs on that column.
+PostgreSQL 15.7's [TemporalSimplify source](https://github.com/postgres/postgres/blob/REL_15_7/src/backend/utils/adt/datetime.c#L4491)
+reduces widening timestamp precision to a no-op relabel, avoiding a heap rewrite.
+The ALTER still requires an ACCESS EXCLUSIVE lock and produces catalog WAL, so it
+is not literally zero WAL. It should not generate a table-sized WAL backlog; this
+is based on the source/catalog checks, not an executed ALTER or measured WAL test.
+Do it between comparisons, with normal integrations stopped on the table.
+[PostgreSQL ALTER TABLE documentation](https://www.postgresql.org/docs/15/sql-altertable.html).
+
+Widening does not recover fractions already rounded away. A later data backfill
+would update rows and generate WAL separately from this metadata change.
+
+FMP's current field metadata is `date-time`. Its
+`DateTimeAttributeFieldDefinition::getNativeType()` returns `timestamp`, and
+`AttributeFieldConstants::TYPE_MAPPING` maps `timestamp without time zone` to
+`date-time`. Thus the ordinary timestamp type matches FMP's native “datum in čas”
+field; no FMP field-type change is needed. Display formatting may still omit
+fractions independently of storage precision. No application end-to-end test or
+production DDL was run. Read-only evidence:
+`diagnostics/enota_timestamp_precision_check.json`.

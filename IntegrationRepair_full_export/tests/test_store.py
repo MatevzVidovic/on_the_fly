@@ -141,3 +141,49 @@ def test_older_prepared_run_gets_repair_user_on_apply(store, prepared_run):
     store.db.execute('UPDATE integration_transfer SET user_id=NULL WHERE id=?', (prepared_run,))
     store.start_apply(prepared_run, DATE)
     assert store.require_prepared_run(prepared_run)['user_id'] == '955ee6d4-d98e-11f0-bd04-de28270b37c5'
+
+
+def test_one_second_leeway_is_opt_in_and_only_for_lift_ahead():
+    oracle = '2026-07-01 21:59:59.999000'
+    rounded = '2026-07-01 22:00:00.000000'
+    assert classify(oracle, rounded) == 'ahead'
+    assert classify(oracle, rounded, True) == 'equal'
+    assert classify(oracle, '2026-07-01 22:00:00.999000', True) == 'equal'
+    assert classify(oracle, '2026-07-01 22:00:01.000000', True) == 'ahead'
+    assert classify(rounded, oracle, True) == 'upsert'
+    assert classify(None, rounded, True) == 'remove'
+    assert classify(oracle, None, True) == 'upsert'
+
+
+def test_enable_leeway_restarts_comparison_without_changing_oracle_export(store, run_id):
+    import pytest
+    store.save_source(run_id, [(1, DATE), (2, DATE)])
+    store.finish_source(run_id)
+    store.compare_target_page(run_id, [('ahead', 1, '2025-01-02 12:00:00.001000'), ('extra', 3, DATE)])
+    store.finish_preparation(run_id)
+    store.enable_one_second_leeway(run_id)
+    run = store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+    assert run['source_complete'] and run['source_count'] == 2 and run['allow_one_second_ahead']
+    assert not run['prepared'] and run['warnings'] == 0 and run['target_last_key'] is None
+    assert store.db.execute('SELECT sum(seen) FROM remote_ids_and_date_changed').fetchone()[0] == 0
+    assert store.db.execute('SELECT count(*) FROM addition_diff').fetchone()[0] == 0
+    assert store.db.execute('SELECT count(*) FROM removal_diff').fetchone()[0] == 0
+    assert store.compare_target_page(run_id, [('ahead', 1, '2025-01-02 12:00:00.001000')]) == []
+    store.finish_preparation(run_id)
+    store.start_apply(run_id, DATE)
+    with pytest.raises(ValueError, match='after apply'):
+        store.enable_one_second_leeway(run_id)
+
+
+def test_one_second_behind_is_independent_and_both_flags_are_symmetric():
+    source = '2026-07-01 22:00:00.000000'
+    behind = '2026-07-01 21:59:59.000000'
+    ahead = '2026-07-01 22:00:01.000000'
+    assert classify(source, behind) == 'upsert'
+    assert classify(source, behind, True) == 'upsert'
+    assert classify(source, behind, False, True) == 'equal'
+    assert classify(source, ahead, False, True) == 'ahead'
+    assert classify(source, behind, True, True) == 'equal'
+    assert classify(source, ahead, True, True) == 'equal'
+    assert classify(source, '2026-07-01 21:59:58.999999', True, True) == 'upsert'
+    assert classify(source, '2026-07-01 22:00:01.000001', True, True) == 'ahead'

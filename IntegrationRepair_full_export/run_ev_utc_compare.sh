@@ -38,4 +38,4 @@ time .venv/bin/python repair.py --store prod-utc-ev-parc-del.sqlite prepare --re
 time .venv/bin/python repair.py --store prod-utc-ev-parcela.sqlite prepare --resume 299d81c1-0176-4b56-8619-63740513e1e3
 
 # ev_parc_enota_h_2025_danes
-time .venv/bin/python repair.py --store prod-utc-ev-parc-enota.sqlite prepare --resume a83190e2-dece-462b-aba7-0588bee1c7ee
+time .venv/bin/python repair.py --store prod-utc-ev-parc-enota.sqlite prepare --resume a83190e2-dece-462b-aba7-0588bee1c7ee --allow-one-second-ahead --allow-one-second-behind

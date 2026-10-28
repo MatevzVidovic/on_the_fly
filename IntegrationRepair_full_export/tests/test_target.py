@@ -126,3 +126,19 @@ def test_map_row_utc_change_time_does_not_shift_other_dates(definition):
     mapped = dict(zip(columns, values))
     assert mapped['date_change_utc'] == '2026-07-01 10:00:00.000000'
     assert mapped['valid_from'] == '2026-07-01 12:00:00.000000'
+
+
+def test_upsert_uses_saved_one_second_leeway(definition):
+    cursor = Cursor([(1, 'row', '2025-01-02 12:00:00.001000')])
+    target = LiftTarget(Database(cursor), None, definition)
+    target.allow_one_second_ahead = True
+    assert target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE) == [('1', None)]
+    assert cursor.calls[1][0].as_string().startswith('UPDATE')
+
+
+def test_apply_leaves_target_within_behind_leeway_untouched(definition):
+    cursor = Cursor([(1, 'row', '2025-01-02 11:59:59.999000')])
+    target = LiftTarget(Database(cursor), None, definition)
+    target.allow_one_second_behind = True
+    assert target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE) == [('1', None)]
+    assert len(cursor.calls) == 1  # Lookup only; no UPDATE for an up-to-date row.

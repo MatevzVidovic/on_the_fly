@@ -19,14 +19,18 @@ from target import LiftTarget
 from timings import measure
 
 
-def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None):
+def prepare(definition, source, target, store, run_id=None, only_src=False, min_date=None, allow_one_second_ahead=False, allow_one_second_behind=False):
     if run_id is None:
         cutoff = utc_time(definition.cutoff)
         if min_date is not None and min_date > cutoff:
             raise ValueError('Minimum date must not be later than the integration cutoff')
         run_id = store.create_run(definition.id, cutoff, definition.table, min_date,
-                                 [definition.date['api_name'], definition.date['target'], 'UTC'])
+                                 [definition.date['api_name'], definition.date['target'], 'UTC'], allow_one_second_ahead, allow_one_second_behind)
     check_run_definition(store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone(), definition)
+    run = store.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+    if (allow_one_second_ahead and not run['allow_one_second_ahead']) or (allow_one_second_behind and not run['allow_one_second_behind']):
+        store.enable_one_second_leeway(run_id, allow_one_second_ahead or run['allow_one_second_ahead'],
+                                      allow_one_second_behind or run['allow_one_second_behind'])
     run = store.resume_preparation(run_id)
     if run['prepared']:
         store.summary(run_id)
@@ -67,6 +71,8 @@ def apply(run_id, definition, source, target, store):
     if run['applied']:
         store.summary(run_id)
         return
+    target.allow_one_second_ahead = bool(run['allow_one_second_ahead'])
+    target.allow_one_second_behind = bool(run['allow_one_second_behind'])
     max_date = store.start_apply(run_id, wall_time(datetime.now(ZoneInfo(os.environ.get('APP_TIMEZONE', 'UTC')))), target.user_id)
     for rows in store.pending('addition_diff', run_id):
         wait_for_barman(target.db)
@@ -115,13 +121,15 @@ def main():
     parser.add_argument('--resume', metavar='RUN_UUID', help='resume preparation of this saved run')
     parser.add_argument('--only-src', action='store_true', help='prepare only the Oracle inventory')
     parser.add_argument('--min-date', help='inclusive minimum source change date: YYYY-MM-DD or ISO datetime; upserts only')
+    parser.add_argument('--allow-one-second-ahead', action='store_true', help='treat LIFT up to one second ahead as equal; enabling on resume restarts the LIFT comparison')
+    parser.add_argument('--allow-one-second-behind', action='store_true', help='treat LIFT up to one second behind as equal; enabling on resume restarts the LIFT comparison')
     parser.add_argument('command', choices=('prepare', 'apply'))
     parser.add_argument('id', nargs='?', help='integration UUID for prepare; repair UUID for apply (default: latest run)')
     args = parser.parse_args()
     if args.command == 'prepare' and args.id is None and args.resume is None:
         parser.error('prepare requires an integration UUID or --resume RUN_UUID')
-    if args.command == 'apply' and (args.resume or args.only_src or args.min_date is not None):
-        parser.error('--resume, --only-src and --min-date are prepare options')
+    if args.command == 'apply' and (args.resume or args.only_src or args.min_date is not None or args.allow_one_second_ahead or args.allow_one_second_behind):
+        parser.error('--resume, --only-src, --min-date and one-second leeway flags are prepare options')
     if args.min_date is not None:
         if args.resume:
             parser.error('resume reuses the saved minimum date; omit --min-date')
@@ -170,7 +178,7 @@ def main():
                           password=os.environ['KN_ORACLE_PASSWORD'], dsn=os.environ['KN_ORACLE_DSN']))
         source, target = OracleSource(oracle, definition), LiftTarget(destination, metadata, definition)
         if args.command == 'prepare':
-            prepare(definition, source, target, store, args.resume, args.only_src, args.min_date)
+            prepare(definition, source, target, store, args.resume, args.only_src, args.min_date, args.allow_one_second_ahead, args.allow_one_second_behind)
         else:
             apply(args.id, definition, source, target, store)
 

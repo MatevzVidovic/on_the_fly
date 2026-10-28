@@ -48,3 +48,14 @@ def test_verify_rejects_pre_utc_export_before_scanning(store, definition):
     store.finish_source(run_id)
     with pytest.raises(ValueError, match='fresh prepare'):
         verify(run_id, SimpleNamespace(d=definition), store.db)
+
+
+def test_verify_respects_both_leeway_flags(store, definition):
+    run = store.create_run('integration', DATE, 'records', date_mapping=['CHANGED', 'changed', 'UTC'],
+                           allow_one_second_ahead=True, allow_one_second_behind=True)
+    store.save_source(run, [(1, DATE)])
+    store.finish_source(run)
+    target = SimpleNamespace(d=definition, inventory=lambda cutoff: iter([
+        [('row', 1, '2025-01-02 11:59:59.999000')]]))
+    counts = verify(run, target, store.db)
+    assert counts['equal'] == 1 and counts['upserts'] == 0 and counts['warnings'] == 0

@@ -8,11 +8,16 @@ from source import PAGE_SIZE
 from definition import REPAIR_USER_ID
 
 
-def classify(source_date, target_date):
+def classify(source_date, target_date, allow_one_second_ahead=False, allow_one_second_behind=False):
     """Pure repair rules; missing bounded source membership means removal."""
     if source_date is None:
         return 'remove'
-    if target_date is None or target_date < source_date:
+    if target_date is None:
+        return 'upsert'
+    if (allow_one_second_ahead and target_date > source_date) or (allow_one_second_behind and target_date < source_date):
+        if abs((datetime.fromisoformat(target_date) - datetime.fromisoformat(source_date)).total_seconds()) <= 1:
+            return 'equal'
+    if target_date < source_date:
         return 'upsert'
     return 'ahead' if target_date > source_date else 'equal'
 
@@ -50,7 +55,8 @@ class RepairStore:
                                ('source_complete', 'INTEGER'), ('source_last_key', 'TEXT'),
                                ('target_last_key', 'TEXT'), ('source_count', 'INTEGER NOT NULL DEFAULT 0'),
                                ('target_count', 'INTEGER NOT NULL DEFAULT 0'), ('min_date', 'TEXT'),
-                               ('date_mapping', 'TEXT')):
+                               ('date_mapping', 'TEXT'), ('allow_one_second_ahead', 'INTEGER NOT NULL DEFAULT 0'),
+                               ('allow_one_second_behind', 'INTEGER NOT NULL DEFAULT 0')):
                 if name not in columns:
                     self.db.execute(f'ALTER TABLE integration_transfer ADD COLUMN {name} {kind}')
             if 'upsert_count' not in columns or 'delete_count' not in columns:
@@ -59,16 +65,29 @@ class RepairStore:
                     delete_count=(SELECT count(*) FROM removal_diff WHERE run_id=integration_transfer.id)
                     WHERE prepared=1''')
 
-    def create_run(self, integration_id, cutoff, table_name, min_date=None, date_mapping=None):
+    def create_run(self, integration_id, cutoff, table_name, min_date=None, date_mapping=None, allow_one_second_ahead=False, allow_one_second_behind=False):
         run_id = str(uuid4())
         created_at = datetime.now(timezone.utc).isoformat(timespec='microseconds')
         with self.db:
             self.db.execute('''INSERT INTO integration_transfer
-                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete,min_date,date_mapping)
-                VALUES (?,?,?,?,?,?,0,?,?)''',
+                (id,integration_id,cutoff,created_at,attribute_table_name,user_id,source_complete,min_date,date_mapping,allow_one_second_ahead,allow_one_second_behind)
+                VALUES (?,?,?,?,?,?,0,?,?,?,?)''',
                 (run_id, integration_id, cutoff, created_at, table_name, REPAIR_USER_ID, min_date,
-                 json.dumps(date_mapping) if date_mapping is not None else None))
+                 json.dumps(date_mapping) if date_mapping is not None else None, allow_one_second_ahead, allow_one_second_behind))
         return run_id
+
+    def enable_one_second_leeway(self, run_id, allow_ahead=True, allow_behind=False):
+        run = self.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+        if run['applied'] or run['max_date'] is not None:
+            raise ValueError('Cannot change comparison rules after apply has started; use a new prepare')
+        with self.db:
+            self.db.execute('DELETE FROM addition_diff WHERE run_id=?', (run_id,))
+            self.db.execute('DELETE FROM removal_diff WHERE run_id=?', (run_id,))
+            self.db.execute('UPDATE remote_ids_and_date_changed SET seen=0 WHERE run_id=? AND seen=1', (run_id,))
+            self.db.execute('''UPDATE integration_transfer SET allow_one_second_ahead=?, allow_one_second_behind=?,
+                prepared=0, warnings=0, target_last_key=NULL, target_count=0,
+                upsert_count=NULL, delete_count=NULL WHERE id=?''', (allow_ahead, allow_behind, run_id))
+        print('Updated one-second leeway; restarting LIFT comparison with the saved Oracle export', flush=True)
 
     def require_prepared_run(self, run_id):
         run = self.db.execute('SELECT * FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
@@ -120,7 +139,7 @@ class RepairStore:
 
     def compare_target_page(self, run_id, page):
         warnings = []
-        run = self.db.execute('SELECT cutoff,min_date FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
+        run = self.db.execute('SELECT cutoff,min_date,allow_one_second_ahead,allow_one_second_behind FROM integration_transfer WHERE id=?', (run_id,)).fetchone()
         cutoff = run['cutoff']
         with self.db:
             for target_id, key, date in page:
@@ -131,7 +150,7 @@ class RepairStore:
                 # A date-filtered export cannot establish that absent keys were deleted.
                 if run['min_date'] is not None and source_date is None:
                     continue
-                decision = classify(source_date, date)
+                decision = classify(source_date, date, run['allow_one_second_ahead'], run['allow_one_second_behind'])
                 if row:
                     self.db.execute('UPDATE remote_ids_and_date_changed SET seen=1 WHERE run_id=? AND key=?',
                                     (run_id, encoded))
@@ -202,3 +221,7 @@ class RepairStore:
               f"prepared={bool(run['prepared'])}, applied={bool(run['applied'])}")
         if run['min_date'] is not None:
             print(f"Change-date range: {run['min_date']} through {run['cutoff']} (inclusive; upserts only)")
+        if run['allow_one_second_ahead']:
+            print('Comparison allows LIFT change time up to one second ahead of Oracle')
+        if run['allow_one_second_behind']:
+            print('Comparison allows LIFT change time up to one second behind Oracle')

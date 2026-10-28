@@ -36,7 +36,9 @@ def verify(run_id, target, db):
                     continue
                 if row:
                     matched += 1
-                decision = classify(source_date, date)
+                decision = classify(source_date, date,
+                                    run['allow_one_second_ahead'] if 'allow_one_second_ahead' in run.keys() else False,
+                                    run['allow_one_second_behind'] if 'allow_one_second_behind' in run.keys() else False)
                 counts[{'equal': 'equal', 'upsert': 'updates', 'remove': 'removals', 'ahead': 'warnings'}[decision]] += 1
             timing['rows'] += len(page)
     counts['inserts'] = counts['source_eligible'] - matched

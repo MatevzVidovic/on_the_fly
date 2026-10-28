@@ -214,3 +214,30 @@ def test_barman_stop_after_batch_preserves_committed_progress(definition, store,
     repair.apply(prepared_run, definition, source, target, store)
     assert len(db.example_cursor.calls) == writes_before
     assert store.require_prepared_run(prepared_run)['applied']
+
+
+def test_enabling_leeway_on_resume_reuses_export_and_removes_old_warnings(definition, store):
+    definition.cutoff = '2025-01-02 12:00:01.000000'
+    source = OracleSource(Database(Cursor([(1, DATE)])), definition)
+    target = LiftTarget(Database(Cursor([('row', 1, '2025-01-02 12:00:00.001000')])), None, definition)
+    run = repair.prepare(definition, source, target, store)
+    assert store.require_prepared_run(run)['warnings'] == 1
+    target.db = Database(Cursor([('row', 1, '2025-01-02 12:00:00.001000')]))
+    repair.prepare(definition, None, target, store, run_id=run, allow_one_second_ahead=True)
+    final = store.require_prepared_run(run)
+    assert final['warnings'] == 0 and final['upsert_count'] == 0 and final['delete_count'] == 0
+    assert final['source_count'] == 1 and final['allow_one_second_ahead']
+    repair.prepare(definition, None, None, store, run_id=run)  # Saved setting survives later resumes.
+
+
+def test_adding_behind_flag_restarts_comparison_and_keeps_ahead_flag(definition, store):
+    source = OracleSource(Database(Cursor([(1, DATE)])), definition)
+    target = LiftTarget(Database(Cursor([('row', 1, '2025-01-02 11:59:59.999000')])), None, definition)
+    run = repair.prepare(definition, source, target, store, allow_one_second_ahead=True)
+    assert store.require_prepared_run(run)['upsert_count'] == 1
+    target.db = Database(Cursor([('row', 1, '2025-01-02 11:59:59.999000')]))
+    repair.prepare(definition, None, target, store, run_id=run, allow_one_second_behind=True)
+    final = store.require_prepared_run(run)
+    assert final['upsert_count'] == 0 and final['warnings'] == 0
+    assert final['allow_one_second_ahead'] and final['allow_one_second_behind']
+    assert final['source_complete'] and final['source_count'] == 1

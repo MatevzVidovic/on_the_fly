@@ -5,6 +5,7 @@ from psycopg import sql
 from source import PAGE_SIZE, wall_time, utc_time
 
 from definition import REPAIR_USER_ID
+from store import classify
 
 
 def map_row(payload, definition, max_date, user_id=REPAIR_USER_ID):
@@ -37,6 +38,8 @@ class LiftTarget:
     def __init__(self, db, metadata, definition, user_id=REPAIR_USER_ID):
         self.db, self.metadata, self.d = db, metadata, definition
         self.user_id = user_id
+        self.allow_one_second_ahead = False
+        self.allow_one_second_behind = False
         self.table = sql.Identifier(definition.table)
         self.key = sql.Identifier(definition.key['target'])
         self.date = sql.Identifier(definition.date['target'])
@@ -84,10 +87,16 @@ class LiftTarget:
             for encoded_key, payload in writes:
                 key = self.d.key_value(payload[self.d.key['api_name']])
                 row = existing.get(key)
-                if row and row[1] > utc_time(payload[self.d.date['api_name']]):
+                source_date = utc_time(payload[self.d.date['api_name']])
+                decision = classify(source_date, row[1] if row else None,
+                                    self.allow_one_second_ahead, self.allow_one_second_behind)
+                if decision == 'ahead':
                     warning = 'LIFT date is newer than Oracle date'
                     print(f'Warning key={key}: {warning}', flush=True)
                     outcomes.append((encoded_key, warning))
+                    continue
+                if row and decision == 'equal' and row[1] < source_date:
+                    outcomes.append((encoded_key, None))
                     continue
                 columns, expressions, values = map_row(payload, self.d, max_date, self.user_id)
                 if row:
