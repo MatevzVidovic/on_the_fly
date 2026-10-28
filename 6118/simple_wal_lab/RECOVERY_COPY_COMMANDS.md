@@ -45,7 +45,7 @@ and `difference = 0`; if either fails, do not run DROP/RENAME. Keep writers stop
 between the check and cutover. Equal counts alone do not prove matching IDs, values
 or UTC conversion. These checks are prepared for you to run, not executed here.
 
-## 1. `public.kn_nep_rpe_ulice_h` — 38 MB
+<!-- ## 1. `public.kn_nep_rpe_ulice_h` — 38 MB
 
 ```sql
 ALTER TABLE public.kn_nep_rpe_ulice_h ALTER COLUMN id SET NOT NULL;
@@ -145,11 +145,11 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.ev_pe_dst_h;
 ALTER TABLE public.ev_pe_dst_h_org2810 RENAME TO ev_pe_dst_h;
 COMMIT;
-```
+``` -->
 
 ## 4. `public.kn_nep_rpe_obcine_h` — 125 MB
 
-```sql
+<!-- ```sql
 ALTER TABLE public.kn_nep_rpe_obcine_h ALTER COLUMN id SET NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_04_source_id_uq
     ON public.kn_nep_rpe_obcine_h (id);
@@ -179,7 +179,7 @@ SET LOCAL lock_timeout = '5s';
 DROP TABLE public.kn_nep_rpe_obcine_h;
 ALTER TABLE public.kn_nep_rpe_obcine_h_org2810 RENAME TO kn_nep_rpe_obcine_h;
 COMMIT;
-```
+``` -->
 
 ## 5. `public.kn_nep_katastrske_obcine_h` — 255 MB
 

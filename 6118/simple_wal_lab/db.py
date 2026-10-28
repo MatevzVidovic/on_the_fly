@@ -14,8 +14,9 @@ parser.add_argument('--schema', default=os.getenv('TARGET_SCHEMA', 'public'))
 parser.add_argument('--date-column', '--utc-column', default=os.getenv('DATE_COLUMN', 'date_change_utc'),
                     help='Destination UTC column')
 parser.add_argument('--source-date-column', default=os.getenv('SOURCE_DATE_COLUMN', 'date_change'))
-if Path(sys.argv[0]).name == 'batched_copy_backfill.py':
+if Path(sys.argv[0]).name in ('batched_copy_backfill.py', 'compare_copy.py'):
     parser.add_argument('--copy-target', help='Destination table; default: source name + _org2810')
+if Path(sys.argv[0]).name == 'batched_copy_backfill.py':
     parser.add_argument('--batch-size', type=int, default=500000)
     parser.add_argument('--pause', type=float, default=1)
 if Path(sys.argv[0]).name == 'db_tracker.py':

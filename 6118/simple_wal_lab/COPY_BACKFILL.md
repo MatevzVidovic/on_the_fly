@@ -58,3 +58,25 @@ values and UTC conversion. Reaching the end of the source isn't a full validatio
 of an arbitrarily pre-existing target. If explicitly copied identity/serial values
 use sequences, check their next values before resuming application inserts; this
 script does not alter sequences. Columns with `timestamp(0)` still round seconds.
+
+## Full contents comparison before cutover
+
+```bash
+.venv/bin/python compare_copy.py --table public.kn_nep_katastrske_obcine_h --source-date-column datum_sys --date-column datum_sys_utc
+```
+
+Default target is the source name plus `_org2810`; `--copy-target` overrides it.
+All PostgreSQL queries are in one read-only REPEATABLE READ snapshot with a
+120-second timeout per query. This scans both tables; stop writers while validating.
+It checks exact row counts, unique/non-NULL IDs, missing/extra IDs, every shared
+column, and destination UTC against the conversion from the source local date.
+The destination's actual timestamp precision is applied to that conversion.
+Existing source UTC values are deliberately not compared directly: the copy
+recomputed UTC. Other values use stable text representations; PostGIS geometry
+uses EWKB including coordinates and SRID, not rounded GeoJSON.
+
+JSON output includes `passed`, per-column mismatch counts and up to ten example
+IDs with differing column names (no full row contents). `passed: true` means all
+checks passed for the inspected snapshot. Exit code is 0 for pass, 1 for mismatch;
+errors/timeouts must not be treated as passes. Start/stop status is recorded in
+local `full.sqlite`; neither PostgreSQL table is modified.
