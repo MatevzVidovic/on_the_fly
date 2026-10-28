@@ -39,6 +39,12 @@ is used: dependency errors must be investigated, not bypassed. These blocks do n
 SET LOGGED; logging restoration remains a separate manual step. Stop writers through
 validation and cutover. A successful copy command alone is not full validation.
 
+The count comparison immediately before each cutover reads both complete tables
+and returns exact counts from one statement snapshot. Require `counts_match = true`
+and `difference = 0`; if either fails, do not run DROP/RENAME. Keep writers stopped
+between the check and cutover. Equal counts alone do not prove matching IDs, values
+or UTC conversion. These checks are prepared for you to run, not executed here.
+
 ## 1. `public.kn_nep_rpe_ulice_h` — 38 MB
 
 ```sql
@@ -49,6 +55,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_01_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_rpe_ulice_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_rpe_ulice_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_rpe_ulice_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -73,6 +92,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_02_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_rpe_naselja_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_rpe_naselja_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -91,6 +123,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_03_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.ev_pe_dst_h --source-date-column date_change --date-column date_change_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.ev_pe_dst_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.ev_pe_dst_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -115,6 +160,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_04_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_rpe_obcine_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_rpe_obcine_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -133,6 +191,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_05_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_katastrske_obcine_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_katastrske_obcine_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_katastrske_obcine_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -157,6 +228,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_06_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_ostalo_gozdno_gosp_obm) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_ostalo_gozdno_gosp_obm_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -175,6 +259,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_07_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_hisne_stevilke_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_hisne_stevilke_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_hisne_stevilke_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -199,6 +296,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_08_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_etaze_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_etaze_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -217,6 +327,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_09_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_stavbe_zps_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_stavbe_zps_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_stavbe_zps_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -241,6 +364,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_10_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_prostori_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_prostori_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -259,6 +395,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_11_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_deli_stavb_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_deli_stavb_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_deli_stavb_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -283,6 +432,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_12_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_etaze_x_deli_stavb_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_etaze_x_deli_stavb_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -301,6 +463,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_13_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_stavbe_parcele_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_stavbe_parcele_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_stavbe_parcele_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -325,6 +500,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_14_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_stavbe_obrisi_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_stavbe_obrisi_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -343,6 +531,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_15_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_stavbe_centroidi_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_stavbe_centroidi_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_stavbe_centroidi_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -367,6 +568,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_16_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -388,6 +602,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_17_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_dejanske_rabe_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_dejanske_rabe_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -402,20 +629,33 @@ COMMIT;
 ALTER TABLE public.ev_parc_del_h ALTER COLUMN id SET NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
     ON public.ev_parc_del_h (id);
-``` -->
+<!-- ``` -->
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.ev_parc_del_h --source-date-column date_change --date-column date_change_utc --batch-size 500000
 ```
 
 ```sql
--- After validating the completed copy:
-BEGIN;
-SET LOCAL lock_timeout = '5s';
-DROP TABLE public.ev_parc_del_h;
-ALTER TABLE public.ev_parc_del_h_org2810 RENAME TO ev_parc_del_h;
-COMMIT;
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+-- WITH counts AS MATERIALIZED (
+--     SELECT
+--         (SELECT count(*) FROM public.ev_parc_del_h) AS restored_source_rows,
+--         (SELECT count(*) FROM public.ev_parc_del_h_org2810) AS copied_target_rows
+-- )
+-- SELECT *,
+--        copied_target_rows - restored_source_rows AS difference,
+--        restored_source_rows = copied_target_rows AS counts_match
+-- FROM counts;
 ```
+
+```sql
+-- After validating the completed copy:
+-- BEGIN;
+-- SET LOCAL lock_timeout = '5s';
+-- DROP TABLE public.ev_parc_del_h;
+-- ALTER TABLE public.ev_parc_del_h_org2810 RENAME TO ev_parc_del_h;
+-- COMMIT;
+``` -->
 
 ## 19. `public.kn_nep_parcele_h` — 6659 MB
 
@@ -427,6 +667,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_19_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_parcele_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_parcele_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_parcele_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
@@ -451,6 +704,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_20_source_id_uq
 ```
 
 ```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_namenske_rabe_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_ostalo_parcele_x_namenske_rabe_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
+```
+
+```sql
 -- After validating the completed copy:
 BEGIN;
 SET LOCAL lock_timeout = '5s';
@@ -469,6 +735,19 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_21_source_id_uq
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.kn_nep_ostalo_dejanske_rabe_parcel_h --source-date-column datum_sys --date-column datum_sys_utc --batch-size 500000
+```
+
+```sql
+-- Exact counts: require counts_match = true and difference = 0 before cutover.
+WITH counts AS MATERIALIZED (
+    SELECT
+        (SELECT count(*) FROM public.kn_nep_ostalo_dejanske_rabe_parcel_h) AS restored_source_rows,
+        (SELECT count(*) FROM public.kn_nep_ostalo_dejanske_rabe_parcel_h_org2810) AS copied_target_rows
+)
+SELECT *,
+       copied_target_rows - restored_source_rows AS difference,
+       restored_source_rows = copied_target_rows AS counts_match
+FROM counts;
 ```
 
 ```sql
