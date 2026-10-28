@@ -1,0 +1,33 @@
+{
+  "started_at": "2026-10-28T20:29:43.616404+00:00",
+  "env_file": ".env",
+  "difference": "Oracle minus LIFT",
+  "excluded_tables": [
+    "kn_nep_ostalo_namenske_rabe",
+    "kn_nep_ostalo_dejanske_rabe_parcel_h"
+  ],
+  "tables": [
+    {
+      "table": "ev_parc_enota_h_2025_danes",
+      "integration_id": "1e57d002-f69c-11f0-9f2c-02420a000266",
+      "cutoff": "2026-10-26 22:59:59.999000",
+      "source_date": "DATE_CHANGE_UTC",
+      "target_date": "date_change_utc",
+      "time_basis": "UTC",
+      "oracle_total": 26542889,
+      "lift_total": 26542889,
+      "oracle_eligible": 26540794,
+      "lift_eligible": 26537816,
+      "oracle_seconds": 35.932,
+      "lift_seconds": 8.035,
+      "lift_rounded_cutoff": "2026-10-26 23:00:00.000000",
+      "lift_rounded_eligible": 26540794,
+      "rounded_cutoff_gap": 0,
+      "total_gap": 0,
+      "cutoff_gap": 2978,
+      "counts_match": true,
+      "cutoff_counts_match": false
+    }
+  ],
+  "finished_at": "2026-10-28T20:30:28.494114+00:00"
+}

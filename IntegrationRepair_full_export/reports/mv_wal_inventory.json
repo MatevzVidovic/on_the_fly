@@ -1,0 +1,1340 @@
+{
+  "at": "2026-10-28T20:36:25.081993+00:00",
+  "base_tables": [
+    "ev_posebna_enota_h",
+    "ev_pe_parc_h",
+    "ev_pe_dst_h",
+    "ev_dst_pripis_podatki_h",
+    "ev_stavba_h",
+    "ev_prostor_h",
+    "ev_del_stavbe_enota_h_2025_danes",
+    "ev_parc_pripis_podatki_h",
+    "ev_del_stavbe_h",
+    "ev_parc_del_h",
+    "ev_parcela_h",
+    "ev_parc_enota_h_2025_danes",
+    "kn_nep_rpe_obcine_h",
+    "kn_nep_katastrske_obcine_h",
+    "kn_nep_rpe_naselja_h",
+    "kn_nep_rpe_ulice_h",
+    "kn_nep_ostalo_gozdno_gosp_obm",
+    "kn_nep_stanovanja_h",
+    "kn_nep_hisne_stevilke_h",
+    "kn_nep_stavbe_parcele_h",
+    "kn_nep_stavbe_zps_h",
+    "kn_nep_etaze_h",
+    "kn_nep_deli_stavb_h",
+    "kn_nep_stavbe_centroidi_h",
+    "kn_nep_stavbe_obrisi_h",
+    "kn_nep_etaze_x_deli_stavb_h",
+    "kn_nep_prostori_h",
+    "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+    "kn_nep_parcele_h",
+    "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+    "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+    "kn_nep_ostalo_dejanske_rabe_parcel_h"
+  ],
+  "settings": [
+    {
+      "name": "checkpoint_timeout",
+      "setting": "300",
+      "unit": "s"
+    },
+    {
+      "name": "full_page_writes",
+      "setting": "on",
+      "unit": null
+    },
+    {
+      "name": "max_wal_size",
+      "setting": "1024",
+      "unit": "MB"
+    },
+    {
+      "name": "server_version",
+      "setting": "15.7 (Debian 15.7-1.pgdg110+1)",
+      "unit": null
+    },
+    {
+      "name": "wal_compression",
+      "setting": "off",
+      "unit": null
+    },
+    {
+      "name": "wal_level",
+      "setting": "replica",
+      "unit": null
+    }
+  ],
+  "dependent_mvs": [
+    {
+      "schema": "public",
+      "view_name": "kn_nep_parcele_a",
+      "base_tables": [
+        "kn_nep_parcele_h"
+      ],
+      "estimated_rows": 5850213,
+      "table_bytes": 4889968640,
+      "index_bytes": 1633779712,
+      "total_bytes": 6523748352,
+      "unique_index": true,
+      "definition": " SELECT DISTINCT ON (p.parcela_id) uuid_generate_v4() AS id,\n    p.created_by,\n    p.created_at,\n    p.parcela_h_id,\n    p.parcela_id,\n    p.ko_id,\n    p.st_parcele,\n    p.povrsina,\n    p.dolocitev_povrsine,\n    p.upravni_status_id,\n    p.e_cen,\n    p.n_cen,\n    p.geom,\n    p.povrsina_geom,\n    p.eid,\n    p.boniteta,\n    p.drzavna_meja,\n    p.skupni_del_etazna_lastnina,\n    pev.idji_pev\n   FROM (kn_nep_parcele_h p\n     LEFT JOIN ( SELECT t1.parcela_id,\n            string_agg((t3.id_pev)::text, ','::text) AS idji_pev\n           FROM ((pev_parcele t1\n             LEFT JOIN pev_fo t2 ON ((t1.id_rel_fo = t2.id)))\n             LEFT JOIN pev_posebne_enote t3 ON ((t2.id_rel_pe = t3.id)))\n          WHERE ((t3.valid_to IS NULL) AND (t2.valid_to_fo IS NULL))\n          GROUP BY t1.parcela_id) pev USING (parcela_id))\n  WHERE ((p.parcela_id IS NOT NULL) AND (p.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n  ORDER BY p.parcela_id, p.datum_sys DESC;",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_parcele",
+      "base_tables": [
+        "ev_parc_enota_h_2025_danes",
+        "kn_nep_parcele_h"
+      ],
+      "estimated_rows": 5830607,
+      "table_bytes": 2327658496,
+      "index_bytes": 624902144,
+      "total_bytes": 2952560640,
+      "unique_index": true,
+      "definition": " SELECT kn_nep_parcele_h.id,\n    kn_nep_parcele_h.parcela_h_id,\n    kn_nep_parcele_h.parcela_id,\n    kn_nep_parcele_h.ko_id,\n    kn_nep_parcele_h.st_parcele,\n    kn_nep_parcele_h.povrsina,\n    kn_nep_parcele_h.e_cen,\n    kn_nep_parcele_h.n_cen,\n    kn_nep_parcele_h.povrsina_geom,\n    kn_nep_parcele_h.eid,\n    kn_nep_parcele_h.boniteta,\n    kn_nep_parcele_h.skupni_del_etazna_lastnina,\n        CASE\n            WHEN (kn_nep_parcele_h.skupni_del_etazna_lastnina = 1) THEN 'Da'::text\n            WHEN (kn_nep_parcele_h.skupni_del_etazna_lastnina = 2) THEN 'Ne'::text\n            ELSE NULL::text\n        END AS solastniki,\n    kn_nep_parcele_h.geom,\n    ev_vrednost.vrednost,\n    ev_vrednost.posplosena_vrednost\n   FROM (( SELECT DISTINCT ON (kn_nep_parcele_h_1.parcela_id) kn_nep_parcele_h_1.id,\n            kn_nep_parcele_h_1.created_by,\n            kn_nep_parcele_h_1.updated_by,\n            kn_nep_parcele_h_1.created_at,\n            kn_nep_parcele_h_1.updated_at,\n            kn_nep_parcele_h_1.parcela_h_id,\n            kn_nep_parcele_h_1.parcela_id,\n            kn_nep_parcele_h_1.ko_id,\n            kn_nep_parcele_h_1.st_parcele,\n            kn_nep_parcele_h_1.povrsina,\n            kn_nep_parcele_h_1.dolocitev_povrsine,\n            kn_nep_parcele_h_1.upravni_status_id,\n            kn_nep_parcele_h_1.e_cen,\n            kn_nep_parcele_h_1.n_cen,\n            kn_nep_parcele_h_1.geom,\n            kn_nep_parcele_h_1.povrsina_geom,\n            kn_nep_parcele_h_1.postopek_id_od,\n            kn_nep_parcele_h_1.postopek_id_do,\n            kn_nep_parcele_h_1.eid,\n            kn_nep_parcele_h_1.boniteta,\n            kn_nep_parcele_h_1.drzavna_meja,\n            kn_nep_parcele_h_1.skupni_del_etazna_lastnina,\n            kn_nep_parcele_h_1.datum_od,\n            kn_nep_parcele_h_1.datum_do,\n            kn_nep_parcele_h_1.datum_sys\n           FROM kn_nep_parcele_h kn_nep_parcele_h_1\n          WHERE (kn_nep_parcele_h_1.datum_do > '2040-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY kn_nep_parcele_h_1.parcela_id, kn_nep_parcele_h_1.datum_sys DESC) kn_nep_parcele_h\n     LEFT JOIN ( SELECT ev_parc_enota_h_2025_danes.pc_mid,\n            sum(ev_parc_enota_h_2025_danes.vrednost) AS vrednost,\n            sum(ev_parc_enota_h_2025_danes.posplosena_vrednost) AS posplosena_vrednost\n           FROM ev_parc_enota_h_2025_danes\n          WHERE (ev_parc_enota_h_2025_danes.valid_to IS NULL)\n          GROUP BY ev_parc_enota_h_2025_danes.pc_mid) ev_vrednost ON ((kn_nep_parcele_h.parcela_id = ev_vrednost.pc_mid)));",
+      "random_uuid": false
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_deli_stavb_stavbe",
+      "base_tables": [
+        "ev_del_stavbe_enota_h_2025_danes",
+        "kn_nep_deli_stavb_h",
+        "kn_nep_hisne_stevilke_h",
+        "kn_nep_rpe_naselja_h",
+        "kn_nep_rpe_ulice_h",
+        "kn_nep_stavbe_centroidi_h",
+        "kn_nep_stavbe_obrisi_h",
+        "kn_nep_stavbe_zps_h"
+      ],
+      "estimated_rows": 1931033,
+      "table_bytes": 1878540288,
+      "index_bytes": 290324480,
+      "total_bytes": 2168864768,
+      "unique_index": true,
+      "definition": " SELECT uuid_generate_v4() AS id,\n    stc.leto_izgradnje,\n    n.polni_naslovi AS polni_naslov,\n    stc.stevilo_etaz,\n    stc.stavba_id,\n    ds.del_stavbe_id,\n    stc.ko_id,\n    stc.st_stavbe,\n    ds.st_dela_stavbe,\n    concat(stc.ko_id, '-', stc.st_stavbe, '-', ds.st_dela_stavbe) AS ko_stst_stdst,\n    sifdr.naziv AS dej_raba_dst,\n    ds.povrsina AS neto_povrsina,\n    ds.vrsta_dejanske_rabe_del_st_id,\n    ds.uporabna_povrsina,\n        CASE\n            WHEN ((ds.status)::numeric = (0)::numeric) THEN 'NULL'::text\n            WHEN ((ds.status)::numeric = (1)::numeric) THEN 'DA'::text\n            WHEN ((ds.status)::numeric = (2)::numeric) THEN 'DA'::text\n            WHEN ((ds.status)::numeric = (3)::numeric) THEN 'NE'::text\n            WHEN ((ds.status)::numeric = (4)::numeric) THEN 'DA'::text\n            WHEN ((ds.status)::numeric = (5)::numeric) THEN 'NULL'::text\n            WHEN ((ds.status)::numeric = ('-1'::integer)::numeric) THEN 'NULL'::text\n            ELSE NULL::text\n        END AS kat_vpis,\n        CASE\n            WHEN (ds.etazna_lastnina = 0) THEN 'NULL'::text\n            WHEN (ds.etazna_lastnina = 1) THEN 'DA'::text\n            WHEN (ds.etazna_lastnina = 2) THEN 'NE'::text\n            ELSE NULL::text\n        END AS etazna_lastnina,\n        CASE\n            WHEN (ds.skupni_del_etazna_lastnina = 0) THEN 'NULL'::text\n            WHEN (ds.skupni_del_etazna_lastnina = 1) THEN 'DA'::text\n            WHEN (ds.skupni_del_etazna_lastnina = 2) THEN 'NE'::text\n            ELSE NULL::text\n        END AS skupni_del_etazna_lasnina,\n        CASE\n            WHEN (stzps.geom IS NOT NULL) THEN 'ZPS geom'::text\n            ELSE 'Obrisi geom'::text\n        END AS vrsta_geom,\n    (st_setsrid(COALESCE(stzps.geom, st_multi(sto.geom)), 3794))::geometry(MultiPolygon,3794) AS geom,\n    ev_vrednost.vrednost,\n    ev_vrednost.posplosena_vrednost\n   FROM ((((((( SELECT DISTINCT ON (d.del_stavbe_id) d.del_stavbe_id,\n            d.stavba_id,\n            d.st_dela_stavbe,\n            d.vrsta_dejanske_rabe_del_st_id,\n            d.povrsina,\n            d.uporabna_povrsina,\n            d.status,\n            d.etazna_lastnina,\n            d.skupni_del_etazna_lastnina\n           FROM kn_nep_deli_stavb_h d\n          WHERE (d.datum_do > '2040-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY d.del_stavbe_id, d.datum_sys DESC) ds\n     LEFT JOIN ( SELECT DISTINCT ON (s.stavba_id) s.stavba_id,\n            s.leto_izgradnje,\n            s.ko_id,\n            s.stevilo_etaz,\n            s.st_stavbe\n           FROM kn_nep_stavbe_centroidi_h s\n          WHERE (s.datum_do > '2040-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY s.stavba_id, s.datum_sys DESC) stc ON ((stc.stavba_id = ds.stavba_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (z.stavba_id) z.stavba_id,\n            z.geom\n           FROM kn_nep_stavbe_zps_h z\n          WHERE (z.datum_do > '2040-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY z.stavba_id, z.datum_sys DESC) stzps ON ((stc.stavba_id = stzps.stavba_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (o.stavba_id) o.stavba_id,\n            o.geom\n           FROM kn_nep_stavbe_obrisi_h o\n          WHERE (o.datum_do > '2040-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY o.stavba_id, o.datum_sys DESC) sto ON ((stc.stavba_id = sto.stavba_id)))\n     LEFT JOIN ( SELECT string_agg(n_1.polni_naslov, '; '::text) AS polni_naslovi,\n            n_1.stavba_id\n           FROM kn_nep_naslovi_view n_1\n          GROUP BY n_1.stavba_id) n ON ((stc.stavba_id = n.stavba_id)))\n     LEFT JOIN ( SELECT sif.sifra,\n            sif.naziv\n           FROM pp_sif_dej_raba_dst_model sif) sifdr ON (((ds.vrsta_dejanske_rabe_del_st_id)::numeric = (sifdr.sifra)::numeric)))\n     LEFT JOIN ( SELECT ev_del_stavbe_enota_h_2025_danes.dst_sid,\n            ev_del_stavbe_enota_h_2025_danes.vrednost,\n            ev_del_stavbe_enota_h_2025_danes.posplosena_vrednost\n           FROM ev_del_stavbe_enota_h_2025_danes\n          WHERE (ev_del_stavbe_enota_h_2025_danes.valid_to IS NULL)) ev_vrednost ON ((ds.del_stavbe_id = ev_vrednost.dst_sid)));",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "pp_kn_parcele_mv",
+      "base_tables": [
+        "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+        "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+        "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+        "kn_nep_parcele_h"
+      ],
+      "estimated_rows": 0,
+      "table_bytes": 516096,
+      "index_bytes": 1738186752,
+      "total_bytes": 1738702848,
+      "unique_index": true,
+      "definition": " SELECT uuid_generate_v4() AS id,\n    p.parcela_id,\n    p.ko_id AS sif_ko,\n    p.st_parcele,\n        CASE\n            WHEN ((p.ko_id IS NULL) OR (p.st_parcele IS NULL)) THEN NULL::text\n            ELSE concat(p.ko_id, ' ', p.st_parcele)\n        END AS ko_parc,\n    (p.povrsina)::numeric AS zemlj_povr,\n    p.boniteta,\n    nr.vrsta_namenske_rabe_id AS nam_raba_parc,\n    nasad.vrsta_nasada,\n    gozd.rastiscni_koeficient AS rk,\n    gozd.odprtost,\n    st_astext(st_setsrid(st_makepoint((p.e_cen)::double precision, (p.n_cen)::double precision), 3794)) AS wkt_centroida,\n    (st_multi(p.geom))::geometry(MultiPolygon,3794) AS geom\n   FROM (((( SELECT DISTINCT ON (p_1.parcela_id) p_1.parcela_id,\n            p_1.ko_id,\n            p_1.st_parcele,\n            p_1.povrsina,\n            p_1.boniteta,\n            p_1.e_cen,\n            p_1.n_cen,\n            p_1.geom\n           FROM kn_nep_parcele_h p_1\n          WHERE ((p_1.parcela_id IS NOT NULL) AND (p_1.datum_od <= CURRENT_TIMESTAMP) AND (p_1.datum_do > CURRENT_TIMESTAMP))\n          ORDER BY p_1.parcela_id, p_1.datum_sys DESC NULLS LAST, p_1.datum_od DESC NULLS LAST, p_1.parcela_h_id DESC NULLS LAST) p\n     LEFT JOIN ( SELECT DISTINCT ON (nr_1.parcela_id) nr_1.parcela_id,\n            nr_1.vrsta_namenske_rabe_id\n           FROM ( SELECT DISTINCT ON (nr_2.parcela_x_namenska_raba_id) nr_2.parcela_x_namenska_raba_id,\n                    nr_2.parcela_id,\n                    nr_2.vrsta_namenske_rabe_id,\n                    nr_2.delez,\n                    nr_2.datum_sys\n                   FROM kn_nep_ostalo_parcele_x_namenske_rabe_h nr_2\n                  WHERE ((nr_2.parcela_x_namenska_raba_id IS NOT NULL) AND (nr_2.datum_od <= CURRENT_TIMESTAMP) AND (nr_2.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY nr_2.parcela_x_namenska_raba_id, nr_2.datum_sys DESC NULLS LAST, nr_2.datum_od DESC NULLS LAST, nr_2.parcela_x_namenska_raba_h_id DESC NULLS LAST) nr_1\n          WHERE (nr_1.parcela_id IS NOT NULL)\n          ORDER BY nr_1.parcela_id, nr_1.datum_sys DESC NULLS LAST, nr_1.delez DESC NULLS LAST, nr_1.parcela_x_namenska_raba_id DESC) nr ON ((nr.parcela_id = p.parcela_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (gozd_1.parcela_id) gozd_1.parcela_id,\n            gozd_1.rastiscni_koeficient,\n            gozd_1.odprtost\n           FROM ( SELECT DISTINCT ON (gozd_2.parcele_x_gozdno_gosp_obm_id) gozd_2.parcele_x_gozdno_gosp_obm_id,\n                    gozd_2.parcela_id,\n                    gozd_2.rastiscni_koeficient,\n                    gozd_2.odprtost,\n                    gozd_2.datum_sys\n                   FROM kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h gozd_2\n                  WHERE ((gozd_2.parcele_x_gozdno_gosp_obm_id IS NOT NULL) AND (gozd_2.datum_od <= CURRENT_TIMESTAMP) AND (gozd_2.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY gozd_2.parcele_x_gozdno_gosp_obm_id, gozd_2.datum_sys DESC NULLS LAST, gozd_2.datum_od DESC NULLS LAST, gozd_2.parcele_x_gozdno_gosp_obm_h_id DESC NULLS LAST) gozd_1\n          WHERE (gozd_1.parcela_id IS NOT NULL)\n          ORDER BY gozd_1.parcela_id, gozd_1.datum_sys DESC NULLS LAST, gozd_1.parcele_x_gozdno_gosp_obm_id DESC) gozd ON ((gozd.parcela_id = p.parcela_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (nasad_1.parcela_id) nasad_1.parcela_id,\n                CASE nasad_1.kg_vrsta_dejanske_rabe_id\n                    WHEN 2 THEN 11\n                    WHEN 4 THEN 13\n                    WHEN 6 THEN 15\n                    WHEN 7 THEN 16\n                    WHEN 8 THEN 17\n                    ELSE NULL::integer\n                END AS vrsta_nasada\n           FROM ( SELECT DISTINCT ON (nasad_2.parcela_x_dejanska_raba_id) nasad_2.parcela_x_dejanska_raba_id,\n                    nasad_2.parcela_id,\n                    nasad_2.kg_vrsta_dejanske_rabe_id,\n                    nasad_2.delez,\n                    nasad_2.datum_sys\n                   FROM kn_nep_ostalo_parcele_x_dejanske_rabe_h nasad_2\n                  WHERE ((nasad_2.parcela_x_dejanska_raba_id IS NOT NULL) AND (nasad_2.datum_od <= CURRENT_TIMESTAMP) AND (nasad_2.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY nasad_2.parcela_x_dejanska_raba_id, nasad_2.datum_sys DESC NULLS LAST, nasad_2.datum_od DESC NULLS LAST, nasad_2.parcela_x_dejanska_raba_h_id DESC NULLS LAST) nasad_1\n          WHERE ((nasad_1.parcela_id IS NOT NULL) AND (nasad_1.kg_vrsta_dejanske_rabe_id = ANY (ARRAY[2, 4, 6, 7, 8])))\n          ORDER BY nasad_1.parcela_id, nasad_1.datum_sys DESC NULLS LAST, nasad_1.delez DESC NULLS LAST, nasad_1.parcela_x_dejanska_raba_id DESC) nasad ON ((nasad.parcela_id = p.parcela_id)));",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_deli_stavb_a",
+      "base_tables": [
+        "kn_nep_deli_stavb_h"
+      ],
+      "estimated_rows": 1917864,
+      "table_bytes": 999489536,
+      "index_bytes": 571727872,
+      "total_bytes": 1571217408,
+      "unique_index": true,
+      "definition": " SELECT DISTINCT ON (d.del_stavbe_id) uuid_generate_v4() AS id,\n    d.created_by,\n    d.updated_by,\n    d.created_at,\n    d.updated_at,\n    d.del_stavbe_h_id,\n    d.del_stavbe_id,\n    d.stavba_id,\n    d.hisna_stevilka_id,\n    d.upravnik_id,\n    d.vrsta_dejanske_rabe_del_st_id,\n    d.dvigalo,\n    d.leto_obnove_instalacij,\n    d.leto_obnove_oken,\n    d.povrsina,\n    d.status,\n    d.st_dela_stavbe,\n    d.stanovanje_id,\n    d.uporabna_povrsina,\n    d.prostornina_cistern_silosov,\n    d.eid,\n    d.nacin_dolocitve_povrsine_dela_stavbe_id,\n    d.upravnik_status,\n    d.omejitev_vpogleda,\n    d.etazna_lastnina,\n    d.skupni_del_etazna_lastnina\n   FROM kn_nep_deli_stavb_h d\n  WHERE ((d.del_stavbe_id IS NOT NULL) AND (d.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n  ORDER BY d.del_stavbe_id, d.datum_sys DESC;",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_stavbe_parcele_a",
+      "base_tables": [
+        "kn_nep_stavbe_parcele_h"
+      ],
+      "estimated_rows": 1323469,
+      "table_bytes": 1283022848,
+      "index_bytes": 256835584,
+      "total_bytes": 1539858432,
+      "unique_index": true,
+      "definition": " SELECT DISTINCT ON (sp.stavba_parcela_id) uuid_generate_v4() AS id,\n    sp.created_by,\n    sp.created_at,\n    sp.stavba_parcela_h_id,\n    sp.stavba_parcela_id,\n    sp.povrsina,\n    sp.parcela_id,\n    sp.stavba_id,\n    sp.stevilka_stavbe,\n    sp.e_cen,\n    sp.n_cen,\n    sp.geom,\n    sp.povrsina_geom,\n    sp.vrsta_povezave_id,\n    sp.eid,\n    sp.povrsina_zps,\n    sp.original_tip_geom\n   FROM kn_nep_stavbe_parcele_h sp\n  WHERE ((sp.stavba_parcela_id IS NOT NULL) AND (sp.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n  ORDER BY sp.stavba_parcela_id, sp.datum_sys DESC;",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "pp_kn_deli_stavb_mv",
+      "base_tables": [
+        "ev_del_stavbe_enota_h_2025_danes",
+        "kn_nep_deli_stavb_h",
+        "kn_nep_etaze_h",
+        "kn_nep_etaze_x_deli_stavb_h",
+        "kn_nep_prostori_h",
+        "kn_nep_stanovanja_h",
+        "kn_nep_stavbe_centroidi_h",
+        "kn_nep_stavbe_obrisi_h",
+        "kn_nep_stavbe_parcele_h",
+        "kn_nep_stavbe_zps_h"
+      ],
+      "estimated_rows": 0,
+      "table_bytes": 507904,
+      "index_bytes": 1448747008,
+      "total_bytes": 1449254912,
+      "unique_index": true,
+      "definition": " SELECT uuid_generate_v4() AS id,\n    b.del_stavbe_id,\n    b.stavba_id,\n    b.sif_ko,\n    b.st_stavbe,\n    b.st_dela_stavbe,\n    b.ko_stst_stdst,\n    b.katas_vpis,\n    b.hisna_stevilka_id,\n    b.st_stanovanja,\n    b.dej_raba_dst,\n    b.tip_stavbe,\n    b.upor_povr,\n    b.neto_povr,\n    b.leto_izg,\n    round(((b.zps_stavbe * b.neto_povr) / NULLIF(sum(b.neto_povr) OVER (PARTITION BY b.stavba_id), (0)::numeric)), 2) AS zps_dst,\n    b.leto_obn_strehe,\n    b.leto_obn_fasade,\n    b.leto_obn_oken,\n    b.leto_obn_inst,\n    b.vhodna_etaza_dst,\n    b.pritlicna_etaza_stavbe,\n    b.id_lega,\n    b.nadstropje,\n    b.st_stanovanj,\n    b.st_etaz,\n    b.id_konstrukcije,\n    b.id_vodovod,\n    b.id_elektrika,\n    b.id_kanalizacija,\n    b.id_plin,\n    b.id_dvigalo,\n    b.neto_prost,\n    b.visina_etaze_rzd,\n    b.atr_povr,\n    b.wkt_centroida,\n    b.vrsta_geom,\n    b.geom,\n    b.vrednost,\n    b.posplosena_vrednost\n   FROM ( SELECT d.del_stavbe_id,\n            d.stavba_id,\n            s.ko_id AS sif_ko,\n            s.st_stavbe,\n            d.st_dela_stavbe,\n                CASE\n                    WHEN ((s.ko_id IS NULL) OR (s.st_stavbe IS NULL) OR (d.st_dela_stavbe IS NULL)) THEN NULL::text\n                    ELSE concat(s.ko_id, '-', s.st_stavbe, '-', d.st_dela_stavbe)\n                END AS ko_stst_stdst,\n            d.status AS katas_vpis,\n            (d.hisna_stevilka_id)::bigint AS hisna_stevilka_id,\n            stan.st_stanovanja,\n            d.vrsta_dejanske_rabe_del_st_id AS dej_raba_dst,\n            s.tip_stavbe_id AS tip_stavbe,\n            COALESCE(pov.upor_povr_iz_prostorov, NULLIF(d.uporabna_povrsina, (0)::numeric)) AS upor_povr,\n            COALESCE(pov.neto_povr_iz_prostorov, NULLIF(d.povrsina, (0)::numeric)) AS neto_povr,\n            NULLIF(s.leto_izgradnje, 0) AS leto_izg,\n            zps.zps_stavbe,\n                CASE\n                    WHEN (NULLIF(s.leto_obnove_strehe, 0) < NULLIF(s.leto_izgradnje, 0)) THEN NULL::integer\n                    ELSE NULLIF(s.leto_obnove_strehe, 0)\n                END AS leto_obn_strehe,\n                CASE\n                    WHEN (NULLIF(s.leto_obnove_fasade, 0) < NULLIF(s.leto_izgradnje, 0)) THEN NULL::integer\n                    ELSE NULLIF(s.leto_obnove_fasade, 0)\n                END AS leto_obn_fasade,\n                CASE\n                    WHEN (NULLIF(d.leto_obnove_oken, 0) < NULLIF(s.leto_izgradnje, 0)) THEN NULL::integer\n                    ELSE NULLIF(d.leto_obnove_oken, 0)\n                END AS leto_obn_oken,\n                CASE\n                    WHEN (NULLIF(d.leto_obnove_instalacij, 0) < NULLIF(s.leto_izgradnje, 0)) THEN NULL::integer\n                    ELSE NULLIF(d.leto_obnove_instalacij, 0)\n                END AS leto_obn_inst,\n            vhodna.stevilka_etaze AS vhodna_etaza_dst,\n            pritlicna.stevilka_etaze AS pritlicna_etaza_stavbe,\n                CASE\n                    WHEN (vhodna.stevilka_etaze < pritlicna.stevilka_etaze) THEN 1\n                    WHEN (vhodna.stevilka_etaze = pritlicna.stevilka_etaze) THEN 2\n                    WHEN (vhodna.stevilka_etaze > pritlicna.stevilka_etaze) THEN 3\n                    ELSE NULL::integer\n                END AS id_lega,\n            (vhodna.stevilka_etaze - pritlicna.stevilka_etaze) AS nadstropje,\n            s.stevilo_stanovanj AS st_stanovanj,\n            s.stevilo_etaz AS st_etaz,\n            s.nosilna_konstrukcija_id AS id_konstrukcije,\n                CASE s.vodovod\n                    WHEN 1 THEN true\n                    WHEN 2 THEN false\n                    ELSE NULL::boolean\n                END AS id_vodovod,\n                CASE s.elektrika\n                    WHEN 1 THEN true\n                    WHEN 2 THEN false\n                    ELSE NULL::boolean\n                END AS id_elektrika,\n                CASE s.kanalizacija\n                    WHEN 1 THEN true\n                    WHEN 2 THEN false\n                    ELSE NULL::boolean\n                END AS id_kanalizacija,\n                CASE s.plin\n                    WHEN 1 THEN true\n                    WHEN 2 THEN false\n                    ELSE NULL::boolean\n                END AS id_plin,\n                CASE d.dvigalo\n                    WHEN 1 THEN true\n                    WHEN 2 THEN false\n                    ELSE NULL::boolean\n                END AS id_dvigalo,\n            d.prostornina_cistern_silosov AS neto_prost,\n                CASE\n                    WHEN (vhodna.visina_etaze < 3.5) THEN 1\n                    WHEN (vhodna.visina_etaze < (6)::numeric) THEN 2\n                    WHEN (vhodna.visina_etaze < (12)::numeric) THEN 3\n                    WHEN (vhodna.visina_etaze < (20)::numeric) THEN 4\n                    WHEN (vhodna.visina_etaze >= (20)::numeric) THEN 5\n                    ELSE NULL::integer\n                END AS visina_etaze_rzd,\n            atr.atr_povr,\n            st_astext(s.geom) AS wkt_centroida,\n                CASE\n                    WHEN (stzps.geom IS NOT NULL) THEN 'ZPS geom'::text\n                    ELSE 'Obrisi geom'::text\n                END AS vrsta_geom,\n            (st_setsrid(COALESCE(stzps.geom, st_multi(o.geom)), 3794))::geometry(MultiPolygon,3794) AS geom,\n            ev_vrednost.vrednost,\n            ev_vrednost.posplosena_vrednost\n           FROM ((((((((((( SELECT DISTINCT ON (d_1.del_stavbe_id) d_1.del_stavbe_id,\n                    d_1.stavba_id,\n                    d_1.hisna_stevilka_id,\n                    d_1.vrsta_dejanske_rabe_del_st_id,\n                    d_1.dvigalo,\n                    d_1.leto_obnove_instalacij,\n                    d_1.leto_obnove_oken,\n                    d_1.povrsina,\n                    d_1.uporabna_povrsina,\n                    d_1.prostornina_cistern_silosov,\n                    d_1.status,\n                    d_1.st_dela_stavbe,\n                    d_1.stanovanje_id\n                   FROM kn_nep_deli_stavb_h d_1\n                  WHERE ((d_1.del_stavbe_id IS NOT NULL) AND (d_1.datum_od <= CURRENT_TIMESTAMP) AND (d_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY d_1.del_stavbe_id, d_1.datum_sys DESC NULLS LAST, d_1.datum_od DESC NULLS LAST, d_1.del_stavbe_h_id DESC NULLS LAST) d\n             LEFT JOIN ( SELECT DISTINCT ON (s_1.stavba_id) s_1.stavba_id,\n                    s_1.ko_id,\n                    s_1.st_stavbe,\n                    s_1.tip_stavbe_id,\n                    s_1.leto_izgradnje,\n                    s_1.leto_obnove_fasade,\n                    s_1.leto_obnove_strehe,\n                    s_1.stevilo_stanovanj,\n                    s_1.stevilo_etaz,\n                    s_1.nosilna_konstrukcija_id,\n                    s_1.vodovod,\n                    s_1.elektrika,\n                    s_1.kanalizacija,\n                    s_1.plin,\n                    s_1.geom\n                   FROM kn_nep_stavbe_centroidi_h s_1\n                  WHERE ((s_1.stavba_id IS NOT NULL) AND (s_1.datum_od <= CURRENT_TIMESTAMP) AND (s_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY s_1.stavba_id, s_1.datum_sys DESC NULLS LAST, s_1.datum_od DESC NULLS LAST, s_1.stavba_h_id DESC NULLS LAST) s ON ((s.stavba_id = d.stavba_id)))\n             LEFT JOIN ( SELECT DISTINCT ON (stzps_1.stavba_id) stzps_1.stavba_id,\n                    stzps_1.geom\n                   FROM kn_nep_stavbe_zps_h stzps_1\n                  WHERE ((stzps_1.stavba_id IS NOT NULL) AND (stzps_1.datum_od <= CURRENT_TIMESTAMP) AND (stzps_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY stzps_1.stavba_id, stzps_1.datum_sys DESC NULLS LAST, stzps_1.datum_od DESC NULLS LAST) stzps ON ((stzps.stavba_id = d.stavba_id)))\n             LEFT JOIN ( SELECT DISTINCT ON (o_1.stavba_id) o_1.stavba_id,\n                    o_1.geom\n                   FROM kn_nep_stavbe_obrisi_h o_1\n                  WHERE ((o_1.stavba_id IS NOT NULL) AND (o_1.datum_od <= CURRENT_TIMESTAMP) AND (o_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY o_1.stavba_id, o_1.datum_sys DESC NULLS LAST, o_1.datum_od DESC NULLS LAST, o_1.stavba_h_id DESC NULLS LAST) o ON ((o.stavba_id = d.stavba_id)))\n             LEFT JOIN ( SELECT DISTINCT ON (stan_1.stanovanje_id) stan_1.stanovanje_id,\n                    stan_1.st_stanovanja\n                   FROM kn_nep_stanovanja_h stan_1\n                  WHERE ((stan_1.stanovanje_id IS NOT NULL) AND (stan_1.datum_od <= CURRENT_TIMESTAMP) AND (stan_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY stan_1.stanovanje_id, stan_1.datum_sys DESC NULLS LAST, stan_1.datum_od DESC NULLS LAST, stan_1.stanovanje_h_id DESC NULLS LAST) stan ON ((stan.stanovanje_id = d.stanovanje_id)))\n             LEFT JOIN ( SELECT vhod.del_stavbe_id,\n                    etaza.stevilka_etaze,\n                    etaza.visina_etaze\n                   FROM (( SELECT DISTINCT ON (vhod_1.del_stavbe_id) vhod_1.del_stavbe_id,\n                            vhod_1.etaza_id\n                           FROM kn_nep_etaze_x_deli_stavb_h vhod_1\n                          WHERE ((vhod_1.del_stavbe_id IS NOT NULL) AND (vhod_1.glavni_vhod_dela_stavbe = 1) AND (vhod_1.datum_od <= CURRENT_TIMESTAMP) AND (vhod_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY vhod_1.del_stavbe_id, vhod_1.datum_sys DESC NULLS LAST, vhod_1.datum_od DESC NULLS LAST, vhod_1.etaza_x_del_stavbe_h_id DESC NULLS LAST) vhod\n                     LEFT JOIN ( SELECT DISTINCT ON (etaza_1.etaza_id) etaza_1.etaza_id,\n                            etaza_1.stevilka_etaze,\n                            etaza_1.visina_etaze\n                           FROM kn_nep_etaze_h etaza_1\n                          WHERE ((etaza_1.etaza_id IS NOT NULL) AND (etaza_1.datum_od <= CURRENT_TIMESTAMP) AND (etaza_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY etaza_1.etaza_id, etaza_1.datum_sys DESC NULLS LAST, etaza_1.datum_od DESC NULLS LAST, etaza_1.etaza_h_id DESC NULLS LAST) etaza ON ((etaza.etaza_id = vhod.etaza_id)))) vhodna ON ((vhodna.del_stavbe_id = d.del_stavbe_id)))\n             LEFT JOIN ( SELECT DISTINCT ON (pritlicna_1.stavba_id) pritlicna_1.stavba_id,\n                    pritlicna_1.stevilka_etaze\n                   FROM kn_nep_etaze_h pritlicna_1\n                  WHERE ((pritlicna_1.stavba_id IS NOT NULL) AND (pritlicna_1.pritlicna_etaza = 1) AND (pritlicna_1.datum_od <= CURRENT_TIMESTAMP) AND (pritlicna_1.datum_do > CURRENT_TIMESTAMP))\n                  ORDER BY pritlicna_1.stavba_id, pritlicna_1.datum_sys DESC NULLS LAST, pritlicna_1.datum_od DESC NULLS LAST, pritlicna_1.etaza_h_id DESC NULLS LAST) pritlicna ON ((pritlicna.stavba_id = d.stavba_id)))\n             LEFT JOIN ( SELECT prostor.del_stavbe_id,\n                    round(sum(prostor.povrsina), 2) AS neto_povr_iz_prostorov,\n                    round(sum(prostor.povrsina) FILTER (WHERE (EXISTS ( SELECT 1\n                           FROM pp_prostori_pravila pravilo\n                          WHERE ((pravilo.id_dej_rabe = del.vrsta_dejanske_rabe_del_st_id) AND (prostor.vrsta_prostora_id = ANY ((string_to_array(pravilo.dov_prostori_upor, ','::text))::integer[])))))), 2) AS upor_povr_iz_prostorov\n                   FROM (( SELECT DISTINCT ON (prostor_1.prostor_id) prostor_1.prostor_id,\n                            prostor_1.del_stavbe_id,\n                            prostor_1.vrsta_prostora_id,\n                            prostor_1.povrsina\n                           FROM kn_nep_prostori_h prostor_1\n                          WHERE ((prostor_1.prostor_id IS NOT NULL) AND (prostor_1.datum_od <= CURRENT_TIMESTAMP) AND (prostor_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY prostor_1.prostor_id, prostor_1.datum_sys DESC NULLS LAST, prostor_1.datum_od DESC NULLS LAST, prostor_1.prostor_h_id DESC NULLS LAST) prostor\n                     JOIN ( SELECT DISTINCT ON (del_1.del_stavbe_id) del_1.del_stavbe_id,\n                            del_1.vrsta_dejanske_rabe_del_st_id\n                           FROM kn_nep_deli_stavb_h del_1\n                          WHERE ((del_1.del_stavbe_id IS NOT NULL) AND (del_1.datum_od <= CURRENT_TIMESTAMP) AND (del_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY del_1.del_stavbe_id, del_1.datum_sys DESC NULLS LAST, del_1.datum_od DESC NULLS LAST, del_1.del_stavbe_h_id DESC NULLS LAST) del ON ((del.del_stavbe_id = prostor.del_stavbe_id)))\n                  GROUP BY prostor.del_stavbe_id) pov ON ((pov.del_stavbe_id = d.del_stavbe_id)))\n             LEFT JOIN ( SELECT sp.stavba_id,\n                    sum(sp.povrsina_zps) AS zps_stavbe\n                   FROM ( SELECT DISTINCT ON (sp_1.stavba_parcela_id) sp_1.stavba_parcela_id,\n                            sp_1.stavba_id,\n                            sp_1.povrsina_zps\n                           FROM kn_nep_stavbe_parcele_h sp_1\n                          WHERE ((sp_1.stavba_parcela_id IS NOT NULL) AND (sp_1.datum_od <= CURRENT_TIMESTAMP) AND (sp_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY sp_1.stavba_parcela_id, sp_1.datum_sys DESC NULLS LAST, sp_1.datum_od DESC NULLS LAST, sp_1.stavba_parcela_h_id DESC NULLS LAST) sp\n                  WHERE (sp.stavba_id IS NOT NULL)\n                  GROUP BY sp.stavba_id) zps ON ((zps.stavba_id = d.stavba_id)))\n             LEFT JOIN ( SELECT sestavina.del_stavbe_id,\n                    round(sum(sestavina.povrsina), 2) AS atr_povr\n                   FROM ( SELECT DISTINCT ON (sestavina_1.sestavina_dela_stavbe_id) sestavina_1.sestavina_dela_stavbe_id,\n                            sestavina_1.del_stavbe_id,\n                            sestavina_1.vrsta_id,\n                            sestavina_1.povrsina\n                           FROM kn_nep_sestavine_delov_stavb_h sestavina_1\n                          WHERE ((sestavina_1.sestavina_dela_stavbe_id IS NOT NULL) AND (sestavina_1.datum_od <= CURRENT_TIMESTAMP) AND (sestavina_1.datum_do > CURRENT_TIMESTAMP))\n                          ORDER BY sestavina_1.sestavina_dela_stavbe_id, sestavina_1.datum_sys DESC NULLS LAST, sestavina_1.datum_od DESC NULLS LAST, sestavina_1.sestavina_dela_stavbe_h_id DESC NULLS LAST) sestavina\n                  WHERE (sestavina.vrsta_id = 1)\n                  GROUP BY sestavina.del_stavbe_id) atr ON ((atr.del_stavbe_id = d.del_stavbe_id)))\n             LEFT JOIN ( SELECT ev.dst_sid,\n                    ev.vrednost,\n                    ev.posplosena_vrednost\n                   FROM ev_del_stavbe_enota_h_2025_danes ev\n                  WHERE (ev.valid_to IS NULL)) ev_vrednost ON ((ev_vrednost.dst_sid = d.del_stavbe_id)))) b;",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_stavbe_obrisi_a",
+      "base_tables": [
+        "kn_nep_stavbe_centroidi_h",
+        "kn_nep_stavbe_obrisi_h"
+      ],
+      "estimated_rows": 1173104,
+      "table_bytes": 957480960,
+      "index_bytes": 445898752,
+      "total_bytes": 1403379712,
+      "unique_index": true,
+      "definition": " SELECT uuid_generate_v4() AS id,\n    o.created_by,\n    o.created_at,\n    o.stavba_h_id,\n    o.stavba_id,\n    o.geom,\n    c.ko_id,\n    c.st_stavbe,\n    pev.idji_pev\n   FROM ((( SELECT DISTINCT ON (s.stavba_id) s.created_by,\n            s.created_at,\n            s.stavba_h_id,\n            s.stavba_id,\n            s.geom\n           FROM kn_nep_stavbe_obrisi_h s\n          WHERE ((s.stavba_id IS NOT NULL) AND (s.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n          ORDER BY s.stavba_id, s.datum_sys DESC) o\n     JOIN ( SELECT DISTINCT ON (s.stavba_id) s.stavba_id,\n            s.ko_id,\n            s.st_stavbe\n           FROM kn_nep_stavbe_centroidi_h s\n          WHERE ((s.stavba_id IS NOT NULL) AND (s.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n          ORDER BY s.stavba_id, s.datum_sys DESC) c USING (stavba_id))\n     LEFT JOIN ( SELECT t1.stavba_id,\n            string_agg((t3.id_pev)::text, ','::text) AS idji_pev\n           FROM ((pev_stavbe t1\n             LEFT JOIN pev_fo t2 ON ((t1.id_rel_fo = t2.id)))\n             LEFT JOIN pev_posebne_enote t3 ON ((t2.id_rel_pe = t3.id)))\n          WHERE ((t3.valid_to IS NULL) AND (t2.valid_to_fo IS NULL))\n          GROUP BY t1.stavba_id) pev USING (stavba_id));",
+      "random_uuid": true
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_naslovi_view",
+      "base_tables": [
+        "kn_nep_hisne_stevilke_h",
+        "kn_nep_rpe_naselja_h",
+        "kn_nep_rpe_ulice_h"
+      ],
+      "estimated_rows": 580263,
+      "table_bytes": 95019008,
+      "index_bytes": 105717760,
+      "total_bytes": 200736768,
+      "unique_index": true,
+      "definition": " SELECT hs.id,\n    hs.hisna_stevilka_id,\n    COALESCE(ul.naziv, na.naziv) AS ulica_naselje,\n    concat(hs.hs_stevilka, hs.hs_dodatek) AS hisna_stevilka_dodatek,\n    po.sifra AS postna_stevilka,\n    po.naziv AS ime_poste,\n    concat(COALESCE(ul.naziv, na.naziv), ' ', hs.hs_stevilka, hs.hs_dodatek, ', ', po.sifra, ' ', po.naziv) AS polni_naslov,\n    hs.stavba_id,\n    hs.geom\n   FROM (((( SELECT DISTINCT ON (kn_nep_hisne_stevilke_h.hisna_stevilka_id) kn_nep_hisne_stevilke_h.id,\n            kn_nep_hisne_stevilke_h.hisna_stevilka_id,\n            kn_nep_hisne_stevilke_h.ulica_id,\n            kn_nep_hisne_stevilke_h.naselje_id,\n            kn_nep_hisne_stevilke_h.postni_okolis_id,\n            kn_nep_hisne_stevilke_h.hs_stevilka,\n            kn_nep_hisne_stevilke_h.hs_dodatek,\n            kn_nep_hisne_stevilke_h.stavba_id,\n            kn_nep_hisne_stevilke_h.geom\n           FROM kn_nep_hisne_stevilke_h\n          WHERE (kn_nep_hisne_stevilke_h.datum_do = '2100-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY kn_nep_hisne_stevilke_h.hisna_stevilka_id, kn_nep_hisne_stevilke_h.datum_sys DESC) hs\n     LEFT JOIN ( SELECT DISTINCT ON (kn_nep_rpe_ulice_h.ulica_id) kn_nep_rpe_ulice_h.naziv,\n            kn_nep_rpe_ulice_h.ulica_id\n           FROM kn_nep_rpe_ulice_h\n          WHERE (kn_nep_rpe_ulice_h.datum_do = '2100-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY kn_nep_rpe_ulice_h.ulica_id, kn_nep_rpe_ulice_h.datum_sys DESC) ul ON ((hs.ulica_id = ul.ulica_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (kn_nep_rpe_naselja_h.naselje_id) kn_nep_rpe_naselja_h.naziv,\n            kn_nep_rpe_naselja_h.naselje_id\n           FROM kn_nep_rpe_naselja_h\n          WHERE (kn_nep_rpe_naselja_h.datum_do = '2100-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY kn_nep_rpe_naselja_h.naselje_id, kn_nep_rpe_naselja_h.datum_sys DESC) na ON ((hs.naselje_id = na.naselje_id)))\n     LEFT JOIN ( SELECT DISTINCT ON (kn_nep_rpe_postni_okolisi_h.postni_okolis_id) kn_nep_rpe_postni_okolisi_h.sifra,\n            kn_nep_rpe_postni_okolisi_h.naziv,\n            kn_nep_rpe_postni_okolisi_h.postni_okolis_id\n           FROM kn_nep_rpe_postni_okolisi_h\n          WHERE (kn_nep_rpe_postni_okolisi_h.datum_do = '2100-01-01 00:00:00'::timestamp without time zone)\n          ORDER BY kn_nep_rpe_postni_okolisi_h.postni_okolis_id, kn_nep_rpe_postni_okolisi_h.datum_sys DESC) po ON ((hs.postni_okolis_id = po.postni_okolis_id)));",
+      "random_uuid": false
+    },
+    {
+      "schema": "public",
+      "view_name": "kn_nep_katastrske_obcine_a",
+      "base_tables": [
+        "kn_nep_katastrske_obcine_h"
+      ],
+      "estimated_rows": 2698,
+      "table_bytes": 39936000,
+      "index_bytes": 671744,
+      "total_bytes": 40607744,
+      "unique_index": true,
+      "definition": " SELECT DISTINCT ON (sp.ko_id) uuid_generate_v4() AS id,\n    sp.created_by,\n    sp.updated_by,\n    sp.created_at,\n    sp.updated_at,\n    sp.ko_id_h,\n    sp.ko_id,\n    sp.naziv,\n    sp.geom,\n    sp.povrsina_geom,\n    sp.sifko,\n    sp.eid\n   FROM kn_nep_katastrske_obcine_h sp\n  WHERE ((sp.ko_id IS NOT NULL) AND (sp.datum_do >= '2040-01-01 00:00:00'::timestamp without time zone))\n  ORDER BY sp.ko_id, sp.datum_sys DESC;",
+      "random_uuid": true
+    }
+  ],
+  "barman_slot": [
+    {
+      "slot_name": "barman",
+      "active": true,
+      "retained_bytes": 11172808
+    }
+  ],
+  "source_columns": [
+    {
+      "column_name": "attribute_table_source_id"
+    },
+    {
+      "column_name": "attribute_table_id"
+    },
+    {
+      "column_name": "source_type"
+    },
+    {
+      "column_name": "source_destination"
+    },
+    {
+      "column_name": "status_key"
+    },
+    {
+      "column_name": "is_archived"
+    },
+    {
+      "column_name": "created_at"
+    },
+    {
+      "column_name": "updated_at"
+    },
+    {
+      "column_name": "created_by"
+    },
+    {
+      "column_name": "updated_by"
+    }
+  ],
+  "fmp_sources": [
+    {
+      "name": "kn_nep_naslovi_view",
+      "type_params": {
+        "events": {
+          "after_create_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_update_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_save_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ]
+        }
+      },
+      "attribute_table_source_id": "7793124c-d3ef-11ef-8e42-02420a000130",
+      "attribute_table_id": "723930ce-d3ef-11ef-8d01-0242ac120008",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_hisne_stevilke_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-01-16 09:51:32",
+      "updated_at": "2025-01-16 09:51:32",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_naslovi_view",
+      "type_params": {
+        "events": {
+          "after_create_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_update_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_save_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ]
+        }
+      },
+      "attribute_table_source_id": "7794e11c-d3ef-11ef-8357-02420a000130",
+      "attribute_table_id": "723930ce-d3ef-11ef-8d01-0242ac120008",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_rpe_ulice_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-01-16 09:51:32",
+      "updated_at": "2025-01-16 09:51:32",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_naslovi_view",
+      "type_params": {
+        "events": {
+          "after_create_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_update_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_save_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ]
+        }
+      },
+      "attribute_table_source_id": "7796c982-d3ef-11ef-b5a2-02420a000130",
+      "attribute_table_id": "723930ce-d3ef-11ef-8d01-0242ac120008",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_rpe_naselja_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-01-16 09:51:32",
+      "updated_at": "2025-01-16 09:51:32",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_naslovi_view",
+      "type_params": {
+        "events": {
+          "after_create_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_update_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_save_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ]
+        }
+      },
+      "attribute_table_source_id": "7798b21a-d3ef-11ef-a398-02420a000130",
+      "attribute_table_id": "723930ce-d3ef-11ef-8d01-0242ac120008",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_rpe_postni_okolisi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-01-16 09:51:32",
+      "updated_at": "2025-01-16 09:51:32",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele",
+      "type_params": null,
+      "attribute_table_source_id": "b054ea44-05ab-11f1-b522-decf92fa1252",
+      "attribute_table_id": "780440b4-e52b-11ef-9708-02420a000189",
+      "source_type": "sql_related_table",
+      "source_destination": "ev_parc_enota_h_2025_danes",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-02-09 11:37:18",
+      "updated_at": "2026-02-09 11:37:18",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "03fa29ac-05ac-11f1-b8b6-decf92fa1252",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "ev_del_stavbe_enota_h_2025_danes",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-02-09 11:39:38",
+      "updated_at": "2026-02-09 11:39:38",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_naslovi_view",
+      "type_params": {
+        "events": {
+          "after_create_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_update_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_save_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ],
+          "after_batch_delete_events": [
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "1b5605f4-e914-11ef-85c5-02420a0001d9"
+              }
+            },
+            {
+              "event_name": "gms.attribute_table.materialized_view.sync",
+              "event_options": {
+                "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9"
+              }
+            }
+          ]
+        }
+      },
+      "attribute_table_source_id": "72a2a108-d3ef-11ef-9f48-0242ac120008",
+      "attribute_table_id": "723930ce-d3ef-11ef-8d01-0242ac120008",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_naslovi_view",
+      "status_key": "ERROR",
+      "is_archived": false,
+      "created_at": "2025-01-16 09:51:24",
+      "updated_at": "2025-01-16 09:51:24",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele",
+      "type_params": null,
+      "attribute_table_source_id": "9d07a2c0-e52b-11ef-a8ec-02420a000193",
+      "attribute_table_id": "780440b4-e52b-11ef-9708-02420a000189",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_parcele_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-07 08:14:55",
+      "updated_at": "2025-02-07 08:14:55",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d0889e-e9f0-11ef-9eca-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_centroidi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d253ae-e9f0-11ef-97d3-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_zps_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d418c4-e9f0-11ef-9089-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_obrisi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d5c872-e9f0-11ef-bf8a-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_naslovi_view",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d76e16-e9f0-11ef-9e0c-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_deli_stavb_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "64d91d42-e9f0-11ef-a0bf-0242ac120006",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_related_table",
+      "source_destination": "pp_sif_dej_raba_dst_model",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:53:36",
+      "updated_at": "2025-02-13 09:53:36",
+      "created_by": "00000000-0000-0000-0000-000000000000",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele",
+      "type_params": null,
+      "attribute_table_source_id": "786bcc70-e52b-11ef-8927-02420a000189",
+      "attribute_table_id": "780440b4-e52b-11ef-9708-02420a000189",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_parcele",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-07 08:13:53",
+      "updated_at": "2025-02-07 08:13:53",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_a",
+      "type_params": null,
+      "attribute_table_source_id": "f6f261ea-581a-11f1-852f-b606ab4d8ece",
+      "attribute_table_id": "f5d18822-581a-11f1-9c44-b606ab4d8ece",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_deli_stavb_a",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:20:26",
+      "updated_at": "2026-05-25 09:20:26",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_a",
+      "type_params": null,
+      "attribute_table_source_id": "09e0d124-581b-11f1-b90d-aaf4399f6921",
+      "attribute_table_id": "f5d18822-581a-11f1-9c44-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_deli_stavb_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:20:57",
+      "updated_at": "2026-05-25 09:20:57",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "2c3fd250-581c-11f1-835c-aaf4399f6921",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_obrisi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:29:04",
+      "updated_at": "2026-05-25 09:29:04",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_katastrske_obcine_a",
+      "type_params": null,
+      "attribute_table_source_id": "44b5b424-599f-11f1-85fa-aaf4399f6921",
+      "attribute_table_id": "3e0c1c62-599f-11f1-b670-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_katastrske_obcine_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-27 07:40:01",
+      "updated_at": "2026-05-27 07:40:01",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_katastrske_obcine_a",
+      "type_params": null,
+      "attribute_table_source_id": "3f48c4ae-599f-11f1-9e1d-b606ab4d8ece",
+      "attribute_table_id": "3e0c1c62-599f-11f1-b670-b606ab4d8ece",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_katastrske_obcine_a",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-27 07:39:52",
+      "updated_at": "2026-05-27 07:39:52",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "89365458-581b-11f1-9f71-aaf4399f6921",
+      "attribute_table_id": "457ecda8-581b-11f1-8533-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_parcele_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:24:31",
+      "updated_at": "2026-05-25 09:24:31",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "fcfd373a-581b-11f1-a756-b606ab4d8ece",
+      "attribute_table_id": "fbe613d0-581b-11f1-828a-b606ab4d8ece",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_stavbe_parcele_a",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:27:45",
+      "updated_at": "2026-05-25 09:27:45",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "0fd293f0-581c-11f1-b4cb-aaf4399f6921",
+      "attribute_table_id": "fbe613d0-581b-11f1-828a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_parcele_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:28:17",
+      "updated_at": "2026-05-25 09:28:17",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_parcele_mv",
+      "type_params": null,
+      "attribute_table_source_id": "92ea2e24-a04c-11f1-9cb7-02420a00027f",
+      "attribute_table_id": "91ad9078-a04c-11f1-af31-02420a00027f",
+      "source_type": "sql_view",
+      "source_destination": "pp_kn_parcele_mv",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:16:56",
+      "updated_at": "2026-08-25 06:16:56",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "1dfd1a90-581c-11f1-b778-b606ab4d8ece",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_stavbe_obrisi_a",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:28:41",
+      "updated_at": "2026-05-25 09:28:41",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "8e7507b8-9d33-11f1-9d6a-02420a0001e2",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_centroidi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-21 07:40:18",
+      "updated_at": "2026-08-21 07:40:18",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "8e78dc08-9d33-11f1-9eca-02420a0001e2",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_stavbe",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-21 07:40:18",
+      "updated_at": "2026-08-21 07:40:18",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "8e7beaba-9d33-11f1-97f0-02420a0001e2",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_fo",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-21 07:40:18",
+      "updated_at": "2026-08-21 07:40:18",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_stavbe_obrisi_a",
+      "type_params": null,
+      "attribute_table_source_id": "8e8110d0-9d33-11f1-a62f-02420a0001e2",
+      "attribute_table_id": "1cdc5216-581c-11f1-a50a-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_posebne_enote",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-21 07:40:18",
+      "updated_at": "2026-08-21 07:40:18",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_parcele_mv",
+      "type_params": null,
+      "attribute_table_source_id": "fafff94e-a04c-11f1-a104-02420a0001e2",
+      "attribute_table_id": "91ad9078-a04c-11f1-af31-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_parcele_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:19:51",
+      "updated_at": "2026-08-25 06:19:51",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "b70c031c-a048-11f1-a365-02420a00027f",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_view",
+      "source_destination": "pp_kn_deli_stavb_mv",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:49:19",
+      "updated_at": "2026-08-25 05:49:19",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77b238d4-a049-11f1-93fc-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_deli_stavb_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77b61c74-a049-11f1-ac58-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_centroidi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77b9e796-a049-11f1-8015-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_obrisi_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77bd67ae-a049-11f1-9c93-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stanovanja_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77c0da06-a049-11f1-928b-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_etaze_x_deli_stavb_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77c42b02-a049-11f1-ad4d-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_etaze_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77ca6f44-a049-11f1-8560-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_prostori_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77d0330c-a049-11f1-aad3-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_parcele_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "77d3bf68-a049-11f1-8a47-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_sestavine_delov_stavb_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 05:54:42",
+      "updated_at": "2026-08-25 05:54:42",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_parcele_mv",
+      "type_params": null,
+      "attribute_table_source_id": "fb0ad04e-a04c-11f1-8f05-02420a0001e2",
+      "attribute_table_id": "91ad9078-a04c-11f1-af31-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_ostalo_parcele_x_dejanske_rabe_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:19:51",
+      "updated_at": "2026-08-25 06:19:51",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_parcele_mv",
+      "type_params": null,
+      "attribute_table_source_id": "fb0348d8-a04c-11f1-a393-02420a0001e2",
+      "attribute_table_id": "91ad9078-a04c-11f1-af31-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_ostalo_parcele_x_namenske_rabe_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:19:51",
+      "updated_at": "2026-08-25 06:19:51",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_parcele_mv",
+      "type_params": null,
+      "attribute_table_source_id": "fb073d1c-a04c-11f1-be53-02420a0001e2",
+      "attribute_table_id": "91ad9078-a04c-11f1-af31-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:19:51",
+      "updated_at": "2026-08-25 06:19:51",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "7c541d2e-a050-11f1-8c2c-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "kn_nep_stavbe_zps_h",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:44:56",
+      "updated_at": "2026-08-25 06:44:56",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "pp_kn_deli_stavb_mv",
+      "type_params": null,
+      "attribute_table_source_id": "7c6cc2ca-a050-11f1-adea-02420a0001e2",
+      "attribute_table_id": "b5a4b2f8-a048-11f1-9803-02420a00027f",
+      "source_type": "sql_related_table",
+      "source_destination": "ev_del_stavbe_enota_h_2025_danes",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-08-25 06:44:57",
+      "updated_at": "2026-08-25 06:44:57",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "46934aa2-581b-11f1-b982-b606ab4d8ece",
+      "attribute_table_id": "457ecda8-581b-11f1-8533-b606ab4d8ece",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_parcele_a",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-05-25 09:22:39",
+      "updated_at": "2026-05-25 09:22:39",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "fd3e34fe-bb14-11f1-97cc-02420a0001e2",
+      "attribute_table_id": "457ecda8-581b-11f1-8533-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_parcele",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-09-28 08:17:04",
+      "updated_at": "2026-09-28 08:17:04",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "fd420fca-bb14-11f1-bfd2-02420a0001e2",
+      "attribute_table_id": "457ecda8-581b-11f1-8533-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_fo",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-09-28 08:17:04",
+      "updated_at": "2026-09-28 08:17:04",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_parcele_a",
+      "type_params": null,
+      "attribute_table_source_id": "fd45b7e2-bb14-11f1-8c65-02420a0001e2",
+      "attribute_table_id": "457ecda8-581b-11f1-8533-b606ab4d8ece",
+      "source_type": "sql_related_table",
+      "source_destination": "pev_posebne_enote",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2026-09-28 08:17:04",
+      "updated_at": "2026-09-28 08:17:04",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    },
+    {
+      "name": "kn_nep_deli_stavb_stavbe",
+      "type_params": null,
+      "attribute_table_source_id": "37f2274c-e9f0-11ef-9d6d-02420a0001d9",
+      "attribute_table_id": "378979c2-e9f0-11ef-8d78-02420a0001d9",
+      "source_type": "sql_view",
+      "source_destination": "kn_nep_deli_stavb_stavbe",
+      "status_key": "ACTIVE",
+      "is_archived": false,
+      "created_at": "2025-02-13 09:52:21",
+      "updated_at": "2025-02-13 09:52:21",
+      "created_by": "4facc1b2-364d-11ec-87f7-005056bcbafc",
+      "updated_by": null
+    }
+  ]
+}

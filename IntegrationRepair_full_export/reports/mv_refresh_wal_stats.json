@@ -1,0 +1,4 @@
+{
+  "available": false,
+  "reason": "pg_stat_statements must be loaded via shared_preload_libraries"
+}
