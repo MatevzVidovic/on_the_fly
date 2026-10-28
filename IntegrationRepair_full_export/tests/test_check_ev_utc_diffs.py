@@ -6,7 +6,8 @@ from conftest import DATE
 from store import RepairStore
 
 
-def test_main_counts_and_requires_every_pinned_plan(tmp_path, monkeypatch, capsys):
+@pytest.mark.parametrize('group', [[], ['--kn']])
+def test_main_counts_and_requires_every_pinned_plan(tmp_path, monkeypatch, capsys, group):
     store = RepairStore(tmp_path / 'ev.sqlite')
     first = store.create_run('integration', DATE, 'first')
     store.save_source(first, [(1, DATE), (2, DATE)])
@@ -14,17 +15,17 @@ def test_main_counts_and_requires_every_pinned_plan(tmp_path, monkeypatch, capsy
     store.finish_preparation(first)
     second = store.create_run('integration', DATE, 'second')
     monkeypatch.setattr(report, 'ROOT', tmp_path)
-    monkeypatch.setattr(report, 'EV_RUNS', [('ev.sqlite', first), ('ev.sqlite', second)])
+    monkeypatch.setattr(report, 'KN_RUNS' if group else 'EV_RUNS', [('ev.sqlite', first), ('ev.sqlite', second)])
     before = list(store.db.iterdump())
-    report.main([])
+    report.main(group)
     out = capsys.readouterr().out
     assert '1/2 plans prepared' in out and 'COMPARISON UNFINISHED' in out
     total = next(line for line in out.splitlines() if line.startswith('TOTAL'))
     assert total.split()[-4:] == ['1', '1', '1', '0']
-    with pytest.raises(SystemExit, match='Finish run_ev_utc_compare.sh'):
-        report.main(['--require-prepared'])
+    with pytest.raises(SystemExit, match='Finish run_.*_utc_compare.sh'):
+        report.main(group + ['--require-prepared'])
     assert list(store.db.iterdump()) == before
     store.finish_preparation(second)
-    report.main(['--require-prepared'])
+    report.main(group + ['--require-prepared'])
     assert '2/2 plans prepared' in capsys.readouterr().out
     store.db.close()

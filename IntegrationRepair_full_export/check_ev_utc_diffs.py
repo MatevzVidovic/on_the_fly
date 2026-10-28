@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Show the twelve pinned EV UTC repair plans using local SQLite only."""
+"""Show pinned EV or KN UTC repair plans using local SQLite only."""
 import argparse
 from pathlib import Path
 import sqlite3
@@ -20,15 +20,39 @@ EV_RUNS = [
     ('prod-utc-ev-parc-enota.sqlite', 'a83190e2-dece-462b-aba7-0588bee1c7ee'),
 ]
 
+KN_RUNS = [
+    ('prod-utc-kn-obcine.sqlite', '0dcf61cd-b73e-4c88-b342-9cf950e203d0'),
+    ('prod-utc-kn-katastrske-obcine.sqlite', '57fe9933-5bdf-43df-8934-bd1a8d92a12f'),
+    ('prod-utc-kn-naselja.sqlite', '46e3f071-cb5d-4e12-945c-c4753179289d'),
+    ('prod-utc-kn-ulice.sqlite', '314dbfba-b333-429b-b222-2d857389fd4a'),
+    ('prod-utc-kn-gozdno-gosp-obm.sqlite', '0e4cafde-a889-4fc4-aa49-4fbaf9b9bc1b'),
+    ('prod-utc-kn-stanovanja.sqlite', '94d1e47f-844d-4f74-97f7-a0f26fdbb8b1'),
+    ('prod-utc-kn-hisne-stevilke.sqlite', 'bd207318-217b-4306-9403-de5e7ca7f003'),
+    ('prod-utc-kn-stavbe-parcele.sqlite', '4b7db52b-c534-406a-abd1-54c00499fd10'),
+    ('prod-utc-kn-stavbe-zps.sqlite', '5a56bf89-7eeb-4247-8fc4-780c51cee26f'),
+    ('prod-utc-kn-etaze.sqlite', '1ef39986-ed80-49d9-858b-ccaefc06d921'),
+    ('prod-utc-kn-deli.sqlite', '60ffe59d-3ac0-47ff-b9df-8b0767568019'),
+    ('prod-utc-kn-stavbe-centroidi.sqlite', '6a88167e-9ca7-4662-bd57-8ba62de2f359'),
+    ('prod-utc-kn-stavbe-obrisi.sqlite', 'b6ce2873-827e-418d-9faf-a889de85929c'),
+    ('prod-utc-kn-etaze-deli.sqlite', '0b5e6c05-263f-46bd-85ab-266e692cc70a'),
+    ('prod-utc-kn-prostori.sqlite', 'f616494f-f419-4adb-9de4-4e65f18ba839'),
+    ('prod-utc-kn-parcele-gozdno.sqlite', '6621799c-c6f7-4093-804b-0ee65f26b40b'),
+    ('prod-utc-kn-parcele.sqlite', '27b899c3-535f-4e83-a13b-afadefde4350'),
+    ('prod-utc-kn-parcele-dejanske-rabe.sqlite', '094c3784-278d-4e31-b478-ae8e0a213638'),
+    ('prod-utc-kn-parcele-namenske-rabe.sqlite', '04168203-09e6-43d0-b216-4d523d43bb6b'),
+]
+
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--require-prepared', action='store_true', help='exit with an error if any comparison is unfinished')
+    parser.add_argument('--kn', action='store_true', help='show the nineteen KN plans instead of EV')
     args = parser.parse_args(argv)
+    runs = KN_RUNS if args.kn else EV_RUNS
     totals = [0, 0, 0, 0]
     unfinished = 0
     print(f"{'Table':38} {'Inserts':>9} {'Updates':>9} {'Deletes':>9} {'Warnings':>9}  Status", flush=True)
-    for filename, run_id in EV_RUNS:
+    for filename, run_id in runs:
         with sqlite3.connect((ROOT / filename).as_uri() + '?mode=ro', uri=True) as db:
             db.row_factory = sqlite3.Row
             db.execute('BEGIN')
@@ -45,9 +69,10 @@ def main(argv=None):
             state = 'APPLIED' if run['applied'] else 'PREPARED'
             print(f"{run['attribute_table_name']:38} {inserts:9,} {updates:9,} {run['delete_count']:9,} {run['warnings']:9,}  {state}", flush=True)
     print(f"{'TOTAL (completed plans only)':38} {totals[0]:9,} {totals[1]:9,} {totals[2]:9,} {totals[3]:9,}", flush=True)
-    print(f'{len(EV_RUNS)-unfinished}/{len(EV_RUNS)} plans prepared. Counts are saved plans, not remaining work or a fresh database comparison.', flush=True)
+    print(f'{len(runs)-unfinished}/{len(runs)} plans prepared. Counts are saved plans, not remaining work or a fresh database comparison.', flush=True)
     if args.require_prepared and unfinished:
-        raise SystemExit('Finish run_ev_utc_compare.sh before applying the batch; nothing has been applied by this script.')
+        script = 'run_kn_utc_compare.sh' if args.kn else 'run_ev_utc_compare.sh'
+        raise SystemExit(f'Finish {script} before applying the batch; nothing has been applied by this script.')
 
 
 if __name__ == '__main__':

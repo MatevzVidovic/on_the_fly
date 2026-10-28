@@ -426,3 +426,62 @@ field; no FMP field-type change is needed. Display formatting may still omit
 fractions independently of storage precision. No application end-to-end test or
 production DDL was run. Read-only evidence:
 `diagnostics/enota_timestamp_precision_check.json`.
+
+### Review/apply the completed KN batch
+
+```sh
+bash run_kn_utc_diff.sh
+# Review the saved plan counts, then:
+bash run_kn_utc_apply.sh
+```
+
+These use the same 19 pinned run UUIDs as `run_kn_utc_compare.sh`. The summary uses
+local read-only SQLite; apply checks all 19 are prepared before starting, stops on
+an error and uses the Barman failsafe. No comparison rerun is needed after completed
+preparation unless the target state/configuration changed.
+
+For the huge table, `set_kn_huge_watermark_now.sql` is provided to run manually on
+the **production system/metadata database `fmp`**, after its backfill/copy cutover
+is complete. It prints the previous watermark and advances only that integration's
+`last_changed_datetime` to current UTC. It has not been executed by the agent.
+Keep the normal integration stopped until the full repair completes: advancing
+its cursor now deliberately bypasses the old range for ordinary delta sync.
+
+Then run the dedicated huge export once, followed by comparison. Omit `--min-date`
+to cover the entire history through the saved new cutoff. Review with
+`bash run_kn_huge_utc_diff.sh`, then use `bash run_kn_huge_utc_apply.sh`. Resume
+normal integration afterward for changes newer than the cutoff and normal cache/MV
+completion. If a huge export already exists from before changing the watermark,
+start a new export rather than resume its older cutoff.
+
+## Current Oracle/PostgreSQL count comparison
+
+```sh
+# All repaired EV + KN delta tables (excludes full sync and the separate huge KN table):
+bash run_utc_counts.sh
+
+# KN only, after the 19-table apply:
+bash run_utc_counts.sh --group kn --output reports/kn_utc_counts_latest.json
+
+# EV only:
+bash run_utc_counts.sh --group ev --output reports/ev_utc_counts_latest.json
+
+# Include the huge KN table once its separate repair is ready to check:
+bash run_utc_counts.sh --group kn --include-huge --output reports/kn_utc_counts_with_huge.json
+```
+
+`check_counts.py` reads current LIFT integration metadata and counts each **saved
+Oracle integration query**, including its original filters, against the mapped
+PostgreSQL table. It reports both total counts and UTC-watermark-bounded counts.
+**Gap = Oracle minus LIFT**: positive means fewer rows in LIFT. `MATCH` means both
+net gaps are zero; it is not a key/date/payload comparison. The one-second repair
+leeway is not applied to count boundaries; these are exact date-filter counts.
+
+The source and target are read-only, with one stable snapshot per database and no
+shared atomic snapshot between them. Tables are counted sequentially, without
+exporting row data or changing SQLite repair state. There is a ten-minute timeout
+per count. Results print immediately per table and the JSON file is checkpointed
+after each result; only a completed run receives `finished_at`. Live source changes
+and timestamp precision can explain gaps, and equal counts can hide offsetting
+missing/extra keys. `--table TABLE` selects one supported table; the huge table also
+requires `--include-huge`. Configuration comes directly from `.env` or `--env PATH`.
