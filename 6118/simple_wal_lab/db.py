@@ -16,7 +16,7 @@ parser.add_argument('--date-column', '--utc-column', default=os.getenv('DATE_COL
 parser.add_argument('--source-date-column', default=os.getenv('SOURCE_DATE_COLUMN', 'date_change'))
 if Path(sys.argv[0]).name == 'batched_copy_backfill.py':
     parser.add_argument('--copy-target', help='Destination table; default: source name + _org2810')
-    parser.add_argument('--batch-size', type=int, default=50000)
+    parser.add_argument('--batch-size', type=int, default=500000)
     parser.add_argument('--pause', type=float, default=1)
 if Path(sys.argv[0]).name == 'db_tracker.py':
     parser.add_argument('sqlite_file', nargs='?', default=str(Path(__file__).with_name('full.sqlite')))

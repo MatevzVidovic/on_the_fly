@@ -14,7 +14,7 @@ on either table. Connection settings come from the same `.env` as other scripts.
 
 Default destination is the source name plus `_org2810`, in the same schema.
 Override with `--copy-target public.some_other_name` if needed.
-Default batch: 50,000 rows; pause: 1 second. Override with `--batch-size 50000
+Default batch: 500,000 rows; pause: 1 second. Override with `--batch-size 500000
 --pause 1`. Only this script accepts these copy options.
 
 All writable destination columns are explicitly mapped by name. IDs, audit fields,
