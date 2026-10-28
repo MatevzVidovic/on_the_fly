@@ -132,9 +132,8 @@ def test_min_date_prepares_recent_upserts_without_deletions_and_resumes(definiti
     cursor = Cursor([(1, minimum), (2, DATE), (3, future)])
     source = OracleSource(Database(cursor), definition)
     target = LiftTarget(Database(Cursor([
-        ('old-version', 1, old),  # Recent Oracle change updates an old LIFT row.
-        ('future-source', 3, old),
-        ('outside-export', 4, DATE),  # Must not become a deletion.
+        (1, 'old-version', old),  # Recent Oracle change updates an old LIFT row.
+        (3, 'future-source', old),
     ])), None, definition)
     run_id = repair.prepare(definition, source, target, store, only_src=True, min_date=minimum)
     run = store.resume_preparation(run_id)
@@ -255,7 +254,7 @@ def test_since_watermark_saves_fixed_range_and_only_upserts(definition, store, m
         (2, '2025-01-02 18:00:00.000000'),
         (3, '2025-01-04 00:00:00.000000'),
     ])), definition)
-    target = LiftTarget(Database(Cursor([('unrelated', 4, DATE)])), None, definition)
+    target = LiftTarget(Database(Cursor()), None, definition)
     run_id = repair.prepare(definition, source, target, store, since_watermark=True)
     run = store.require_prepared_run(run_id)
     assert run['min_date'] == DATE
@@ -264,3 +263,24 @@ def test_since_watermark_saves_fixed_range_and_only_upserts(definition, store, m
     assert definition.cutoff == DATE
     repair.prepare(definition, None, None, store, run_id=run_id)
     assert store.require_prepared_run(run_id)['cutoff'] == run['cutoff']
+
+
+def test_recent_prepare_looks_up_only_source_keys_and_resumes(definition, store, monkeypatch):
+    import pytest
+    minimum = '2025-01-01 00:00:00.000000'
+    source = OracleSource(Database(Cursor([(1, DATE), (2, DATE), (3, DATE)])), definition)
+    target = LiftTarget(Database(Cursor()), None, definition)
+    monkeypatch.setattr(target, 'inventory', lambda *a, **k: pytest.fail('Recent prepare must not scan LIFT'))
+    calls = []
+    def lookup(keys):
+        calls.append(keys)
+        return {key: row for key, row in {1: ('old', minimum), 2: ('equal', DATE)}.items() if key in keys}
+    monkeypatch.setattr(target, 'lookup_rows', lookup)
+    run = repair.prepare(definition, source, target, store, only_src=True, min_date=minimum)
+    # A page compared by the old full-scan implementation must not be repeated.
+    store.compare_target_page(run, [('old', 1, minimum)])
+    repair.prepare(definition, None, target, store, run_id=run)
+    assert calls == [[2, 3]]
+    assert store.require_prepared_run(run)['upsert_count'] == 2
+    assert store.require_prepared_run(run)['delete_count'] == 0
+    assert {r['key'] for r in store.db.execute('SELECT key FROM addition_diff')} == {'1', '3'}

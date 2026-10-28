@@ -1,20 +1,13 @@
 {
   "server_version": "15.7 (Debian 15.7-1.pgdg110+1)",
-  "dependent_views": [],
-  "cast_plan": [
+  "column": [
     [
-      "Limit"
-    ],
-    [
-      "  Output: ((date_change_utc)::timestamp without time zone)"
-    ],
-    [
-      "  ->  Seq Scan on public.ev_parc_enota_h_2025_danes"
-    ],
-    [
-      "        Output: (date_change_utc)::timestamp without time zone"
+      "timestamp(0) without time zone",
+      false
     ]
   ],
+  "indexes_using_column": [],
+  "dependent_views": [],
   "fmp_field": [
     [
       "date-time",

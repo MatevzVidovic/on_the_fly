@@ -57,7 +57,12 @@ def prepare(definition, source, target, store, run_id=None, only_src=False, min_
         return run_id
     last_key = json.loads(run['target_last_key']) if run['target_last_key'] is not None else None
     with measure('prepare.lift_scan_and_compare', run_id=run_id, resumed=last_key is not None, rows=0) as timing:
-        for page in target.inventory(cutoff, after_key=last_key):
+        if run['min_date'] is not None:
+            print('Comparing exported Oracle keys with batched LIFT lookups', flush=True)
+            pages = target.inventory_keys(store.source_keys_to_compare(run_id))
+        else:
+            pages = target.inventory(cutoff, after_key=last_key)
+        for page in pages:
             for key, warning in store.compare_target_page(run_id, page):
                 print(f'Warning key={key}: {warning}', flush=True)
             timing['rows'] += len(page)

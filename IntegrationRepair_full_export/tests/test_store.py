@@ -187,3 +187,15 @@ def test_one_second_behind_is_independent_and_both_flags_are_symmetric():
     assert classify(source, ahead, True, True) == 'equal'
     assert classify(source, '2026-07-01 21:59:58.999999', True, True) == 'upsert'
     assert classify(source, '2026-07-01 22:00:01.000001', True, True) == 'ahead'
+
+
+def test_source_keys_to_compare_pages_past_missing_keys_and_excludes_seen_and_future(store):
+    from conftest import DATE
+    run = store.create_run('integration', DATE, 'records', min_date=DATE)
+    store.save_source(run, [(key, DATE) for key in range(1002)] + [(9999, '2099-01-01 00:00:00.000000')])
+    store.compare_target_page(run, [('matched', 0, DATE)])
+    pages = list(store.source_keys_to_compare(run))
+    assert [len(page) for page in pages] == [1000, 1]
+    assert {key for page in pages for key in page} == set(range(1, 1002))
+    # Missing keys remain unseen until final planning; paging must still terminate.
+    assert list(store.source_keys_to_compare(run)) == pages

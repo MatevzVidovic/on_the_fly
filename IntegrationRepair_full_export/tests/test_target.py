@@ -142,3 +142,79 @@ def test_apply_leaves_target_within_behind_leeway_untouched(definition):
     target.allow_one_second_behind = True
     assert target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE) == [('1', None)]
     assert len(cursor.calls) == 1  # Lookup only; no UPDATE for an up-to-date row.
+
+
+def test_inventory_keys_reads_matching_old_and_new_dates_without_date_filter(definition):
+    cursor = Cursor([(1, 'old', '2024-01-01 00:00:00'),
+                     (2, 'new', '2099-01-01 00:00:00')])
+    db = Database(cursor)
+    pages = list(LiftTarget(db, None, definition).inventory_keys([[1, 2, 3]]))
+    assert pages == [[('old', 1, '2024-01-01 00:00:00.000000'),
+                      ('new', 2, '2099-01-01 00:00:00.000000')]]
+    assert cursor.calls[0][1] == ([1, 2, 3],)
+    assert db.commits == 1
+
+
+def test_lookup_rows_rejects_duplicate_integration_ids(definition):
+    import pytest
+    target = LiftTarget(Database(Cursor([(1, 'a', DATE), (1, 'b', DATE)])), None, definition)
+    with pytest.raises(ValueError, match='Duplicate LIFT key: 1'):
+        target.lookup_rows([1])
+
+
+def test_invalid_geometry_rolls_back_batch_and_skips_only_bad_row(definition, capsys):
+    from types import SimpleNamespace
+    from psycopg.errors import InternalError_
+    class InvalidGeometry(InternalError_):
+        @property
+        def diag(self):
+            return SimpleNamespace(message_primary='parse error - invalid geometry')
+    class Transaction(Database):
+        def __init__(self):
+            super().__init__(Cursor())
+            self.queued, self.saved, self.rollbacks = [], [], 0
+        def cursor(self, **options):
+            db = self
+            class Writes(Cursor):
+                def execute(self, query, params=None):
+                    if query.as_string().startswith('SELECT'):
+                        self.rows = []
+                    else:
+                        db.queued.append(params[1])  # Mapped KEY after generated UUID.
+                    return self
+            return Writes()
+        def pipeline(self):
+            db = self
+            class Pipeline:
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    if 2 in db.queued:
+                        raise InvalidGeometry()
+            return Pipeline()
+        def rollback(self):
+            self.queued.clear()
+            self.rollbacks += 1
+        def commit(self):
+            self.saved.extend(self.queued)
+            self.queued.clear()
+            super().commit()
+    db = Transaction()
+    target = LiftTarget(db, None, definition)
+    result = target.upsert_batch([(str(k), dict(KEY=k, CHANGED=DATE)) for k in (1, 2, 3)], DATE)
+    assert db.saved == [1, 3]
+    assert db.rollbacks > 0
+    assert result[0] == ('1', None) and result[2] == ('3', None)
+    assert result[1] == ('2', 'Skipped row: Oracle geometry cannot be parsed by PostGIS')
+    assert 'Warning key=2:' in capsys.readouterr().out
+
+
+def test_other_internal_errors_are_not_skipped(definition, monkeypatch):
+    import pytest
+    from psycopg.errors import InternalError_
+    target = LiftTarget(Database(Cursor()), None, definition)
+    def fail(*args):
+        raise InternalError_('Some other internal database error')
+    monkeypatch.setattr(target, '_upsert_batch', fail)
+    with pytest.raises(InternalError_, match='Some other internal'):
+        target.upsert_batch([('1', dict(KEY=1, CHANGED=DATE))], DATE)

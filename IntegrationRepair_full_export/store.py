@@ -137,6 +137,16 @@ class RepairStore:
         with self.db:
             self.db.execute('UPDATE integration_transfer SET source_complete=1 WHERE id=?', (run_id,))
 
+    def source_keys_to_compare(self, run_id):
+        """Page through unexamined source keys in the saved repair range."""
+        after_key = ''
+        while rows := self.db.execute('''SELECT key FROM remote_ids_and_date_changed
+                WHERE run_id=? AND key>? AND NOT seen
+                AND date <= (SELECT cutoff FROM integration_transfer WHERE id=?)
+                ORDER BY key LIMIT 1000''', (run_id, after_key, run_id)).fetchall():
+            after_key = rows[-1]['key']
+            yield [json.loads(row['key']) for row in rows]
+
     def compare_target_page(self, run_id, page):
         warnings = []
         run = self.db.execute('SELECT cutoff,min_date,allow_one_second_ahead,allow_one_second_behind FROM integration_transfer WHERE id=?', (run_id,)).fetchone()

@@ -1,6 +1,7 @@
 """FMP payload mapping, then direct PostgreSQL reads/writes and completion."""
 from uuid import uuid1
 from psycopg import sql
+from psycopg.errors import InternalError_
 
 from source import PAGE_SIZE, wall_time, utc_time
 
@@ -68,14 +69,41 @@ class LiftTarget:
                 yield page
         self.db.commit()
 
+    def inventory_keys(self, key_pages):
+        """Date-filtered repairs only need rows matching the exported source keys."""
+        for keys in key_pages:
+            yield [(str(id), key, date) for key, (id, date) in self.lookup_rows(keys).items()]
+        self.db.commit()
+
     def lookup_rows(self, keys):
         """Read the existing UUIDs and dates in one database round trip."""
         with self.db.cursor() as cur:
             cur.execute(sql.SQL('SELECT {}, id, {} FROM {} WHERE {}=ANY(%s)').format(
                 self.key, self.date, self.table, self.key), (keys,))
-            return {self.d.key_value(key): (target_id, utc_time(date)) for key, target_id, date in cur}
+            rows = {}
+            for key, target_id, date in cur:
+                key = self.d.key_value(key)
+                if key in rows:
+                    raise ValueError(f'Duplicate LIFT key: {key}')
+                rows[key] = (target_id, utc_time(date))
+            return rows
 
     def upsert_batch(self, writes, max_date):
+        try:
+            return self._upsert_batch(writes, max_date)
+        except InternalError_ as error:
+            if error.diag.message_primary != 'parse error - invalid geometry':
+                raise
+            self.db.rollback()
+            if len(writes) == 1:
+                key = writes[0][0]
+                warning = 'Skipped row: Oracle geometry cannot be parsed by PostGIS'
+                print(f'Warning key={key}: {warning}', flush=True)
+                return [(key, warning)]
+            middle = len(writes) // 2
+            return self.upsert_batch(writes[:middle], max_date) + self.upsert_batch(writes[middle:], max_date)
+
+    def _upsert_batch(self, writes, max_date):
         if not writes:
             return []
         existing = self.lookup_rows([self.d.key_value(payload[self.d.key['api_name']])
