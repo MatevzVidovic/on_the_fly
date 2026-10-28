@@ -1,6 +1,6 @@
 # KN and EV UTC audit
 
-Exported: 2026-10-28T10:36:07.456227+00:00  
+Exported: 2026-10-28T11:46:46.142759+00:00  
 Data database: `fmp_data_gurs`; metadata database: `fmp`.
 
 Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one audit row per UTC candidate and integration. KN expects `datum_sys_utc`; EV expects `date_change_utc`. Sizes include allocated space; row counts are estimates. Partition parents exclude child storage; children are listed separately. Metadata is matched by table name; duplicate names across schemas need review. Snapshots from the two databases are taken separately.
@@ -12,7 +12,7 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_del_stavbe_enota_h_2025_danes | logged | 4894832 | 1794 MB | 1218 MB | 3012 MB | 3158802432 |
 | public.ev_del_stavbe_h | logged | 11060290 | 2902 MB | 1008 MB | 3910 MB | 4099842048 |
 | public.ev_dst_pripis_podatki_h | logged | 1949662 | 483 MB | 118 MB | 601 MB | 630439936 |
-| public.ev_parc_del_h | logged | 16977524 | 2999 MB | 511 MB | 3509 MB | 3679887360 |
+| public.ev_parc_del_h | logged | 16977524 | 3129 MB | 1078 MB | 4208 MB | 4411883520 |
 | public.ev_parc_enota_h_2025_danes | logged | 26490712 | 5559 MB | 3772 MB | 9331 MB | 9784369152 |
 | public.ev_parc_pripis_podatki_h | logged | 8825796 | 1853 MB | 536 MB | 2389 MB | 2505211904 |
 | public.ev_parcela_h | logged | 26520712 | 5717 MB | 3674 MB | 9392 MB | 9847799808 |
@@ -21,30 +21,69 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_posebna_enota_h | logged | 45222 | 95 MB | 5616 kB | 101 MB | 105381888 |
 | public.ev_prostor_h | logged | 4659596 | 753 MB | 282 MB | 1035 MB | 1085693952 |
 | public.ev_stavba_h | logged | 3190187 | 898 MB | 320 MB | 1218 MB | 1277345792 |
-| public.kn_nep_deli_stavb_h | logged | 2741147 | 552 MB | 0 bytes | 552 MB | 579010560 |
-| public.kn_nep_etaze_h | logged | 2358117 | 464 MB | 0 bytes | 464 MB | 486629376 |
-| public.kn_nep_etaze_x_deli_stavb_h | logged | 2891696 | 655 MB | 0 bytes | 655 MB | 686465024 |
-| public.kn_nep_hisne_stevilke_h | logged | 1448209 | 334 MB | 0 bytes | 334 MB | 350076928 |
-| public.kn_nep_katastrske_obcine_h | logged | 19711 | 151 MB | 0 bytes | 151 MB | 158752768 |
+| public.kn_nep_deli_stavb_h | logged | 2740632 | 572 MB | 453 MB | 1025 MB | 1074970624 |
+| public.kn_nep_etaze_h | logged | 2360661 | 481 MB | 405 MB | 885 MB | 928153600 |
+| public.kn_nep_etaze_x_deli_stavb_h | logged | 2888483 | 674 MB | 405 MB | 1079 MB | 1131823104 |
+| public.kn_nep_hisne_stevilke_h | logged | 1448293 | 344 MB | 173 MB | 516 MB | 541229056 |
+| public.kn_nep_katastrske_obcine_h | logged | 19711 | 147 MB | 2080 kB | 149 MB | 156516352 |
 | public.kn_nep_ostalo_dejanske_rabe_parcel_h | logged | 26261976 | 17 GB | 0 bytes | 17 GB | 17986035712 |
-| public.kn_nep_ostalo_gozdno_gosp_obm | logged | 53681 | 210 MB | 0 bytes | 210 MB | 219971584 |
+| public.kn_nep_ostalo_gozdno_gosp_obm | logged | 53681 | 210 MB | 7528 kB | 217 MB | 227680256 |
 | public.kn_nep_ostalo_namenske_rabe | logged | 511214 | 447 MB | 68 MB | 515 MB | 540000256 |
 | public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | logged | 15146632 | 2282 MB | 0 bytes | 2282 MB | 2393120768 |
-| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | logged | 6068364 | 855 MB | 0 bytes | 855 MB | 896139264 |
+| public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | logged | 6068420 | 855 MB | 183 MB | 1037 MB | 1087569920 |
 | public.kn_nep_ostalo_parcele_x_namenske_rabe_h | logged | 16491022 | 2780 MB | 0 bytes | 2780 MB | 2914738176 |
-| public.kn_nep_parcele_h | logged | 7911218 | 3579 MB | 0 bytes | 3579 MB | 3752607744 |
-| public.kn_nep_prostori_h | logged | 4435292 | 672 MB | 0 bytes | 672 MB | 704266240 |
-| public.kn_nep_rpe_naselja_h | unlogged | 20018 | 56 MB | 1464 kB | 58 MB | 60383232 |
-| public.kn_nep_rpe_obcine_h | logged | 3559 | 122 MB | 0 bytes | 122 MB | 128180224 |
-| public.kn_nep_rpe_ulice_h | unlogged | 30983 | 13 MB | 10 MB | 24 MB | 24657920 |
-| public.kn_nep_stavbe_centroidi_h | logged | 2761433 | 761 MB | 0 bytes | 761 MB | 798392320 |
-| public.kn_nep_stavbe_obrisi_h | logged | 2760946 | 837 MB | 0 bytes | 837 MB | 877428736 |
-| public.kn_nep_stavbe_parcele_h | logged | 1643864 | 827 MB | 0 bytes | 827 MB | 866951168 |
-| public.kn_nep_stavbe_zps_h | logged | 1936510 | 569 MB | 0 bytes | 569 MB | 596910080 |
+| public.kn_nep_parcele_h | logged | 7903936 | 3580 MB | 1314 MB | 4894 MB | 5132050432 |
+| public.kn_nep_prostori_h | logged | 4434789 | 708 MB | 388 MB | 1096 MB | 1149165568 |
+| public.kn_nep_rpe_naselja_h | logged | 20018 | 56 MB | 1440 kB | 58 MB | 60481536 |
+| public.kn_nep_rpe_obcine_h | logged | 3559 | 122 MB | 280 kB | 122 MB | 128442368 |
+| public.kn_nep_rpe_ulice_h | logged | 30983 | 13 MB | 3224 kB | 16 MB | 16941056 |
+| public.kn_nep_stavbe_centroidi_h | logged | 2761620 | 780 MB | 465 MB | 1245 MB | 1305018368 |
+| public.kn_nep_stavbe_obrisi_h | logged | 2760952 | 856 MB | 350 MB | 1206 MB | 1264402432 |
+| public.kn_nep_stavbe_parcele_h | logged | 1641883 | 828 MB | 248 MB | 1076 MB | 1128366080 |
+| public.kn_nep_stavbe_zps_h | logged | 1937159 | 579 MB | 240 MB | 819 MB | 858603520 |
 
 ## UTC fields and integration mappings
 
 “Sole watermark” requires exactly one flagged mapping and that mapping must target this UTC field. LIFT type is exported verbatim; the datetime check accepts `date-time`, `datetime` and PostgreSQL timestamp types. NULL counts were not requested; use --num-nulls to include them. SQL correctness requires review below.
+
+## Integration dates
+
+Expected watermark calendar date: 2026-10-27 (yesterday in Europe/Ljubljana). This checks the stored watermark date only; it does not prove a completed import or data completeness. Last sync start/end and processing status are shown separately. Stored timestamps are displayed as returned by PostgreSQL.
+
+| Table | Stored watermark | Watermark dated yesterday | Last sync start | Last sync end | Processing status |
+| --- | --- | --- | --- | --- | --- |
+| ev_del_stavbe_enota_h_2025_danes | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:21:40 | 2026-10-27 14:22:40 | PROCESSED |
+| ev_del_stavbe_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:22:14 | 2026-10-27 14:23:06 | PROCESSED |
+| ev_dst_pripis_podatki_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:22:32 | 2026-10-27 14:22:57 | PROCESSED |
+| ev_parc_del_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:23:45 | 2026-10-27 14:29:25 | PROCESSED |
+| ev_parcela_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:24:00 | 2026-10-27 14:28:17 | PROCESSED |
+| ev_parc_enota_h_2025_danes | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:24:16 | 2026-10-27 14:50:14 | PROCESSED |
+| ev_parc_pripis_podatki_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:26:54 | 2026-10-27 14:38:37 | PROCESSED |
+| ev_pe_dst_h | 2026-10-21 21:59:59.999000 | False | 2026-10-27 14:27:05 | 2026-10-27 14:27:10 | PROCESSED |
+| ev_pe_parc_h | 2026-10-21 21:59:59.999000 | False | 2026-10-27 14:27:16 | 2026-10-27 14:27:17 | PROCESSED |
+| ev_posebna_enota_h | 2026-10-21 21:59:59.999000 | False | 2026-10-27 14:28:12 | 2026-10-27 14:28:13 | PROCESSED |
+| ev_prostor_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:28:22 | 2026-10-27 14:29:49 | PROCESSED |
+| ev_stavba_h | 2026-10-26 22:59:59.999000 | False | 2026-10-27 14:28:57 | 2026-10-27 14:29:41 | PROCESSED |
+| kn_nep_deli_stavb_h | 2026-10-27 14:22:31 | True | 2026-10-27 14:29:30 | 2026-10-27 14:30:38 | PROCESSED |
+| kn_nep_etaze_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:30:16 | 2026-10-27 14:30:56 | PROCESSED |
+| kn_nep_etaze_x_deli_stavb_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:30:44 | 2026-10-27 14:31:30 | PROCESSED |
+| kn_nep_hisne_stevilke_h | 2026-10-27 13:55:09 | True | 2026-10-27 14:31:05 | 2026-10-27 14:31:13 | PROCESSED |
+| kn_nep_katastrske_obcine_h | 2026-10-27 13:53:00 | True | 2026-10-27 14:31:26 | 2026-10-27 14:31:28 | PROCESSED |
+| kn_nep_ostalo_dejanske_rabe_parcel_h | 2026-01-29 11:24:19 | exempt: giant table | 2026-01-30 04:50:00 | 2026-01-30 04:51:00 | CONFIGURED |
+| kn_nep_ostalo_gozdno_gosp_obm | 2024-06-03 18:42:35 | False | 2026-10-24 05:50:00 | 2026-10-24 05:50:00 | PROCESSING |
+| kn_nep_ostalo_namenske_rabe | 2026-10-20 11:45:39 | not applicable: full sync | 2026-10-27 15:32:18 | 2026-10-27 16:19:26 | PROCESSED |
+| kn_nep_ostalo_parcele_x_dejanske_rabe_h | 2026-10-27 14:18:36 | True | 2026-10-27 14:32:06 | 2026-10-27 14:41:09 | PROCESSED |
+| kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | 2026-10-27 13:54:31 | True | 2026-10-27 14:32:30 | 2026-10-27 14:33:05 | PROCESSED |
+| kn_nep_ostalo_parcele_x_namenske_rabe_h | 2026-10-27 14:18:40 | True | 2026-10-27 14:32:58 | 2026-10-27 14:33:48 | PROCESSED |
+| kn_nep_parcele_h | 2026-10-27 14:18:38 | True | 2026-10-27 14:34:25 | 2026-10-27 14:35:33 | PROCESSED |
+| kn_nep_prostori_h | 2026-10-27 14:22:31 | True | 2026-10-27 14:34:59 | 2026-10-27 14:35:58 | PROCESSED |
+| kn_nep_rpe_naselja_h | 2026-10-22 07:48:35 | False | 2026-10-27 14:35:53 | 2026-10-27 14:35:53 | PROCESSED |
+| kn_nep_rpe_obcine_h | 2026-10-27 13:53:00 | True | 2026-10-27 14:36:29 | 2026-10-27 14:36:31 | PROCESSED |
+| kn_nep_rpe_ulice_h | 2026-10-22 07:53:42 | False | 2026-10-27 14:37:07 | 2026-10-27 14:37:07 | PROCESSED |
+| kn_nep_stavbe_centroidi_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:37:23 | 2026-10-27 14:38:06 | PROCESSED |
+| kn_nep_stavbe_obrisi_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:38:13 | 2026-10-27 14:38:47 | PROCESSED |
+| kn_nep_stavbe_parcele_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:38:42 | 2026-10-27 14:39:56 | PROCESSED |
+| kn_nep_stavbe_zps_h | 2026-10-27 14:17:38 | True | 2026-10-27 14:39:12 | 2026-10-27 14:39:37 | PROCESSED |
 
 | Table | UTC field | DB column exists | DB type | LIFT field exists | LIFT type | LIFT datetime | DB timestamp | All watermarks | Sole watermark |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -60,26 +99,26 @@ Only the fixed backfill scope (12 EV and 20 KN tables) is included, with one aud
 | public.ev_posebna_enota_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_prostor_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
 | public.ev_stavba_h | date_change_utc | True | timestamp without time zone | True | date-time | True | True | DATE_CHANGE_UTC → date_change_utc | True |
-| public.kn_nep_deli_stavb_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_etaze_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_etaze_x_deli_stavb_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_hisne_stevilke_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_katastrske_obcine_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_deli_stavb_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_etaze_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_etaze_x_deli_stavb_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_hisne_stevilke_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_katastrske_obcine_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_ostalo_dejanske_rabe_parcel_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_ostalo_gozdno_gosp_obm | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_ostalo_gozdno_gosp_obm | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_ostalo_namenske_rabe | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_ostalo_parcele_x_dejanske_rabe_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_ostalo_parcele_x_namenske_rabe_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_parcele_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_prostori_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_parcele_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_prostori_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_rpe_naselja_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_rpe_obcine_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_rpe_obcine_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 | public.kn_nep_rpe_ulice_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_stavbe_centroidi_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_stavbe_obrisi_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_stavbe_parcele_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
-| public.kn_nep_stavbe_zps_h | datum_sys_utc | False | — | True | date-time | True | False | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_centroidi_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_obrisi_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_parcele_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
+| public.kn_nep_stavbe_zps_h | datum_sys_utc | True | timestamp without time zone | True | date-time | True | True | DATUM_SYS_UTC → datum_sys_utc | True |
 
 ## Integration SQL for LLM review
 

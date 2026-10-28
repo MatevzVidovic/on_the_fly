@@ -1,7 +1,8 @@
 """Read-only KN/EV inventory and UTC mapping audit. Uses ../simple_wal_lab/.env."""
 import argparse
 import re
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 import psycopg
@@ -71,6 +72,7 @@ def main():
         integrations = db.execute("""
             SELECT t.id AS table_id,t.name AS table_name,i.id,i.name,i.integration_type,
                    i.is_full_sync,i.use_changed_datetime_for_delta,i.url AS query,
+                   i.last_changed_datetime,i.last_sync_start,i.last_sync_end,i.processing_status,
                    COALESCE((SELECT jsonb_agg(jsonb_build_object(
                      'source',f.api_name,'field_id',f.attribute_field_id,'target',a.name,
                      'watermark',f.api_last_sync_field))
@@ -144,6 +146,24 @@ def main():
                         *((any_null,) if args.any_null else ()),
                         ', '.join(f"{m['source']} → {m['target']}" for m in watermarks) or None,
                         bool(i and len(watermarks)==1 and watermarks[0] in mappings)))
+    yesterday = datetime.now(ZoneInfo('Europe/Ljubljana')).date() - timedelta(days=1)
+    date_rows = []
+    for i in integrations:
+        watermark = i['last_changed_datetime']
+        if i['table_name'] == 'kn_nep_ostalo_dejanske_rabe_parcel_h':
+            check = 'exempt: giant table'
+        elif i['is_full_sync']:
+            check = 'not applicable: full sync'
+        else:
+            check = watermark is not None and watermark.date() == yesterday
+        date_rows.append((i['table_name'], watermark, check, i['last_sync_start'],
+                          i['last_sync_end'], i['processing_status']))
+    out += ['## Integration dates', '',
+            f'Expected watermark calendar date: {yesterday} (yesterday in Europe/Ljubljana). '
+            'This checks the stored watermark date only; it does not prove a completed import or data completeness. '
+            'Last sync start/end and processing status are shown separately. Stored timestamps are displayed as returned by PostgreSQL.', '',
+            table(['Table', 'Stored watermark', 'Watermark dated yesterday', 'Last sync start',
+                   'Last sync end', 'Processing status'], date_rows), '']
     out += [table(['Table','UTC field','DB column exists','DB type','LIFT field exists','LIFT type','LIFT datetime','DB timestamp',
                    *(['Num-null'] if args.num_nulls else []),*(['Any-null'] if args.any_null else []),'All watermarks','Sole watermark'],rows),
             '', '## Integration SQL for LLM review', '',

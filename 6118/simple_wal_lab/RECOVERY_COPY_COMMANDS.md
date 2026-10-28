@@ -476,7 +476,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_deli_stavb_h SET LOGGED;
 ``` -->
 
-## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB — ~2,891,696 rows
+<!-- ## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB — ~2,891,696 rows
 
 ```sql
 ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h ALTER COLUMN id SET NOT NULL;
@@ -513,9 +513,9 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h SET LOGGED;
-```
+``` -->
 
-## 13. `public.kn_nep_stavbe_parcele_h` — 1645 MB — ~1,643,864 rows
+<!-- ## 13. `public.kn_nep_stavbe_parcele_h` — 1645 MB — ~1,643,864 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_parcele_h ALTER COLUMN id SET NOT NULL;
@@ -552,8 +552,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_stavbe_parcele_h SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 14. `public.kn_nep_stavbe_obrisi_h` — 1731 MB — ~2,760,946 rows
 
 ```sql
@@ -591,9 +591,9 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_stavbe_obrisi_h SET LOGGED;
-```
+``` -->
 
-## 15. `public.kn_nep_stavbe_centroidi_h` — 1828 MB — ~2,761,433 rows
+<!-- ## 15. `public.kn_nep_stavbe_centroidi_h` — 1828 MB — ~2,761,433 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_centroidi_h ALTER COLUMN id SET NOT NULL;
@@ -630,9 +630,9 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_stavbe_centroidi_h SET LOGGED;
-```
+``` -->
 
-## 16. `public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — 3590 MB — ~6,068,364 rows
+<!-- ## 16. `public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — 3590 MB — ~6,068,364 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h ALTER COLUMN id SET NOT NULL;
@@ -669,8 +669,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 17. `public.kn_nep_ostalo_parcele_x_dejanske_rabe_h` — 5403 MB — ~15,146,632 rows
 
 ```sql
@@ -708,8 +708,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_ostalo_parcele_x_dejanske_rabe_h SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 18. `public.ev_parc_del_h` — 6359 MB — ~16,977,524 rows
 <!-- 
 ```sql
@@ -717,10 +717,10 @@ ALTER TABLE public.ev_parc_del_h ALTER COLUMN id SET NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
     ON public.ev_parc_del_h (id);
 <!-- ``` -->
-
+<!-- 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.ev_parc_del_h --source-date-column date_change --date-column date_change_utc --batch-size 500000
-```
+``` -->
 
 ```sql
 -- Exact counts: require counts_match = true and difference = 0 before cutover.
@@ -747,7 +747,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
 -- ```sql
 -- -- After the rename has committed; run separately with sufficient disk headroom.
 -- ALTER TABLE public.ev_parc_del_h SET LOGGED;
--- ```
+-- ``` -->
 
 -- ## 19. `public.kn_nep_parcele_h` — 6659 MB — ~7,911,218 rows
 

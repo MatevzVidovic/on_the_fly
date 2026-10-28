@@ -44,3 +44,5 @@ To use a different metadata database:
 Each run overwrites `report.md` in this directory. The report contains the fixed backfill list (12 EV and 20 KN tables), table sizes, UTC column and integration mapping checks, and the integration SQL for review.
 
 All database connections enforce read-only transactions. The script does not modify the database. Inventory row counts are estimates. With `--num-nulls`, `Num-null` counts scan existing UTC columns and are exact at query time. Each query has a 30-second timeout; timed-out counts are marked `timeout`.
+
+The report also includes stored watermarks, last sync start/end, and processing status. It checks whether the watermark date is yesterday (Europe/Ljubljana); the giant table and full-sync integrations are exempt. This date check does not prove the historical reload is complete.
