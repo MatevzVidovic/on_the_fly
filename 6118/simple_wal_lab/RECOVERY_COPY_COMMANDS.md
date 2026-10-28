@@ -1,7 +1,8 @@
 # Recovery: index restored tables, then copy and backfill UTC
 
 21 tables, sorted by total allocated size from the October 27 report (table,
-TOAST and indexes). Historical sizes can include bloat; they are not current
+TOAST and indexes). Row counts beside sizes are historical PostgreSQL estimates,
+not verified copy counts. Historical sizes can include bloat; they are not current
 restore sizes or a disk-space budget.
 
 Run each SQL block in `fmp_data_gurs`, then its Python command from
@@ -46,7 +47,7 @@ and `difference = 0`; if either fails, do not run DROP/RENAME. Keep writers stop
 between the check and cutover. Equal counts alone do not prove matching IDs, values
 or UTC conversion. These checks are prepared for you to run, not executed here.
 
-<!-- ## 1. `public.kn_nep_rpe_ulice_h` — 38 MB
+<!-- ## 1. `public.kn_nep_rpe_ulice_h` — 38 MB — ~30,983 rows
 
 ```sql
 ALTER TABLE public.kn_nep_rpe_ulice_h ALTER COLUMN id SET NOT NULL;
@@ -85,7 +86,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_rpe_ulice_h SET LOGGED;
 ```
 
-## 2. `public.kn_nep_rpe_naselja_h` — 113 MB
+## 2. `public.kn_nep_rpe_naselja_h` — 113 MB — ~20,018 rows
 
 ```sql
 ALTER TABLE public.kn_nep_rpe_naselja_h ALTER COLUMN id SET NOT NULL;
@@ -124,7 +125,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_rpe_naselja_h SET LOGGED;
 ```
 
-## 3. `public.ev_pe_dst_h` — 121 MB
+## 3. `public.ev_pe_dst_h` — 121 MB — ~210,842 rows
 
 ```sql
 ALTER TABLE public.ev_pe_dst_h ALTER COLUMN id SET NOT NULL;
@@ -163,7 +164,7 @@ COMMIT;
 ALTER TABLE public.ev_pe_dst_h SET LOGGED;
 ```
 
-## 4. `public.kn_nep_rpe_obcine_h` — 125 MB
+## 4. `public.kn_nep_rpe_obcine_h` — 125 MB — ~3,559 rows
 
 <!-- ```sql
 ALTER TABLE public.kn_nep_rpe_obcine_h ALTER COLUMN id SET NOT NULL;
@@ -202,7 +203,7 @@ COMMIT;
 -- ALTER TABLE public.kn_nep_rpe_obcine_h SET LOGGED;
 ``` --> --> -->
 <!-- 
-## 5. `public.kn_nep_katastrske_obcine_h` — 255 MB
+## 5. `public.kn_nep_katastrske_obcine_h` — 255 MB — ~19,711 rows
 
 ```sql
 ALTER TABLE public.kn_nep_katastrske_obcine_h ALTER COLUMN id SET NOT NULL;
@@ -241,7 +242,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_katastrske_obcine_h SET LOGGED;
 ``` -->
 <!-- 
-## 6. `public.kn_nep_ostalo_gozdno_gosp_obm` — 440 MB
+## 6. `public.kn_nep_ostalo_gozdno_gosp_obm` — 440 MB — ~53,681 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_gozdno_gosp_obm ALTER COLUMN id SET NOT NULL;
@@ -280,7 +281,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_ostalo_gozdno_gosp_obm SET LOGGED;
 ``` -->
 <!-- 
-## 7. `public.kn_nep_hisne_stevilke_h` — 792 MB
+## 7. `public.kn_nep_hisne_stevilke_h` — 792 MB — ~1,448,209 rows
 
 ```sql
 ALTER TABLE public.kn_nep_hisne_stevilke_h ALTER COLUMN id SET NOT NULL;
@@ -319,7 +320,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_hisne_stevilke_h SET LOGGED;
 ``` -->
 <!-- 
-## 8. `public.kn_nep_etaze_h` — 1361 MB
+## 8. `public.kn_nep_etaze_h` — 1361 MB — ~2,358,117 rows
 
 ```sql
 ALTER TABLE public.kn_nep_etaze_h ALTER COLUMN id SET NOT NULL;
@@ -358,7 +359,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_etaze_h SET LOGGED;
 ``` -->
 <!-- 
-## 9. `public.kn_nep_stavbe_zps_h` — 1416 MB
+## 9. `public.kn_nep_stavbe_zps_h` — 1416 MB — ~1,936,510 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_zps_h ALTER COLUMN id SET NOT NULL;
@@ -397,7 +398,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_stavbe_zps_h SET LOGGED;
 ``` -->
 
-## 10. `public.kn_nep_prostori_h` — 1520 MB
+<!-- ## 10. `public.kn_nep_prostori_h` — 1520 MB — ~4,435,292 rows
 
 ```sql
 ALTER TABLE public.kn_nep_prostori_h ALTER COLUMN id SET NOT NULL;
@@ -434,9 +435,9 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_prostori_h SET LOGGED;
-```
+``` -->
 
-## 11. `public.kn_nep_deli_stavb_h` — 1581 MB
+## 11. `public.kn_nep_deli_stavb_h` — 1581 MB — ~2,741,147 rows
 
 ```sql
 ALTER TABLE public.kn_nep_deli_stavb_h ALTER COLUMN id SET NOT NULL;
@@ -475,7 +476,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_deli_stavb_h SET LOGGED;
 ```
 
-## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB
+## 12. `public.kn_nep_etaze_x_deli_stavb_h` — 1598 MB — ~2,891,696 rows
 
 ```sql
 ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h ALTER COLUMN id SET NOT NULL;
@@ -514,7 +515,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_etaze_x_deli_stavb_h SET LOGGED;
 ```
 
-## 13. `public.kn_nep_stavbe_parcele_h` — 1645 MB
+## 13. `public.kn_nep_stavbe_parcele_h` — 1645 MB — ~1,643,864 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_parcele_h ALTER COLUMN id SET NOT NULL;
@@ -553,7 +554,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_stavbe_parcele_h SET LOGGED;
 ```
 
-## 14. `public.kn_nep_stavbe_obrisi_h` — 1731 MB
+## 14. `public.kn_nep_stavbe_obrisi_h` — 1731 MB — ~2,760,946 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_obrisi_h ALTER COLUMN id SET NOT NULL;
@@ -592,7 +593,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_stavbe_obrisi_h SET LOGGED;
 ```
 
-## 15. `public.kn_nep_stavbe_centroidi_h` — 1828 MB
+## 15. `public.kn_nep_stavbe_centroidi_h` — 1828 MB — ~2,761,433 rows
 
 ```sql
 ALTER TABLE public.kn_nep_stavbe_centroidi_h ALTER COLUMN id SET NOT NULL;
@@ -631,7 +632,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_stavbe_centroidi_h SET LOGGED;
 ```
 
-## 16. `public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — 3590 MB
+## 16. `public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — 3590 MB — ~6,068,364 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h ALTER COLUMN id SET NOT NULL;
@@ -670,7 +671,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h SET LOGGED;
 ```
 
-## 17. `public.kn_nep_ostalo_parcele_x_dejanske_rabe_h` — 5403 MB
+## 17. `public.kn_nep_ostalo_parcele_x_dejanske_rabe_h` — 5403 MB — ~15,146,632 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_parcele_x_dejanske_rabe_h ALTER COLUMN id SET NOT NULL;
@@ -709,7 +710,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_ostalo_parcele_x_dejanske_rabe_h SET LOGGED;
 ```
 
-## 18. `public.ev_parc_del_h` — 6359 MB
+## 18. `public.ev_parc_del_h` — 6359 MB — ~16,977,524 rows
 <!-- 
 ```sql
 ALTER TABLE public.ev_parc_del_h ALTER COLUMN id SET NOT NULL;
@@ -748,7 +749,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
 -- ALTER TABLE public.ev_parc_del_h SET LOGGED;
 -- ```
 
--- ## 19. `public.kn_nep_parcele_h` — 6659 MB
+-- ## 19. `public.kn_nep_parcele_h` — 6659 MB — ~7,911,218 rows
 
 -- ```sql
 -- ALTER TABLE public.kn_nep_parcele_h ALTER COLUMN id SET NOT NULL;
@@ -787,7 +788,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
 -- ALTER TABLE public.kn_nep_parcele_h SET LOGGED;
 ```
 
-## 20. `public.kn_nep_ostalo_parcele_x_namenske_rabe_h` — 9250 MB
+## 20. `public.kn_nep_ostalo_parcele_x_namenske_rabe_h` — 9250 MB — ~16,491,022 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h ALTER COLUMN id SET NOT NULL;
@@ -826,7 +827,7 @@ COMMIT;
 ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h SET LOGGED;
 ```
 
-## 21. `public.kn_nep_ostalo_dejanske_rabe_parcel_h` — 20 GB
+## 21. `public.kn_nep_ostalo_dejanske_rabe_parcel_h` — 20 GB — ~26,261,976 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_dejanske_rabe_parcel_h ALTER COLUMN id SET NOT NULL;
