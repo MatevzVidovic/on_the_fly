@@ -240,7 +240,7 @@ COMMIT;
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_katastrske_obcine_h SET LOGGED;
 ``` -->
-
+<!-- 
 ## 6. `public.kn_nep_ostalo_gozdno_gosp_obm` — 440 MB
 
 ```sql
@@ -278,8 +278,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_ostalo_gozdno_gosp_obm SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 7. `public.kn_nep_hisne_stevilke_h` — 792 MB
 
 ```sql
@@ -317,8 +317,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_hisne_stevilke_h SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 8. `public.kn_nep_etaze_h` — 1361 MB
 
 ```sql
@@ -356,8 +356,8 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_etaze_h SET LOGGED;
-```
-
+``` -->
+<!-- 
 ## 9. `public.kn_nep_stavbe_zps_h` — 1416 MB
 
 ```sql
@@ -395,7 +395,7 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_stavbe_zps_h SET LOGGED;
-```
+``` -->
 
 ## 10. `public.kn_nep_prostori_h` — 1520 MB
 
