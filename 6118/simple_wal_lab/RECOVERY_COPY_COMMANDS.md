@@ -788,7 +788,7 @@ CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
 -- ALTER TABLE public.kn_nep_parcele_h SET LOGGED;
 ```
 
-## 20. `public.kn_nep_ostalo_parcele_x_namenske_rabe_h` — 9250 MB — ~16,491,022 rows
+<!-- ## 20. `public.kn_nep_ostalo_parcele_x_namenske_rabe_h` — 9250 MB — ~16,491,022 rows
 
 ```sql
 ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h ALTER COLUMN id SET NOT NULL;
@@ -825,7 +825,7 @@ COMMIT;
 ```sql
 -- After the rename has committed; run separately with sufficient disk headroom.
 ALTER TABLE public.kn_nep_ostalo_parcele_x_namenske_rabe_h SET LOGGED;
-```
+``` -->
 
 ## 21. `public.kn_nep_ostalo_dejanske_rabe_parcel_h` — 20 GB — ~26,261,976 rows
 
