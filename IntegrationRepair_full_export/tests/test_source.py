@@ -144,3 +144,10 @@ def test_inventory_normalizes_change_time_to_utc(definition):
     cursor = Cursor([(1, '2025-01-02 14:00:00 +02:00')])
     source = OracleSource(Database(cursor), definition)
     assert list(source.inventory(DATE)) == [[(1, DATE)]]
+
+
+def test_geometry_clob_is_fetched_as_text_with_the_batch():
+    cursor = Cursor()
+    cursor.arraysize = 1000
+    result = OracleSource.timestamp_text(cursor, SimpleNamespace(type_code=oracledb.DB_TYPE_CLOB))
+    assert result == (oracledb.DB_TYPE_LONG, dict(arraysize=1000))

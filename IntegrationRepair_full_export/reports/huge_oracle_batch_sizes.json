@@ -1,0 +1,69 @@
+{
+  "run": "eb6eef3a-e08f-4e0f-b105-94625718e188",
+  "measurements": [
+    {
+      "requested": 1000,
+      "query_size": 1000,
+      "seconds": 0.739,
+      "rows": 1000,
+      "wkt_chars": 747183,
+      "sha256": "eb6aeb40a115a4291496ee8c224cddff12ae7fdc73d78abf4c9af4c04dac93e0"
+    },
+    {
+      "requested": 1000,
+      "query_size": 100,
+      "seconds": 1.133,
+      "rows": 1000,
+      "wkt_chars": 747183,
+      "sha256": "eb6aeb40a115a4291496ee8c224cddff12ae7fdc73d78abf4c9af4c04dac93e0"
+    },
+    {
+      "requested": 1000,
+      "query_size": 500,
+      "seconds": 0.667,
+      "rows": 1000,
+      "wkt_chars": 747183,
+      "sha256": "eb6aeb40a115a4291496ee8c224cddff12ae7fdc73d78abf4c9af4c04dac93e0"
+    },
+    {
+      "requested": 1000,
+      "query_size": 1000,
+      "seconds": 0.52,
+      "rows": 1000,
+      "wkt_chars": 747183,
+      "sha256": "eb6aeb40a115a4291496ee8c224cddff12ae7fdc73d78abf4c9af4c04dac93e0"
+    },
+    {
+      "requested": 10000,
+      "query_size": 1000,
+      "seconds": 4.631,
+      "rows": 10000,
+      "wkt_chars": 7135850,
+      "sha256": "1d538bc34e0249ffa9cb40a76758129f1b3074c755cbb07bca6558a8aa863ae7"
+    },
+    {
+      "requested": 10000,
+      "query_size": 100,
+      "seconds": 11.503,
+      "rows": 10000,
+      "wkt_chars": 7135850,
+      "sha256": "1d538bc34e0249ffa9cb40a76758129f1b3074c755cbb07bca6558a8aa863ae7"
+    },
+    {
+      "requested": 10000,
+      "query_size": 500,
+      "seconds": 4.276,
+      "rows": 10000,
+      "wkt_chars": 7135850,
+      "sha256": "1d538bc34e0249ffa9cb40a76758129f1b3074c755cbb07bca6558a8aa863ae7"
+    },
+    {
+      "requested": 10000,
+      "query_size": 1000,
+      "seconds": 3.415,
+      "rows": 10000,
+      "wkt_chars": 7135850,
+      "sha256": "1d538bc34e0249ffa9cb40a76758129f1b3074c755cbb07bca6558a8aa863ae7"
+    }
+  ]
+}

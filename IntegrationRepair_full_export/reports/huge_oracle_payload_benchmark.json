@@ -1,0 +1,190 @@
+{
+  "run": "eb6eef3a-e08f-4e0f-b105-94625718e188",
+  "measurements": [
+    {
+      "kind": "full",
+      "requested": 100,
+      "rows": 100,
+      "seconds": 2.58,
+      "wkt_chars": 56272
+    },
+    {
+      "kind": "batched_clob",
+      "requested": 100,
+      "rows": 100,
+      "seconds": 0.163,
+      "wkt_chars": 56272,
+      "identical_to_baseline": true
+    },
+    {
+      "kind": "without_wkt",
+      "requested": 100,
+      "rows": 100,
+      "seconds": 0.189,
+      "wkt_chars": 0
+    },
+    {
+      "kind": "full",
+      "requested": 1000,
+      "rows": 1000,
+      "seconds": 25.833,
+      "wkt_chars": 747183
+    },
+    {
+      "kind": "batched_clob",
+      "requested": 1000,
+      "rows": 1000,
+      "seconds": 0.999,
+      "wkt_chars": 747183,
+      "identical_to_baseline": true
+    },
+    {
+      "kind": "without_wkt",
+      "requested": 1000,
+      "rows": 1000,
+      "seconds": 0.269,
+      "wkt_chars": 0
+    }
+  ],
+  "indexes": [
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_IDPOSDO_UK",
+      "NORMAL",
+      "UNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_IDPOSDO_UK",
+      "NORMAL",
+      "UNIQUE",
+      "VALID",
+      "POSTOPEK_ID_DO",
+      "2"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_IDPOSOD_UK",
+      "NORMAL",
+      "UNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_IDPOSOD_UK",
+      "NORMAL",
+      "UNIQUE",
+      "VALID",
+      "POSTOPEK_ID_OD",
+      "2"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_PK",
+      "NORMAL",
+      "UNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_H_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_POSDO_IDX",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "POSTOPEK_ID_DO",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_H_POSOD_IDX",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "POSTOPEK_ID_OD",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_IN_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_IN_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_IN1_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_IN1_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_IN2_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_IN2_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_IN3_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_IN3_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_KG_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_KG_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_PO_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_PO_ID",
+      "1"
+    ],
+    [
+      "NEP_OSTALO",
+      "DEJANSKE_RABE_VZ_H_FK",
+      "NORMAL",
+      "NONUNIQUE",
+      "VALID",
+      "DEJANSKA_RABA_VZ_ID",
+      "1"
+    ]
+  ],
+  "types": [
+    [
+      "GEOM",
+      "SDO_GEOMETRY"
+    ],
+    [
+      "DEJANSKA_RABA_H_ID",
+      "NUMBER"
+    ]
+  ],
+  "last_cursor_plan": [
+    "User has no SELECT privilege on V$SESSION"
+  ]
+}

@@ -50,6 +50,9 @@ class OracleSource:
 
     @staticmethod
     def timestamp_text(cursor, metadata):
+        # Fetch WKT with its batch, avoiding a separate LOB.read() round trip per row.
+        if metadata.type_code == oracledb.DB_TYPE_CLOB:
+            return cursor.var(oracledb.DB_TYPE_LONG, arraysize=cursor.arraysize)
         # Preserve Oracle NUMBER precision instead of converting decimals to float.
         if metadata.type_code == oracledb.DB_TYPE_NUMBER:
             return cursor.var(oracledb.DB_TYPE_VARCHAR, size=100, arraysize=cursor.arraysize)

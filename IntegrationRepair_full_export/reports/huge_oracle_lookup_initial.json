@@ -1,0 +1,44 @@
+{
+  "query": "SELECT  DEJANSKA_RABA_H_ID,\n        DEJANSKA_RABA_ID,\n               case when regexp_count(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+') = 1\n                then to_number(regexp_substr(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+'))\n            when regexp_count(SESTAVLJENA_VRSTA_DRABE_SIFRA, '[[:digit:]]+') > 1 then 99\n            else null end            as                          ENOSTAVNA_VRSTA_DRABE_SIFRA,\n        DEJANSKA_RABA_KG_ID,\n        KG_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_PO_ID,\n        PO_VRSTA_DEJANSKE_RABE_ID,\n        STAVBA_ID,\n        ST_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN_ID,\n        IN_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN1_ID,\n        IN1_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN2_ID,\n        IN2_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_IN3_ID,\n        IN3_VRSTA_DEJANSKE_RABE_ID,\n        DEJANSKA_RABA_VZ_ID,\n        VZ_VRSTA_DEJANSKE_RABE_ID,\n        POLIGONI_SI800M_1K_ID,\n        NN_VRSTA_DEJANSKE_RABE_ID,\n        SESTAVLJENA_VRSTA_DRABE_SIFRA,\n        LOKACIJSKA_NAT,\n        from_tz(cast(VIR_DATUM as TIMESTAMP), 'Europe/Ljubljana')  VIR_DATUM,\n        POVRSINA_GEOM,\n        SDO_UTIL.TO_WKTGEOMETRY(GEOM) AS GEOM,\n        EID,\n        POSTOPEK_ID_OD,\n        POSTOPEK_ID_DO,\n        from_tz(cast(DATUM_OD as TIMESTAMP), 'Europe/Ljubljana')  DATUM_OD,\n        from_tz(cast(DATUM_DO as TIMESTAMP), 'Europe/Ljubljana')  DATUM_DO,\n        from_tz(cast(DATUM_SYS as TIMESTAMP), 'Europe/Ljubljana') DATUM_SYS,\n        FROM_TZ(CAST(DATUM_SYS AS TIMESTAMP), 'Europe/Ljubljana') AT TIME ZONE 'UTC' AS datum_sys_utc\nfrom nep_ostalo.DEJANSKE_RABE_H",
+  "key": {
+    "id": "ea5617bc-f34c-11ef-9248-02420a0001ec",
+    "attribute_table_integration_id": "e0c4ee44-f34c-11ef-9c8f-02420a0001ec",
+    "attribute_field_id": "ea1b92f4-f34c-11ef-982c-02420a0001ec",
+    "api_name": "DEJANSKA_RABA_H_ID",
+    "api_type": "bigint",
+    "api_description": null,
+    "api_id": true,
+    "api_location": false,
+    "api_block_sync": false,
+    "created_at": "2025-02-25 07:48:34",
+    "updated_at": "2025-02-25 07:48:34",
+    "created_by": "00000000-0000-0000-0000-000000000000",
+    "updated_by": "00000000-0000-0000-0000-000000000000",
+    "api_location_transformation": null,
+    "api_privacy": false,
+    "api_privacy_field_name": null,
+    "api_location_transformation_srid": null,
+    "api_last_sync_field": false,
+    "target": "dejanska_raba_h_id",
+    "field_type": "bigint",
+    "field_params": {
+      "default": null,
+      "nullable": true,
+      "required": false
+    }
+  },
+  "keys": [
+    10003935791,
+    10003935802,
+    10003935974,
+    10003936192,
+    10003936213,
+    10003936388,
+    10003936419,
+    10003936502,
+    10003936557,
+    10003936606
+  ],
+  "seconds": 0.4288026670110412,
+  "rows": 10
+}
