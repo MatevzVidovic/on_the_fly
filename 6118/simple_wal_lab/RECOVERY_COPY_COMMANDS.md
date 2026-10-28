@@ -397,12 +397,12 @@ COMMIT;
 ```
 
 ## 18. `public.ev_parc_del_h` — 6359 MB
-
+<!-- 
 ```sql
 ALTER TABLE public.ev_parc_del_h ALTER COLUMN id SET NOT NULL;
 CREATE UNIQUE INDEX IF NOT EXISTS recovery2810_18_source_id_uq
     ON public.ev_parc_del_h (id);
-```
+``` -->
 
 ```bash
 .venv/bin/python batched_copy_backfill.py --table public.ev_parc_del_h --source-date-column date_change --date-column date_change_utc --batch-size 500000
