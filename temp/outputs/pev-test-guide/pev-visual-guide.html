@@ -1,0 +1,107 @@
+<!doctype html><html lang="sl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PEV · vizualni vodič za preverjanje delez_bzps</title><style>body{font:16px/1.55 system-ui,sans-serif;color:#182c38;background:#edf2f5;margin:0}main{max-width:1100px;margin:auto;padding:32px 20px}h1{font-size:32px;line-height:1.2}h2{font-size:23px}h3{font-size:18px}section{background:white;padding:24px;margin:20px 0;border-radius:12px}header p{max-width:850px}.tag{display:inline-block;background:#dceaf4;color:#123f61;padding:4px 10px;border-radius:5px}.notice{border-left:5px solid #bd7818;padding:12px 18px;background:#fff4d9}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.pane{border:2px solid #547488;border-radius:6px;padding:16px}.head{background:#e4edf3;padding:8px;font-weight:600}.pin{display:inline-block;background:#125c88;color:white;border-radius:50%;width:28px;text-align:center;margin-right:7px}pre{background:#132b3b;color:#e6f1f8;padding:18px;overflow:auto;border-radius:8px;font-size:13px;line-height:1.55}button{padding:9px 16px;background:#125c88;color:white;border:0;border-radius:6px;cursor:pointer}button:focus{outline:3px solid #e6a23c}table{border-collapse:collapse;width:100%}td,th{text-align:left;padding:10px;border-bottom:1px solid #d4e0e7;vertical-align:top}code{overflow-wrap:anywhere}.result{background:#e8f5ed;padding:14px;border-left:4px solid #32784c}.scroll{overflow:auto}label{display:block;padding:8px 0}a{color:#125c88}.small{font-size:14px}@media(max-width:700px){.grid{grid-template-columns:1fr}main{padding:18px 12px}section{padding:16px}h1{font-size:26px}}@media print{button{display:none}body{background:white}section{break-inside:avoid}pre{white-space:pre-wrap;color:black;background:#f4f4f4}}</style><main><header><span class="tag">PEV · testni vodič + SQL</span><h1>Spremeni v LIFT → preveri oba prikaza → potrdi v bazi</h1><p>Primer: PNB 10683 · parcela 2100 267/47 · stavba 2100-1802. Najprej test.gurs.lift.flycom.si, nato lift-t.gurs.sigov.si. Vloga: admin PEV.</p><div class="notice"><b>Preverjeno proti priloženi SQL-podlagi, ne na živi bazi.</b> Dostop do brskalnika je bil zavrnjen. Spodnje risbe so sheme, ne posnetki dejanskega vmesnika. Točnih imen gumbov LIFT ni bilo mogoče potrditi. SQL vsebuje samo SELECT/CTE; ne namesti prožilcev in ne spreminja podatkov.</div></header>
+<section><h2>Kje narediš katero dejanje</h2><div class="grid"><div class="pane"><div class="head">LIFT · izbrano TESTNO okolje</div><p><span class="pin">A</span>PEV PNB 10683 → parcela 2100 267/47</p><div class="pane">Odprta atributna tabela<br>Izbor ✓ · Filter ✓ · Položaj ✓<br><b>delez_bzps: 248 → 268</b></div><p>↕ istočasno preveri isto parcelo</p><div class="pane">Odprt prikaz atributov<br><b>Delež: 300 → 320 → Shrani</b><br>delez_bzps: 248 → 268</div><p><span class="pin">B</span>Opazuj obvestilo: pravi seq_id_parc.</p></div><div class="pane"><div class="head">pgAdmin · fmp_data_gurs</div><p><span class="pin">1</span>Servers → testna povezava</p><p><span class="pin">2</span>Databases → fmp_data_gurs</p><p><span class="pin">3</span>Desni klik → Query Tool</p><div class="pane">SQL editor<br>Prilepi en spodnji blok → Execute</div><p>↓</p><div class="pane">Data Output<br><b>shranjeno = izracunana_vrednost</b><br>preverjanje = MATCH</div></div></div><p class="small">SQL ne dokazuje samodejne osvežitve, obvestil ali ohranitve neshranjenih sprememb. Te lastnosti opazuj v LIFT. Spremembe za test sproži prek aplikacije, ne z neposrednim UPDATE v bazi.</p></section><section><h2>1 · Preveri povezavo</h2><p>pgAdmin → Servers → izbrano TESTNO okolje → Databases → fmp_data_gurs → desni klik → Query Tool. SQL prilepi v urejevalnik in izvedi izbrani blok z Execute. Ne izvajaj priložene migracijske skripte.</p><button type="button" data-copy="sql0">Kopiraj SQL</button><pre><code id="sql0">SELECT current_database() AS baza,
+       current_user AS uporabnik,
+       inet_server_addr() AS streznik,
+       inet_server_port() AS vrata;
+</code></pre><div class="result"><b>Kaj iščeš:</b> Baza mora biti fmp_data_gurs. Strežnik primerjaj z nastavitvami povezave za izbrano testno okolje; samo ime baze ne potrjuje okolja.</div></section><section><h2>2 · Poišči zapis</h2><p>V LIFT odpri PEV PNB 10683 → parcelo 2100 267/47 → atribute. Prepiši seq_id_parc. V naslednjih blokih zamenjaj REPLACE_SEQ_ID z dejansko vrednostjo. Številka 10683 NI seq_id_parc.</p><button type="button" data-copy="sql1">Kopiraj SQL</button><pre><code id="sql1">SELECT p.id, p.seq_id_parc, p.id_rel_fo, p.parcela_id,
+       p.upostevan, p.delez, p.delez_bzps,
+       f.id_rel_pe, pe.valid_to
+FROM public.pev_parcele p
+LEFT JOIN public.pev_fo f ON f.id = p.id_rel_fo
+LEFT JOIN public.pev_posebne_enote pe ON pe.id = f.id_rel_pe
+WHERE p.seq_id_parc::text = &#x27;REPLACE_SEQ_ID&#x27;;
+</code></pre><div class="result"><b>Kaj iščeš:</b> Pričakuj točno 1 vrstico in v aplikaciji potrdi identiteto parcele. Pred vsakim testom shrani rezultat (CSV ali posnetek): delez, delez_bzps, FO in upoštevanost. 0 ali več vrstic → najprej razreši izbor.</div></section><section><h2>3 · Neodvisno preveri izračun</h2><p>Po uspešnem shranjevanju v LIFT ponovno izvedi ta SELECT. Ne kliče stare računske funkcije in ne spreminja podatkov. Oznaka MATCH potrdi numerično stanje, ne izvora ali števila izvajanj.</p><button type="button" data-copy="sql2">Kopiraj SQL</button><pre><code id="sql2">WITH target AS (
+    SELECT p.*, f.id_rel_pe,
+           CASE WHEN pe.id IS NOT NULL
+                THEN COALESCE(pe.valid_to, DATE &#x27;2100-01-01&#x27;)
+           END AS effective_valid_to
+    FROM public.pev_parcele p
+    LEFT JOIN public.pev_fo f ON f.id = p.id_rel_fo
+    LEFT JOIN public.pev_posebne_enote pe ON pe.id = f.id_rel_pe
+    WHERE p.seq_id_parc::text = &#x27;REPLACE_SEQ_ID&#x27;
+), latest AS (
+    SELECT DISTINCT ON (stavba_parcela_id, datum_od, datum_do)
+           stavba_parcela_id, datum_od, datum_do,
+           parcela_id, stavba_id, povrsina_zps
+    FROM public.kn_nep_stavbe_parcele_h
+    ORDER BY stavba_parcela_id, datum_od, datum_do, datum_sys DESC
+), measured AS (
+    SELECT p.*, (
+        SELECT SUM(kn.povrsina_zps)
+        FROM latest kn
+        WHERE kn.parcela_id = p.parcela_id
+          AND p.effective_valid_to &lt;= kn.datum_do
+          AND EXISTS (
+              SELECT 1 FROM public.pev_stavbe st
+              WHERE st.id_rel_fo = p.id_rel_fo
+                AND st.stavba_id = kn.stavba_id
+                AND EXISTS (
+                    SELECT 1 FROM public.pev_deli_stavb d
+                    WHERE d.id_rel_sta = st.id
+                      AND d.upostevan IS TRUE
+                )
+          )
+    ) AS vsota_zps
+    FROM target p
+), expected AS (
+    SELECT m.*,
+           CASE WHEN upostevan IS TRUE
+                     AND id_rel_pe IS NOT NULL
+                     AND vsota_zps IS NOT NULL
+                THEN CASE WHEN delez IS NULL THEN NULL::numeric
+                          ELSE GREATEST(delez - vsota_zps, 0) END
+           END AS izracunana_vrednost
+    FROM measured m
+)
+SELECT seq_id_parc, id_rel_fo, delez, delez_bzps AS shranjeno,
+       vsota_zps, izracunana_vrednost,
+       CASE
+         WHEN upostevan IS NOT TRUE
+           THEN &#x27;CHECK BEFORE: neupostevana; ohrani vrednost&#x27;
+         WHEN id_rel_pe IS NULL
+           THEN CASE WHEN delez_bzps IS NULL THEN &#x27;MATCH: brez FO-PEV, NULL&#x27;
+                     ELSE &#x27;MISMATCH: pricakovan NULL&#x27; END
+         WHEN vsota_zps IS NULL
+           THEN &#x27;CHECK BEFORE: UPDATE ohrani; INSERT NULL&#x27;
+         WHEN delez_bzps IS NOT DISTINCT FROM izracunana_vrednost
+           THEN &#x27;MATCH&#x27;
+         ELSE &#x27;MISMATCH&#x27;
+       END AS preverjanje
+FROM expected;
+</code></pre><div class="result"><b>Kaj iščeš:</b> Za osnovni primer: vsota_zps = 52; delez = 300 → shranjeno = izracunana_vrednost = 248. Nato 320 → 268. CHECK BEFORE zahteva primerjavo s posnetkom pred dogodkom; ni avtomatski PASS. Rezultat brez dogodka ne dokazuje, da se je workflow sprožil.</div></section><section><h2>4 · Preveri obseg FO in dele</h2><p>Iz istega seq_id_parc izpiši vse parcele tega FO in njegove stavbe. Pri premiku uporabi še seq_id_parc parcele drugega FO in ponovi blok 3 za vse prizadete parcele.</p><button type="button" data-copy="sql3">Kopiraj SQL</button><pre><code id="sql3">SELECT p.seq_id_parc, p.id_rel_fo, p.parcela_id,
+       p.upostevan, p.delez, p.delez_bzps
+FROM public.pev_parcele p
+WHERE p.id_rel_fo IN (
+    SELECT id_rel_fo FROM public.pev_parcele
+    WHERE seq_id_parc::text = &#x27;REPLACE_SEQ_ID&#x27;
+)
+ORDER BY p.id;
+
+SELECT st.id AS pev_stavba_id, st.id_rel_fo, st.stavba_id,
+       COUNT(d.id) FILTER (WHERE d.upostevan IS TRUE) AS upostevani_deli
+FROM public.pev_stavbe st
+LEFT JOIN public.pev_deli_stavb d ON d.id_rel_sta = st.id
+WHERE st.id_rel_fo IN (
+    SELECT id_rel_fo FROM public.pev_parcele
+    WHERE seq_id_parc::text = &#x27;REPLACE_SEQ_ID&#x27;
+)
+GROUP BY st.id, st.id_rel_fo, st.stavba_id
+ORDER BY st.id;
+</code></pre><div class="result"><b>Kaj iščeš:</b> 1 → 2 upoštevana dela iste stavbe: ZPS in rezultat ostaneta enaka. 2 → 1: isto. 1 → 0 brez drugih ustreznih ZPS: prejšnji delez_bzps se ohrani. Pri premiku preveri oba FO; izvorni FO brez ZPS ohrani prejšnjo vrednost.</div></section><section><h2>5 · Preveri odstranitev prožilcev</h2><p>Po uvedbi workflowa, v Query Tool istega okolja. To je preverjanje, ne odstranitev. Pred uvedbo je prisotnost starih prožilcev pričakovana.</p><button type="button" data-copy="sql4">Kopiraj SQL</button><pre><code id="sql4">SELECT n.nspname AS shema, c.relname AS tabela,
+       t.tgname AS prozilec, t.tgenabled AS omogocen,
+       pg_get_triggerdef(t.oid) AS definicija
+FROM pg_trigger t
+JOIN pg_class c ON c.oid = t.tgrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE NOT t.tgisinternal
+  AND n.nspname = &#x27;public&#x27;
+  AND t.tgname IN (
+    &#x27;tr_pev_parcele_delez_bzps&#x27;,
+    &#x27;tr_pev_stavbe_delez_bzps&#x27;,
+    &#x27;tr_pev_deli_stavb_delez_bzps&#x27;
+  );
+</code></pre><div class="result"><b>Kaj iščeš:</b> Po uvedbi: 0 vrstic. Onemogočen prožilec še vedno ni odstranjen. Nato sproži novo spremembo v LIFT in potrdi rezultat ter dnevnik workflowa; ta SELECT sam ne dokazuje odsotnosti drugih računskih poti.</div></section><section><h2>Testna pot · označi šele po preverjanju</h2><div class="scroll"><table><thead><tr><th>Opravljeno</th><th>Test / dejanje</th><th>Pričakovano</th></tr></thead><tbody><tr><td><label><input type="checkbox" aria-label="Osnovni primer"> Osnovni primer</label></td><td>300, ZPS 52, vsaj 1 upoštevan del</td><td>248 v bazi in obeh odprtih prikazih.</td></tr><tr><td><label><input type="checkbox" aria-label="Sprememba deleža"> Sprememba deleža</label></td><td>300 → 320; shrani</td><td>268; delez ostane 320.</td></tr><tr><td><label><input type="checkbox" aria-label="Deli stavbe"> Deli stavbe</label></td><td>1 → 2 → 1 upoštevan del</td><td>ZPS ostane 52; pri deležu 320 rezultat ostane 268.</td></tr><tr><td><label><input type="checkbox" aria-label="Zadnji del"> Zadnji del</label></td><td>1 → 0, brez drugega ustreznega ZPS</td><td>Ohrani prejšnjo vrednost; brez uspešnega obvestila.</td></tr><tr><td><label><input type="checkbox" aria-label="Oba vrstna reda"> Oba vrstna reda</label></td><td>Parcela → stavba + del; nato obrnjeno</td><td>Ob zadnjem relevantnem shranjevanju pravilen rezultat.</td></tr><tr><td><label><input type="checkbox" aria-label="Premik"> Premik</label></td><td>Stavbo / parcelo / del prestavi v drug FO oziroma na drugo stavbo</td><td>Preveri vse prizadete parcele obeh FO. Brez ZPS se stara vrednost ohrani.</td></tr><tr><td><label><input type="checkbox" aria-label="Vsak dogodek"> Vsak dogodek</label></td><td>Parcela: vnos, delez, parcela_id, FO, upostevan. Stavba: vnos, brisanje, FO, stavba_id. Del: vnos, brisanje, id_rel_sta, upostevan.</td><td>Vsako spremembo posebej shrani; rezultat primerjaj s starim vedenjem.</td></tr><tr><td><label><input type="checkbox" aria-label="Naknadna povezava"> Naknadna povezava</label></td><td>Dopolni povezavo parcela–stavba</td><td>Zabeleži, kateri dogodek dejansko sproži workflow; sam trigger-podklad nima dogodka na tabeli povezav.</td></tr><tr><td><label><input type="checkbox" aria-label="Robni pogoji"> Robni pogoji</label></td><td>Neupoštevana parcela, NULL delež, brez FO→PEV, brez ZPS</td><td>Primerjaj s spodnjo logiko; ne označi vseh kot preskok.</td></tr><tr><td><label><input type="checkbox" aria-label="Datumi in zgodovina"> Datumi in zgodovina</label></td><td>valid_to = datum_do; valid_to &gt; datum_do; NULL valid_to; več različic</td><td>Enakost sodeluje; &gt; ne. NULL uporabi 2100-01-01. Zadnja različica po datum_sys za isti ključ.</td></tr><tr><td><label><input type="checkbox" aria-label="Neshranjene spremembe"> Neshranjene spremembe</label></td><td>Pred dogodkom spremeni drugo polje in ga ne shrani</td><td>Po osvežitvi ostane vnos; izbor, filter in položaj ostanejo. Preveri več odprtih prikazov.</td></tr><tr><td><label><input type="checkbox" aria-label="Hitre spremembe"> Hitre spremembe</label></td><td>300 → 310 → 320, nato počakaj na zaključek workflowov</td><td>Končno 268; brez poznejšega starejšega rezultata ali zanke.</td></tr><tr><td><label><input type="checkbox" aria-label="Napaka in ponovni poskus"> Napaka in ponovni poskus</label></td><td>Razvijalec nadzorovano povzroči napako ob veljavnih vhodih</td><td>Napaka vidna; ni gumba za ponovni zagon; naslednja relevantna sprememba ponovno sproži izračun.</td></tr><tr><td><label><input type="checkbox" aria-label="Brez dvojnega izvajanja"> Brez dvojnega izvajanja</label></td><td>Po uvedbi sproži nov dogodek in preveri dnevnike</td><td>3 stari prožilci odsotni. Po dogodku en logični preračun; zapis delez_bzps ne sproži rekurzije. SQL rezultati sami tega ne dokazujejo.</td></tr></tbody></table></div></section><section><h2>Pravilna razlaga robnih pogojev</h2><pre>Parcela upostevan ni TRUE → ohrani obstoječo/vneseno vrednost
+Sicer FO nima id_rel_pe → NULL
+Sicer vsota ZPS je NULL → UPDATE: stara vrednost; INSERT: NULL
+Sicer delez je NULL → NULL
+Sicer → največ(delez − vsota ZPS, 0)</pre><p>ZPS = 0 je znana vsota in ni isto kot NULL. Več delov iste stavbe ne množi ZPS, ker podlaga uporablja EXISTS. Podlaga filtrira valid_to ≤ datum_do; ne dodajaj pogoja datum_od ≤ valid_to, ker bi spremenil pravilo.</p><p>Če FO kaže na neobstoječ PEV, podlaga dobi NULL effective_valid_to in ne najde ZPS; neodvisni SELECT ohrani tudi to vedenje. Manjkajoča vrstica PEV ni isto kot obstoječa vrstica z NULL valid_to.</p></section><section><h2>Kaj še zahteva dokaz iz okolja</h2><p>V dnevniku workflowa poišči čas shranjevanja, ID dogodka, prizadeta FO, seq_id_parc, izid (izračun / ohranitev / NULL / preskok / napaka) in zapis rezultata. Imena dnevnikov in njihovih polj niso bila podana; ni jih mogoče zanesljivo ugibati. Za dokaz o prehodu brez prekinitve potrebuješ tudi časovnico uvedbe in dogodke okoli preklopa.</p><p>Odprto za uskladitev: uspešno izračunana ista vrednost ni nujno enako kot ohranitev zaradi manjkajočega ZPS. Kdaj v tem primeru prikazati obvestilo, potrdi s skrbnikom specifikacije. Ne predpostavi, da mora sprememba števila vedno spremljati izveden izračun.</p><p>Za primerjavo starega in novega vedenja uporabi enaka začetna stanja v ločenih testnih izvedbah. Ne poganjaj starega prožilca in novega workflowa hkrati kot dokaz pravilnosti.</p><p><a href="pev-checks.sql" download>Prenesi vse SQL-bloke</a> · Za PDF uporabi tiskanje v brskalniku.</p></section></main><script>document.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{const t=document.getElementById(b.dataset.copy).textContent;try{await navigator.clipboard.writeText(t);b.textContent='Kopirano';}catch(e){const r=document.createRange();r.selectNodeContents(document.getElementById(b.dataset.copy));const s=window.getSelection();s.removeAllRanges();s.addRange(r);b.textContent='SQL izbran — kopiraj s Ctrl/Cmd+C';}}));</script></html>

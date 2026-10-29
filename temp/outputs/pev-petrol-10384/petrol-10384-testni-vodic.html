@@ -1,0 +1,136 @@
+<!doctype html><html lang="sl"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Testiranje PEV 10384 · parcela 1443 95/15</title><style>*{box-sizing:border-box}body{margin:0;background:#edf2f5;color:#1c303d;font:16px/1.55 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:36px 22px}h1{font-size:34px;line-height:1.18;max-width:850px}h2{font-size:24px}h3{font-size:18px}section{padding:25px;margin:22px 0;background:#fff;border-radius:12px}.eyebrow{color:#235777;font-weight:600}.note{padding:14px 18px;border-left:4px solid #a5690a;background:#fff3d8}.good{padding:14px 18px;border-left:4px solid #338354;background:#eaf6ee}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.panel{padding:18px;border:1px solid #b6cbd8;border-radius:7px}.bar{background:#e7eff5;padding:8px 12px}.badge{border-radius:50%;background:#175c86;color:white;display:inline-block;text-align:center;width:29px;margin-right:8px}pre{padding:18px;background:#152d3c;color:#e6f2fa;font:13px/1.6 ui-monospace,monospace;overflow:auto;border-radius:7px}button{background:#175c86;color:white;border:0;border-radius:6px;padding:10px 15px;cursor:pointer}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #dc9b29;outline-offset:3px}a{color:#155e8a}table{width:100%;border-collapse:collapse}th,td{padding:11px 9px;text-align:left;border-bottom:1px solid #d7e2e9;vertical-align:top}.scroll{overflow:auto}.mini{font-size:14px}.flow{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.step{padding:12px 18px;background:#e5eff5;border-radius:7px}label{display:block;margin:12px 0}input[type=number]{padding:10px;width:180px;max-width:100%;font:inherit;border:1px solid #7f9bac;border-radius:5px}output{display:block;font-size:22px;margin-top:15px}details{margin:14px 0}summary{cursor:pointer;color:#175c86;padding:8px 0}nav{display:flex;gap:14px;flex-wrap:wrap}.value{font-family:ui-monospace,monospace;overflow-wrap:anywhere}.check{display:flex;gap:10px;align-items:flex-start}input[type=checkbox]{margin-top:6px;min-width:18px;min-height:18px}@media(max-width:720px){.grid{grid-template-columns:1fr}main{padding:20px 12px}section{padding:17px}h1{font-size:28px}}@media print{button,nav{display:none}body{background:white}pre{white-space:pre-wrap;color:black;background:#f1f1f1}section{break-inside:avoid}.scroll{overflow:visible}}</style><main><header><div class="eyebrow">TEST_NAS_DB · PNB 10384 · NOV VODIČ</div><h1>Najprej dopolni podatke parcele, nato preveri workflow</h1><p>PETROL BS DVOR PRI ŽUŽEMBERKU · parcela <b>1443 95/15</b> · FO <b>297515</b> · zap. št. parcele <b>2789407</b>.</p><div class="note">Ta vodič uporablja tvoj izpis kot začetno stanje. Povezave ZPS in deli stavb še niso preverjeni v bazi. Zato 248/268 za ta primer <b>nista vnaprej pričakovana rezultata</b>. Pričakovano vrednost najprej določiš iz dejanske vsote ZPS.</div><p><a href="petrol-10384-checks.sql" download>Prenesi SQL</a> · <button type="button" id="print">Natisni / shrani PDF</button></p><nav><a href="#start">1. Priprava</a><a href="#inputs">2. Dopolnitev</a><a href="#test">3. Testi</a><a href="#extra">4. Dodatni scenariji</a><a href="#end">5. Zaključek</a></nav></header>
+<section><h2>Tvoja začetna točka</h2><div class="grid"><div><table><tr><th>Podatek</th><th>Vrednost iz tvojega izpisa</th></tr><tr><td>Baza</td><td>test_nas_db</td></tr><tr><td>PEV / PNB</td><td>10384</td></tr><tr><td>seq_id_parc</td><td>2789407</td></tr><tr><td>KN parcela_id</td><td>140979879</td></tr><tr><td>Upoštevan</td><td>true ✓</td></tr><tr><td>delez</td><td>NULL — najprej dopolni</td></tr><tr><td>delez_bzps</td><td>NULL</td></tr><tr><td>PE valid_to</td><td>NULL → za izračun 2100-01-01</td></tr></table></div><div class="panel"><h3>Stavbi v istem FO</h3><p><b>1443-1153</b><br>KN ID 25069184 · zap. št. 998269</p><p><b>1443-1444</b><br>KN ID 31273796 · zap. št. 1003186</p><p>Za vsako potrebujemo dejansko povezavo na parcelo in vsaj en upoštevan del. Kljukica »Upoštevan« na stavbi sama tega ne dokazuje.</p><details><summary>Tehnični identifikatorji</summary><p class="value">PEV: fd222cfc-4ffc-4dea-b799-6c842a0d165c</p><p class="value">FO: bbcf0052-2792-41d2-a2fa-6fc554ad0ebf</p><p class="value">PEV parcela: ab3206c6-b1c2-442b-8da7-841ff4038ab5</p></details></div></div></section>
+<section id="start"><h2>1 · Najprej preveri pogoje, še brez sprememb</h2><div class="flow"><div class="step">pgAdmin → testna povezava</div><span>→</span><div class="step">Databases → test_nas_db</div><span>→</span><div class="step">Desni klik → Query Tool</div></div><p>Prilepi in izvedi posamezen SQL-blok. V »Data Output« preberi rezultat. Ime strežnika primerjaj z nastavitvami testne povezave.</p><h3>A · Potrdi zapis in shrani stanje PREJ</h3><button type="button" data-copy="q0">Kopiraj SQL</button><pre><code id="q0">SELECT current_database() AS baza, inet_server_addr() AS streznik,
+       p.id, p.seq_id_parc, p.parcela_id, p.id_rel_fo,
+       p.upostevan, p.delez, p.delez_bzps, f.id_rel_pe, pe.valid_to,
+       CASE WHEN pe.id IS NOT NULL
+            THEN COALESCE(pe.valid_to, DATE &#x27;2100-01-01&#x27;) END AS datum_za_zps
+FROM public.pev_parcele p
+LEFT JOIN public.pev_fo f ON f.id = p.id_rel_fo
+LEFT JOIN public.pev_posebne_enote pe ON pe.id = f.id_rel_pe
+WHERE p.id = &#x27;ab3206c6-b1c2-442b-8da7-841ff4038ab5&#x27;::uuid;</code></pre><div class="good"><b>Kaj iščeš:</b> Točno 1 vrstica. baza = test_nas_db; seq_id_parc = 2789407; parcela_id = 140979879; FO in PEV UUID kot zgoraj; upostevan = true; delez in delez_bzps sta trenutno NULL. Če se stanje razlikuje, uporabi dejanski začetni posnetek. Izvozi rezultat v CSV.</div><h3>B · Ali imata stavbi upoštevane dele?</h3><button type="button" data-copy="q1">Kopiraj SQL</button><pre><code id="q1">SELECT st.id AS pev_stavba_uuid, st.stavba_id,
+       COUNT(d.id) AS vsi_deli,
+       COUNT(d.id) FILTER (WHERE d.upostevan IS TRUE) AS upostevani_deli
+FROM public.pev_stavbe st
+LEFT JOIN public.pev_deli_stavb d ON d.id_rel_sta = st.id
+WHERE st.id_rel_fo = &#x27;bbcf0052-2792-41d2-a2fa-6fc554ad0ebf&#x27;::uuid
+GROUP BY st.id, st.stavba_id
+ORDER BY st.stavba_id, st.id;
+
+SELECT st.stavba_id, st.id AS pev_stavba_uuid,
+       d.id AS pev_del_uuid, d.upostevan
+FROM public.pev_stavbe st
+JOIN public.pev_deli_stavb d ON d.id_rel_sta = st.id
+WHERE st.id_rel_fo = &#x27;bbcf0052-2792-41d2-a2fa-6fc554ad0ebf&#x27;::uuid
+ORDER BY st.stavba_id, d.id;</code></pre><div class="good"><b>Kaj iščeš:</b> Za sodelujočo stavbo mora biti upostevani_deli ≥ 1. Zabeleži UUID in upoštevanost delov, preden kaj spremeniš. vsi_deli = 0 pomeni, da moraš v aplikaciji dodati ustrezen del stavbe. Drugi SELECT pokaže obstoječe dele.</div><h3>C · Ali parcela sploh ima ustrezen ZPS?</h3><button type="button" data-copy="q2">Kopiraj SQL</button><pre><code id="q2">WITH target AS (
+    SELECT p.id, p.seq_id_parc, p.id_rel_fo, p.parcela_id,
+           p.upostevan, p.delez, p.delez_bzps,
+           f.id_rel_pe AS calc_fo_pe_id,
+           CASE WHEN pe.id IS NOT NULL
+                THEN COALESCE(pe.valid_to, DATE &#x27;2100-01-01&#x27;) END AS datum_za_zps
+    FROM public.pev_parcele p
+    LEFT JOIN public.pev_fo f ON f.id = p.id_rel_fo
+    LEFT JOIN public.pev_posebne_enote pe ON pe.id = f.id_rel_pe
+    WHERE p.id = &#x27;ab3206c6-b1c2-442b-8da7-841ff4038ab5&#x27;::uuid
+), latest AS (
+    SELECT DISTINCT ON (stavba_parcela_id, datum_od, datum_do)
+           stavba_parcela_id, datum_od, datum_do,
+           parcela_id, stavba_id, povrsina_zps
+    FROM public.kn_nep_stavbe_parcele_h
+    ORDER BY stavba_parcela_id, datum_od, datum_do, datum_sys DESC
+), links AS (
+    SELECT p.id AS pev_parcela_uuid, kn.*,
+           p.datum_za_zps &lt;= kn.datum_do AS datum_ustreza,
+           EXISTS (
+               SELECT 1 FROM public.pev_stavbe st
+               WHERE st.id_rel_fo = p.id_rel_fo
+                 AND st.stavba_id = kn.stavba_id
+                 AND EXISTS (
+                     SELECT 1 FROM public.pev_deli_stavb d
+                     WHERE d.id_rel_sta = st.id AND d.upostevan IS TRUE
+                 )
+           ) AS ima_upostevan_del_v_istem_fo
+    FROM target p
+    JOIN latest kn ON kn.parcela_id = p.parcela_id
+)
+SELECT stavba_parcela_id, stavba_id, povrsina_zps, datum_od, datum_do,
+       datum_ustreza, ima_upostevan_del_v_istem_fo,
+       datum_ustreza AND ima_upostevan_del_v_istem_fo AS sodeluje
+FROM links
+ORDER BY stavba_id, stavba_parcela_id, datum_od, datum_do;</code></pre><div class="good"><b>Kaj iščeš:</b> sodeluje = true pomeni: datum ustreza in v istem FO obstaja stavba z upoštevanim delom. povrsina_zps mora biti znana za numerični izračun. 0 vrstic pomeni, da za to KN parcelo ni povezave; NULL/false pomeni, da del pogojev ni izpolnjen. Preglej vse vrstice, ne le dveh pričakovanih stavb.</div><p class="note"><b>Če povezave ni ali je ZPS NULL:</b> sam vnos deleža ne zadostuje. Povezava se bere iz <code>kn_nep_stavbe_parcele_h</code>, ne iz površine parcele 1607. Dopolnitev KN povezav naj izvede skrbnik prek ustaljenega testnega postopka; nato ponovno izvedi C in sproži relevantno shranjevanje. Ta vodič ne izmišljuje INSERT-a v zgodovinsko KN tabelo, ker obvezni stolpci in postopek niso podani.</p><p class="mini">Iz priložene funkcije: datum preverja valid_to ≤ datum_do; dodatnega pogoja na datum_od ni. Za isti (stavba_parcela_id, datum_od, datum_do) vzame zadnjo različico po datum_sys. Različnih veljavnih vrstic ne združuj ročno samo po stavba_id.</p></section>
+<section id="inputs"><h2>2 · Dopolni potrebne atribute v LIFT</h2><p>Odpri isti testni LIFT, ki je povezan na <b>test_nas_db</b>, z vlogo admin PEV. Poišči PNB <b>10384</b> in preveri naziv objekta.</p><div class="grid"><div class="panel"><div class="bar">PEV Parcele (1) → 2789407 → 1443 95/15</div><p><span class="badge">1</span>Odpri urejanje tega zapisa.</p><p><span class="badge">2</span>»Upoštevan« naj bo ✓.</p><p><span class="badge">3</span>Izpolni <b>»Delež površine vključene v PEV«</b> — to je <code>delez</code>.</p><p><span class="badge">4</span>Če obrazec zahteva »Vir podatka delež«, izberi dejanski dogovorjeni testni vir. Vrednosti vira iz podlage ni mogoče določiti.</p><p><span class="badge">5</span>Shrani in počakaj na zaključek workflowa.</p></div><div class="panel"><div class="bar">PEV Stavbe → izbrana stavba → deli stavbe</div><p>Če v koraku B ni upoštevanega dela, odpri ustrezno stavbo <b>1443-1153</b> ali <b>1443-1444</b>.</p><p>Dodaj dejanski ustrezen del oziroma pri obstoječem nastavi <b>Upoštevan ✓</b> in shrani.</p><p>Preveri povezavo dela na pravo stavbo. Dejanski FO dela določa povezana stavba (<code>id_rel_sta</code>).</p><p><b>Ne vpisuj</b> ročno v »Delež površine brez ZPS«. To je rezultat workflowa. »FO upost.« in upoštevanost stavbe sama ne nadomestita upoštevanega dela.</p></div></div><p class="mini">Razpored zgoraj je shematski in uporablja imena polj iz tvojega izpisa. Gumbov in dejanskega razporeda zaslona nisem mogel pregledati.</p><h3>Katero vrednost naj vpišem v delez?</h3><p>Če je vsota ZPS že znana, izberi osnovni delež <b>B = S + 300</b>. Tako dobiš jasen rezultat 300, nato 320, brez omejitve na nič. Če je B neskladen z omejitvami obrazca ali smiselnim deležem te parcele, izberi drug dovoljen delež in pričakovano vrednost izračunaj spodaj.</p><p>Če moraš najprej dodati del, lahko najprej vpišeš dovoljen začasni delež, npr. 300, shraniš in po dopolnitvi delov iz SQL prebereš S. Nato nastaviš končni osnovni delež B. Število 300 je testni vhod, ne dejanski ugotovljeni delež.</p></section>
+<section id="test"><h2>3 · Preveri osnovni izračun na tej parceli</h2><h3>D · Ta SQL izvedi po vsakem shranjevanju</h3><button type="button" data-copy="q3">Kopiraj SQL</button><pre><code id="q3">WITH target AS (
+    SELECT p.id, p.seq_id_parc, p.id_rel_fo, p.parcela_id,
+           p.upostevan, p.delez, p.delez_bzps,
+           f.id_rel_pe AS calc_fo_pe_id,
+           CASE WHEN pe.id IS NOT NULL
+                THEN COALESCE(pe.valid_to, DATE &#x27;2100-01-01&#x27;) END AS datum_za_zps
+    FROM public.pev_parcele p
+    LEFT JOIN public.pev_fo f ON f.id = p.id_rel_fo
+    LEFT JOIN public.pev_posebne_enote pe ON pe.id = f.id_rel_pe
+    WHERE p.id = &#x27;ab3206c6-b1c2-442b-8da7-841ff4038ab5&#x27;::uuid
+), latest AS (
+    SELECT DISTINCT ON (stavba_parcela_id, datum_od, datum_do)
+           stavba_parcela_id, datum_od, datum_do,
+           parcela_id, stavba_id, povrsina_zps
+    FROM public.kn_nep_stavbe_parcele_h
+    ORDER BY stavba_parcela_id, datum_od, datum_do, datum_sys DESC
+), links AS (
+    SELECT p.id AS pev_parcela_uuid, kn.*,
+           p.datum_za_zps &lt;= kn.datum_do AS datum_ustreza,
+           EXISTS (
+               SELECT 1 FROM public.pev_stavbe st
+               WHERE st.id_rel_fo = p.id_rel_fo
+                 AND st.stavba_id = kn.stavba_id
+                 AND EXISTS (
+                     SELECT 1 FROM public.pev_deli_stavb d
+                     WHERE d.id_rel_sta = st.id AND d.upostevan IS TRUE
+                 )
+           ) AS ima_upostevan_del_v_istem_fo
+    FROM target p
+    JOIN latest kn ON kn.parcela_id = p.parcela_id
+), measured AS (
+    SELECT p.*, (
+        SELECT SUM(l.povrsina_zps) FROM links l
+        WHERE l.pev_parcela_uuid = p.id
+          AND l.datum_ustreza IS TRUE
+          AND l.ima_upostevan_del_v_istem_fo IS TRUE
+    ) AS vsota_zps
+    FROM target p
+), expected AS (
+    SELECT m.*,
+           CASE WHEN delez IS NULL THEN NULL::numeric
+                ELSE GREATEST(delez - vsota_zps, 0) END AS numericni_rezultat
+    FROM measured m
+)
+SELECT seq_id_parc, upostevan, delez, delez_bzps AS shranjeno,
+       vsota_zps,
+       CASE WHEN upostevan IS TRUE AND calc_fo_pe_id IS NOT NULL
+                      AND vsota_zps IS NOT NULL
+            THEN numericni_rezultat END AS pricakovano_ob_izracunu,
+       CASE
+         WHEN upostevan IS NOT TRUE
+           THEN &#x27;PRIMERJAJ PREJ: neupostevana parcela ohrani vrednost&#x27;
+         WHEN calc_fo_pe_id IS NULL
+           THEN CASE WHEN delez_bzps IS NULL THEN &#x27;UJEMANJE: NULL brez FO-PEV&#x27;
+                     ELSE &#x27;NAPACNO: pricakovan NULL brez FO-PEV&#x27; END
+         WHEN vsota_zps IS NULL
+           THEN &#x27;PRIMERJAJ PREJ: UPDATE ohrani; INSERT NULL&#x27;
+         WHEN delez_bzps IS NOT DISTINCT FROM numericni_rezultat
+           THEN &#x27;UJEMANJE&#x27;
+         ELSE &#x27;NEUJEMANJE&#x27;
+       END AS kontrola
+FROM expected;</code></pre><div class="good"><b>Kaj iščeš:</b> Pri izpolnjenih pogojih: shranjeno = pricakovano_ob_izracunu in kontrola = UJEMANJE. vsota_zps je S za trenutno stanje. UJEMANJE potrjuje stanje, ne pa tega, da je workflow res tekel enkrat. PRIMERJAJ PREJ zahteva začetni posnetek.</div><div class="panel"><h3>Izračunaj pričakovani rezultat iz svojega SQL</h3><div class="grid"><label>Vsota ZPS S iz SQL (m²)<br><input id="sum" type="number" min="0" step="any" placeholder="Prepiši vsota_zps"></label><label>Izbrani delež B (m²)<br><input id="share" type="number" min="0" step="any" value="300"></label></div><button id="suggest" type="button">Nastavi B = S + 300</button><output id="calc" aria-live="polite">Najprej vpiši znano vsoto ZPS; NULL ni 0.</output><p class="mini">To je lokalni kalkulator pričakovanja. Ne bere baze in ničesar ne shranjuje v LIFT.</p></div><h3>Odpri oba prikaza, potem spremeni B</h3><div class="grid"><div class="panel"><div class="bar">Atributna tabela parcel · 2789407</div><p>Nastavi filter, izberi parcelo in premakni položaj tabele. Zabeleži stanje.</p><p><b>Delež površine brez ZPS = največ(B − S, 0)</b></p></div><div class="panel"><div class="bar">Odprt prikaz atributov iste parcele</div><p>Pusti ga odprtega med shranjevanjem.</p><p><b>Isti rezultat kot v tabeli in bazi</b></p></div></div><ol><li>V LIFT shrani osnovni delež B. Izvedi D; preveri rezultat v obeh odprtih prikazih brez ročne osvežitve.</li><li>Spremeni delež na B + 20 in shrani. Z nespremenjenim S se mora rezultat povečati za 20, če oba izračuna ostaneta nad nič. Pri B = S + 300: 300 → 320.</li><li>Preveri obvestilo s <b>seq_id_parc 2789407</b>. V SQL mora delez ostati točno vrednost, ki si jo vpisal.</li><li>Izbor, filter in položaj tabele morajo ostati ohranjeni.</li></ol></section>
+<section id="extra"><h2>4 · Preostali testi · vsak posebej shrani</h2><p>Pred vsakim testom zabeleži delez, delez_bzps, S in stanje delov. Po testu vrni sestavo v izhodiščno stanje, da naslednji test ne uporablja napačnih predpostavk.</p><div class="scroll"><table><thead><tr><th>✓</th><th>Dejanje na tvojem primeru</th><th>Kaj moraš videti</th></tr></thead><tbody><tr><td><input type="checkbox" aria-label="Več delov iste stavbe"></td><td><b>Več delov iste stavbe</b><br>Na eni sodelujoči stavbi dodaj/vključi drugi ustrezen del.</td><td>S se ne poveča; rezultat ostane enak. Nato izključi enega od dveh: še vedno isto.</td></tr><tr><td><input type="checkbox" aria-label="Zadnji del posamezne stavbe"></td><td><b>Zadnji del posamezne stavbe</b><br>Izključi zadnji upoštevani del ene stavbe.</td><td>Če druga še prispeva znani ZPS, se preračuna z njim. Če ni več nobenega znanega ustreznega ZPS, se stara vrednost ohrani; ne vrne se samodejno na delez.</td></tr><tr><td><input type="checkbox" aria-label="Brez vseh ustreznih delov"></td><td><b>Brez vseh ustreznih delov</b><br>Na obeh stavbah začasno izključi vse upoštevane dele; preveri tudi morebitne druge povezane stavbe.</td><td>Ko vsota_zps postane NULL: delez_bzps ostane kot pred testom. Tudi sprememba delez tedaj ne spremeni delez_bzps. Ni uspešnega obvestila. ZPS = 0 pa je znana vsota, ne NULL.</td></tr><tr><td><input type="checkbox" aria-label="Ponovna vključitev"></td><td><b>Ponovna vključitev</b><br>Ponovno vključi prvotne upoštevane dele.</td><td>D mora pokazati izračun iz trenutnega delez in S. Prvotna stara vrednost ne sme ostati, če se od nove razlikuje.</td></tr><tr><td><input type="checkbox" aria-label="Omejitev na 0"></td><td><b>Omejitev na 0</b><br>Če je S &gt; 0, vnesi dovoljen delez pod S.</td><td>Rezultat 0, nikoli negativen. Za S = 0 negativnega dovoljenega vhoda ne izmišljaj; ta primer potrebuje drug testni podatek.</td></tr><tr><td><input type="checkbox" aria-label="NULL delež"></td><td><b>NULL delež</b><br>Ob znanem S počisti »Delež površine vključene v PEV« in shrani.</td><td>delez_bzps = NULL, brez uspešnega obvestila. Nato vrni B. Če obrazec NULL ne dovoli, naj razvijalec preveri prek podprtega testnega API-ja.</td></tr><tr><td><input type="checkbox" aria-label="Neupoštevana parcela"></td><td><b>Neupoštevana parcela</b><br>Pri znanem rezultatu odkljukaj »Upoštevan« na parceli; nato spremeni delez.</td><td>delez_bzps se ohrani. Ob ponovni vključitvi se izračuna iz aktualnih podatkov. Vneseno stanje upoštevanosti vrni na true.</td></tr><tr><td><input type="checkbox" aria-label="Hitra shranjevanja"></td><td><b>Hitra shranjevanja</b><br>Ob nespremenjenem S shrani B → B + 10 → B + 20.</td><td>Končni rezultat največ(B + 20 − S, 0); starejši workflow ga pozneje ne sme prepisati. Brez zanke.</td></tr><tr><td><input type="checkbox" aria-label="Neshranjeno polje in več prikazov"></td><td><b>Neshranjeno polje in več prikazov</b><br>V odprtem prikazu spremeni drugo urejevalno polje, a ga ne shrani. Iz drugega prikaza spremeni del stavbe.</td><td>Rezultat se sam osveži; neshranjen vnos, izbor, filter in položaj ostanejo. Preveri vse odprte prizadete parcele. Nato neshranjeni testni vnos zavrzi.</td></tr><tr><td><input type="checkbox" aria-label="Premik med FO"></td><td><b>Premik med FO</b><br>Na dogovorjenem drugem testnem FO premakni stavbo; ločeno testiraj premik parcele in dela na drugo stavbo.</td><td>Obravnavana sta izvorni in ciljni FO. Za oba shrani seznam parcel in preveri vse rezultate. Pri premiku parcele spremljaj njen UUID; SQL D jo sledi tudi po premiku. Po testu vrni povezave.</td></tr><tr><td><input type="checkbox" aria-label="Vnos / brisanje / identiteta"></td><td><b>Vnos / brisanje / identiteta</b><br>Na dodatnih testnih zapisih ločeno izvedi vnos/brisanje stavbe in dela, zamenjavo stavba_id, parcela_id ter povezave dela.</td><td>Rezultati po vsakem dogodku kot pri stari funkciji. Brisanje te parcele ni del navedenega parcelnega prožilca; jedrnega zapisa ni treba brisati za dokaz kriterija.</td></tr><tr><td><input type="checkbox" aria-label="Oba vrstna reda"></td><td><b>Oba vrstna reda</b><br>Na dodatnem testnem FO: najprej parcela, nato stavba in del; drugič najprej stavba in del, nato parcela.</td><td>Končni izračun pravilen. Pri vnosu upoštevane parcele brez ZPS je rezultat NULL. En obstoječ zapis ne more dokazati obeh vrstnih redov vnosa.</td></tr><tr><td><input type="checkbox" aria-label="Naknadna KN povezava"></td><td><b>Naknadna KN povezava</b><br>Če je povezava na začetku manjkala, zabeleži dopolnitev in dogodek, ki sproži workflow.</td><td>Pravilen izračun po dogovorjenem dogodku. Stara podlaga nima prožilca na kn_nep_stavbe_parcele_h; samodejni sprožilec zgolj ob dopolnitvi mora potrditi implementacija.</td></tr><tr><td><input type="checkbox" aria-label="Datumi / FO→PEV"></td><td><b>Datumi / FO→PEV</b><br>V izoliranem testnem primeru preveri mejo datum_do, NULL valid_to in manjkajoči FO→PEV.</td><td>valid_to = datum_do sodeluje; &gt; ne. NULL valid_to → 2100-01-01. Brez id_rel_pe upoštevana parcela dobi NULL. Ne spreminjaj veljavnosti PEV 10384, če bi vplivala na druge podatke.</td></tr><tr><td><input type="checkbox" aria-label="Nadzorovana napaka"></td><td><b>Nadzorovana napaka</b><br>Razvijalec ob popolnih podatkih simulira neuspešen izračun v testnem okolju.</td><td>Vidna napaka; brez gumba za ponovni zagon. Naslednja relevantna sprememba po odpravi napake spet sproži izračun. Manjkajoči ZPS ni napaka.</td></tr></tbody></table></div><p class="note">Premiki, novi vnosi, zgodovinski datumi in manjkajoči FO→PEV zahtevajo dodatne nadzorovane testne podatke. Ta ena parcela je dobra za osnovni izračun in večino posodobitev, sama pa ne pokrije vseh kriterijev sprejetja.</p><h3>Seznam vseh parcel FO pred premikom</h3><pre><code id="fo">SELECT id, seq_id_parc, parcela_id, upostevan, delez, delez_bzps
+FROM public.pev_parcele
+WHERE id_rel_fo = 'bbcf0052-2792-41d2-a2fa-6fc554ad0ebf'::uuid
+ORDER BY id;</code></pre><button type="button" data-copy="fo">Kopiraj SQL za izvorni FO</button><p>Za ciljni FO uporabi njegov dejanski UUID; tu ga nimamo. Pred premikom shrani oba seznama in po njem preveri iste UUID-je parcel.</p></section>
+<section id="end"><h2>5 · Preveri samo workflow in zabeleži zaključek</h2><h3>E · Ali so stari računski prožilci odstranjeni?</h3><button type="button" data-copy="q4">Kopiraj SQL</button><pre><code id="q4">SELECT n.nspname AS shema, c.relname AS tabela, t.tgname,
+       t.tgenabled, pg_get_triggerdef(t.oid) AS definicija
+FROM pg_trigger t
+JOIN pg_class c ON c.oid = t.tgrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE NOT t.tgisinternal AND n.nspname = &#x27;public&#x27;
+  AND t.tgname IN (&#x27;tr_pev_parcele_delez_bzps&#x27;,
+                  &#x27;tr_pev_stavbe_delez_bzps&#x27;,
+                  &#x27;tr_pev_deli_stavb_delez_bzps&#x27;);</code></pre><div class="good"><b>Kaj iščeš:</b> Po uvedbi workflowa pričakuj 0 vrstic, ne le onemogočenih prožilcev. Če so prisotni, numerično ujemanje še ne dokazuje workflowa. Njihove odstranitve ne izvajaj na svojo roko v tem vodiču.</div><p>V dnevniku workflowa za čas tvojega shranjevanja poišči dogodek, prizadeti FO in seq_id_parc <b>2789407</b>. Preveri en logični preračun, odsotnost rekurzije po zapisu delez_bzps ter končni rezultat po hitrih spremembah. Imena orodja za dnevnik in njegovih polj niso podana; skrbnik naj pokaže dejansko lokacijo.</p><p>Obvestila ni pri ohranitvi zaradi manjkajočega ZPS, preskoku ali nastavitvi NULL. Če je izračun izveden, a vrne isto številko, uskladi pričakovano obvestilo s skrbnikom: to ni isto kot ohranitev zaradi manjkajočega ZPS.</p><div class="note"><b>Povrnitev prvotnega stanja:</b> vrni povezave, upoštevanost in dele po posnetku PREJ. Tvoj začetni delez in delez_bzps sta NULL. Če brez ZPS samo počistiš delez, se lahko delez_bzps zaradi pravila ohranitve ne počisti. Zato povrnitve ne označi kot uspešne, dokler oba polja v SQL ne ustrezata začetnemu stanju; preostalo povrnitev naj opravi skrbnik po dogovorjenem postopku.</div><h3>Dokaz za vsak test</h3><p>Zabeleži čas, dejanje, stanje PREJ, S, pričakovano vrednost, dejansko vrednost v bazi, oba odprta prikaza, obvestilo in ID izvedbe workflowa. Pričakovan izračun in ohranitev sta različna izida.</p><label class="check"><input type="checkbox"> Osnovni rezultat pravilen v bazi in obeh prikazih</label><label class="check"><input type="checkbox"> Deli iste stavbe ne podvojijo ZPS</label><label class="check"><input type="checkbox"> Robni pogoji in obvestila preverjeni</label><label class="check"><input type="checkbox"> Stanje vmesnika in neshranjeni podatki ohranjeni</label><label class="check"><input type="checkbox"> Workflow brez dvojnega izvajanja ali zastarelega rezultata</label><label class="check"><input type="checkbox"> Podatki povrnjeni in preostali scenariji preverjeni na dodatnih primerih</label><p class="mini">Preverjanje vodiča: SQL primerjan s priloženo funkcijo in sintaktično preverjen s PostgreSQL parserjem. SQL ni bil izveden na test_nas_db. Zasloni so shematski; dostop do aplikacije ni bil na voljo. Datumsko polje 01.01.3000 iz drugega dela obrazca ni samodejno PE valid_to — tvoj SQL za PE kaže NULL.</p></section></main><script>const root=document;root.getElementById('print').addEventListener('click',()=>window.print());root.querySelectorAll('[data-copy]').forEach(b=>b.addEventListener('click',async()=>{const el=root.getElementById(b.dataset.copy);try{await navigator.clipboard.writeText(el.textContent);b.textContent='Kopirano';}catch(e){const r=document.createRange();r.selectNodeContents(el);const s=window.getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Izbrano — kopiraj s Ctrl/Cmd+C';}}));function update(){const s=root.getElementById('sum'),b=root.getElementById('share'),o=root.getElementById('calc');if(s.value.trim()===''||b.value.trim()===''){o.textContent='Najprej vpiši znano vsoto ZPS in delež; NULL ni 0.';return;}const z=Number(s.value),v=Number(b.value);if(!Number.isFinite(z)||!Number.isFinite(v)||z<0||v<0){o.textContent='Vpiši veljavni nenegativni števili.';return;}const f=x=>new Intl.NumberFormat('sl-SI',{maximumFractionDigits:6}).format(x);o.textContent='Pri B = '+f(v)+': '+f(Math.max(v-z,0))+' m². Pri B + 20 = '+f(v+20)+': '+f(Math.max(v+20-z,0))+' m².';}root.getElementById('sum').addEventListener('input',update);root.getElementById('share').addEventListener('input',update);root.getElementById('suggest').addEventListener('click',()=>{const s=root.getElementById('sum');if(s.value.trim()===''||!Number.isFinite(Number(s.value))||Number(s.value)<0){root.getElementById('calc').textContent='Najprej prepiši znano vsoto_zps iz SQL.';return;}root.getElementById('share').value=Number(s.value)+300;update();});</script></html>

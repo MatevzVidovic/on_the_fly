@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Why Razreži loses the connections</title>
+<style>
+:root{color-scheme:light dark;--bg:light-dark(#f6f7fa,#14171d);--fg:light-dark(#202834,#eef1f7);--muted:light-dark(#586578,#aab5c6);--panel:light-dark(#fff,#202630);--line:light-dark(#d9dfe7,#394353);--red:light-dark(#b32635,#ff9aa5);--green:light-dark(#146849,#84d8b3);--accent:light-dark(#244fa3,#a6c4ff)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.45 system-ui,sans-serif}main{max-width:960px;margin:auto;padding:32px 24px}h1{font-size:30px;line-height:1.15;margin:6px 0 12px}p{margin:0 0 18px}.muted{color:var(--muted)}.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}button{font:inherit;padding:9px 15px;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:7px;cursor:pointer}button[aria-pressed=true]{background:var(--accent);color:var(--bg);border-color:var(--accent)}.controls{display:flex;gap:8px;margin:22px 0}.cause{border-left:4px solid var(--red);padding:10px 16px;margin:20px 0;background:var(--panel)}.lanes{display:grid;grid-template-columns:1fr 1fr;gap:28px}.lane-title{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:6px 0 14px}.step{border:1px solid var(--line);border-radius:10px;padding:15px;background:var(--panel);min-height:94px}.step strong{display:block;margin-bottom:5px}.step p{font-size:14px;margin:0;color:var(--muted)}.arrow{text-align:center;color:var(--muted);font-size:14px;padding:8px}.result{color:var(--green);font-weight:650}.broken{border:2px solid var(--red)}.stopped{opacity:.52}.tag{font-size:12px;font-weight:650;color:var(--red)}code{font-size:13px;overflow-wrap:anywhere}.bridge{grid-column:1/-1;text-align:center;padding:10px 0;color:var(--accent)}footer{font-size:13px;color:var(--muted);border-top:1px solid var(--line);padding-top:15px;margin-top:24px}#status{font-size:18px;font-weight:650;margin-top:22px}.good{color:var(--green)}@media(max-width:620px){main{padding:22px 16px}.lanes{grid-template-columns:1fr;gap:16px}h1{font-size:26px}.bridge{grid-column:auto}}
+</style>
+<main>
+<div class="eyebrow">Razreži · območja · staging</div>
+<h1>The split saves. The reconnection never starts.</h1>
+<p>The backend needs to know <b>which original območje to copy connections from.</b><br>That identity is currently carried by a hidden form field: <code>split_group_id</code>.</p>
+<div class="controls" aria-label="Compare split behavior">
+<button id="broken" aria-pressed="true">What happens now</button>
+<button id="working" aria-pressed="false">With source identity preserved</button>
+</div>
+<div class="cause" id="cause"><b>The break: form configuration removes the identity.</b><br>The form-flags migration disables UUID fields. The backend-built form therefore omits <code>split_group_id</code> before you even click Save.</div>
+<div class="lanes">
+<section>
+<div class="lane-title">1 · Browser — standard geometry editor</div>
+<div class="step"><strong>You click Razreži, then Save</strong><p>The browser splits the geometry into two pieces.</p></div>
+<div class="arrow">↓ standard create request</div>
+<div class="step" id="payload"><strong>Create the new območje</strong><p>New geometry + form values<br><code id="field">split_group_id: MISSING</code></p></div>
+<div class="arrow">↓ after create succeeds, standard update request</div>
+<div class="step"><strong>Update the original’s geometry</strong><p class="result">✓ Two območja now exist in the database.</p></div>
+</section>
+<section>
+<div class="lane-title">2 · Backend — triggered by the create request</div>
+<div class="step"><strong>Insert new md_geo_obm row</strong><p>Fires <code>md_geo_obm.after_insert</code>.</p></div>
+<div class="arrow">↓ MdGeoObmInsertEventListener</div>
+<div class="step broken" id="listener"><strong id="guard">Missing identity? Return immediately.</strong><p id="guard-detail">No error is raised. No workflow is started.</p></div>
+<div class="arrow" id="workflow-arrow">✕ no call reaches Temporal</div>
+<div class="step stopped" id="workflow"><strong>GeoObmSplitWorkflow · Temporal</strong><p>Find original → read all its cona links → copy them to the new območje, across model versions.</p></div>
+</section>
+</div>
+<div id="status" role="status" aria-live="polite">Result: 2 območja, but the new one has 0 connections.</div>
+<footer>No območja-specific SFC or custom edit renderer is configured in staging. Geometry saving and backend reconnection are separate steps; only reconnection depends on the missing identity. The second view illustrates the required handoff, not an implemented fix.</footer>
+</main>
+<script>
+const byId=id=>document.getElementById(id);
+function show(working){
+ byId('broken').setAttribute('aria-pressed',String(!working));byId('working').setAttribute('aria-pressed',String(working));
+ byId('cause').innerHTML=working?'<b>Required handoff: preserve the source identity.</b><br>The create operation must tell the backend which original območje this piece came from. It must survive form configuration.':'<b>The break: form configuration removes the identity.</b><br>The form-flags migration disables UUID fields. The backend-built form therefore omits <code>split_group_id</code> before you even click Save.';
+ byId('field').textContent=working?'split_group_id: original’s group ID':'split_group_id: MISSING';
+ byId('listener').classList.toggle('broken',!working);
+ byId('guard').textContent=working?'Source identity present → start workflow':'Missing identity? Return immediately.';
+ byId('guard-detail').textContent=working?'Pass the new row ID and original’s split group ID to Temporal.':'No error is raised. No workflow is started.';
+ byId('workflow-arrow').textContent=working?'↓ start Temporal workflow':'✕ no call reaches Temporal';
+ byId('workflow').classList.toggle('stopped',!working);
+ byId('status').textContent=working?'Result after workflow completes: 2 območja, both with the original’s connections.':'Result: 2 območja, but the new one has 0 connections.';
+ byId('status').classList.toggle('good',working);
+}
+byId('broken').addEventListener('click',()=>show(false));byId('working').addEventListener('click',()=>show(true));
+</script>
+</html>
