@@ -98,7 +98,7 @@ Routing and SQL details: [integration/MV/WAL report](integration_mv_refresh_wal.
   - MVs:
     - `pp_kn_deli_stavb_mv` — **~2.26 GiB** including indexes; UUID regeneration: **YES**.
 - `kn_nep_etaze_x_deli_stavb_h` — `fb72d988-b94d-11ef-bb81-0242ac120008`
-  - [ ] Started
+  - [x] Started
   - [ ] Finished
   - MVs:
     - `pp_kn_deli_stavb_mv` — **~2.26 GiB** including indexes; UUID regeneration: **YES**.
@@ -122,11 +122,11 @@ Routing and SQL details: [integration/MV/WAL report](integration_mv_refresh_wal.
   - MVs: **none configured in the saved routing snapshot**.
 - `kn_nep_ostalo_parcele_x_dejanske_rabe_h` — `8264be70-aafd-11ef-947a-0242ac120008`
   - [x] Started
-  - [ ] Finished
+  - [x] Finished
   - MVs:
     - `pp_kn_parcele_mv` — **~3.82 GiB** including indexes; UUID regeneration: **YES**.
 - `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` — `e0d985ce-a8bb-11ef-ac18-0242ac120008`
-  - [ ] Started
+  - [x] Started
   - [ ] Finished
   - MVs:
     - `pp_kn_parcele_mv` — **~3.82 GiB** including indexes; UUID regeneration: **YES**.
@@ -149,7 +149,7 @@ Routing and SQL details: [integration/MV/WAL report](integration_mv_refresh_wal.
     - `pp_kn_deli_stavb_mv` — **~2.26 GiB** including indexes; UUID regeneration: **YES**.
 - `kn_nep_rpe_naselja_h` — `403dee5c-d34f-11ef-a441-0242ac120008`
   - [x] Started
-  - [ ] Finished
+  - [x] Finished
   - MVs:
     - `kn_nep_naslovi_view` — **~0.19 GiB** including indexes; UUID regeneration: **NO**.
 - `kn_nep_rpe_obcine_h` — `6460237c-f34d-11ef-91f1-02420a0001ec`
@@ -188,7 +188,7 @@ Routing and SQL details: [integration/MV/WAL report](integration_mv_refresh_wal.
     - `pp_kn_deli_stavb_mv` — **~2.26 GiB** including indexes; UUID regeneration: **YES**.
 - `kn_nep_stavbe_zps_h` — `969f1312-ff45-11ef-8df0-0242ac120008`
   - [x] Started
-  - [ ] Finished
+  - [x] Finished
   - MVs:
     - `kn_nep_deli_stavb_stavbe` — **~3.08 GiB** including indexes; UUID regeneration: **YES**.
     - `pp_kn_deli_stavb_mv` — **~2.26 GiB** including indexes; UUID regeneration: **YES**.
