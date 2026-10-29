@@ -10,51 +10,53 @@ Scope: 12 EV and 19 regular KN delta integrations, plus the separately repaired 
 
 This table follows the active FMP `attribute_table_sources` registry: base table → `sql_related_table` owner → its `sql_view` name. It is the direct configured refresh routing, not just a list of SQL dependencies. `YES` means the current stored MV query contains `uuid_generate_v4()`. A dash means no direct MV route was found for that integration; it does not mean there can be no independent manual refresh or other application hook.
 
-| Integration / source table | Integration UUID | Materialized view | is_the_uuid_regen_one |
-|---|---|---|:---:|
-| `ev_del_stavbe_enota_h_2025_danes` | `726fc9e4-b684-11f1-b953-02420a00027f` | `kn_nep_deli_stavb_stavbe` | YES |
-| `ev_del_stavbe_enota_h_2025_danes` | `726fc9e4-b684-11f1-b953-02420a00027f` | `pp_kn_deli_stavb_mv` | YES |
-| `ev_del_stavbe_h` | `b867296c-ab2a-11f0-a252-169cd02558fe` | — (none configured) | — |
-| `ev_dst_pripis_podatki_h` | `ebe9dc2a-9356-11f1-a711-02420a000208` | — (none configured) | — |
-| `ev_parc_del_h` | `8a9ed9a4-ae58-11f0-9f8c-169cd02558fe` | — (none configured) | — |
-| `ev_parcela_h` | `c469d91a-ae56-11f0-84be-169cd02558fe` | — (none configured) | — |
-| `ev_parc_enota_h_2025_danes` | `1e57d002-f69c-11f0-9f2c-02420a000266` | `kn_nep_parcele` | NO |
-| `ev_parc_pripis_podatki_h` | `5b3da3c2-9357-11f1-a60a-02420a000208` | — (none configured) | — |
-| `ev_pe_dst_h` | `f5519202-ae65-11f0-adb7-169cd02558fe` | — (none configured) | — |
-| `ev_pe_parc_h` | `26856cbc-ae67-11f0-8b08-169cd02558fe` | — (none configured) | — |
-| `ev_posebna_enota_h` | `a75bfb06-ae69-11f0-941e-169cd02558fe` | — (none configured) | — |
-| `ev_prostor_h` | `3d6e03ec-ae6e-11f0-bc34-169cd02558fe` | — (none configured) | — |
-| `ev_stavba_h` | `39aa410c-beff-11f0-a601-5212cffe39ac` | — (none configured) | — |
-| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `kn_nep_deli_stavb_a` | YES |
-| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES |
-| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_etaze_h` | `550a20ee-9d03-11ef-8c7b-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_etaze_x_deli_stavb_h` | `fb72d988-b94d-11ef-bb81-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_hisne_stevilke_h` | `736ac43c-b60b-11ef-a0fc-0242ac120008` | `kn_nep_naslovi_view` | NO |
-| `kn_nep_katastrske_obcine_h` | `f6c3a090-8638-11ef-8275-0242ac120007` | `kn_nep_katastrske_obcine_a` | YES |
-| `kn_nep_ostalo_dejanske_rabe_parcel_h` | `e0c4ee44-f34c-11ef-9c8f-02420a0001ec` | — (none configured) | — |
-| `kn_nep_ostalo_gozdno_gosp_obm` | `a99024c6-a8aa-11ef-adaf-0242ac120008` | — (none configured) | — |
-| `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | `8264be70-aafd-11ef-947a-0242ac120008` | `pp_kn_parcele_mv` | YES |
-| `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | `e0d985ce-a8bb-11ef-ac18-0242ac120008` | `pp_kn_parcele_mv` | YES |
-| `kn_nep_ostalo_parcele_x_namenske_rabe_h` | `8b9adbea-a59f-11ef-a7dc-0242ac120008` | `pp_kn_parcele_mv` | YES |
-| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `kn_nep_parcele` | NO |
-| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `kn_nep_parcele_a` | YES |
-| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `pp_kn_parcele_mv` | YES |
-| `kn_nep_prostori_h` | `5b16f1a0-a592-11ef-9316-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_rpe_naselja_h` | `403dee5c-d34f-11ef-a441-0242ac120008` | `kn_nep_naslovi_view` | NO |
-| `kn_nep_rpe_obcine_h` | `6460237c-f34d-11ef-91f1-02420a0001ec` | — (none configured) | — |
-| `kn_nep_rpe_ulice_h` | `d1d4521c-bc79-11ef-89e9-0242ac120008` | `kn_nep_naslovi_view` | NO |
-| `kn_nep_stanovanja_h` | `04f9f57a-a1b3-11ef-adba-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES |
-| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `kn_nep_stavbe_obrisi_a` | YES |
-| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `kn_nep_deli_stavb_stavbe` | YES |
-| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `kn_nep_stavbe_obrisi_a` | YES |
-| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_stavbe_parcele_h` | `a33e8606-a8c0-11ef-84ad-0242ac120008` | `kn_nep_stavbe_parcele_a` | YES |
-| `kn_nep_stavbe_parcele_h` | `a33e8606-a8c0-11ef-84ad-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
-| `kn_nep_stavbe_zps_h` | `969f1312-ff45-11ef-8df0-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES |
-| `kn_nep_stavbe_zps_h` | `969f1312-ff45-11ef-8df0-0242ac120008` | `pp_kn_deli_stavb_mv` | YES |
+| Integration / source table | Integration UUID | Materialized view | is_the_uuid_regen_one | MV size estimate (GiB) | WAL planning estimate per refresh (GiB) |
+|---|---|---|:---:|---:|---|
+| `ev_del_stavbe_enota_h_2025_danes` | `726fc9e4-b684-11f1-b953-02420a00027f` | `kn_nep_deli_stavb_stavbe` | YES | 3.081 | ~15.41 (5× scenario; can be higher) |
+| `ev_del_stavbe_enota_h_2025_danes` | `726fc9e4-b684-11f1-b953-02420a00027f` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `ev_del_stavbe_h` | `b867296c-ab2a-11f0-a252-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_dst_pripis_podatki_h` | `ebe9dc2a-9356-11f1-a711-02420a000208` | — (none configured) | — | — | — (no direct MV) |
+| `ev_parc_del_h` | `8a9ed9a4-ae58-11f0-9f8c-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_parcela_h` | `c469d91a-ae56-11f0-84be-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_parc_enota_h_2025_danes` | `1e57d002-f69c-11f0-9f2c-02420a000266` | `kn_nep_parcele` | NO | 2.750 | Delta-dependent; small if unchanged; unmeasured |
+| `ev_parc_pripis_podatki_h` | `5b3da3c2-9357-11f1-a60a-02420a000208` | — (none configured) | — | — | — (no direct MV) |
+| `ev_pe_dst_h` | `f5519202-ae65-11f0-adb7-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_pe_parc_h` | `26856cbc-ae67-11f0-8b08-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_posebna_enota_h` | `a75bfb06-ae69-11f0-941e-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_prostor_h` | `3d6e03ec-ae6e-11f0-bc34-169cd02558fe` | — (none configured) | — | — | — (no direct MV) |
+| `ev_stavba_h` | `39aa410c-beff-11f0-a601-5212cffe39ac` | — (none configured) | — | — | — (no direct MV) |
+| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `kn_nep_deli_stavb_a` | YES | 0.843 | ~4.22 (5× scenario; can be higher) |
+| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES | 3.081 | ~15.41 (5× scenario; can be higher) |
+| `kn_nep_deli_stavb_h` | `bfe62b52-9aaf-11ef-9c54-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_etaze_h` | `550a20ee-9d03-11ef-8c7b-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_etaze_x_deli_stavb_h` | `fb72d988-b94d-11ef-bb81-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_hisne_stevilke_h` | `736ac43c-b60b-11ef-a0fc-0242ac120008` | `kn_nep_naslovi_view` | NO | 0.187 | Delta-dependent; small if unchanged; unmeasured |
+| `kn_nep_katastrske_obcine_h` | `f6c3a090-8638-11ef-8275-0242ac120007` | `kn_nep_katastrske_obcine_a` | YES | 0.038 | ~0.19 (5× scenario; can be higher) |
+| `kn_nep_ostalo_dejanske_rabe_parcel_h` | `e0c4ee44-f34c-11ef-9c8f-02420a0001ec` | — (none configured) | — | — | — (no direct MV) |
+| `kn_nep_ostalo_gozdno_gosp_obm` | `a99024c6-a8aa-11ef-adaf-0242ac120008` | — (none configured) | — | — | — (no direct MV) |
+| `kn_nep_ostalo_parcele_x_dejanske_rabe_h` | `8264be70-aafd-11ef-947a-0242ac120008` | `pp_kn_parcele_mv` | YES | 1.619 | Unestimated: near-empty heap, large existing indexes |
+| `kn_nep_ostalo_parcele_x_gozdno_gosp_obm_h` | `e0d985ce-a8bb-11ef-ac18-0242ac120008` | `pp_kn_parcele_mv` | YES | 1.619 | Unestimated: near-empty heap, large existing indexes |
+| `kn_nep_ostalo_parcele_x_namenske_rabe_h` | `8b9adbea-a59f-11ef-a7dc-0242ac120008` | `pp_kn_parcele_mv` | YES | 1.619 | Unestimated: near-empty heap, large existing indexes |
+| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `kn_nep_parcele` | NO | 2.750 | Delta-dependent; small if unchanged; unmeasured |
+| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `kn_nep_parcele_a` | YES | 6.076 | ~30.38 (5× scenario; can be higher) |
+| `kn_nep_parcele_h` | `4f44b04c-a7e5-11ef-b133-0242ac120008` | `pp_kn_parcele_mv` | YES | 1.619 | Unestimated: near-empty heap, large existing indexes |
+| `kn_nep_prostori_h` | `5b16f1a0-a592-11ef-9316-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_rpe_naselja_h` | `403dee5c-d34f-11ef-a441-0242ac120008` | `kn_nep_naslovi_view` | NO | 0.187 | Delta-dependent; small if unchanged; unmeasured |
+| `kn_nep_rpe_obcine_h` | `6460237c-f34d-11ef-91f1-02420a0001ec` | — (none configured) | — | — | — (no direct MV) |
+| `kn_nep_rpe_ulice_h` | `d1d4521c-bc79-11ef-89e9-0242ac120008` | `kn_nep_naslovi_view` | NO | 0.187 | Delta-dependent; small if unchanged; unmeasured |
+| `kn_nep_stanovanja_h` | `04f9f57a-a1b3-11ef-adba-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES | 3.081 | ~15.41 (5× scenario; can be higher) |
+| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `kn_nep_stavbe_obrisi_a` | YES | 1.307 | ~6.53 (5× scenario; can be higher) |
+| `kn_nep_stavbe_centroidi_h` | `45293dec-bd13-11ef-bde9-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `kn_nep_deli_stavb_stavbe` | YES | 3.081 | ~15.41 (5× scenario; can be higher) |
+| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `kn_nep_stavbe_obrisi_a` | YES | 1.307 | ~6.53 (5× scenario; can be higher) |
+| `kn_nep_stavbe_obrisi_h` | `e54577ee-f9b0-11ef-bd51-02420a0001ec` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_stavbe_parcele_h` | `a33e8606-a8c0-11ef-84ad-0242ac120008` | `kn_nep_stavbe_parcele_a` | YES | 1.434 | ~7.17 (5× scenario; can be higher) |
+| `kn_nep_stavbe_parcele_h` | `a33e8606-a8c0-11ef-84ad-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+| `kn_nep_stavbe_zps_h` | `969f1312-ff45-11ef-8df0-0242ac120008` | `kn_nep_deli_stavb_stavbe` | YES | 3.081 | ~15.41 (5× scenario; can be higher) |
+| `kn_nep_stavbe_zps_h` | `969f1312-ff45-11ef-8df0-0242ac120008` | `pp_kn_deli_stavb_mv` | YES | 2.262 | ~11.31 (5× scenario; can be higher) |
+
+**Reading the size/WAL columns:** MV size is the catalogue physical footprint (heap/TOAST plus indexes), in GiB, at the saved production snapshot. It includes bloat/free space and is not a measurement of the next result size. WAL numbers are a **5× physical-size planning scenario** for the UUID-regenerating/full-churn views, informed only by the user's observation of >5× amplification in previous operations. They are not calibrated per-MV predictions, lower bounds, upper bounds or a recommended capacity limit; the actual WAL may exceed them. This explicit scenario replaces no missing measurement. For stable-ID concurrent refreshes, changed-row count is unknown, so no numerical WAL prediction is asserted. The two PP views have near-empty heaps but large existing indexes; multiplying that misleading footprint would not estimate their next populated refresh. Repeated entries are the same MV requested by different integrations: count once per actual refresh execution, not once per unique view name. Repeated refreshes, failed attempts, regular integration writes and other database traffic add further WAL.
 
 The large `kn_nep_parcele_h` integration requests `kn_nep_parcele`, `kn_nep_parcele_a`, and `pp_kn_parcele_mv`. The medium `kn_nep_deli_stavb_h` integration requests `kn_nep_deli_stavb_a`, `kn_nep_deli_stavb_stavbe`, and `pp_kn_deli_stavb_mv`.
 
@@ -999,3 +1001,107 @@ To attribute this incident, obtain the exact measured path/host, Barman version/
 These are the freshly requested read-only recounts after normal LIFT integrations. They verify count parity, not equality of all keys or values, and do not establish that every MV refresh succeeded. Raw files: `kn_deli_after_lift_counts.json`, `kn_parcele_after_lift_counts.json`.
 
 Evidence: `integration_mv_refresh_map.json` (active metadata routes, current SQL and unique indexes), `mv_wal_inventory.json` (catalogue dependency/size snapshot), `mv_refresh_wal_stats.json` (historical WAL statistics unavailable). These files capture different short read-only snapshots, not one cross-database atomic snapshot.
+
+## Observed Parcele WAL incident — 2026-10-28
+
+The user's log is now supplemented by a read-only inspection of `6118/simple_wal_lab/full.sqlite` and current PostgreSQL catalogues. No refreshes, cancellations or configuration changes were executed by this investigation.
+
+### Which Parcele object regenerates UUIDs?
+
+| Object | Type | Current physical size including indexes | Random UUID in query? |
+|---|---|---:|:---:|
+| `kn_nep_parcele_h` | Integration target table | 4.784 GiB | Not an MV |
+| `kn_nep_parcele` | MV | 2.750 GiB | No |
+| `kn_nep_parcele_a` | MV | 6.104 GiB | **Yes** |
+| `pp_kn_parcele_mv` | MV | 3.822 GiB | **Yes** |
+
+The normal Parcele integration has configured routes to all three MVs. Therefore a stable-ID definition in `kn_nep_parcele` does not imply a low-churn integration/MV workflow. The PP view's size changed substantially from the earlier snapshot, which had a near-empty heap and large indexes; the old physical size was not a trustworthy forecast of its regenerated result.
+
+### What the tracker actually measured
+
+- The configured tracker relation is **`public.kn_nep_rpe_obcine_h`**, not Parcele or its MVs. This explains the constant **123.0 MiB** display. `db_tracker.py` uses `pg_total_relation_size(TARGET_TABLE)` only for that table-size column.
+- `WAL generated` is the **cluster-wide insert-LSN change since that tracker process started**, not WAL attributed to the named table or one MV. The process restart correctly reset that displayed baseline to zero; it did not reset PostgreSQL WAL or Barman retention.
+- The original logged cumulative total reached about **126.2 GiB** before the tracker was interrupted. That includes work before the first pasted line and possibly concurrent work, so do not label it as a completed per-MV WAL measurement.
+- `Barman retained` is the primary's required LSN span from slot `restart_lsn`, not disk consumed by Barman's processed WAL archive. The unknown `WAL disk` column means the tracker lacked `pg_ls_waldir` permission; it does not mean no primary disk was used.
+
+### Measured rates from matching tracker endpoints
+
+From **21:05:28.603039 UTC** to **21:11:15.359699 UTC** (346.757 seconds):
+
+| Quantity | Observed change/rate |
+|---|---:|
+| New cluster WAL by insert LSN | 39,464.1 MiB = 38.54 GiB |
+| Average generation | **113.81 MiB/s** |
+| Increase in slot-retained LSN span | 32,636.1 MiB = 31.87 GiB |
+| Implied slot `restart_lsn` advancement | **19.69 MiB/s** |
+| Net backlog growth | **94.12 MiB/s**, about **5.52 GiB/minute** |
+
+The inferred slot advancement is not a direct measurement of Barman archive/compression throughput. It does show that the required retained range was growing far faster than the slot could advance. Stopping the producer should allow draining, but does not remove already generated WAL. Approximately 65 GiB at 20 MiB/s would take about 55 minutes **only if new WAL were negligible and that advancement rate held**. With continued 15 MiB/s generation and only 20 MiB/s advancement, the net 5 MiB/s drain would take roughly 3.7 hours. These are arithmetic scenarios, not completion guarantees.
+
+### Checkpoint/FPI evidence
+
+Across the captured **21:05:28–21:16:59 UTC** interval, requested checkpoints increased **408 → 484** (**76**) while timed checkpoints stayed **333 → 333**; reset timestamps were unchanged. The inspected settings were `max_wal_size=1 GiB`, `checkpoint_timeout=5 minutes`, `full_page_writes=on`, and `wal_compression=off`.
+
+This is strong evidence of checkpoint pressure. The requested count alone does not distinguish WAL-volume-triggered checkpoints from manually requested checkpoints. At the observed WAL rate a 1 GiB checkpoint threshold is quickly consumed. PostgreSQL documents that smaller checkpoint intervals increase repeated full-page-image WAL. Investigate checkpoint logs and tune capacity/intervals rather than treating `max_wal_size` as a retained-WAL disk cap. [PostgreSQL WAL configuration](https://www.postgresql.org/docs/15/wal-configuration.html).
+
+An important measurement caveat: at **21:11:15.359699**, `pg_stat_wal.wal_bytes` jumped by about **80.15 GiB** while insert LSN advanced only about **3 MiB** during that individual sample interval. Statistics were catching up when a long-running backend became idle, not proving an 80 GiB one-second WAL burst. The cumulative `wal_fpi` statistics also increased substantially, but cannot be naively aligned to this narrow LSN window or multiplied by 8192 to claim exact FPI bytes. Use insert-LSN changes for immediate generation rates and respect delayed statistics flushes. [PostgreSQL statistics timing](https://www.postgresql.org/docs/15/monitoring-stats.html#MONITORING-STATS-VIEWS).
+
+### What can and cannot be concluded
+
+The combination of **two full-churn UUID MVs**, **frequent requested checkpoints with uncompressed FPIs**, and **production far above observed slot advancement** is consistent with the disk-pressure event. The supplied logs do not assign percentages of the WAL to those mechanisms or isolate one MV from other cluster writes. The connected diagnostic account does not have `pg_read_all_stats`, so an empty visible active-query result is **not proof that all other users' refreshes stopped**.
+
+Before another bulk integration/refresh: allow the backlog to drain, identify the actual receiver/archive bottleneck, remove random-ID churn through a reviewed stable-ID migration, consolidate repeated MV refresh requests, and assess checkpoint/WAL compression settings with the DBA using measured disk and recovery requirements. The first stable-ID migration itself requires capacity and can produce substantial WAL. No automatic deletion of WAL, slot dropping, or unreviewed configuration changes were performed or suggested as a shortcut.
+
+Raw evidence: `parcele_wal_active_check.json`, `parcele_wal_tracker_endpoints.json`; full per-second samples remain in the existing local `simple_wal_lab/full.sqlite` recording.
+
+### Workflow timing supplied afterward
+
+The user associated the large WAL burst with the **third refresh activity** and supplied workflow `SyncMaterializedView-18de0df0-a5ab-11ef-89f8-0242ac120008`, run `2318d63e-2d08-4225-9386-91ba65239bff`. That source-table UUID maps to `kn_nep_parcele_h`. It started at 2026-10-28 20:47:09.30 UTC and was displayed as running at about 21:19:52 UTC. The supplied workflow-level input does not identify the third activity's MV. The three names in the mapping table are not a verified Temporal execution order; activity input is needed before assigning the burst to one view.
+
+A subsequent read-only `pg_locks` check found no sessions holding relation locks on any of `kn_nep_parcele`, `kn_nep_parcele_a`, or `pp_kn_parcele_mv` at that instant in the checked database. This is distinct from the activity-state visibility limitation: lock rows are the relevant evidence here. A Temporal workflow can remain running while an activity is queued/retrying or awaiting completion/reporting, so its running status alone is not proof of a currently executing REFRESH. Saved lock snapshot: `parcele_mv_current_locks.json`.
+
+### Confirmed refresh order from the supplied Temporal event history
+
+The user subsequently supplied workflow events 1–32 for run `2318d63e-2d08-4225-9386-91ba65239bff`. Event 16 resolves the exact order, and the scheduled/completed activity events confirm:
+
+| Order | MV | UTC start / scheduling time | UTC completion | Recorded duration | Random UUID |
+|---:|---|---|---|---|:---:|
+| 1 | `kn_nep_parcele` | Started 20:47:39.568776 (event 21) | 20:51:58.103888 (event 22) | 4m 18.535s | No |
+| 2 | `pp_kn_parcele_mv` | Started 20:51:58.127984 (event 27) | 20:55:38.073048 (event 28) | 3m 39.945s | Yes |
+| 3 | **`kn_nep_parcele_a`** | **Scheduled 20:55:38.726720 (event 32)** | Not present in supplied history | Unknown | **Yes** |
+
+Event 32's input is explicitly `kn_nep_parcele_a`. This resolves the identity of the user's third refresh and makes that UUID-regenerating MV the main candidate for the reported large burst. Its stored definition selects `uuid_generate_v4() AS id` and it has a unique index on `id`, so complete-row identity changes at every refresh.
+
+The captured **21:05–21:11 UTC WAL burst occurs after the second refresh's recorded completion and after scheduling the third**. This is strong timing correlation, but not per-statement WAL attribution across the cluster. The supplied history ends with the third activity **scheduled**: it contains no third-activity started or completed event. Consequently its exact actual execution duration and current DB state are not established by this excerpt. Lack of a started event in an incomplete running-workflow history is not, by itself, proof that database execution never started. No retry of the third refresh is shown; its policy limits attempts to one.
+
+### Important feedback effect: a low checkpoint threshold can increase generated WAL
+
+The inspected settings trigger an automatic checkpoint when **5 minutes pass (`checkpoint_timeout=300s`) or WAL volume approaches `max_wal_size=1 GiB`, whichever comes first**. This is PostgreSQL's documented checkpoint policy, not a hard 1 GiB limit on WAL disk use. [PostgreSQL 15 WAL configuration](https://www.postgresql.org/docs/15/wal-configuration.html).
+
+At the measured **113.81 MiB/s**, generating 1 GiB takes about **9 seconds**. The observed **76 requested checkpoints across roughly 11.5 minutes** averages about one every 9 seconds, consistent with strong WAL-volume pressure. This is an average over the captured interval, not a fixed schedule or proof of the trigger of each request; the counter also includes manual checkpoint requests.
+
+**The low threshold can make the WAL problem worse:**
+
+```text
+Heavy row/index churn
+    → WAL reaches the small checkpoint threshold quickly
+    → more frequent checkpoints
+    → pages modified again after a checkpoint need new full-page images
+    → additional WAL, which contributes to reaching the next threshold
+```
+
+This amplification applies when heap/index pages are revisited across checkpoints; it does not mean every row change always writes an entire page, or that increasing the threshold eliminates ordinary row/index WAL. `full_page_writes=on` and `wal_compression=off` make this mechanism especially relevant in the inspected setup. PostgreSQL explicitly documents that shorter checkpoint intervals can increase WAL volume. [PostgreSQL checkpoint/FPI explanation](https://www.postgresql.org/docs/15/wal-configuration.html).
+
+**Barman retention is separate.** A checkpoint writes dirty database pages to storage; it does not normally wait for Barman to consume its WAL. A lagging replication slot can retain WAL even after a checkpoint has completed. Thus there are two simultaneous effects: frequent checkpoints can increase **generation**, while Barman lag increases **retention**. [Replication-slot retention](https://www.postgresql.org/docs/15/warm-standby.html#STREAMING-REPLICATION-SLOTS).
+
+Increasing `max_wal_size` is therefore a concrete tuning candidate for reducing repeated checkpoint/FPI work, **not** a way to cap or clear the Barman backlog. Selecting a value requires available disk headroom, checkpoint logs, actual generation/FPI measurements and acceptable crash-recovery time. It permits more WAL between checkpoints and will not make an undersized receiver faster. No setting was changed in this investigation.
+
+
+
+## Refresh mode audit — 29 October 2026
+
+A fresh read-only metadata export covers 32 scoped integrations. All 10 resolved MVs use the Temporal `SyncMaterializedViewActivity` path, whose line 82 unconditionally executes `REFRESH MATERIALIZED VIEW CONCURRENTLY %s`. There is no ordinary-refresh fallback in that activity. Eight of these ten MV definitions contain `uuid_generate_v4()`.
+
+FMP also has a separate generic `gms.materialized_view.refresh` infrastructure event: its facade (line 37) executes ordinary `REFRESH MATERIALIZED VIEW`. Thus the integration path is concurrent; not every refresh path in FMP is concurrent. This is code/metadata verification, not verification of the deployed revision or every historical SQL execution.
+
+Presentation: [WAL and Barman](wal_barman_presentation.html). Source scan: [refresh code paths](mv_refresh_code_paths.json).

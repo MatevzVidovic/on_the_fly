@@ -1,0 +1,54 @@
+{
+  "at": "2026-10-28T21:17:31.025436+00:00",
+  "active": [],
+  "relations": [
+    {
+      "relname": "kn_nep_parcele",
+      "relkind": "m",
+      "table_bytes": 2327666688,
+      "index_bytes": 625106944,
+      "total_bytes": 2952773632,
+      "random_uuid": false
+    },
+    {
+      "relname": "kn_nep_parcele_a",
+      "relkind": "m",
+      "table_bytes": 4890697728,
+      "index_bytes": 1663598592,
+      "total_bytes": 6554296320,
+      "random_uuid": true
+    },
+    {
+      "relname": "kn_nep_parcele_h",
+      "relkind": "r",
+      "table_bytes": 3757539328,
+      "index_bytes": 1378787328,
+      "total_bytes": 5136326656,
+      "random_uuid": null
+    },
+    {
+      "relname": "pp_kn_parcele_mv",
+      "relkind": "m",
+      "table_bytes": 2180169728,
+      "index_bytes": 1923407872,
+      "total_bytes": 4103577600,
+      "random_uuid": true
+    }
+  ],
+  "slot": [
+    {
+      "slot_name": "barman",
+      "active": true,
+      "restart_lsn": "140B/AA000000",
+      "retained_bytes": 64613670176
+    }
+  ],
+  "wal_stats": [
+    {
+      "wal_records": 281335096,
+      "wal_fpi": 30087327,
+      "wal_bytes": "283038123562",
+      "stats_reset": "2026-10-27 15:04:27.373021+00:00"
+    }
+  ]
+}

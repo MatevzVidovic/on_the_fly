@@ -1,0 +1,20 @@
+[
+  {
+    "path": "/Users/matevzvidovic/on_the_fly/symlinks/fmp/app/_Company/Triglav/Services/Util/DamageSynchronizationUtilityService.php",
+    "line": 93,
+    "sql": "'sql' => \"REFRESH MATERIALIZED VIEW CONCURRENTLY $refreshableView;\",",
+    "concurrently": true
+  },
+  {
+    "path": "/Users/matevzvidovic/on_the_fly/symlinks/fmp/app/_AttributeTables/Services/Activities/SyncMaterializedViewActivity.php",
+    "line": 82,
+    "sql": "$this->attributeDataQB->execRaw(sprintf('REFRESH MATERIALIZED VIEW CONCURRENTLY %s', $viewName));",
+    "concurrently": true
+  },
+  {
+    "path": "/Users/matevzvidovic/on_the_fly/symlinks/fmp/app/_Infrastructure/Services/Facade/RefreshMaterializedViewFacadeService.php",
+    "line": 37,
+    "sql": "$this->attributeDataQB->execRaw(sprintf('REFRESH MATERIALIZED VIEW %s', $viewName));",
+    "concurrently": false
+  }
+]
