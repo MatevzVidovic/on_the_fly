@@ -1,0 +1,29 @@
+{
+  "started_at": "2026-10-29T09:11:12.192616+00:00",
+  "env_file": ".env",
+  "difference": "Oracle minus LIFT",
+  "excluded_tables": [
+    "kn_nep_ostalo_namenske_rabe"
+  ],
+  "tables": [
+    {
+      "table": "kn_nep_ostalo_dejanske_rabe_parcel_h",
+      "integration_id": "e0c4ee44-f34c-11ef-9c8f-02420a0001ec",
+      "cutoff": "2026-10-28 11:24:19.000000",
+      "source_date": "DATUM_SYS_UTC",
+      "target_date": "datum_sys_utc",
+      "time_basis": "UTC",
+      "oracle_total": 29745559,
+      "lift_total": 29745559,
+      "oracle_eligible": 29745429,
+      "lift_eligible": 29745429,
+      "oracle_seconds": 39.895,
+      "lift_seconds": 16.673,
+      "total_gap": 0,
+      "cutoff_gap": 0,
+      "counts_match": true,
+      "cutoff_counts_match": true
+    }
+  ],
+  "finished_at": "2026-10-29T09:12:09.303311+00:00"
+}
